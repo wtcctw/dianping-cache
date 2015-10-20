@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:p="http://www.springframework.org/schema/p" xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:tx="http://www.springframework.org/schema/tx" xmlns:aop="http://www.springframework.org/schema/aop"
+    xsi:schemaLocation="
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.2.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.2.xsd
+		http://www.springframework.org/schema/aop  http://www.springframework.org/schema/aop/spring-aop-3.2.xsd ">
+
+    <bean id="cacheConfigurationService" class="com.dianping.cache.service.impl.CacheConfigurationServiceImpl">
+        <property name="configurationDao" ref="cacheConfigurationDao" />
+        <property name="cacheKeyConfigurationService" ref="cacheKeyConfigurationService" />
+        <property name="serverGroupService" ref="serverGroupService" />
+        <property name="cacheMessageProducer" ref="notifyMessageProducer" />
+        <property name="smsMessageSender" ref="smsMessageSender" />
+        <property name="operationLogService" ref="operationLogService" />
+        <property name="migrator" ref="migrator" />
+    </bean>
+
+    <bean id="cacheKeyConfigurationService" class="com.dianping.cache.service.impl.CacheKeyConfigurationServiceImpl">
+        <property name="configurationDao" ref="cacheKeyConfigurationDao" />
+        <property name="cacheMessageProducer" ref="notifyMessageProducer" />
+        <property name="operationLogService" ref="operationLogService" />
+    </bean>
+
+    <bean id="operationLogService" class="com.dianping.cache.service.impl.OperationLogServiceImpl">
+        <property name="operationLogDao" ref="operationLogDao" />
+    </bean>
+	
+	
+ 	<bean id="serverService" class="com.dianping.cache.service.impl.ServerServiceImpl">
+		<property name="serverDao" ref="serverDao"/>
+	</bean>
+	
+	<bean id="memcacheStatsService" class="com.dianping.cache.service.impl.MemcacheStatsServiceImpl">
+		<property name="memcacheStatsDao" ref="memcacheStatsDao"/>
+	</bean>
+	
+	<bean id="serverStatsService" class="com.dianping.cache.service.impl.ServerStatsServiceImpl">
+		<property name="serverStatsDao" ref="serverStatsDao"/>
+	</bean>
+	
+	<bean id="serverClusterService" class="com.dianping.cache.service.impl.ServerClusterServiceImpl">
+		<property name="serverClusterDao" ref="serverClusterDao"></property>
+		<property name="serverDao" ref="serverDao"/>
+	</bean>
+    <bean id="userService" class="com.dianping.cache.service.impl.UserServiceImpl">
+        <property name="userDao" ref="userDao" />
+    </bean>
+
+    <bean id="serverGroupService" class="com.dianping.cache.service.impl.ServerGroupServiceImpl">
+        <property name="serverGroupDao" ref="serverGroupDao" />
+    </bean>
+    
+    <bean id="categoryToAppService" class="com.dianping.cache.service.impl.CategoryToAppServiceImpl">
+        <property name="categoryToAppDao" ref="categoryToAppDao" />
+    </bean>
+
+    <bean id="mailService" class="com.dianping.dpsf.spring.ProxyBeanFactory"
+        init-method="init">
+        <property name="serviceName"
+            value="http://service.dianping.com/mailService/mailService_1.0.0" />
+        <property name="iface" value="com.dianping.mailremote.remote.MailService" />
+        <property name="serialize" value="hessian" />
+        <property name="callMethod" value="sync" />
+        <property name="timeout" value="5000" />
+    </bean>
+
+    <bean id="smsService" class="com.dianping.dpsf.spring.ProxyBeanFactory"
+        init-method="init">
+        <property name="serviceName"
+            value="http://service.dianping.com/smsService/smsRemoteService_1.0.0" />
+        <property name="iface" value="com.dianping.sms.biz.SMSService" />
+        <property name="serialize" value="hessian" />
+        <property name="callMethod" value="sync" />
+        <property name="timeout" value="5000" />
+    </bean>
+
+    <bean id="weixinService" class="com.dianping.dpsf.spring.ProxyBeanFactory"
+        init-method="init">
+        <property name="serviceName"
+            value="http://service.dianping.com/ba/es/qyweixin/adapter/MessageService_1.0.0" />
+        <property name="iface"
+            value="com.dianping.ba.es.qyweixin.adapter.api.service.MessageService" />
+        <property name="serialize" value="hessian" />
+        <property name="callMethod" value="sync" />
+        <property name="timeout" value="5000" />
+    </bean>
+
+    <bean id="serviceMonitorService" class="com.dianping.cache.service.impl.ServiceMonitorServiceImpl" />
+
+</beans>

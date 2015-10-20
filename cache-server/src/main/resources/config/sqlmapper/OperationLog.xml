@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.dianping.cache.dao.OperationLogDao">
+	
+	<resultMap id="OperationLogResult" type="OperationLog">
+		<result column="ID" property="id"/>
+		<result column="Operator" property="operator"/>
+		<result column="OperateTime" property="operateTime"/>
+		<result column="Succeed" property="succeed"/>
+		<result column="Content" property="content"/>
+		<result column="IsCritical" property="critical"/>
+	</resultMap>
+
+	<insert id="create" parameterType="OperationLog">
+		INSERT INTO CacheOperationLog(Operator, OperateTime, Succeed, Content, IsCritical)
+		VALUES(#{operator}, NOW(), #{succeed}, #{content}, #{critical})
+	</insert>
+	
+	<sql id="search_fragment">
+		<trim prefix="WHERE" prefixOverrides="AND | OR">
+			<if test=" cond.operator != null">
+				And Operator LIKE CONCAT('%', #{cond.operator}, '%')
+			</if>
+			<if test=" cond.operateStart != null">
+				And OperateTime &gt;= #{cond.operateStart}
+			</if>
+			<if test=" cond.operateEnd != null">
+				And OperateTime &lt;= #{cond.operateEnd}
+			</if>
+			<if test=" cond.succeed != -1">
+				And Succeed = #{cond.succeed}
+			</if>
+			<if test=" cond.content != null">
+				And Content LIKE CONCAT('%', #{cond.content}, '%')
+			</if>
+			<if test=" cond.critical == true">
+				And IsCritical = 1
+			</if>
+   		</trim>
+	</sql>
+	
+	<select id="paginate" resultMap="OperationLogResult" parameterType="map">
+   		SELECT ID, Operator, OperateTime, Succeed, Content, IsCritical
+   		FROM CacheOperationLog
+   		<include refid="search_fragment"/>
+   		ORDER BY OperateTime DESC
+   		Limit #{pageId},20 
+	</select>
+	
+	<select id="paginate_COUNT" resultType="int" parameterType="map">
+		select COUNT(1) 
+		FROM CacheOperationLog
+		<include refid="search_fragment"/>
+	</select>
+	
+	<delete id="delete" parameterType="map">
+		DELETE FROM CacheOperationLog 
+   		WHERE OperateTime &lt;= #{before}
+	</delete>	
+
+</mapper>

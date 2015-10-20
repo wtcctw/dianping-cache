@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.dianping.cache.dao.ServerStatsDao">
+	
+	<resultMap id="ServerStatsResult" type="ServerStats">
+		<result column="id" property="id"/>
+		<result column="serverId" property="serverId"/>
+		<result column="curr_time" property="curr_time"/>
+		<result column="process_load" property="process_load"/>
+		<result column="net_in" property="net_in"/>
+		<result column="net_out" property="net_out"/>
+		<result column="mem_total" property="mem_total"/>
+		<result column="mem_used" property="mem_used"/>
+		<result column="icmp_loss" property="icmp_loss"/>
+		<result column="retransmission" property="retransmission"/>
+	</resultMap>
+
+	<insert id="insert" parameterType="ServerStats">
+		INSERT INTO server_stats(serverId, curr_time, process_load, 
+					net_in, net_out, mem_total,mem_used, icmp_loss,retransmission)
+		VALUES(#{serverId}, #{curr_time}, #{process_load}, 
+					#{net_in}, #{net_out}, #{mem_total}, #{mem_used}, #{icmp_loss},#{retransmission})
+	</insert>
+	
+	
+	<select id="findByServer" resultMap="ServerStatsResult" parameterType="String">
+   		SELECT id, serverId, curr_time, process_load, 
+					net_in, net_out, mem_total,mem_used, icmp_loss, retransmission
+   		FROM server_stats
+   		WHERE serverId = select id from servers where address = #{server}
+   		ORDER BY id DESC
+	</select>
+	
+	<select id="findAll" resultMap="ServerStatsResult">
+		SELECT id, serverId, curr_time, process_load, 
+					net_in, net_out, mem_total,mem_used, icmp_loss, retransmission
+   		FROM server_stats
+   		ORDER BY id DESC
+	</select>
+
+	<select id="findLast" resultMap="ServerStatsResult" >
+		SELECT id, serverId, curr_time, process_load, 
+					net_in, net_out, mem_total,mem_used, icmp_loss, retransmission
+   		FROM server_stats
+   		WHERE serverId = select id from servers where address = #{server}
+   		ORDER BY id DESC
+   		limit 1
+	</select>	
+	
+	<select id="findByServerWithInterval" resultMap="ServerStatsResult" parameterType="map">
+		<![CDATA[
+		SELECT id,serverId, curr_time, process_load, 
+					net_in, net_out, mem_total,mem_used, icmp_loss, retransmission
+   		FROM server_stats 
+   		WHERE curr_time >= #{start} AND curr_time <= #{end} AND serverId = (select id from servers  where address = #{address})
+   		ORDER BY curr_time ASC 
+		 ]]>
+	</select>
+	
+	<delete id="delete" parameterType="map">
+		DELETE FROM server_stats 
+   		WHERE curr_time &lt;= #{timeBefore}
+	</delete>
+	
+</mapper>

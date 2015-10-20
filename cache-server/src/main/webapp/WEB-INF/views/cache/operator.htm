@@ -1,0 +1,127 @@
+<div class="main-content" style="opacity: 1.0;"
+	ng-controller="OperatorController">
+	<div class=" main-content-inner">
+		<div class="breadcrumbs" id="breadcrumbs">
+			<script type="text/javascript"
+				src="${rc.contextPath}/static/js/avatar-cacheoperator.js"></script>
+			<script type="text/javascript">
+				try {
+					ace.settings.check('breadcrumbs', 'fixed')
+				} catch (e) {
+				}
+			</script>
+
+			<form class="bs-example bs-example-form" role="form">
+				<div class="input-group" style="margin-left: 20px">
+					操作者 <input type="text" class="form-control"
+						placeholder="cacheOperator" style="width: 200px" id="operator"
+						ng-model='operator' required> 操作内容 <input type="text"
+						class="form-control" placeholder="content" style="width: 200px"
+						id="content" ng-model='content' required>
+					<ul class="typeahead dropdown-menu"
+						style="top: 28px; left: 0px; display: none;">
+					</ul>
+
+					<span class="input-group-addon" style="opacity: 0;"></span> 时间 <input
+						type="text" placeholder="开始时间..." ng-model="startTime"
+						id="starttime"> <input type="text" placeholder="结束时间..."
+						ng-model="endTime" id="stoptime">
+					<button type="button" class="btn btn-success btn-swallow-ok"
+						id="summittime" ng-click="query()">查询</button>
+				</div>
+			</form>
+
+			<!-- end  breadcrumbs-->
+		</div>
+
+
+
+		<!-- page-content -->
+		<div class="page-content">
+			<!--page-header  -->
+			<div class="page-header">
+
+				<!--row  -->
+				<div class="row">
+					<div class="col-xs-12">
+
+						<table class="table  table-striped  table-condensed table-hover"
+							style="table-layout: fixed;">
+							<tr>
+								<th style="width: 5%; text-align: center">ID</th>
+								<th style="width: 10%; text-align: center">操作者</th>
+								<th style="width: 15%; text-align: center">操作时间</th>
+								<th style="width: 10%; text-align: center">操作内容</th>
+								<th style="width: 5%; text-align: center">结果</th>
+							</tr>
+
+							<tr ng-repeat="info in searchPaginator.currentPageItems">
+								<td
+									style="text-align: center; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">
+									{{$index+1}}</td>
+								<td
+									style="text-align: center; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">
+									{{info.operator}}</td>
+								<td
+									style="text-align: center; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">
+									{{info.operateTime | date:'yyyy-MM-dd HH:mm:ss'}}</td>
+								<td
+									style="text-align: center; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">
+									<a href="#myModal" class="badge" data-toggle="modal"
+									ng-click="setContent(info.content)">
+										{{info.content.substring(0,info.content.indexOf("("))}} </a>
+								</td>
+								<td
+									style="text-align: center; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">
+									<i class="icon-ok green" ng-show="{{info.succeed}}"></i> <i
+									class="icon-remove red" ng-show="!{{info.succeed}}"></i>
+								</td>
+							</tr>
+						</table>
+
+						<ul style="margin-top: 20px;" class="pagination">
+							<li><a href="" ng-click="searchPaginator.fetch(1)">首页</a></li>
+							<li><a href="" ng-click="searchPaginator.previous()">上一页</a></li>
+							<li ng-repeat="p in searchPaginator.pages"><a href=""
+								ng-click="searchPaginator.fetch(p)" ng-bind="p"></a></li>
+
+							<li><a href="" ng-click="searchPaginator.next()"
+								ng-show="searchPaginator.hasNext()">下一页</a></li>
+
+							<li><a href=""
+								ng-click="searchPaginator.fetch(searchPaginator.endPage)">末页</a></li>
+							<li class="disabled"><a href="javascript:;">共{{searchPaginator.totalPage}}页</a></li>
+						</ul>
+
+					</div>
+				</div>
+				<!--end row  -->
+			</div>
+
+			<!-- 模态框（Modal） -->
+			<div class="modal fade" id="myModal" tabindex="-1" role="dialog"
+				aria-labelledby="myModalLabel" aria-hidden="true">
+				<div class="modal-dialog">
+					<div class="modal-content">
+						<div class="modal-header">
+							<button type="button" class="close" data-dismiss="modal"
+								aria-hidden="true">&times;</button>
+							<h4 class="modal-title" id="myModalLabel">操作内容</h4>
+						</div>
+						<div class="modal-body">
+							<form method="post" class="form-horizontal" name="myForm">
+								<textarea rows="18" class="col-sm-12" disabled>{{modalcontent}}</textarea>
+								<p>&nbsp;</p>
+							</form>
+						</div>
+
+					</div>
+				</div>
+				<!-- /.modal-content -->
+			</div>
+
+			<!--end page-header  -->
+		</div>
+		<!-- end page-content -->
+	</div>
+</div>

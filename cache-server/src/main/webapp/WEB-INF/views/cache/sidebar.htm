@@ -1,0 +1,64 @@
+<div class="sidebar " id="sidebar"
+	data-sidebar="true" data-sidebar-scroll="true"
+	data-sidebar-hover="true" style="float:left">
+	<script type="text/javascript">
+		try {
+			ace.settings.check('sidebar', 'fixed')
+		} catch (e) {
+		}
+	</script>
+		<ul class="nav nav-list">
+		<li class="#if($side == 'cachemanager') open #end"><a href="#"
+			class="dropdown-toggle"> <i class="menu-icon  fa fa-gavel bigger-130"></i> <span
+				class="menu-text">&nbsp;&nbsp;&nbsp;缓存管理</span> <b class="arrow icon-angle-down"></b>
+		</a>
+			<ul class="submenu" style="display: block;">
+				<li class="#if($subside == 'config') active #end"><a
+					href="${rc.contextPath}/cache/config"> <i
+						class="icon-globe"></i> 缓存集群配置
+				</a></li>
+				<li class="#if($subside == 'key') active #end"><a
+					href="${rc.contextPath}/cache/key"> <i
+						class="icon-globe"></i> 缓存类别配置
+				</a></li>
+				<li class="#if($subside == 'operator') active #end"><a
+					href="${rc.contextPath}/cache/operator"> <i
+						class="icon-globe"></i> 操作日志
+				</a></li>
+				<li class="#if($subside == 'query') active #end"><a
+					href="${rc.contextPath}/cache/query"> <i
+						class="icon-globe"></i> 缓存查询
+				</a></li>
+			</ul></li>
+					<!--  <li class="#if($menu == 'monitor') open #end"><a href="#"
+			class="dropdown-toggle"> <i class="menu-icon  fa fa-tachometer bigger-130"></i> <span
+				class="menu-text">&nbsp;&nbsp;&nbsp;缓存监控</span> <b class="arrow icon-angle-down"></b>
+		</a>
+			<ul class="submenu" style="display: block;">
+				
+				<li class="#if($subside == 'dashboard') active #end"><a
+					href="${rc.contextPath}/monitor/dashboard"> <i
+						class="icon-globe"></i> 集群监控
+				</a></li>
+				<li class="#if($subside == 'node') active #end"><a
+					href="${rc.contextPath}/monitor/node"> <i
+						class="icon-globe"></i> 节点监控
+				</a></li>
+				
+			</ul></li> -->
+	</ul>
+	<!-- /.nav-list -->
+
+	<div class="sidebar-collapse sidebar-toggle" id="sidebar-collapse">
+		<i class="icon-double-angle-left" data-icon1="icon-double-angle-left"
+			data-icon2="icon-double-angle-right"></i>
+	</div>
+
+	<script type="text/javascript">
+		try {
+			ace.settings.check('sidebar', 'collapsed')
+		} catch (e) {
+		}
+	</script>
+</div>
+
