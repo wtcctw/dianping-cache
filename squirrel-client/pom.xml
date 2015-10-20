@@ -13,7 +13,7 @@
 	<dependencies>
 		<dependency>
 			<groupId>com.dianping</groupId>
-			<artifactId>squirrel-core</artifactId>
+			<artifactId>squirrel-store</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>com.dianping.cat</groupId>
