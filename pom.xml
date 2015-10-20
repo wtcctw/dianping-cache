@@ -35,16 +35,6 @@
 				<version>${project.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>${project.groupId}</groupId>
-				<artifactId>squirrel-builder</artifactId>
-				<version>${project.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>${project.groupId}</groupId>
-				<artifactId>squirrel-client-remote</artifactId>
-				<version>${project.version}</version>
-			</dependency>
-			<dependency>
 				<groupId>commons-lang</groupId>
 				<artifactId>commons-lang</artifactId>
 				<version>2.6</version>
@@ -147,11 +137,9 @@
 	</dependencies>
 
 	<modules>
-		<module>squirrel-core</module>
-		<module>squirrel-builder</module>
-		<module>squirrel-server</module>
+		<module>squirrel-console</module>
 		<module>squirrel-client</module>
-		<module>squirrel-client-remote</module>
+		<module>squirrel-core</module>
 		<module>squirrel-test</module>
 	</modules>
 

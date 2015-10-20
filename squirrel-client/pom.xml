@@ -12,6 +12,10 @@
 	<version>1.0.0-SNAPSHOT</version>
 	<dependencies>
 		<dependency>
+			<groupId>com.dianping</groupId>
+			<artifactId>squirrel-core</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>com.dianping.cat</groupId>
 			<artifactId>cat-core</artifactId>
 			<scope>provided</scope>
@@ -24,14 +28,6 @@
 			<groupId>com.dianping.lion</groupId>
 			<artifactId>lion-client</artifactId>
 			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>${project.groupId}</groupId>
-			<artifactId>squirrel-builder</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>${project.groupId}</groupId>
-			<artifactId>squirrel-client-remote</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
