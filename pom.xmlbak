@@ -9,10 +9,10 @@
 		<version>2.1.0</version>
 	</parent>
 
-	<artifactId>squirrel-parent</artifactId>
-	<version>1.0.0-SNAPSHOT</version>
+	<artifactId>avatar-cache-parent</artifactId>
+	<version>2.8.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
-	<name>squirrel-parent</name>
+	<name>avatar-cache-parent</name>
 
 	<url>http://maven.apache.org</url>
 
@@ -31,17 +31,17 @@
 			</dependency>
 			<dependency>
 				<groupId>${project.groupId}</groupId>
-				<artifactId>squirrel-core</artifactId>
+				<artifactId>cache-core</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>${project.groupId}</groupId>
-				<artifactId>squirrel-builder</artifactId>
+				<artifactId>cache-builder</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>${project.groupId}</groupId>
-				<artifactId>squirrel-client-remote</artifactId>
+				<artifactId>avatar-cache-remote</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 			<dependency>
@@ -147,12 +147,12 @@
 	</dependencies>
 
 	<modules>
-		<module>squirrel-core</module>
-		<module>squirrel-builder</module>
-		<module>squirrel-server</module>
-		<module>squirrel-client</module>
-		<module>squirrel-client-remote</module>
-		<module>squirrel-test</module>
+		<module>cache-core</module>
+		<module>cache-builder</module>
+		<module>cache-server</module>
+		<module>avatar-cache</module>
+		<module>avatar-cache-remote</module>
+		<module>cache-test</module>
 	</modules>
 
 	<build>
