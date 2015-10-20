@@ -4,14 +4,17 @@
 
 	<!--Extend the pom from cache parent -->
     <parent>
-        <groupId>com.dianping</groupId>
+        <groupId>com.dianping.squirrel</groupId>
         <artifactId>squirrel-parent</artifactId>
         <version>1.0.0-SNAPSHOT</version>
     </parent>
+
+    <groupId>com.dianping.squirrel</groupId>
     <artifactId>squirrel-store</artifactId>
     <packaging>jar</packaging>
-    <name>squirrel-store</name>
     <version>1.0.0-SNAPSHOT</version>
+    <name>squirrel-store</name>
+    
     <url>http://maven.apache.org</url>
     <dependencies>
         <dependency>
