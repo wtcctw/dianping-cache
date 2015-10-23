@@ -17,10 +17,15 @@ public final class StatusHolder {
 	public static final boolean statEnable = ConfigManagerLoader.getConfigManager().getBooleanValue(
 			"avatar-cache.stat.enable", true);
 
-	public static void init() {
-		Thread t = new Thread(new StatusChecker());
-		t.setDaemon(true);
-		t.start();
+	private static volatile boolean inited = false;
+	
+	public static synchronized void init() {
+		if(!inited) {
+			inited = true;
+			Thread t = new Thread(new StatusChecker());
+			t.setDaemon(true);
+			t.start();
+		}
 	}
 
 	public static Map<String, CapacityBucket> getCapacityBuckets() {

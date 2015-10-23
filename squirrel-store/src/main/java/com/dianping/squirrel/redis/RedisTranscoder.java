@@ -1,13 +1,13 @@
-package com.dianping.cache.redis;
+package com.dianping.squirrel.redis;
 
-import com.dianping.cache.compress.Compressor;
-import com.dianping.cache.compress.CompressorFactory;
-import com.dianping.cache.compress.Compressor.CompressType;
 import com.dianping.cache.core.Transcoder;
-import com.dianping.cache.serialize.SerializeException;
-import com.dianping.cache.serialize.Serializer;
-import com.dianping.cache.serialize.Serializer.SerializeType;
-import com.dianping.cache.serialize.SerializerFactory;
+import com.dianping.squirrel.compress.Compressor;
+import com.dianping.squirrel.compress.CompressorFactory;
+import com.dianping.squirrel.compress.Compressor.CompressType;
+import com.dianping.squirrel.serialize.StoreSerializeException;
+import com.dianping.squirrel.serialize.Serializer;
+import com.dianping.squirrel.serialize.SerializerFactory;
+import com.dianping.squirrel.serialize.Serializer.SerializeType;
 
 public class RedisTranscoder implements Transcoder<String> {
 
@@ -33,7 +33,7 @@ public class RedisTranscoder implements Transcoder<String> {
     }
 
     @Override
-    public <T> String encode(T object) throws SerializeException {
+    public <T> String encode(T object) throws StoreSerializeException {
         if(object instanceof Integer) {
             return object.toString();
         }
@@ -48,7 +48,7 @@ public class RedisTranscoder implements Transcoder<String> {
     }
 
     @Override
-    public <T> T decode(String data, Class<T> clazz) throws SerializeException {
+    public <T> T decode(String data, Class<T> clazz) throws StoreSerializeException {
         if(clazz == Integer.class) {
             return (T) Integer.valueOf(data);
         }
@@ -58,7 +58,7 @@ public class RedisTranscoder implements Transcoder<String> {
         if(clazz == String.class) {
             return (T) data;
         }
-        T object = serializer.fromString(data, clazz);
+        T object = (T) serializer.fromString(data, clazz);
         return object;
     }
     

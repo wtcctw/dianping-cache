@@ -1,4 +1,4 @@
-package com.dianping.cache.redis;
+package com.dianping.squirrel.redis;
 
 import java.util.ArrayList;
 import java.util.List;

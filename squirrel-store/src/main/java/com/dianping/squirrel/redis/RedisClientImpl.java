@@ -1,8 +1,13 @@
-package com.dianping.cache.redis;
+package com.dianping.squirrel.redis;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeoutException;
 
@@ -10,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import redis.clients.jedis.JedisCluster;
+import redis.clients.jedis.exceptions.JedisException;
 
 import com.dianping.cache.core.CASResponse;
 import com.dianping.cache.core.CASValue;
@@ -21,9 +27,12 @@ import com.dianping.cache.core.KeyAware;
 import com.dianping.cache.core.Lifecycle;
 import com.dianping.cache.core.Transcoder;
 import com.dianping.cache.exception.CacheException;
-import com.dianping.cache.serialize.SerializeException;
+import com.dianping.squirrel.exception.StoreException;
+import com.dianping.squirrel.serialize.StoreSerializeException;
+import com.dianping.squirrel.serialize.Serializer;
+import com.dianping.squirrel.serialize.SerializerFactory;
 
-public class RedisClientImpl implements CacheClient, Lifecycle, KeyAware, InitialConfiguration {
+public class RedisClientImpl implements RedisStore, CacheClient, Lifecycle, KeyAware, InitialConfiguration {
 
     private static Logger logger = LoggerFactory.getLogger(RedisClientImpl.class);
     
@@ -36,6 +45,8 @@ public class RedisClientImpl implements CacheClient, Lifecycle, KeyAware, Initia
     private JedisCluster client;
     
     private Transcoder<String> transcoder = new RedisTranscoder();
+    
+    private Serializer serializer = SerializerFactory.getSerializer("hessian");
     
     @Override
     public void init(CacheClientConfiguration config) {
@@ -255,5 +266,257 @@ public class RedisClientImpl implements CacheClient, Lifecycle, KeyAware, Initia
             TimeoutException {
         throw new UnsupportedOperationException("redis does not support cas operation");
     }
+
+	@Override
+	public Boolean exists(String key) {
+		return client.exists(key);
+	}
+
+	@Override
+	public String type(String key) {
+		return client.type(key);
+	}
+
+	@Override
+	public Boolean expire(String key, int seconds) {
+		Long result = client.expire(key, seconds);
+		return result == 1;
+	}
+
+	@Override
+	public Long ttl(String key) {
+		Long result = client.ttl(key);
+		if(result == -1) 
+			throw new StoreException("key " + key + " does not exist");
+		if(result == -2) 
+			throw new StoreException("key " + key + " exists but has no associated expire");
+		return result;
+	}
+
+	@Override
+	public Boolean persist(String key) {
+		Long result = client.persist(key);
+		return result == 1;
+	}
+
+	@Override
+	public Long hset(String key, String field, Object value) {
+		try {
+			String serialized = serializer.toString(value);
+			Long result = client.hset(key, field, serialized);
+			return result;
+		} catch (StoreSerializeException e) {
+			throw new StoreException(e);
+		}
+	}
+
+	@Override
+	public <T> T hget(String key, String field) {
+		String value = client.hget(key, field);
+		T object = (T)serializer.fromString(value, Object.class);
+		return object;
+	}
+
+	@Override
+	public Long hdel(String key, String... field) {
+		return client.hdel(key, field);
+	}
+
+	@Override
+	public Set<String> hkeys(String key) {
+		return client.hkeys(key);
+	}
+
+	@Override
+	public List<Object> hvals(String key) {
+		List<String> values = client.hvals(key);
+		if(values != null && values.size() > 0) {
+			List<Object> objects = new ArrayList<Object>(values.size());
+			for(String value : values) {
+				Object object = serializer.fromString(value, Object.class);
+				objects.add(object);
+			}
+			return objects;
+		} else {
+			return Collections.EMPTY_LIST;
+		}
+	}
+
+	@Override
+	public Map<String, Object> hgetAll(String key) {
+		Map<String, String> map = client.hgetAll(key);
+		if(map != null && map.size() > 0) {
+			Map<String, Object> objMap = new HashMap<String, Object>(map.size());
+			for(Map.Entry<String, String> entry : map.entrySet()) {
+				Object object = serializer.fromString(entry.getValue(), Object.class);
+				objMap.put(entry.getKey(), object);
+			}
+			return objMap;
+		} else {
+			return Collections.EMPTY_MAP;
+		}
+	}
+
+	@Override
+	public Long rpush(String key, Object... objects) {
+		if(objects != null && objects.length > 0) {
+			String[] strings = new String[objects.length];
+			for(int i=0; i<objects.length; i++) {
+				Object object = objects[i];
+				if(object == null) {
+					throw new IllegalArgumentException("one of the list objects is null");
+				}
+				strings[i] = serializer.toString(object);
+			}
+			return client.rpush(key, strings);
+		} else {
+			return -1L;
+		}
+	}
+
+	@Override
+	public Long lpush(String key, Object... objects) {
+		if(objects != null && objects.length > 0) {
+			String[] strings = new String[objects.length];
+			for(int i=0; i<objects.length; i++) {
+				Object object = objects[i];
+				if(object == null) {
+					throw new IllegalArgumentException("one of the list objects is null");
+				}
+				strings[i] = serializer.toString(object);
+			}
+			return client.lpush(key, strings);
+		} else {
+			return -1L;
+		}
+	}
+
+	@Override
+	public <T> T lpop(String key) {
+		String value = client.lpop(key);
+		if(value != null) {
+			T object = (T)serializer.fromString(value, Object.class);
+			return object;
+		}
+		return null;
+	}
+
+	@Override
+	public <T> T rpop(String key) {
+		String value = client.rpop(key);
+		if(value != null) {
+			T object = (T)serializer.fromString(value, Object.class);
+			return object;
+		}
+		return null;
+	}
+
+	@Override
+	public <T> T lindex(String key, long index) {
+		String value = client.lindex(key, index);
+		if(value != null) {
+			T object = (T)serializer.fromString(value, Object.class);
+			return object;
+		}
+		return null;
+	}
+
+	@Override
+	public Boolean lset(String key, long index, Object object) {
+		String value = serializer.toString(object);
+		if(value != null) {
+			String result = client.lset(key, index, value);
+			return "OK".equals(result);
+		}
+		return false;
+	}
+
+	@Override
+	public Long llen(String key) {
+		return client.llen(key);
+	}
+
+	@Override
+	public List<Object> lrange(String key, long start, long end) {
+		List<String> strList = client.lrange(key, start, end);
+		if(strList != null && strList.size() > 0) {
+			List<Object> objList = new ArrayList<Object>(strList.size());
+			for(String str : strList) {
+				Object obj = serializer.fromString(str, Object.class);
+				objList.add(obj);
+			}
+			return objList;
+		} else {
+			return Collections.EMPTY_LIST;
+		}
+	}
+
+	@Override
+	public Boolean ltrim(String key, long start, long end) {
+		String result = client.ltrim(key, start, end);
+		return "OK".equals(result);
+	}
+
+	@Override
+	public Long sadd(String key, Object... objects) {
+		if(objects != null && objects.length > 0) {
+			String[] strings = new String[objects.length];
+			for(int i=0; i<objects.length; i++) {
+				Object object = objects[i];
+				if(object == null) {
+					throw new IllegalArgumentException("one of the set objects is null");
+				}
+				strings[i] = serializer.toString(object);
+			}
+			return client.sadd(key, strings);
+		} else {
+			return -1L;
+		}
+	}
+
+	@Override
+	public Long srem(String key, Object... objects) {
+		if(objects != null && objects.length > 0) {
+			String[] strings = new String[objects.length];
+			for(int i=0; i<objects.length; i++) {
+				Object object = objects[i];
+				if(object == null) {
+					throw new IllegalArgumentException("one of the set objects is null");
+				}
+				strings[i] = serializer.toString(object);
+			}
+			return client.srem(key, strings);
+		} else {
+			return -1L;
+		}
+	}
+
+	@Override
+	public Set<Object> smembers(String key) {
+		Set<String> strSet = client.smembers(key);
+		if(strSet != null && strSet.size() > 0) {
+			Set<Object> objSet = new HashSet<Object>(strSet.size());
+			for(String str : strSet) {
+				Object obj = serializer.fromString(str, Object.class);
+				objSet.add(obj);
+			}
+			return objSet;
+		} else {
+			return Collections.EMPTY_SET;
+		}
+	}
+
+	@Override
+	public Long scard(String key) {
+		return client.scard(key);
+	}
+
+	@Override
+	public Boolean sismember(String key, Object member) {
+		if(member == null) 
+			throw new IllegalArgumentException("set member is null");
+		String str = serializer.toString(member);
+		return client.sismember(key, str);
+	}
 
 }

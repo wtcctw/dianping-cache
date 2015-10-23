@@ -1,11 +1,11 @@
 package com.dianping.cache.core;
 
-import com.dianping.cache.serialize.SerializeException;
+import com.dianping.squirrel.serialize.StoreSerializeException;
 
 public interface Transcoder<D> {
 
-    public <T> D encode(T object) throws SerializeException;
+    public <T> D encode(T object) throws StoreSerializeException;
     
-    public <T> T decode(D data, Class<T> clazz) throws SerializeException;
+    public <T> T decode(D data, Class<T> clazz) throws StoreSerializeException;
     
 }

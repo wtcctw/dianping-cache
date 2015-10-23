@@ -1,9 +1,9 @@
-package com.dianping.cache.compress;
+package com.dianping.squirrel.compress;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-import com.dianping.cache.compress.Compressor.CompressType;
+import com.dianping.squirrel.compress.Compressor.CompressType;
 
 public class CompressorFactory {
 

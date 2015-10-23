@@ -34,12 +34,12 @@ import com.dianping.cache.core.CacheClientConfiguration;
 import com.dianping.cache.core.CacheConfiguration;
 import com.dianping.cache.dcache.DCacheClientImpl;
 import com.dianping.cache.exception.InitializingException;
-import com.dianping.cache.redis.RedisClientImpl;
 import com.dianping.cache.util.ZKUtils;
 import com.dianping.pigeon.remoting.ServiceFactory;
 import com.dianping.remote.cache.CacheConfigurationWebService;
 import com.dianping.remote.cache.dto.CacheConfigurationDTO;
 import com.dianping.remote.cache.dto.CacheConfigurationsDTO;
+import com.dianping.squirrel.redis.RedisClientImpl;
 
 /**
  * Remote centralized managed cache client config

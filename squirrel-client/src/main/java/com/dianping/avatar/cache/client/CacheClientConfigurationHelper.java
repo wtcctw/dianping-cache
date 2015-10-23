@@ -27,8 +27,8 @@ import com.dianping.cache.dcache.DCacheClientImpl;
 import com.dianping.cache.ehcache.EhcacheClientImpl;
 import com.dianping.cache.exception.InitializingException;
 import com.dianping.cache.memcached.MemcachedClientImpl;
-import com.dianping.cache.redis.RedisClientImpl;
 import com.dianping.remote.cache.dto.CacheConfigurationDTO;
+import com.dianping.squirrel.redis.RedisClientImpl;
 
 /**
  * CacheClientConfiguration parse helper class

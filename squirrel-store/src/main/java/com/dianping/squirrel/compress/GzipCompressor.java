@@ -1,4 +1,4 @@
-package com.dianping.cache.compress;
+package com.dianping.squirrel.compress;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -11,7 +11,7 @@ import com.dianping.cache.util.FileUtils;
 public class GzipCompressor implements Compressor {
 
     @Override
-    public byte[] compress(byte[] bytes) throws CompressException {
+    public byte[] compress(byte[] bytes) throws StoreCompressException {
         if (bytes == null) {
             return null;
         }
@@ -24,14 +24,14 @@ public class GzipCompressor implements Compressor {
 
             return bos.toByteArray();
         } catch (IOException e) {
-            throw new CompressException("failed to compress data", e);
+            throw new StoreCompressException("failed to compress data", e);
         } finally {
             FileUtils.close(gz);
         }
     }
 
     @Override
-    public byte[] decompress(byte[] bytes) throws CompressException {
+    public byte[] decompress(byte[] bytes) throws StoreCompressException {
         if (bytes == null) {
             return null;
         }
@@ -50,7 +50,7 @@ public class GzipCompressor implements Compressor {
             
             return bos.toByteArray();
         } catch (IOException e) {
-            throw new CompressException("failed to decompress data", e);
+            throw new StoreCompressException("failed to decompress data", e);
         } finally {
             FileUtils.close(gis);
         }

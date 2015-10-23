@@ -1,9 +1,9 @@
-package com.dianping.cache.serialize;
+package com.dianping.squirrel.serialize;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-import com.dianping.cache.serialize.Serializer.SerializeType;
+import com.dianping.squirrel.serialize.Serializer.SerializeType;
 
 public class SerializerFactory {
 

@@ -1,4 +1,4 @@
-package com.dianping.cache.serialize;
+package com.dianping.squirrel.serialize;
 
 import java.io.IOException;
 
@@ -30,38 +30,38 @@ public class JsonSerializer implements Serializer {
     }
 
     @Override
-    public <T> String toString(T object) throws SerializeException {
+    public String toString(Object object) throws StoreSerializeException {
         try {
             return mapper.writeValueAsString(object);
         } catch (IOException e) {
-            throw new SerializeException("failed to serialize " + object, e);
+            throw new StoreSerializeException("failed to serialize " + object, e);
         }
     }
     
     @Override
-    public <T> byte[] toBytes(T object) throws SerializeException {
+    public byte[] toBytes(Object object) throws StoreSerializeException {
         try {
             return mapper.writeValueAsBytes(object);
         } catch (IOException e) {
-            throw new SerializeException("failed to serialize " + object, e);
+            throw new StoreSerializeException("failed to serialize " + object, e);
         }
     }
 
     @Override
-    public <T> T fromString(String data, Class<T> clazz) throws SerializeException {
+    public Object fromString(String data, Class clazz) throws StoreSerializeException {
         try {
-            return (T)mapper.readValue(data, clazz);
+            return mapper.readValue(data, clazz);
         } catch (IOException e) {
-            throw new SerializeException("failed to deserialize " + data, e);
+            throw new StoreSerializeException("failed to deserialize " + data, e);
         }
     }
     
     @Override
-    public <T> T fromBytes(byte[] data, Class<T> clazz) throws SerializeException {
+    public Object fromBytes(byte[] data, Class clazz) throws StoreSerializeException {
         try {
-            return (T)mapper.readValue(data, clazz);
+            return mapper.readValue(data, clazz);
         } catch (IOException e) {
-            throw new SerializeException("failed to deserialize " + data, e);
+            throw new StoreSerializeException("failed to deserialize " + data, e);
         }
     }
 

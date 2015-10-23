@@ -1,6 +1,8 @@
-package com.dianping.squirrel.client;
+package com.dianping.squirrel;
 
 import java.util.concurrent.Future;
+
+import com.dianping.squirrel.exception.StoreException;
 
 public interface StoreClient {
 
@@ -30,5 +32,7 @@ public interface StoreClient {
     public void asyncAdd(StoreKey key, Object value, StoreCallback<Boolean> callback);
     
     public void asyncDelete(StoreKey key, StoreCallback<Boolean> callback);
+    
+    public Store getStore(String category);
     
 }

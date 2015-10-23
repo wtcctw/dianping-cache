@@ -1,8 +1,8 @@
 package com.dianping.cache.memcached;
 
-import com.dianping.cache.compress.Compressor.CompressType;
 import com.dianping.cache.core.Transcoder;
-import com.dianping.cache.serialize.Serializer.SerializeType;
+import com.dianping.squirrel.compress.Compressor.CompressType;
+import com.dianping.squirrel.serialize.Serializer.SerializeType;
 
 import net.spy.memcached.CachedData;
 
