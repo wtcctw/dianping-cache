@@ -23,6 +23,8 @@ import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.xml.XmlBeanFactory;
 import org.springframework.core.io.ClassPathResource;
 
+import com.dianping.squirrel.client.spring.CacheBeanDefinitionParser;
+
 /**
  * CacheBeanDefinitionParserTest
  * @author youngphy.yang

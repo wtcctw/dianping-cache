@@ -9,8 +9,8 @@ import com.dianping.avatar.cache.CacheKey;
 import com.dianping.avatar.cache.CacheService;
 import com.dianping.cache.exception.CacheException;
 import com.dianping.cache.service.CacheTestService;
-import com.dianping.cache.util.ZKUtils;
 import com.dianping.pigeon.remoting.provider.config.annotation.Service;
+import com.dianping.squirrel.common.util.ZKUtils;
 
 @Service(url = "com.dianping.cache.service.CacheTestService")
 public class CacheTestServiceImpl implements CacheTestService {

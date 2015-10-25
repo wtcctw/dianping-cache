@@ -13,15 +13,15 @@ import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.dianping.cache.config.ConfigChangeListener;
-import com.dianping.cache.config.ConfigManager;
-import com.dianping.cache.config.ConfigManagerLoader;
 import com.dianping.cache.entity.CacheConfiguration;
 import com.dianping.cache.service.CacheConfigurationService;
 import com.dianping.cache.support.spring.SpringLocator;
 import com.dianping.cache.util.CollectionUtils;
 import com.dianping.lion.Environment;
 import com.dianping.pigeon.threadpool.NamedThreadFactory;
+import com.dianping.squirrel.common.config.ConfigChangeListener;
+import com.dianping.squirrel.common.config.ConfigManager;
+import com.dianping.squirrel.common.config.ConfigManagerLoader;
 
 public class TaskManager implements ServiceListener {
 

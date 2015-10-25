@@ -15,7 +15,6 @@
  */
 package com.dianping.cache.remote;
 
-import com.dianping.avatar.cache.util.DTOUtils;
 import com.dianping.avatar.exception.DuplicatedIdentityException;
 import com.dianping.cache.entity.CacheConfiguration;
 import com.dianping.cache.entity.CacheKeyConfiguration;
@@ -25,6 +24,7 @@ import com.dianping.remote.cache.CacheManageWebService;
 import com.dianping.remote.cache.dto.CacheClearDTO;
 import com.dianping.remote.cache.dto.CacheKeyConfigurationDTO;
 import com.dianping.remote.cache.dto.GenericCacheConfigurationDTO;
+import com.dianping.squirrel.client.util.DTOUtils;
 
 /**
  * 用于缓存的管理，如清除缓存等

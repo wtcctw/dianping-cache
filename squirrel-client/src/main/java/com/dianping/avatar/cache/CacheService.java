@@ -21,11 +21,11 @@ import java.util.Set;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeoutException;
 
-import com.dianping.cache.core.CASResponse;
-import com.dianping.cache.core.CASValue;
-import com.dianping.cache.core.CacheCallback;
-import com.dianping.cache.core.CacheClient;
 import com.dianping.cache.exception.CacheException;
+import com.dianping.squirrel.client.core.CASResponse;
+import com.dianping.squirrel.client.core.CASValue;
+import com.dianping.squirrel.client.core.CacheCallback;
+import com.dianping.squirrel.client.core.CacheClient;
 
 /**
  * Cache interface provided for business.

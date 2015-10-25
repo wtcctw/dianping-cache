@@ -2,8 +2,8 @@ package com.dianping.cache.test;
 
 import org.springframework.stereotype.Component;
 
-import com.dianping.avatar.cache.annotation.Cache;
-import com.dianping.avatar.cache.annotation.CacheParam;
+import com.dianping.squirrel.client.annotation.Cache;
+import com.dianping.squirrel.client.annotation.CacheParam;
 
 @Component
 public class Biz {

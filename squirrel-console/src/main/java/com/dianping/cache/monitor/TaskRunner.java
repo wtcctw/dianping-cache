@@ -10,7 +10,7 @@ import org.apache.zookeeper.KeeperException.NodeExistsException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.dianping.avatar.cache.util.IPUtils;
+import com.dianping.squirrel.client.util.IPUtils;
 
 public class TaskRunner implements Runnable, ServerListener {
 

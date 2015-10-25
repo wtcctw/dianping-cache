@@ -13,10 +13,10 @@ import org.junit.Test;
 import com.dianping.avatar.cache.CacheKey;
 import com.dianping.avatar.cache.CacheService;
 import com.dianping.avatar.cache.CacheServiceFactory;
-import com.dianping.cache.core.CacheCallback;
-import com.dianping.cache.dcache.DCacheClientConfiguration;
-import com.dianping.cache.dcache.DCacheClientImpl;
-import com.dianping.cache.dcache.HessianTranscoder;
+import com.dianping.squirrel.client.core.CacheCallback;
+import com.dianping.squirrel.client.impl.dcache.DCacheClientConfig;
+import com.dianping.squirrel.client.impl.dcache.DCacheClientImpl;
+import com.dianping.squirrel.client.impl.dcache.HessianTranscoder;
 
 public class DCacheTest {
 
@@ -27,14 +27,14 @@ public class DCacheTest {
     @Test
     public void test0() throws Exception {
         final DCacheClientImpl dcache = new DCacheClientImpl();
-        DCacheClientConfiguration config = new DCacheClientConfiguration();
+        DCacheClientConfig config = new DCacheClientConfig();
         config.setClientClazz("com.dianping.cache.memcached.MemcachedClientImpl");
         config.setModule("testimage");
         config.setProxy("DCache.testProxyServer.ProxyObj");
         config.setLocator("taf.tafregistry.QueryObj@tcp -h 192.168.215.157 -p 17890");
         config.setPersistent(true);
         config.setTranscoderClass(HessianTranscoder.class);
-        dcache.init(config);
+        dcache.initialize(config);
         dcache.start();
         
         String value = null;

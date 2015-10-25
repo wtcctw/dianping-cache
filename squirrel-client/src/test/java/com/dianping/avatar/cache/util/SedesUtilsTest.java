@@ -9,9 +9,9 @@ import java.util.List;
 import org.apache.commons.lang.RandomStringUtils;
 import org.junit.Test;
 
-import com.dianping.cache.util.JsonUtils;
 import com.dianping.remote.cache.dto.SingleCacheRemoveDTO;
 import com.dianping.remote.cache.util.SedesUtils;
+import com.dianping.squirrel.common.util.JsonUtils;
 import com.fasterxml.jackson.core.type.TypeReference;
 
 public class SedesUtilsTest {

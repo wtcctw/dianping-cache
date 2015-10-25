@@ -15,7 +15,6 @@
  */
 package com.dianping.cache.remote.translator;
 
-import com.dianping.avatar.cache.util.DTOUtils;
 import com.dianping.cache.entity.CacheConfiguration;
 import com.dianping.cache.entity.SupportedSpecification.SupportedCacheClients;
 import com.dianping.remote.cache.dto.CacheConfigDetailDTO;
@@ -24,6 +23,7 @@ import com.dianping.remote.cache.dto.EhcacheConfigDetailDTO;
 import com.dianping.remote.cache.dto.MemcachedConfigDetailDTO;
 //import com.dianping.remote.cache.dto.XMemcachedConfigDetailDTO;
 //import com.dianping.remote.cache.dto.DCacheConfigDetailDTO;
+import com.dianping.squirrel.client.util.DTOUtils;
  
 /**
  * CacheConfiguration2DTO Translator

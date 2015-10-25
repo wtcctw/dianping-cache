@@ -5,7 +5,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import com.dianping.avatar.cache.CacheKey;
 import com.dianping.avatar.cache.CacheService;
-import com.dianping.avatar.cache.annotation.Cache;
+import com.dianping.squirrel.client.annotation.Cache;
 
 public class TestCat {
 

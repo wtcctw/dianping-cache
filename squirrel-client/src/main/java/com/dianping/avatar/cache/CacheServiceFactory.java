@@ -4,7 +4,7 @@
  */
 package com.dianping.avatar.cache;
 
-import com.dianping.cache.exception.InitializingException;
+import com.dianping.squirrel.common.exception.StoreInitializeException;
 
 public class CacheServiceFactory {
 
@@ -15,7 +15,7 @@ public class CacheServiceFactory {
 			cacheService = new DefaultCacheService();
 		} catch (Throwable e) {
 			e.printStackTrace();
-			throw new InitializingException(e);
+			throw new StoreInitializeException(e);
 		}
 	}
 

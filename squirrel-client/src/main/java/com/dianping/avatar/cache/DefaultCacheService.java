@@ -27,18 +27,18 @@ import java.util.concurrent.TimeoutException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.dianping.avatar.cache.log.LoggerLoader;
-import com.dianping.avatar.cache.util.CacheMonitorUtil;
-import com.dianping.cache.config.ConfigChangeListener;
-import com.dianping.cache.core.CASResponse;
-import com.dianping.cache.core.CASValue;
-import com.dianping.cache.core.CacheCallback;
-import com.dianping.cache.core.CacheClient;
 import com.dianping.cache.exception.CacheException;
-import com.dianping.cache.monitor.SizeMonitor;
-import com.dianping.cache.monitor.TimeMonitor;
-import com.dianping.cache.status.StatusHolder;
-import com.dianping.cache.config.ConfigManagerLoader;
+import com.dianping.squirrel.client.core.CASResponse;
+import com.dianping.squirrel.client.core.CASValue;
+import com.dianping.squirrel.client.core.CacheCallback;
+import com.dianping.squirrel.client.core.CacheClient;
+import com.dianping.squirrel.client.log.LoggerLoader;
+import com.dianping.squirrel.client.monitor.SizeMonitor;
+import com.dianping.squirrel.client.monitor.StatusHolder;
+import com.dianping.squirrel.client.monitor.TimeMonitor;
+import com.dianping.squirrel.client.util.CacheMonitorUtil;
+import com.dianping.squirrel.common.config.ConfigChangeListener;
+import com.dianping.squirrel.common.config.ConfigManagerLoader;
 
 /**
  * Default Cache Service Interface implement. The class should be used in

@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
 
 import com.dianping.cache.entity.CacheConfiguration;
 import com.dianping.cache.util.CollectionUtils;
-import com.dianping.cache.util.JsonUtils;
+import com.dianping.squirrel.common.util.JsonUtils;
 
 public class ServiceMonitor implements CuratorHandler {
 

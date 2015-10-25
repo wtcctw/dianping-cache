@@ -12,14 +12,14 @@ import com.dianping.ba.es.qyweixin.adapter.api.dto.MessageDto;
 import com.dianping.ba.es.qyweixin.adapter.api.dto.media.TextDto;
 import com.dianping.ba.es.qyweixin.adapter.api.exception.QyWeixinAdaperException;
 import com.dianping.ba.es.qyweixin.adapter.api.service.MessageService;
-import com.dianping.cache.config.ConfigChangeListener;
-import com.dianping.cache.config.ConfigManager;
-import com.dianping.cache.config.ConfigManagerLoader;
 import com.dianping.cache.util.CollectionUtils;
 import com.dianping.lion.Environment;
 import com.dianping.mailremote.remote.MailService;
 import com.dianping.pigeon.remoting.ServiceFactory;
 import com.dianping.sms.biz.SMSService;
+import com.dianping.squirrel.common.config.ConfigChangeListener;
+import com.dianping.squirrel.common.config.ConfigManager;
+import com.dianping.squirrel.common.config.ConfigManagerLoader;
 
 public class NotifyManager {
 

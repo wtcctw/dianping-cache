@@ -32,14 +32,10 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
 
 import com.dianping.avatar.exception.DuplicatedIdentityException;
-import com.dianping.cache.config.ConfigChangeListener;
-import com.dianping.cache.core.CacheClient;
-import com.dianping.cache.core.CacheClientBuilder;
 import com.dianping.cache.dao.CacheConfigurationDao;
 import com.dianping.cache.entity.CacheConfiguration;
 import com.dianping.cache.entity.CacheKeyConfiguration;
 import com.dianping.cache.entity.ServerGroup;
-import com.dianping.cache.memcached.MemcachedClientConfiguration;
 import com.dianping.cache.remote.jms.CacheMessageNotifier;
 import com.dianping.cache.remote.jms.CacheMessageProducer;
 import com.dianping.cache.remote.translator.CacheConfiguration2DTOTranslator;
@@ -50,7 +46,6 @@ import com.dianping.cache.service.OperationLogService;
 import com.dianping.cache.service.ServerGroupService;
 import com.dianping.cache.util.CollectionUtils;
 import com.dianping.cache.util.Migrator;
-import com.dianping.cache.config.ConfigManagerLoader;
 import com.dianping.lion.Environment;
 import com.dianping.ops.cmdb.CmdbManager;
 import com.dianping.ops.cmdb.CmdbProject;
@@ -62,6 +57,11 @@ import com.dianping.queue.message.TextMessage;
 import com.dianping.remote.cache.dto.CacheConfigurationDTO;
 import com.dianping.remote.cache.dto.CacheKeyTypeVersionUpdateDTO;
 import com.dianping.remote.cache.dto.SingleCacheRemoveDTO;
+import com.dianping.squirrel.client.core.CacheClient;
+import com.dianping.squirrel.client.core.CacheClientBuilder;
+import com.dianping.squirrel.client.impl.memcached.MemcachedClientConfiguration;
+import com.dianping.squirrel.common.config.ConfigChangeListener;
+import com.dianping.squirrel.common.config.ConfigManagerLoader;
 
 /**
  * CacheConfigurationService to provide cache configuration data
@@ -147,7 +147,7 @@ public class CacheConfigurationServiceImpl implements CacheConfigurationService,
 			configurationDao.create(config);
 			CacheConfiguration created = configurationDao.find(cacheKey);
 			cacheMessageProducer.sendMessageToTopic(translator.translate(created));
-			com.dianping.cache.core.CacheConfiguration.addCache(cacheKey, created.getClientClazz());
+			com.dianping.squirrel.client.core.CacheConfiguration.addCache(cacheKey, created.getClientClazz());
 			logConfigurationCreate(config, true);
 			return created;
 		} catch (RuntimeException e) {
@@ -171,8 +171,8 @@ public class CacheConfigurationServiceImpl implements CacheConfigurationService,
 			cacheMessageProducer.sendMessageToTopic(translator.translate(updated));
 			String cacheKey = config.getCacheKey();
 			CacheClientBuilder.closeCacheClient(cacheKey);
-			com.dianping.cache.core.CacheConfiguration.removeCache(cacheKey);
-			com.dianping.cache.core.CacheConfiguration.addCache(cacheKey, updated.getClientClazz());
+			com.dianping.squirrel.client.core.CacheConfiguration.removeCache(cacheKey);
+			com.dianping.squirrel.client.core.CacheConfiguration.addCache(cacheKey, updated.getClientClazz());
 			logConfigurationUpdate(oldConfig, updated, true);
 			return updated;
 		} catch (RuntimeException e) {
@@ -189,7 +189,7 @@ public class CacheConfigurationServiceImpl implements CacheConfigurationService,
 			configFound = find(cacheKey);
 			if (configFound != null) {
 				CacheClientBuilder.closeCacheClient(cacheKey);
-				com.dianping.cache.core.CacheConfiguration.removeCache(cacheKey);
+				com.dianping.squirrel.client.core.CacheConfiguration.removeCache(cacheKey);
 				configurationDao.delete(cacheKey);
 				logConfigurationDelete(configFound, true);
 			}
@@ -429,7 +429,7 @@ public class CacheConfigurationServiceImpl implements CacheConfigurationService,
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		for (CacheConfiguration configuration : findAll()) {
-			com.dianping.cache.core.CacheConfiguration.addCache(configuration.getCacheKey(),
+			com.dianping.squirrel.client.core.CacheConfiguration.addCache(configuration.getCacheKey(),
 					configuration.getClientClazz());
 		}
 	}

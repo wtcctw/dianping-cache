@@ -23,26 +23,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeoutException;
 
 import com.dianping.avatar.cache.CacheService.EntityKey;
-import com.dianping.avatar.cache.annotation.Cache;
-import com.dianping.avatar.cache.client.RemoteCacheClientFactory;
-import com.dianping.avatar.cache.configuration.CacheItemConfigManager;
-import com.dianping.avatar.cache.configuration.CacheKeyType;
-import com.dianping.avatar.cache.configuration.RemoteCacheItemConfigManager;
-import com.dianping.avatar.cache.support.CacheTracker;
-import com.dianping.avatar.cache.support.DefaultCacheTracker;
-import com.dianping.avatar.cache.util.CacheAnnotationUtils;
-import com.dianping.avatar.cache.util.CacheMonitorUtil;
-import com.dianping.cache.builder.CacheClientFactory;
-import com.dianping.cache.config.ConfigManagerLoader;
-import com.dianping.cache.core.CASResponse;
-import com.dianping.cache.core.CASValue;
-import com.dianping.cache.core.CacheCallback;
-import com.dianping.cache.core.CacheClient;
 import com.dianping.cache.exception.CacheException;
-import com.dianping.cache.monitor.HitRateMonitor;
-import com.dianping.cache.monitor.KeyCountMonitor;
-import com.dianping.cache.monitor.TimeMonitor;
-import com.dianping.cache.status.StatusHolder;
 import com.dianping.cat.Cat;
 import com.dianping.cat.CatConstants;
 import com.dianping.cat.message.Message;
@@ -51,6 +32,25 @@ import com.dianping.pigeon.remoting.ServiceFactory;
 import com.dianping.pigeon.remoting.invoker.config.InvokerConfig;
 import com.dianping.remote.cache.CacheManageWebService;
 import com.dianping.remote.cache.dto.CacheClearDTO;
+import com.dianping.squirrel.client.annotation.Cache;
+import com.dianping.squirrel.client.config.CacheClientFactory;
+import com.dianping.squirrel.client.config.CacheItemConfigManager;
+import com.dianping.squirrel.client.config.CacheKeyType;
+import com.dianping.squirrel.client.config.RemoteCacheClientFactory;
+import com.dianping.squirrel.client.config.RemoteCacheItemConfigManager;
+import com.dianping.squirrel.client.core.CASResponse;
+import com.dianping.squirrel.client.core.CASValue;
+import com.dianping.squirrel.client.core.CacheCallback;
+import com.dianping.squirrel.client.core.CacheClient;
+import com.dianping.squirrel.client.monitor.HitRateMonitor;
+import com.dianping.squirrel.client.monitor.KeyCountMonitor;
+import com.dianping.squirrel.client.monitor.StatusHolder;
+import com.dianping.squirrel.client.monitor.TimeMonitor;
+import com.dianping.squirrel.client.util.CacheAnnotationUtils;
+import com.dianping.squirrel.client.util.CacheMonitorUtil;
+import com.dianping.squirrel.client.util.CacheTracker;
+import com.dianping.squirrel.client.util.DefaultCacheTracker;
+import com.dianping.squirrel.common.config.ConfigManagerLoader;
 import com.site.helper.Stringizers;
 
 /**
@@ -64,7 +64,7 @@ public class CacheServiceContainer {
 	/**
 	 * Default cache
 	 */
-	private String defaultCacheType = CacheKeyType.DEFAULT_CACHE_TYPE;
+	private String defaultCacheType = CacheKeyType.DEFAULT_STORE_TYPE;
 
 	/**
 	 * Default cache category

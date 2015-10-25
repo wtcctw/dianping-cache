@@ -25,6 +25,8 @@ import com.dianping.cache.entity.CacheKeyConfiguration;
 import com.dianping.cache.service.CacheConfigurationService;
 import com.dianping.cache.service.CacheKeyConfigurationService;
 import com.dianping.remote.cache.dto.CacheKeyTypeVersionUpdateDTO;
+import com.dianping.squirrel.common.util.JsonUtils;
+import com.dianping.squirrel.common.util.ZKUtils;
 
 public class Migrator implements InitializingBean{
 

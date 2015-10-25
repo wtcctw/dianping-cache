@@ -16,8 +16,8 @@ import org.apache.zookeeper.Watcher.Event.EventType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.dianping.avatar.cache.util.IPUtils;
 import com.dianping.cache.util.CollectionUtils;
+import com.dianping.squirrel.client.util.IPUtils;
 
 public class MemberMonitor implements CuratorHandler {
     

@@ -20,9 +20,9 @@ import org.apache.zookeeper.WatchedEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.dianping.cache.config.ConfigManager;
-import com.dianping.cache.config.ConfigManagerLoader;
 import com.dianping.pigeon.threadpool.NamedThreadFactory;
+import com.dianping.squirrel.common.config.ConfigManager;
+import com.dianping.squirrel.common.config.ConfigManagerLoader;
 
 public class CuratorManager {
     

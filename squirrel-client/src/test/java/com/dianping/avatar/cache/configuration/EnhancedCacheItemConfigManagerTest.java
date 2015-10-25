@@ -25,6 +25,11 @@ import java.util.Set;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import com.dianping.squirrel.client.config.CacheItemConfigManager;
+import com.dianping.squirrel.client.config.CacheKeyType;
+import com.dianping.squirrel.client.config.DefaultCacheKeyType;
+import com.dianping.squirrel.client.config.EnhancedCacheItemConfigManager;
+
 /**
  * TODO Comment of EnhancedCacheItemConfigManagerTest
  * 
@@ -46,7 +51,7 @@ public class EnhancedCacheItemConfigManagerTest {
 
 	/**
 	 * Test method for
-	 * {@link com.dianping.avatar.cache.configuration.EnhancedCacheItemConfigManager#getCacheKeyType(java.lang.String)}
+	 * {@link com.dianping.squirrel.client.config.EnhancedCacheItemConfigManager#getCacheKeyType(java.lang.String)}
 	 * .
 	 */
 	@Test
@@ -61,7 +66,7 @@ public class EnhancedCacheItemConfigManagerTest {
 		CacheKeyType cacheKeyType = cacheItemConfigManager.getCacheKeyType(CATEGORY_INEXISTS);
 		assertNotNull(cacheKeyType);
 		assertTrue(cacheKeyType instanceof DefaultCacheKeyType);
-		assertEquals(CacheKeyType.DEFAULT_CACHE_TYPE, cacheKeyType.getCacheType());
+		assertEquals(CacheKeyType.DEFAULT_STORE_TYPE, cacheKeyType.getCacheType());
 		assertEquals(CATEGORY_INEXISTS, cacheKeyType.getCategory());
 		assertEquals("category-inexist.(hello)(vv)_0", cacheKeyType.getKey(new String[] { "hello", "vv" }));
 	}

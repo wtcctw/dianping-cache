@@ -3,9 +3,9 @@ package com.dianping.cache.test;
 import java.util.List;
 import java.util.concurrent.TimeoutException;
 
-import com.dianping.cache.core.CASResponse;
-import com.dianping.cache.core.CASValue;
 import com.dianping.cache.exception.CacheException;
+import com.dianping.squirrel.client.core.CASResponse;
+import com.dianping.squirrel.client.core.CASValue;
 
 public interface CacheDemoService {
 

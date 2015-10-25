@@ -31,7 +31,7 @@
 				<version>2.2.5</version>
 			</dependency>
 			<dependency>
-				<groupId>com.dianping.squirrel</groupId>
+				<groupId>${project.groupId}</groupId>
 				<artifactId>squirrel-store</artifactId>
 				<version>${project.version}</version>
 			</dependency>
@@ -140,7 +140,6 @@
 	<modules>
 		<module>squirrel-console</module>
 		<module>squirrel-client</module>
-		<module>squirrel-store</module>
 		<module>squirrel-test</module>
 	</modules>
 

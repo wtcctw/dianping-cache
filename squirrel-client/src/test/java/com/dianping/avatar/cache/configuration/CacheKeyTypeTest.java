@@ -4,6 +4,8 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
+import com.dianping.squirrel.client.config.CacheKeyType;
+
 public class CacheKeyTypeTest {
 
     @Test

@@ -22,12 +22,12 @@ import com.dianping.avatar.cache.CacheService;
 import com.dianping.avatar.cache.CacheServiceFactory;
 import com.dianping.avatar.tracker.ExecutionContextHolder;
 import com.dianping.avatar.tracker.TrackerContext;
-import com.dianping.cache.core.CASResponse;
-import com.dianping.cache.core.CASValue;
-import com.dianping.cache.core.CacheCallback;
 import com.dianping.cache.exception.CacheException;
 import com.dianping.pigeon.remoting.provider.config.annotation.Service;
 import com.dianping.remote.cache.CacheManageWebService;
+import com.dianping.squirrel.client.core.CASResponse;
+import com.dianping.squirrel.client.core.CASValue;
+import com.dianping.squirrel.client.core.CacheCallback;
 
 @Service(url = "com.dianping.cache.test.MemcacheDemoService")
 public class MemcacheDemoServiceImpl implements CacheDemoService {

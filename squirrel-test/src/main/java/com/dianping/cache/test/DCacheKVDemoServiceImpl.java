@@ -13,10 +13,10 @@ import com.dianping.avatar.cache.CacheKey;
 import com.dianping.avatar.cache.CacheService;
 import com.dianping.avatar.tracker.ExecutionContextHolder;
 import com.dianping.avatar.tracker.TrackerContext;
-import com.dianping.cache.core.CASResponse;
-import com.dianping.cache.core.CASValue;
 import com.dianping.cache.exception.CacheException;
 import com.dianping.pigeon.remoting.provider.config.annotation.Service;
+import com.dianping.squirrel.client.core.CASResponse;
+import com.dianping.squirrel.client.core.CASValue;
 
 @Service(url = "com.dianping.cache.test.DCacheKVDemoService")
 public class DCacheKVDemoServiceImpl implements CacheDemoService {

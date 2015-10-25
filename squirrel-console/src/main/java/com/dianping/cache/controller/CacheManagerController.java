@@ -44,10 +44,8 @@ import org.springframework.web.servlet.ModelAndView;
 import com.dianping.avatar.cache.CacheKey;
 import com.dianping.avatar.cache.CacheService;
 import com.dianping.avatar.exception.DuplicatedIdentityException;
-import com.dianping.cache.core.CacheClient;
 import com.dianping.cache.entity.*;
 import com.dianping.cache.exception.CacheException;
-import com.dianping.cache.memcached.MemcachedClientImpl;
 import com.dianping.cache.monitor.storage.MemcacheStatsDataStorage;
 import com.dianping.cache.monitor.storage.ServerStatsDataStorage;
 import com.dianping.cache.service.*;
@@ -56,6 +54,8 @@ import com.dianping.cache.service.condition.OperationLogSearchCondition;
 import com.dianping.cache.util.NetUtil;
 import com.dianping.cache.util.RequestUtil;
 import com.dianping.core.type.PageModel;
+import com.dianping.squirrel.client.core.CacheClient;
+import com.dianping.squirrel.client.impl.memcached.MemcachedClientImpl;
 
 @Controller
 public class CacheManagerController extends AbstractCacheController {

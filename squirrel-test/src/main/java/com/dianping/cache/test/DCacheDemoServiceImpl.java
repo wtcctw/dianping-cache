@@ -9,8 +9,8 @@ import java.util.Set;
 import javax.annotation.Resource;
 
 import com.dianping.avatar.cache.CacheService;
-import com.dianping.cache.dcache.DCacheClient;
 import com.dianping.pigeon.remoting.provider.config.annotation.Service;
+import com.dianping.squirrel.client.impl.dcache.DCacheClient;
 import com.qq.cloud.component.dcache.client.api.BatchCacheResult;
 import com.qq.cloud.component.dcache.client.api.CacheResult;
 import com.qq.cloud.component.dcache.client.api.ConditionStatement;
