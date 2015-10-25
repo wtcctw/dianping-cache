@@ -17,6 +17,7 @@ package com.dianping.squirrel.client.config;
 
 import java.util.Set;
 
+import com.dianping.squirrel.client.StoreClient;
 import com.dianping.squirrel.client.core.CacheClient;
 import com.dianping.squirrel.client.core.CacheClientConfiguration;
 
@@ -35,11 +36,11 @@ public interface CacheClientFactory {
 	Set<String> getCacheClientKeys();
 
 	/**
-	 * Retrieve a {@link CacheService} instance by key
+	 * Retrieve a {@link StoreClient} instance by key
 	 */
-	CacheClient findCacheClient(String cacheKey);
+	StoreClient findCacheClient(String cacheKey);
 
-	CacheClient init(String cacheKey);
+	StoreClient init(String cacheKey);
 	
 	/**
 	 * Get current {@link CacheClientConfiguration}

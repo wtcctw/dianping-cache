@@ -28,8 +28,8 @@ import com.dianping.pigeon.remoting.ServiceFactory;
 import com.dianping.remote.cache.CacheConfigurationWebService;
 import com.dianping.remote.cache.dto.CacheConfigurationDTO;
 import com.dianping.remote.cache.dto.CacheConfigurationsDTO;
+import com.dianping.squirrel.client.StoreClient;
 import com.dianping.squirrel.client.config.zookeeper.CacheCuratorClient;
-import com.dianping.squirrel.client.core.CacheClient;
 import com.dianping.squirrel.client.core.CacheClientBuilder;
 import com.dianping.squirrel.client.core.CacheClientConfiguration;
 import com.dianping.squirrel.client.core.CacheConfiguration;
@@ -82,7 +82,7 @@ public class RemoteCacheClientFactory implements CacheClientFactory {
 	}
 	
 	@Override
-	public CacheClient findCacheClient(String cacheKey) {
+	public StoreClient findCacheClient(String cacheKey) {
 	    if(StringUtils.isBlank(cacheKey)) {
 	        throw new NullPointerException("cache service is empty");
 	    }
@@ -93,7 +93,7 @@ public class RemoteCacheClientFactory implements CacheClientFactory {
 	}
 
 	@Override
-	public CacheClient init(String cacheKey) {
+	public StoreClient init(String cacheKey) {
 		CacheClientConfiguration config = configMap.get(cacheKey);
 		if (config == null) {
 			synchronized (this) {

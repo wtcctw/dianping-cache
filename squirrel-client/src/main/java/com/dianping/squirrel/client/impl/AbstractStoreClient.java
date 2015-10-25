@@ -1,5 +1,7 @@
 package com.dianping.squirrel.client.impl;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Future;
@@ -18,6 +20,7 @@ import com.dianping.squirrel.client.monitor.StatusHolder;
 import com.dianping.squirrel.client.monitor.TimeMonitor;
 import com.dianping.squirrel.common.exception.StoreException;
 import com.dianping.squirrel.common.exception.StoreTimeoutException;
+import com.dianping.squirrel.common.util.ZKUtils;
 
 public abstract class AbstractStoreClient implements StoreClient {
 
@@ -27,6 +30,23 @@ public abstract class AbstractStoreClient implements StoreClient {
 		configManager = RemoteCacheItemConfigManager.getInstance();
 	}
 	
+	@Override
+    public Boolean delete(final String finalKey) throws StoreException {
+	    checkNotNull(finalKey, "final key is null");
+	    String category = ZKUtils.getCategoryFromKey(finalKey);
+        final CacheKeyType categoryConfig = configManager.findCacheKeyType(category);
+        checkNotNull(categoryConfig, "%s' category config is null", category);
+        
+        return executeWithMonitor(new Command() {
+
+            @Override
+            public Object execute() throws Exception {
+                return doDelete(categoryConfig, finalKey);
+            }
+            
+        }, categoryConfig, finalKey, "delete");
+	}
+    
 	@Override
 	public <T> T get(StoreKey key) throws StoreException {
 		if (key == null) {

@@ -20,6 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.dianping.remote.cache.dto.SingleCacheRemoveDTO;
+import com.dianping.squirrel.client.StoreClient;
 import com.dianping.squirrel.client.config.RemoteCacheClientFactory;
 import com.dianping.squirrel.client.core.CacheClient;
 import com.dianping.squirrel.client.util.IPUtils;
@@ -53,7 +54,7 @@ public class SingleCacheRemoveListener {
 			if (destinations == null || destinations.contains(serverIp)) {
 				String cacheType = cacheRemoveDTO.getCacheType();
 				String cacheKeys = cacheRemoveDTO.getCacheKey();
-				CacheClient cacheClient = RemoteCacheClientFactory.getInstance().findCacheClient(cacheType);
+				StoreClient cacheClient = RemoteCacheClientFactory.getInstance().findCacheClient(cacheType);
 				if (cacheClient != null) {
 					String[] keyList = StringUtils.splitByWholeSeparator(cacheKeys, CACHE_FINAL_KEY_SEP);
 					if (keyList != null) {
@@ -62,7 +63,7 @@ public class SingleCacheRemoveListener {
 						Throwable lastError = null;
 						for (String finalKey : keyList) {
 							try {
-								cacheClient.asyncDelete(finalKey, true, ZKUtils.getCategoryFromKey(finalKey));
+								cacheClient.delete(finalKey);
 								removedKeys.add(finalKey);
 							} catch (Throwable e) {
 								failedKeys.add(finalKey);

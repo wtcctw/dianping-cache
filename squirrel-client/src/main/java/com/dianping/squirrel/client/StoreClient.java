@@ -8,6 +8,9 @@ import com.dianping.squirrel.common.exception.StoreException;
 
 public interface StoreClient {
 
+    // final key operations
+    public Boolean delete(String finalKey) throws StoreException;
+    
     // sync single key operations
     public <T> T get(StoreKey key) throws StoreException;
     

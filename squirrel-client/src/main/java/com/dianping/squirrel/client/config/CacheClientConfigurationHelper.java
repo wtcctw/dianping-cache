@@ -22,6 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.dianping.remote.cache.dto.CacheConfigurationDTO;
+import com.dianping.squirrel.client.StoreClient;
 import com.dianping.squirrel.client.config.parser.CacheClientConfigurationParser;
 import com.dianping.squirrel.client.config.parser.DCacheClientConfigurationParser;
 import com.dianping.squirrel.client.config.parser.EhcacheClientConfigurationParser;
@@ -43,7 +44,7 @@ import com.dianping.squirrel.common.exception.StoreInitializeException;
  */
 public class CacheClientConfigurationHelper {
 	private static transient Logger logger = LoggerFactory.getLogger(CacheClientConfigurationHelper.class);
-	private static Map<Class<? extends CacheClient>, CacheClientConfigurationParser> parserMap = new ConcurrentHashMap<Class<? extends CacheClient>, CacheClientConfigurationParser>();
+	private static Map<Class, CacheClientConfigurationParser> parserMap = new ConcurrentHashMap<Class, CacheClientConfigurationParser>();
 
 	static {
 		register(MemcachedClientImpl.class, new MemcachedClientConfigurationParser());
@@ -52,7 +53,7 @@ public class CacheClientConfigurationHelper {
 		register(RedisStoreClientImpl.class, new RedisClusterClientConfigurationParser());
 	}
 
-	public static void register(Class<? extends CacheClient> clientClazz, CacheClientConfigurationParser parser) {
+	public static void register(Class clientClazz, CacheClientConfigurationParser parser) {
 		parserMap.put(clientClazz, parser);
 	}
 

@@ -18,6 +18,8 @@ package com.dianping.squirrel.client.core;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import com.dianping.squirrel.client.StoreClient;
+
 /**
  * Build cache client from configuration file. Each cache key will be built only
  * one instance. And, if the client implements {@link Lifecycle}, it will be
@@ -31,13 +33,13 @@ public class CacheClientBuilder {
 	/**
 	 * The caches for all client implementation
 	 */
-	private static Map<String, CacheClient> caches = new ConcurrentHashMap<String, CacheClient>();
+	private static Map<String, StoreClient> caches = new ConcurrentHashMap<String, StoreClient>();
 
-	public static CacheClient getCacheClient(String key, CacheClientConfiguration config) {
+	public static StoreClient getCacheClient(String key, CacheClientConfiguration config) {
 		if (key == null) {
 			throw new IllegalArgumentException("Cache key is null.");
 		}
-		CacheClient cacheClient = caches.get(key);
+		StoreClient cacheClient = caches.get(key);
 		if (cacheClient != null) {
 			return cacheClient;
 		} else {
@@ -51,12 +53,12 @@ public class CacheClientBuilder {
 	 * cached to HashMap for multiple retrieves. Every key will only be built
 	 * for one instance.
 	 */
-	public synchronized static CacheClient buildCacheClient(String key, CacheClientConfiguration config) {
+	public synchronized static StoreClient buildCacheClient(String key, CacheClientConfiguration config) {
 		if (key == null) {
 			throw new IllegalArgumentException("Cache key is null.");
 		}
 
-		CacheClient cacheClient = caches.get(key);
+		StoreClient cacheClient = caches.get(key);
 
 		if (cacheClient != null) {
 			return cacheClient;
@@ -83,13 +85,13 @@ public class CacheClientBuilder {
 			}
 		}
 
-		if (!CacheClient.class.isAssignableFrom(cz)) {
+		if (!StoreClient.class.isAssignableFrom(cz)) {
 			throw new IllegalArgumentException("The cache implementation[" + cacheImplementation
-					+ "] is not drived from " + CacheClient.class.getName());
+					+ "] is not drived from " + StoreClient.class.getName());
 		}
 
 		try {
-			cacheClient = (CacheClient) cz.newInstance();
+			cacheClient = (StoreClient) cz.newInstance();
 
 		} catch (InstantiationException e) {
 			throw new IllegalArgumentException("Cann't instantiate cache implementation[" + cacheImplementation + "]",
@@ -121,7 +123,7 @@ public class CacheClientBuilder {
 			return;
 		}
 
-		CacheClient cacheClient = caches.get(key);
+		StoreClient cacheClient = caches.get(key);
 
 		if (cacheClient == null) {
 			return;

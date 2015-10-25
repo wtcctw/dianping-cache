@@ -1,5 +1,7 @@
 package com.dianping.squirrel.client.impl;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Future;
@@ -7,10 +9,15 @@ import java.util.concurrent.Future;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.dianping.squirrel.client.Store;
 import com.dianping.squirrel.client.StoreCallback;
 import com.dianping.squirrel.client.StoreClient;
+import com.dianping.squirrel.client.StoreClientFactory;
 import com.dianping.squirrel.client.StoreKey;
+import com.dianping.squirrel.client.config.CacheClientFactory;
+import com.dianping.squirrel.client.config.CacheItemConfigManager;
+import com.dianping.squirrel.client.config.CacheKeyType;
+import com.dianping.squirrel.client.config.RemoteCacheClientFactory;
+import com.dianping.squirrel.client.config.RemoteCacheItemConfigManager;
 import com.dianping.squirrel.client.log.LoggerLoader;
 import com.dianping.squirrel.client.monitor.SizeMonitor;
 import com.dianping.squirrel.client.monitor.StatusHolder;
@@ -18,6 +25,7 @@ import com.dianping.squirrel.client.monitor.TimeMonitor;
 import com.dianping.squirrel.common.config.ConfigChangeListener;
 import com.dianping.squirrel.common.config.ConfigManagerLoader;
 import com.dianping.squirrel.common.exception.StoreException;
+import com.dianping.squirrel.common.util.ZKUtils;
 
 public class DefaultStoreClient implements StoreClient {
 
@@ -32,10 +40,7 @@ public class DefaultStoreClient implements StoreClient {
 	
 	private volatile boolean enable = DEFAULT_STORE_ENABLE;
 	
-	private final StoreClientContainer container;
-
 	public DefaultStoreClient() {
-        this.container = new StoreClientContainer();
         this.enable = ConfigManagerLoader.getConfigManager().getBooleanValue(KEY_STORE_ENABLE, DEFAULT_STORE_ENABLE);
         try {
             ConfigManagerLoader.getConfigManager().registerConfigChangeListener(new ConfigChangeListener() {
@@ -70,89 +75,180 @@ public class DefaultStoreClient implements StoreClient {
 	
 	@Override
 	public <T> T get(StoreKey key) throws StoreException {
+	    checkNotNull(key, "store key is null");
+	    StoreClient storeClient = StoreClientFactory.getStoreClientByCategory(key.getCategory());
+	    checkNotNull(storeClient, "no store client for category %s", key.getCategory());
 		if(enable) {
-			return container.get(key);
+			return storeClient.get(key);
+		} else {
+		    return null;
 		}
-		return null;
 	}
 
-	@Override
+    @Override
 	public Boolean set(StoreKey key, Object value) throws StoreException {
-		if(enable) {
-			return container.set(key, value);
-		}
-		return false;
+        checkNotNull(key, "store key is null");
+        checkNotNull(value, "value is null");
+        StoreClient storeClient = StoreClientFactory.getStoreClientByCategory(key.getCategory());
+        checkNotNull(storeClient, "no store client for category %s", key.getCategory());
+        if(enable) {
+            return storeClient.set(key, value);
+        } else {
+            return false;
+        }
 	}
 
 	@Override
 	public Boolean add(StoreKey key, Object value) throws StoreException {
-		return container.addIfAbsent(key, value);
+	    checkNotNull(key, "store key is null");
+        checkNotNull(value, "value is null");
+        StoreClient storeClient = StoreClientFactory.getStoreClientByCategory(key.getCategory());
+        checkNotNull(storeClient, "no store client for category %s", key.getCategory());
+        if(enable) {
+            return storeClient.add(key, value);
+        } else {
+            return false;
+        }
 	}
 
 	@Override
 	public Boolean delete(StoreKey key) throws StoreException {
-		return container.delete(key);
+	    checkNotNull(key, "store key is null");
+        StoreClient storeClient = StoreClientFactory.getStoreClientByCategory(key.getCategory());
+        checkNotNull(storeClient, "no store client for category %s", key.getCategory());
+        if(enable) {
+            return storeClient.delete(key);
+        } else {
+            return false;
+        }
 	}
 
 	@Override
 	public <T> Future<T> asyncGet(StoreKey key) throws StoreException {
-		return container.asyncGet(key);
+	    checkNotNull(key, "store key is null");
+        StoreClient storeClient = StoreClientFactory.getStoreClientByCategory(key.getCategory());
+        checkNotNull(storeClient, "no store client for category %s", key.getCategory());
+        if(enable) {
+            return storeClient.asyncGet(key);
+        } else {
+            return null;
+        }
 	}
 
 	@Override
-	public Future<Boolean> asyncSet(StoreKey key, Object value)
-			throws StoreException {
-		return container.asyncSet(key, value);
+	public Future<Boolean> asyncSet(StoreKey key, Object value) throws StoreException {
+	    checkNotNull(key, "store key is null");
+        checkNotNull(value, "value is null");
+        StoreClient storeClient = StoreClientFactory.getStoreClientByCategory(key.getCategory());
+        checkNotNull(storeClient, "no store client for category %s", key.getCategory());
+        if(enable) {
+            return storeClient.asyncSet(key, value);
+        } else {
+            return null;
+        }
 	}
 
 	@Override
-	public Future<Boolean> asyncAdd(StoreKey key, Object value)
-			throws StoreException {
-		return container.asyncAdd(key, value);
+	public Future<Boolean> asyncAdd(StoreKey key, Object value) throws StoreException {
+	    checkNotNull(key, "store key is null");
+        checkNotNull(value, "value is null");
+        StoreClient storeClient = StoreClientFactory.getStoreClientByCategory(key.getCategory());
+        checkNotNull(storeClient, "no store client for category %s", key.getCategory());
+        if(enable) {
+            return storeClient.asyncAdd(key, value);
+        } else {
+            return null;
+        }
 	}
 
 	@Override
 	public Future<Boolean> asyncDelete(StoreKey key) throws StoreException {
-		// TODO Auto-generated method stub
-		return null;
+	    checkNotNull(key, "store key is null");
+        StoreClient storeClient = StoreClientFactory.getStoreClientByCategory(key.getCategory());
+        checkNotNull(storeClient, "no store client for category %s", key.getCategory());
+        if(enable) {
+            return storeClient.asyncDelete(key);
+        } else {
+            return null;
+        }
 	}
 
 	@Override
 	public <T> Void asyncGet(StoreKey key, StoreCallback<T> callback) {
-		// TODO Auto-generated method stub
-	    return null;
+	    checkNotNull(key, "store key is null");
+	    checkNotNull(callback, "callback is null");
+        StoreClient storeClient = StoreClientFactory.getStoreClientByCategory(key.getCategory());
+        checkNotNull(storeClient, "no store client for category %s", key.getCategory());
+        if(enable) {
+            return storeClient.asyncGet(key, callback);
+        } else {
+            return null;
+        }
 	}
 
 	@Override
-	public Void asyncSet(StoreKey key, Object value,
-			StoreCallback<Boolean> callback) {
-		// TODO Auto-generated method stub
-	    return null;
+	public Void asyncSet(StoreKey key, Object value, StoreCallback<Boolean> callback) {
+	    checkNotNull(key, "store key is null");
+	    checkNotNull(value, "value is null");
+        checkNotNull(callback, "callback is null");
+        StoreClient storeClient = StoreClientFactory.getStoreClientByCategory(key.getCategory());
+        checkNotNull(storeClient, "no store client for category %s", key.getCategory());
+        if(enable) {
+            return storeClient.asyncSet(key, value, callback);
+        } else {
+            return null;
+        }
 	}
 
 	@Override
-	public Void asyncAdd(StoreKey key, Object value,
-			StoreCallback<Boolean> callback) {
-		// TODO Auto-generated method stub
-	    return null;
+	public Void asyncAdd(StoreKey key, Object value, StoreCallback<Boolean> callback) {
+	    checkNotNull(key, "store key is null");
+        checkNotNull(value, "value is null");
+        checkNotNull(callback, "callback is null");
+        StoreClient storeClient = StoreClientFactory.getStoreClientByCategory(key.getCategory());
+        checkNotNull(storeClient, "no store client for category %s", key.getCategory());
+        if(enable) {
+            return storeClient.asyncAdd(key, value, callback);
+        } else {
+            return null;
+        }
 	}
 
 	@Override
 	public Void asyncDelete(StoreKey key, StoreCallback<Boolean> callback) {
-		// TODO Auto-generated method stub
-	    return null;
+	    checkNotNull(key, "store key is null");
+        checkNotNull(callback, "callback is null");
+        StoreClient storeClient = StoreClientFactory.getStoreClientByCategory(key.getCategory());
+        checkNotNull(storeClient, "no store client for category %s", key.getCategory());
+        if(enable) {
+            return storeClient.asyncDelete(key, callback);
+        } else {
+            return null;
+        }
 	}
 
 	@Override
 	public Long increase(StoreKey key, int amount) throws StoreException {
-		// TODO Auto-generated method stub
-		return 0L;
+	    checkNotNull(key, "store key is null");
+        StoreClient storeClient = StoreClientFactory.getStoreClientByCategory(key.getCategory());
+        checkNotNull(storeClient, "no store client for category %s", key.getCategory());
+        if(enable) {
+            return storeClient.increase(key, amount);
+        } else {
+            return -1L;
+        }
 	}
 
 	@Override
 	public Long decrease(StoreKey key, int amount) throws StoreException {
-		// TODO Auto-generated method stub
-		return 0L;
+	    checkNotNull(key, "store key is null");
+        StoreClient storeClient = StoreClientFactory.getStoreClientByCategory(key.getCategory());
+        checkNotNull(storeClient, "no store client for category %s", key.getCategory());
+        if(enable) {
+            return storeClient.decrease(key, amount);
+        } else {
+            return -1L;
+        }
 	}
 
 	@Override
@@ -182,5 +278,18 @@ public class DefaultStoreClient implements StoreClient {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+    @Override
+    public Boolean delete(String finalKey) throws StoreException {
+        checkNotNull(finalKey, "final key is null");
+        String category = ZKUtils.getCategoryFromKey(finalKey);
+        StoreClient storeClient = StoreClientFactory.getStoreClientByCategory(category);
+        checkNotNull(storeClient, "no store client for category %s", category);
+        if(enable) {
+            return storeClient.delete(finalKey);
+        } else {
+            return false;
+        }
+    }
 
 }
