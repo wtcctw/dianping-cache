@@ -25,7 +25,7 @@ import com.dianping.squirrel.client.monitor.TimeMonitor;
 import com.dianping.squirrel.common.config.ConfigChangeListener;
 import com.dianping.squirrel.common.config.ConfigManagerLoader;
 import com.dianping.squirrel.common.exception.StoreException;
-import com.dianping.squirrel.common.util.ZKUtils;
+import com.dianping.squirrel.common.util.PathUtils;
 
 public class DefaultStoreClient implements StoreClient {
 
@@ -282,7 +282,7 @@ public class DefaultStoreClient implements StoreClient {
     @Override
     public Boolean delete(String finalKey) throws StoreException {
         checkNotNull(finalKey, "final key is null");
-        String category = ZKUtils.getCategoryFromKey(finalKey);
+        String category = PathUtils.getCategoryFromKey(finalKey);
         StoreClient storeClient = StoreClientFactory.getStoreClientByCategory(category);
         checkNotNull(storeClient, "no store client for category %s", category);
         if(enable) {

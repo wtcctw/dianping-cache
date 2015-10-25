@@ -38,7 +38,7 @@ import com.dianping.squirrel.client.impl.redis.RedisStoreClientImpl;
 import com.dianping.squirrel.common.config.ConfigManager;
 import com.dianping.squirrel.common.config.ConfigManagerLoader;
 import com.dianping.squirrel.common.exception.StoreInitializeException;
-import com.dianping.squirrel.common.util.ZKUtils;
+import com.dianping.squirrel.common.util.PathUtils;
 
 /**
  * Remote centralized managed cache client config
@@ -217,7 +217,7 @@ public class RemoteCacheClientFactory implements CacheClientFactory {
 	}
 	
 	private void initCacheServices() {
-        if (ZKUtils.isZookeeperEnabled()) {
+        if (PathUtils.isZookeeperEnabled()) {
             String appName = configManager.getAppName();
             if (StringUtils.isNotEmpty(appName)) {
                 try {

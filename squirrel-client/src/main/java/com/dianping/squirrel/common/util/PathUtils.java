@@ -10,7 +10,7 @@ import java.util.List;
 import com.dianping.squirrel.common.config.ConfigManager;
 import com.dianping.squirrel.common.config.ConfigManagerLoader;
 
-public class ZKUtils {
+public class PathUtils {
 
     public static final String CACHE_SERVICE_PATH = "/dp/cache/service";
     public static final String CACHE_CATEGORY_PATH = "/dp/cache/category";

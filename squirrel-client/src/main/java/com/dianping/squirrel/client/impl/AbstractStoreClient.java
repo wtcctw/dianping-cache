@@ -20,7 +20,7 @@ import com.dianping.squirrel.client.monitor.StatusHolder;
 import com.dianping.squirrel.client.monitor.TimeMonitor;
 import com.dianping.squirrel.common.exception.StoreException;
 import com.dianping.squirrel.common.exception.StoreTimeoutException;
-import com.dianping.squirrel.common.util.ZKUtils;
+import com.dianping.squirrel.common.util.PathUtils;
 
 public abstract class AbstractStoreClient implements StoreClient {
 
@@ -33,7 +33,7 @@ public abstract class AbstractStoreClient implements StoreClient {
 	@Override
     public Boolean delete(final String finalKey) throws StoreException {
 	    checkNotNull(finalKey, "final key is null");
-	    String category = ZKUtils.getCategoryFromKey(finalKey);
+	    String category = PathUtils.getCategoryFromKey(finalKey);
         final CacheKeyType categoryConfig = configManager.findCacheKeyType(category);
         checkNotNull(categoryConfig, "%s' category config is null", category);
         

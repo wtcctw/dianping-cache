@@ -26,7 +26,7 @@ import com.dianping.cache.service.CacheConfigurationService;
 import com.dianping.cache.service.CacheKeyConfigurationService;
 import com.dianping.remote.cache.dto.CacheKeyTypeVersionUpdateDTO;
 import com.dianping.squirrel.common.util.JsonUtils;
-import com.dianping.squirrel.common.util.ZKUtils;
+import com.dianping.squirrel.common.util.PathUtils;
 
 public class Migrator implements InitializingBean{
 
@@ -57,22 +57,22 @@ public class Migrator implements InitializingBean{
     }
     
     private void migrateServiceConfig() throws Exception {
-        ensurePath(ZKUtils.CACHE_SERVICE_PATH);
+        ensurePath(PathUtils.CACHE_SERVICE_PATH);
         List<CacheConfiguration> serviceConfigs = cacheConfigService.findAll();
         for(CacheConfiguration serviceConfig : serviceConfigs) {
             String json = JsonUtils.toStr(serviceConfig);
-            String path = ZKUtils.getServicePath(serviceConfig.getCacheKey());
+            String path = PathUtils.getServicePath(serviceConfig.getCacheKey());
             updateNode(path, json);
         }
     }
 
     private void migrateCategoryConfig() throws Exception {
-        ensurePath(ZKUtils.CACHE_CATEGORY_PATH);
+        ensurePath(PathUtils.CACHE_CATEGORY_PATH);
         List<CacheKeyConfiguration> categoryConfigs = cacheKeyConfigService.findAll();
         for(CacheKeyConfiguration categoryConfig : categoryConfigs) {
             if(StringUtils.isEmpty(categoryConfig.getCategory()))
                 continue;
-            String path = ZKUtils.getCategoryPath(categoryConfig.getCategory());
+            String path = PathUtils.getCategoryPath(categoryConfig.getCategory());
             String json = JsonUtils.toStr(categoryConfig);
             updateNode(path, json);
             CacheKeyTypeVersionUpdateDTO versionDto = new CacheKeyTypeVersionUpdateDTO();

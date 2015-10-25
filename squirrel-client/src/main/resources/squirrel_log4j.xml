@@ -11,7 +11,7 @@
 
 	<appender name="FileAppender" class="org.apache.log4j.DailyRollingFileAppender">
 		<param name="Threshold" value="INFO" />
-		<param name="file" value="/data/applogs/cache/cache.log" />
+		<param name="file" value="/data/applogs/squirrel/squirrel.log" />
 		<param name="append" value="true" />
 		<param name="encoding" value="GBK" />
 		<layout class="org.apache.log4j.PatternLayout">

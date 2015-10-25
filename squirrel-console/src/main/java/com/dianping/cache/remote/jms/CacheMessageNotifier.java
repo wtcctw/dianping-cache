@@ -27,7 +27,7 @@ import com.dianping.squirrel.common.config.ConfigManager;
 import com.dianping.squirrel.common.config.ConfigManagerLoader;
 import com.dianping.squirrel.common.util.BoundedLinkedList;
 import com.dianping.squirrel.common.util.JsonUtils;
-import com.dianping.squirrel.common.util.ZKUtils;
+import com.dianping.squirrel.common.util.PathUtils;
 import com.geekhua.filequeue.Config;
 import com.geekhua.filequeue.FileQueue;
 import com.geekhua.filequeue.FileQueueImpl;
@@ -122,7 +122,7 @@ public class CacheMessageNotifier implements Serializable, InitializingBean, MQS
     }
 
     public void notifyServiceConfigChange(CacheConfigurationDTO serviceConfig) {
-        String path = ZKUtils.getServicePath(serviceConfig.getCacheKey());
+        String path = PathUtils.getServicePath(serviceConfig.getCacheKey());
         try {
             String content = JsonUtils.toStr(serviceConfig);
             updateNode(path, content);
@@ -136,9 +136,9 @@ public class CacheMessageNotifier implements Serializable, InitializingBean, MQS
     }
     
     public void notifyCategoryConfigChange(CacheKeyConfigurationDTO categoryConfig) {
-        String path = ZKUtils.getCategoryPath(categoryConfig.getCategory());
-        String versionPath = ZKUtils.getVersionPath(categoryConfig.getCategory());
-        String extPath = ZKUtils.getExtensionPath(categoryConfig.getCategory());
+        String path = PathUtils.getCategoryPath(categoryConfig.getCategory());
+        String versionPath = PathUtils.getVersionPath(categoryConfig.getCategory());
+        String extPath = PathUtils.getExtensionPath(categoryConfig.getCategory());
         try {
             String content = JsonUtils.toStr(categoryConfig);
             String versionContent = getVersionContent(categoryConfig);
@@ -191,7 +191,7 @@ public class CacheMessageNotifier implements Serializable, InitializingBean, MQS
     }
 
     public void notifyVersionChange(CacheKeyTypeVersionUpdateDTO message) {
-        String path = ZKUtils.getVersionPath(message.getMsgValue());
+        String path = PathUtils.getVersionPath(message.getMsgValue());
         try {
             String content = JsonUtils.toStr(message);
             updateNode(path, content);
@@ -203,8 +203,8 @@ public class CacheMessageNotifier implements Serializable, InitializingBean, MQS
     }
 
     public void notifyKeyRemove(SingleCacheRemoveDTO message) {
-        String category = ZKUtils.getCategoryFromKey(message.getCacheKey());
-        String path = ZKUtils.getKeyPath(category);
+        String category = PathUtils.getCategoryFromKey(message.getCacheKey());
+        String path = PathUtils.getKeyPath(category);
         try {
             String content = JsonUtils.toStr(message);
             long start = System.currentTimeMillis();
@@ -213,17 +213,17 @@ public class CacheMessageNotifier implements Serializable, InitializingBean, MQS
             if(time > 25) {
                 logger.warn("notifyKeyRemove.update took " + time);
             }
-            Cat.logEvent(CAT_EVENT_TYPE, "clear.key:" + ZKUtils.getCategoryFromKey(message.getCacheKey()), 
+            Cat.logEvent(CAT_EVENT_TYPE, "clear.key:" + PathUtils.getCategoryFromKey(message.getCacheKey()), 
                     "0", message.getCacheKey());
         } catch (Exception e) {
-            Cat.logEvent(CAT_EVENT_TYPE, "clear.key:" + ZKUtils.getCategoryFromKey(message.getCacheKey()), 
+            Cat.logEvent(CAT_EVENT_TYPE, "clear.key:" + PathUtils.getCategoryFromKey(message.getCacheKey()), 
                     "-1", e.getMessage());
             logger.error("failed to notify cache key remove: " + message, e);
         }
     }
 
     public void addToKeyRemoveBuffer(SingleCacheRemoveDTO message) {
-        String category = ZKUtils.getCategoryFromKey(message.getCacheKey());
+        String category = PathUtils.getCategoryFromKey(message.getCacheKey());
         if(category != null) {
             synchronized(this) {
                 List<SingleCacheRemoveDTO> list = keyRemoveBuffer.get(category);
@@ -299,7 +299,7 @@ public class CacheMessageNotifier implements Serializable, InitializingBean, MQS
                     continue;
                 }
                 count += removeKeyList.size();
-                String path = ZKUtils.getBatchKeyPath(entry.getKey());
+                String path = PathUtils.getBatchKeyPath(entry.getKey());
                 try {
                     String content = SedesUtils.serialize(removeKeyList);
                     updateNode(path, content);

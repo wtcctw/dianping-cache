@@ -13,7 +13,7 @@ import com.dianping.remote.cache.dto.SingleCacheRemoveDTO;
 import com.dianping.squirrel.client.config.RemoteCacheClientFactory;
 import com.dianping.squirrel.client.config.RemoteCacheItemConfigManager;
 import com.dianping.squirrel.client.core.CacheConfigurationListener;
-import com.dianping.squirrel.common.util.ZKUtils;
+import com.dianping.squirrel.common.util.PathUtils;
 
 public class CacheMessageManager implements CacheConfigurationListener {
 
@@ -97,7 +97,7 @@ public class CacheMessageManager implements CacheConfigurationListener {
 	}
 
 	public static boolean isInterestedMessage(SingleCacheRemoveDTO keyRemove) {
-		String category = ZKUtils.getCategoryFromKey(keyRemove.getCacheKey());
+		String category = PathUtils.getCategoryFromKey(keyRemove.getCacheKey());
 		return RemoteCacheItemConfigManager.getInstance().getCacheKeyType(category) != null;
 	}
 

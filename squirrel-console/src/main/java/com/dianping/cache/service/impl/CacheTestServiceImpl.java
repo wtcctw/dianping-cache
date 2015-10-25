@@ -10,7 +10,7 @@ import com.dianping.avatar.cache.CacheService;
 import com.dianping.cache.exception.CacheException;
 import com.dianping.cache.service.CacheTestService;
 import com.dianping.pigeon.remoting.provider.config.annotation.Service;
-import com.dianping.squirrel.common.util.ZKUtils;
+import com.dianping.squirrel.common.util.PathUtils;
 
 @Service(url = "com.dianping.cache.service.CacheTestService")
 public class CacheTestServiceImpl implements CacheTestService {
@@ -61,7 +61,7 @@ public class CacheTestServiceImpl implements CacheTestService {
 
     @Override
     public String getCategoryPath(String category) {
-        return ZKUtils.getCategoryPath(category);
+        return PathUtils.getCategoryPath(category);
     }
     
 }

@@ -27,7 +27,7 @@ import com.dianping.squirrel.client.config.listener.CacheKeyTypeVersionUpdateLis
 import com.dianping.squirrel.client.config.listener.SingleCacheRemoveListener;
 import com.dianping.squirrel.client.config.zookeeper.CacheEvent.CacheEventType;
 import com.dianping.squirrel.common.util.JsonUtils;
-import com.dianping.squirrel.common.util.ZKUtils;
+import com.dianping.squirrel.common.util.PathUtils;
 
 public class CacheMessageListener implements CuratorListener {
 
@@ -138,7 +138,7 @@ public class CacheMessageListener implements CuratorListener {
         if(ce.getContent() instanceof CacheKeyConfigurationDTO) {
             // get extension
             CacheKeyConfigurationDTO categoryConfig = (CacheKeyConfigurationDTO)ce.getContent();
-            String extension = getData(client, ZKUtils.getExtensionPath(categoryConfig.getCategory()), false);
+            String extension = getData(client, PathUtils.getExtensionPath(categoryConfig.getCategory()), false);
             categoryConfig.setExtension(extension);
         }
         dispatchCacheEvent(ce);
@@ -182,7 +182,7 @@ public class CacheMessageListener implements CuratorListener {
             return false;
         case KeyRemove:
             SingleCacheRemoveDTO keyRemove = (SingleCacheRemoveDTO) ce.getContent();
-            Cat.logEvent(CAT_EVENT_TYPE, "clear.key:" + ZKUtils.getCategoryFromKey(keyRemove.getCacheKey()));
+            Cat.logEvent(CAT_EVENT_TYPE, "clear.key:" + PathUtils.getCategoryFromKey(keyRemove.getCacheKey()));
             keyRemoveListener.handleMessage(keyRemove);
             return true;
         case BatchKeyRemove:
@@ -190,7 +190,7 @@ public class CacheMessageListener implements CuratorListener {
             if(keyRemoves == null || keyRemoves.size() == 0) {
                 return false;
             }
-            String category = ZKUtils.getCategoryFromKey(keyRemoves.get(0).getCacheKey());
+            String category = PathUtils.getCategoryFromKey(keyRemoves.get(0).getCacheKey());
             for(SingleCacheRemoveDTO singleKeyRemove : keyRemoves) {
                 Cat.logEvent(CAT_EVENT_TYPE, "clear.key:" + category);
                 keyRemoveListener.handleMessage(singleKeyRemove);

@@ -35,7 +35,7 @@ import com.dianping.squirrel.client.config.zookeeper.CacheCuratorClient;
 import com.dianping.squirrel.client.util.DTOUtils;
 import com.dianping.squirrel.common.config.ConfigManager;
 import com.dianping.squirrel.common.config.ConfigManagerLoader;
-import com.dianping.squirrel.common.util.ZKUtils;
+import com.dianping.squirrel.common.util.PathUtils;
 
 /**
  * Remote centralized managed cache item config
@@ -196,7 +196,7 @@ public class RemoteCacheItemConfigManager implements CacheItemConfigManager {
 	}
 	
 	private void initCacheCategories() {
-	    if (ZKUtils.isZookeeperEnabled()) {
+	    if (PathUtils.isZookeeperEnabled()) {
             String appName = configManager.getAppName();
             if (StringUtils.isNotEmpty(appName)) {
                 try {

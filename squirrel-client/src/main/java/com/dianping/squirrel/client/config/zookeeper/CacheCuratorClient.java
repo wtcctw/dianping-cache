@@ -33,7 +33,7 @@ import com.dianping.squirrel.common.config.ConfigChangeListener;
 import com.dianping.squirrel.common.config.ConfigManager;
 import com.dianping.squirrel.common.config.ConfigManagerLoader;
 import com.dianping.squirrel.common.util.JsonUtils;
-import com.dianping.squirrel.common.util.ZKUtils;
+import com.dianping.squirrel.common.util.PathUtils;
 
 public class CacheCuratorClient {
 
@@ -101,8 +101,8 @@ public class CacheCuratorClient {
 	}
 	
 	public CacheConfigurationDTO getServiceConfig(String service) throws Exception {
-		if (ZKUtils.isZookeeperEnabled() && isZookeeperConnected()) {
-			String path = ZKUtils.getServicePath(service);
+		if (PathUtils.isZookeeperEnabled() && isZookeeperConnected()) {
+			String path = PathUtils.getServicePath(service);
 			String content = getData(path, true);
 			if (StringUtils.isBlank(content)) {
 				logger.warn("cache service config [" + service + "] is empty");
@@ -120,7 +120,7 @@ public class CacheCuratorClient {
     }
 
     public CacheKeyConfigurationDTO getCategoryConfig(String category) throws Exception {
-		if (ZKUtils.isZookeeperEnabled() && isZookeeperConnected()) {
+		if (PathUtils.isZookeeperEnabled() && isZookeeperConnected()) {
 		    // get category
 			CacheKeyConfigurationDTO categoryConfig = _getCategoryConfig(category);
 			if (categoryConfig == null) {
@@ -146,7 +146,7 @@ public class CacheCuratorClient {
 
 			
 			if (WEB_CACHE.equals(categoryConfig.getCacheType())) {
-			    String parentPath = ZKUtils.getBatchKeyParentPath(category);
+			    String parentPath = PathUtils.getBatchKeyParentPath(category);
 			    cacheMessageListener.watchChildren(curatorClient, parentPath);
 			}
 			return categoryConfig;
@@ -155,7 +155,7 @@ public class CacheCuratorClient {
 	}
 
     private CacheKeyConfigurationDTO _getCategoryConfig(String category) throws Exception {
-		String path = ZKUtils.getCategoryPath(category);
+		String path = PathUtils.getCategoryPath(category);
 		String content = getData(path, true);
 		if (StringUtils.isBlank(content)) {
 			logger.warn("cache category config [" + category + "] is empty");
@@ -166,7 +166,7 @@ public class CacheCuratorClient {
 	}
 
 	private CacheKeyTypeVersionUpdateDTO _getVersionChange(String category) throws Exception {
-		String path = ZKUtils.getVersionPath(category);
+		String path = PathUtils.getVersionPath(category);
 		String content = getData(path, true);
 		if (StringUtils.isBlank(content)) {
 			logger.warn("cache category version [" + category + "] is empty");
@@ -177,14 +177,14 @@ public class CacheCuratorClient {
 	}
 	
 	private String _getExtension(String category) throws Exception {
-	    String path = ZKUtils.getExtensionPath(category);
+	    String path = PathUtils.getExtensionPath(category);
 	    String content = getData(path, false);
 	    return content;
 	}
 
 	public String getRuntimeServices(String appName) throws Exception {
 	    if(isZookeeperConnected()) {
-    		String path = ZKUtils.getRuntimeServicePath(appName);
+    		String path = PathUtils.getRuntimeServicePath(appName);
     		return getData(path, false);
 	    } else {
 	        return null;
@@ -193,7 +193,7 @@ public class CacheCuratorClient {
 
 	public String getRuntimeCategories(String appName) throws Exception {
 	    if(isZookeeperConnected()) {
-    		String path = ZKUtils.getRuntimeCategoryPath(appName);
+    		String path = PathUtils.getRuntimeCategoryPath(appName);
     		return getData(path, false);
 	    } else {
             return null;
@@ -247,7 +247,7 @@ public class CacheCuratorClient {
 	}
 
 	private void _syncAll() throws Exception {
-		if (ZKUtils.isZookeeperEnabled() && isZookeeperConnected()) {
+		if (PathUtils.isZookeeperEnabled() && isZookeeperConnected()) {
 			Transaction t = Cat.getProducer().newTransaction("Cache.sync", "syncAll");
 			try {
 				syncAllServices();
@@ -305,7 +305,7 @@ public class CacheCuratorClient {
 			fireConfigChange(categoryConfig);
 
 			if (WEB_CACHE.equals(categoryConfig.getCacheType())) {
-			    String parentPath = ZKUtils.getBatchKeyParentPath(category);
+			    String parentPath = PathUtils.getBatchKeyParentPath(category);
                 cacheMessageListener.watchChildren(curatorClient, parentPath);
             }
 		}
@@ -316,7 +316,7 @@ public class CacheCuratorClient {
 		if (!CollectionUtils.isEmpty(cacheServices)) {
 			String appName = configManager.getAppName();
 			if (StringUtils.isNotEmpty(appName)) {
-				String path = ZKUtils.getRuntimeServicePath(appName);
+				String path = PathUtils.getRuntimeServicePath(appName);
 				String value = StringUtils.join(cacheServices, ',');
 				update(path, value);
 				logger.info(String.format("logged %s's cache services %s to zookeeper", appName, value));
@@ -329,7 +329,7 @@ public class CacheCuratorClient {
 		if (!CollectionUtils.isEmpty(cacheCategories)) {
 			String appName = configManager.getAppName();
 			if (StringUtils.isNotEmpty(appName)) {
-				String path = ZKUtils.getRuntimeCategoryPath(appName);
+				String path = PathUtils.getRuntimeCategoryPath(appName);
 				String value = StringUtils.join(cacheCategories, ',');
 				update(path, value);
 				logger.info(String.format("logged %s's cache categories %s to zookeeper", appName, value));
