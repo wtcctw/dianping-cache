@@ -9,7 +9,7 @@ Squirrel 是点评的 Key-Value 存储框架，继承自 Avatar-Cache 缓存框�
 3. 后续版本会增加多备份，自动扩容等功能。
 
 ## 客户端使用说明
-1. 依赖
+a. 依赖
 
 ```
 <dependency>
@@ -19,7 +19,7 @@ Squirrel 是点评的 Key-Value 存储框架，继承自 Avatar-Cache 缓存框�
 </dependency>
 ```
 
-2. Spring 配置使用方式
+b. Spring 配置使用方式
 
 ```
 <?xml version="1.0" encoding="UTF-8"?>
@@ -56,12 +56,12 @@ public class Bean {
 
     public String getValue(String key) {
         StoreKey storeKey = new StoreKey("myredis", key);
-        return storeClient.get(cacheKey);
+        return storeClient.get(storeKey);
     }
 }
 ```
 
-3. Java API 使用方式
+c. Java API 使用方式
 
 ```
 StoreClient storeClient = StoreClientFactory.getStoreClient();
@@ -119,6 +119,7 @@ public interface StoreClient {
 
 ## RedisStoreClient 接口
 Redis cluster 专用接口支持一些 redis 特有的命令，支持 Hash，List 和 Set 的相关操作。
+Redis 相关操作暂时只支持同步接口，multi 和 async 相关操作由于 jedis 驱动不支持，我们现在也不支持，将在后续版本增加。
 
 1. 获取 RedisStoreClient 实例
 
