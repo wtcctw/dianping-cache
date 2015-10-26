@@ -16,6 +16,7 @@ import com.dianping.squirrel.client.StoreKey;
 import com.dianping.squirrel.client.config.CacheItemConfigManager;
 import com.dianping.squirrel.client.config.CacheKeyType;
 import com.dianping.squirrel.client.config.RemoteCacheItemConfigManager;
+import com.dianping.squirrel.client.log.LoggerLoader;
 import com.dianping.squirrel.client.monitor.StatusHolder;
 import com.dianping.squirrel.client.monitor.TimeMonitor;
 import com.dianping.squirrel.common.exception.StoreException;
@@ -24,6 +25,10 @@ import com.dianping.squirrel.common.util.PathUtils;
 
 public abstract class AbstractStoreClient implements StoreClient {
 
+    static {
+        LoggerLoader.init();
+    }
+    
 	protected CacheItemConfigManager configManager;
 
 	public AbstractStoreClient() {

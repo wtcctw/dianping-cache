@@ -7,9 +7,6 @@ import java.util.concurrent.Future;
 import com.dianping.squirrel.common.exception.StoreException;
 
 public interface StoreClient {
-
-    // final key operations
-    public Boolean delete(String finalKey) throws StoreException;
     
     // sync single key operations
     public <T> T get(StoreKey key) throws StoreException;
@@ -51,5 +48,8 @@ public interface StoreClient {
     public <T> Boolean multiSet(List<StoreKey> keys, List<T> values) throws StoreException;
 
 	<T> Void asyncMultiSet(List<StoreKey> keys, List<T> values, StoreCallback<Boolean> callback);
-    
+
+    // final key operations
+    public Boolean delete(String finalKey) throws StoreException;
+
 }
