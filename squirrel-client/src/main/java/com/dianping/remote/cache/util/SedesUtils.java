@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.dianping.remote.cache.dto.SingleCacheRemoveDTO;
+import com.dianping.squirrel.common.util.PathUtils;
 
 public class SedesUtils {
 
@@ -13,13 +14,6 @@ public class SedesUtils {
     private static final String SEPARATOR = "*";
     private static final String CACHE_TYPE = "web";
     
-    private static final String[] SpecialCategories = {
-        "DianPing.Common.StaticFile",
-        "DianPing.Common.CityDAC",
-        "DianPing.Common.ConfigurationDAC",
-        "DianPing.API.RegionAPIService_CustomerCategory",
-    };
-    
     public static String serialize(List<SingleCacheRemoveDTO> messages) {
         if(messages == null || messages.size() == 0) {
             return null;
@@ -27,7 +21,7 @@ public class SedesUtils {
         
         StringBuilder buf = new StringBuilder(50+messages.size()*20);
         buf.append(MAGIC_HEADER);
-        String category = getCategoryFromKey(messages.get(0).getCacheKey());
+        String category = PathUtils.getCategoryFromKey(messages.get(0).getCacheKey());
         buf.append(category);
         
         for(SingleCacheRemoveDTO message : messages) {
@@ -55,25 +49,6 @@ public class SedesUtils {
             messages.add(msg);
         }
         return messages;
-    }
-    
-    public static String getCategoryFromKey(String key) {
-        if(key == null) {
-            return null;
-        }
-        int idx = key.indexOf('.');
-        if(idx == -1) {
-            return null;
-        }
-        String category = key.substring(0, idx);
-        if(category.equals("DianPing")) {
-            for(int i=0; i<SpecialCategories.length; i++) {
-                if(key.startsWith(SpecialCategories[i])) {
-                    category = SpecialCategories[i];
-                }
-            }
-        }
-        return category;
     }
     
 }

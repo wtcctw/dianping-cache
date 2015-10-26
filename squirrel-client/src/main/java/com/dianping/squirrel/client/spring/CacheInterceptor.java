@@ -24,8 +24,8 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.util.Assert;
 
-import com.dianping.avatar.cache.CacheKey;
-import com.dianping.avatar.cache.CacheService;
+import com.dianping.squirrel.client.StoreClient;
+import com.dianping.squirrel.client.StoreKey;
 import com.dianping.squirrel.client.annotation.Cache;
 import com.dianping.squirrel.client.annotation.CacheOperation;
 import com.dianping.squirrel.client.util.CacheAnnotationUtils;
@@ -38,52 +38,52 @@ import com.dianping.squirrel.client.util.CacheAnnotationUtils;
  * 
  */
 public class CacheInterceptor implements MethodInterceptor, InitializingBean {
-	/**
-	 * Cache service
-	 */
-	private CacheService cacheService;
+    /**
+     * Cache service
+     */
+    private StoreClient cacheService;
 
-	@Override
-	public Object invoke(MethodInvocation invocation) throws Throwable {
-		Method method = invocation.getMethod();
-		Cache cache = AnnotationUtils.findAnnotation(method, Cache.class);
-		if (cache == null) {
-			Class<? extends Object> targetClazz = invocation.getThis().getClass();
-			method = MethodUtils.getAccessibleMethod(targetClazz, method.getName(), method.getParameterTypes());
-			cache = AnnotationUtils.findAnnotation(method, Cache.class);
-		}
-		if (cache != null) {
+    @Override
+    public Object invoke(MethodInvocation invocation) throws Throwable {
+        Method method = invocation.getMethod();
+        Cache cache = AnnotationUtils.findAnnotation(method, Cache.class);
+        if (cache == null) {
+            Class<? extends Object> targetClazz = invocation.getThis().getClass();
+            method = MethodUtils.getAccessibleMethod(targetClazz, method.getName(), method.getParameterTypes());
+            cache = AnnotationUtils.findAnnotation(method, Cache.class);
+        }
+        if (cache != null) {
 
-			CacheOperation operation = cache.operation();
+            CacheOperation operation = cache.operation();
 
-			CacheKey cacheKey = CacheAnnotationUtils.getCacheKey(method, invocation.getArguments());
+            StoreKey cacheKey = CacheAnnotationUtils.getCacheKey(method, invocation.getArguments());
 
-			if (operation == CacheOperation.SetAndGet) {
-				Object cachedItem = cacheService.get(cacheKey);
+            if (operation == CacheOperation.SetAndGet) {
+                Object cachedItem = cacheService.get(cacheKey);
 
-				if (cachedItem != null) {
-					return cachedItem;
-				}
+                if (cachedItem != null) {
+                    return cachedItem;
+                }
 
-				Object item = invocation.proceed();
-				// consider create an null object instead of null
-				cacheService.add(cacheKey, item);
+                Object item = invocation.proceed();
+                // consider create an null object instead of null
+                cacheService.add(cacheKey, item);
 
-				return item;
-			} else if (operation == CacheOperation.Update || operation == CacheOperation.Remove) {
-				cacheService.remove(cacheKey);
-				return invocation.proceed();
-			}
-		}
-		return invocation.proceed();
-	}
+                return item;
+            } else if (operation == CacheOperation.Update || operation == CacheOperation.Remove) {
+                cacheService.delete(cacheKey);
+                return invocation.proceed();
+            }
+        }
+        return invocation.proceed();
+    }
 
-	public void setCacheService(CacheService cacheService) {
-		this.cacheService = cacheService;
-	}
+    public void setCacheService(StoreClient cacheService) {
+        this.cacheService = cacheService;
+    }
 
-	@Override
-	public void afterPropertiesSet() throws Exception {
-		Assert.notNull(cacheService, "cacheService required.");
-	}
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        Assert.notNull(cacheService, "cacheService required.");
+    }
 }

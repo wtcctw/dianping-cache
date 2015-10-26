@@ -24,7 +24,7 @@ import java.util.List;
 
 import org.springframework.util.ReflectionUtils;
 
-import com.dianping.avatar.cache.CacheKey;
+import com.dianping.squirrel.client.StoreKey;
 import com.dianping.squirrel.client.annotation.Cache;
 import com.dianping.squirrel.client.annotation.CacheParam;
 
@@ -99,7 +99,7 @@ public class CacheAnnotationUtils {
 	 * Generate {@link CacheKey} instance by {@link Method} and arguments.The
 	 * method should be annotated by {@link Cache}
 	 */
-	public static CacheKey getCacheKey(final Method method, final Object[] args) {
+	public static StoreKey getCacheKey(final Method method, final Object[] args) {
 
 		if (method == null || args == null) {
 			throw new IllegalArgumentException("method/argus must not be null.");
@@ -137,7 +137,7 @@ public class CacheAnnotationUtils {
 			values[i] = oField.field;
 		}
 
-		return new CacheKey(cache.category(), values);
+		return new StoreKey(cache.category(), values);
 	}
 
 	/**

@@ -24,13 +24,14 @@ import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
  * @author guoqing.chen
  * 
  */
-public class AvatarNamespacheHandler extends NamespaceHandlerSupport {
+public class SquirrelNamespacheHandler extends NamespaceHandlerSupport {
 
 	/**
 	 * Register {@link BeanDefinitionParser} instance
 	 */
 	@Override
 	public void init() {
-		this.registerBeanDefinitionParser("cache", new CacheBeanDefinitionParser());
+		this.registerBeanDefinitionParser("store", new StoreBeanDefinitionParser());
 	}
+	
 }

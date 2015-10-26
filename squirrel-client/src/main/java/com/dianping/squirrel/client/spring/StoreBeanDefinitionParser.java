@@ -32,10 +32,7 @@ import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.util.StringUtils;
 import org.w3c.dom.Element;
 
-import com.dianping.avatar.cache.CacheService;
-import com.dianping.avatar.cache.DefaultCacheService;
-import com.dianping.squirrel.client.config.RemoteCacheClientFactory;
-import com.dianping.squirrel.client.config.RemoteCacheItemConfigManager;
+import com.dianping.squirrel.client.impl.DefaultStoreClient;
 
 /**
  * The meta-data parser for avatar:cache
@@ -45,7 +42,7 @@ import com.dianping.squirrel.client.config.RemoteCacheItemConfigManager;
  * @author pengshan.zhang
  * @author youngphy.yang
  */
-public class CacheBeanDefinitionParser implements BeanDefinitionParser {
+public class StoreBeanDefinitionParser implements BeanDefinitionParser {
 
 	private static final String CACHE_CONFIGURATION_WEB_SERVICE_ID = "configurationWebService";
 
@@ -67,12 +64,12 @@ public class CacheBeanDefinitionParser implements BeanDefinitionParser {
 	/**
 	 * Default cache service id
 	 */
-	private static final String DEFAULT_CACHE_SERVICE_ID = "innerCacheService";
+	private static final String DEFAULT_CACHE_SERVICE_ID = "innerStoreClient";
 
 	/**
 	 * Default cache service proxy id
 	 */
-	private static final String DEFAULT_CACHE_SERVICE_PROXY_ID = "cacheService";
+	private static final String DEFAULT_CACHE_SERVICE_PROXY_ID = "storeClient";
 
 	/**
 	 * Cache factory bean name
@@ -114,10 +111,6 @@ public class CacheBeanDefinitionParser implements BeanDefinitionParser {
 
 	private static final String CACHE_ITEM_MANAGER_ID_ATTR = "itemConfigManager";
 
-	private static final String DEFAULT_CACHE_MESSAGE_LISTENER_ID = "cacheMessageListener";
-
-	private static final String DEFAULT_CACHE_CURATOR_CLIENT_ID = "cacheCuratorClient";
-
 	/**
 	 * CacheService id
 	 */
@@ -144,10 +137,6 @@ public class CacheBeanDefinitionParser implements BeanDefinitionParser {
 
 	private String cacheClientFactory = DEFAULT_CACHE_CLIENT_FACTORY_ID;
 
-	private String cacheMessageListener = DEFAULT_CACHE_MESSAGE_LISTENER_ID;
-
-	private String cacheCuratorClient = DEFAULT_CACHE_CURATOR_CLIENT_ID;
-
 	// private GenericBeanDefinition cacheDefinition = new
 	// GenericBeanDefinition();
 
@@ -157,9 +146,6 @@ public class CacheBeanDefinitionParser implements BeanDefinitionParser {
 		// Init cache service
 		GenericBeanDefinition cacheDefinition = initCacheServiceDefinition(element,
 				getBeanDefinitionRegistry(parserContext));
-
-		// Register the statistics cache interceptor
-		// registerStatisticsCacheInterceptor(element, getBeanDefinitionRegistry(parserContext));
 
 		// Register the statistics cache interceptor proxy bean
 		registerCacheProxyBean(element, getBeanDefinitionRegistry(parserContext), cacheDefinition);
@@ -184,7 +170,7 @@ public class CacheBeanDefinitionParser implements BeanDefinitionParser {
 	protected GenericBeanDefinition initCacheServiceDefinition(Element element,
 			BeanDefinitionRegistry beanDefinitionRegistry) {
 		GenericBeanDefinition cacheDefinition = new GenericBeanDefinition();
-		cacheDefinition.setBeanClass(DefaultCacheService.class);
+		cacheDefinition.setBeanClass(DefaultStoreClient.class);
 		cacheDefinition.setAutowireCandidate(false);
 
 		cacheServiceId = element.getAttribute(CACHE_SERVICE_ID_ATTR);
@@ -193,104 +179,13 @@ public class CacheBeanDefinitionParser implements BeanDefinitionParser {
 			cacheServiceId = DEFAULT_CACHE_SERVICE_ID;
 		}
 
-		// Add reference to CacheFactory
-//		ConstructorArgumentValues constructorArgumentValues = cacheDefinition.getConstructorArgumentValues();
-
-//		GenericBeanDefinition cacheCuratorClientBean = new GenericBeanDefinition();
-//		cacheCuratorClientBean.setBeanClass(CacheCuratorClient.class);
-//		BeanDefinitionReaderUtils.registerBeanDefinition(new BeanDefinitionHolder(cacheCuratorClientBean,
-//				cacheCuratorClient), beanDefinitionRegistry);
-
 		cacheClientFactory = element.getAttribute(CACHE_CLIENT_FACTORY_ID_ATTR);
 		cacheItemConfigManager = element.getAttribute(CACHE_ITEM_MANAGER_ID_ATTR);
 		if (!StringUtils.hasText(cacheClientFactory) || !StringUtils.hasText(cacheItemConfigManager)) {
 			registerCacheRelatedWebService(beanDefinitionRegistry);
 		}
 
-//		if (!StringUtils.hasText(cacheClientFactory)) {
-//			cacheClientFactory = DEFAULT_CACHE_CLIENT_FACTORY_ID;
-//			// Register default cache client factory
-//			registerDefaultCacheClientFactory(beanDefinitionRegistry);
-//		}
-//		constructorArgumentValues.addGenericArgumentValue(new RuntimeBeanReference(cacheClientFactory));
-//		constructorArgumentValues.addGenericArgumentValue(new RuntimeBeanReference(ONEWAY_CACHE_MANAGE_WEB_SERVICE_ID));
-
-//		if (!StringUtils.hasText(cacheItemConfigManager)) {
-//			cacheItemConfigManager = DEFAULT_ITEM_CONFIG_MANAGER_ID;
-//			// Register default cache item config manager
-//			registerDefaultCacheItemConfigManager(beanDefinitionRegistry);
-//		}
-//		constructorArgumentValues.addGenericArgumentValue(new RuntimeBeanReference(cacheItemConfigManager));
-
-//		GenericBeanDefinition definition = new GenericBeanDefinition();
-//		MutablePropertyValues propertyValues = definition.getPropertyValues();
-//		definition = new GenericBeanDefinition();
-//		definition.setBeanClass(CacheKeyTypeVersionUpdateListener.class);
-//		propertyValues = definition.getPropertyValues();
-//		propertyValues.addPropertyValue("cacheItemConfigManager", new RuntimeBeanReference(cacheItemConfigManager));
-//		BeanDefinitionReaderUtils.registerBeanDefinition(new BeanDefinitionHolder(definition,
-//				"keyTypeVersionUpdateListener"), beanDefinitionRegistry);
-
-//		definition = new GenericBeanDefinition();
-//		definition.setBeanClass(SingleCacheRemoveListener.class);
-//		propertyValues = definition.getPropertyValues();
-//		propertyValues.addPropertyValue("cacheClientFactory", new RuntimeBeanReference(cacheClientFactory));
-//		BeanDefinitionReaderUtils.registerBeanDefinition(new BeanDefinitionHolder(definition,
-//				"singleCacheRemoveListener"), beanDefinitionRegistry);
-
-//		definition = new GenericBeanDefinition();
-//		definition.setBeanClass(CacheConfigurationUpdateListener.class);
-//		propertyValues = definition.getPropertyValues();
-//		propertyValues.addPropertyValue("cacheClientFactory", new RuntimeBeanReference(cacheClientFactory));
-//		BeanDefinitionReaderUtils.registerBeanDefinition(new BeanDefinitionHolder(definition,
-//				"cacheConfigUpdateListener"), beanDefinitionRegistry);
-
-//		definition = new GenericBeanDefinition();
-//		definition.setBeanClass(CacheKeyConfigUpdateListener.class);
-//		propertyValues = definition.getPropertyValues();
-//		propertyValues.addPropertyValue("cacheItemConfigManager", new RuntimeBeanReference(cacheItemConfigManager));
-//		BeanDefinitionReaderUtils.registerBeanDefinition(new BeanDefinitionHolder(definition,
-//				"cacheKeyConfigUpdateListener"), beanDefinitionRegistry);
-
-//		definition = new GenericBeanDefinition();
-//		definition.setBeanClass(CacheMessageListener.class);
-//		propertyValues = definition.getPropertyValues();
-//		propertyValues.addPropertyValue("mappingList[0]", new RuntimeBeanReference("keyTypeVersionUpdateListener"));
-//		propertyValues.addPropertyValue("mappingList[1]", new RuntimeBeanReference("singleCacheRemoveListener"));
-//		propertyValues.addPropertyValue("mappingList[2]", new RuntimeBeanReference("cacheConfigUpdateListener"));
-//		propertyValues.addPropertyValue("mappingList[3]", new RuntimeBeanReference("cacheKeyConfigUpdateListener"));
-//		BeanDefinitionReaderUtils.registerBeanDefinition(new BeanDefinitionHolder(definition, cacheMessageListener),
-//				beanDefinitionRegistry);
-
-//		definition = new GenericBeanDefinition();
-//		definition.setBeanClass(CacheMessageManager.class);
-//		propertyValues = definition.getPropertyValues();
-//		propertyValues.addPropertyValue("cacheItemConfigManager", new RuntimeBeanReference(cacheItemConfigManager));
-//		propertyValues.addPropertyValue("cacheClientFactory", new RuntimeBeanReference(cacheClientFactory));
-//		BeanDefinitionReaderUtils.registerBeanDefinition(new BeanDefinitionHolder(definition, "cacheMessageManager"),
-//				beanDefinitionRegistry);
-
-//		propertyValues = cacheCuratorClientBean.getPropertyValues();
-//		propertyValues.addPropertyValue("cacheItemConfigManager", new RuntimeBeanReference(cacheItemConfigManager));
-//		propertyValues.addPropertyValue("cacheClientFactory", new RuntimeBeanReference(cacheClientFactory));
-//		propertyValues.addPropertyValue("cacheMessageListener", new RuntimeBeanReference(cacheMessageListener));
-
 		return cacheDefinition;
-	}
-
-	protected void registerStatisticsCacheInterceptor(Element element, BeanDefinitionRegistry beanDefinitionRegistry) {
-		GenericBeanDefinition definition = new GenericBeanDefinition();
-		definition.setBeanClass(getStatisticsCacheInterceptor());
-		String cacheInterceptorId = "monitorInterceptor";
-		// register the cache item config manager
-		cacheItemConfigManager = element.getAttribute(CACHE_ITEM_MANAGER_ID_ATTR);
-		if (!StringUtils.hasText(cacheItemConfigManager)) {
-			cacheItemConfigManager = DEFAULT_ITEM_CONFIG_MANAGER_ID;
-		}
-		MutablePropertyValues propertyValues = definition.getPropertyValues();
-		propertyValues.addPropertyValue(cacheItemConfigManager, new RuntimeBeanReference(cacheItemConfigManager));
-		BeanDefinitionHolder holder = new BeanDefinitionHolder(definition, cacheInterceptorId);
-		BeanDefinitionReaderUtils.registerBeanDefinition(holder, beanDefinitionRegistry);
 	}
 
 	protected void registerCacheProxyBean(Element element, BeanDefinitionRegistry beanDefinitionRegistry,
@@ -304,20 +199,6 @@ public class CacheBeanDefinitionParser implements BeanDefinitionParser {
 		BeanDefinitionReaderUtils.registerBeanDefinition(holder, beanDefinitionRegistry);
 	}
 
-	/**
-	 * Register {@link XMLCacheClientFactory} definition
-	 */
-	private void registerDefaultCacheClientFactory(BeanDefinitionRegistry beanDefinitionRegistry) {
-		GenericBeanDefinition definition = new GenericBeanDefinition();
-		definition.setBeanClass(RemoteCacheClientFactory.class);
-		definition.setLazyInit(true);
-		MutablePropertyValues propertyValues = definition.getPropertyValues();
-		propertyValues.addPropertyValue("configurationWebService", new RuntimeBeanReference(
-				CACHE_CONFIGURATION_WEB_SERVICE_ID));
-		propertyValues.addPropertyValue("cacheCuratorClient", new RuntimeBeanReference(cacheCuratorClient));
-		BeanDefinitionReaderUtils.registerBeanDefinition(new BeanDefinitionHolder(definition,
-				DEFAULT_CACHE_CLIENT_FACTORY_ID), beanDefinitionRegistry);
-	}
 
 	/**
 	 * @param parserContext
@@ -359,23 +240,6 @@ public class CacheBeanDefinitionParser implements BeanDefinitionParser {
 	}
 
 	/**
-	 * @param parserContext
-	 * 
-	 */
-	private void registerDefaultCacheItemConfigManager(BeanDefinitionRegistry beanDefinitionRegistry) {
-		GenericBeanDefinition definition = new GenericBeanDefinition();
-		definition.setBeanClass(RemoteCacheItemConfigManager.class);
-		// lazy init because default CacheItemConfigManager is not required
-		definition.setLazyInit(true);
-		MutablePropertyValues propertyValues = definition.getPropertyValues();
-		propertyValues.addPropertyValue("configurationWebService", new RuntimeBeanReference(
-				CACHE_CONFIGURATION_WEB_SERVICE_ID));
-		propertyValues.addPropertyValue("cacheCuratorClient", new RuntimeBeanReference(cacheCuratorClient));
-		BeanDefinitionReaderUtils.registerBeanDefinition(new BeanDefinitionHolder(definition,
-				DEFAULT_ITEM_CONFIG_MANAGER_ID), beanDefinitionRegistry);
-	}
-
-	/**
 	 * Register {@link CacheInterceptor} definition
 	 */
 	private void registerCacheInterceptorDefinition(Element element, ParserContext parserContext) {
@@ -407,7 +271,7 @@ public class CacheBeanDefinitionParser implements BeanDefinitionParser {
 		definition.getConstructorArgumentValues().addGenericArgumentValue(new ValueHolder(null, "java.lang.Class"));
 
 		definition.getConstructorArgumentValues().addGenericArgumentValue(
-				new ValueHolder("com.dianping.avatar.cache.annotation.Cache", "java.lang.Class"));
+				new ValueHolder("com.dianping.squirrel.client.annotation.Cache", "java.lang.Class"));
 
 		cachePointcutId = element.getAttribute(CACHE_POINTCUT_ID_ATTR);
 
@@ -453,10 +317,6 @@ public class CacheBeanDefinitionParser implements BeanDefinitionParser {
 			beanDefinitionRegistry = parserContext.getRegistry();
 		}
 		return beanDefinitionRegistry;
-	}
-
-	protected Class<?> getStatisticsCacheInterceptor() {
-		return CacheMonitorInterceptor.class;
 	}
 
 }
