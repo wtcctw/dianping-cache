@@ -19,8 +19,8 @@ public interface RedisStoreClient extends StoreClient {
 
 	/**
 	 * @return TTL in seconds<br>
-	 *         -1 if key does not exist
-	 *         -2 if key exists but has no associated expire
+	 *         -2 if key does not exist<br>
+	 *         -1 if key exists but has no associated expire
 	 */
 	Long ttl(StoreKey key);
 

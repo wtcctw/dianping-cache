@@ -317,8 +317,12 @@ public class RedisStoreClientImpl extends AbstractStoreClient implements RedisSt
             @Override
             public Object execute() throws Exception {
                 String value = client.hget(finalKey, field);
-                T object = (T) serializer.fromString(value, Object.class);
-                return object;
+                if(value != null) {
+                    T object = (T) serializer.fromString(value, Object.class);
+                    return object;
+                } else {
+                    return null;
+                }
             }
             
         }, categoryConfig, finalKey, "hget");

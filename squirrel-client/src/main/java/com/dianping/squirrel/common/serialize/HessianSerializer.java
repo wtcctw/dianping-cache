@@ -21,11 +21,10 @@ public class HessianSerializer implements Serializer {
             ByteArrayOutputStream bos = new ByteArrayOutputStream();
             h2os = new Hessian2Output(bos);
             h2os.writeObject(object);
+            h2os.close();
             return bos.toByteArray();
         } catch (IOException e) {
             throw new StoreSerializeException("failed to serialize object", e);
-        } finally {
-            close(h2os);
         }
     }
     
@@ -36,11 +35,10 @@ public class HessianSerializer implements Serializer {
             ByteArrayOutputStream bos = new ByteArrayOutputStream();
             h2os = new Hessian2Output(bos);
             h2os.writeObject(object);
+            h2os.close();
             return bos.toString("UTF-8");
         } catch (IOException e) {
             throw new StoreSerializeException("failed to serialize object", e);
-        } finally {
-            close(h2os);
         }
     }
 
@@ -51,11 +49,10 @@ public class HessianSerializer implements Serializer {
             ByteArrayInputStream bis = new ByteArrayInputStream(bytes);
             h2is = new Hessian2Input(bis);
             Object rv = h2is.readObject();
+            h2is.close();
             return rv;
         } catch(IOException e) {
             throw new StoreSerializeException("failed to deserialize data", e);
-        } finally {
-            close(h2is);
         }
     }
     
@@ -66,11 +63,10 @@ public class HessianSerializer implements Serializer {
             ByteArrayInputStream bis = new ByteArrayInputStream(bytes.getBytes("UTF-8"));
             h2is = new Hessian2Input(bis);
             Object rv = h2is.readObject();
+            h2is.close();
             return rv;
         } catch(IOException e) {
             throw new StoreSerializeException("failed to deserialize data", e);
-        } finally {
-            close(h2is);
         }
     }
     
