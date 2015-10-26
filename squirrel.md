@@ -124,10 +124,7 @@ Redis 相关操作暂时只支持同步接口，multi 和 async 相关操作由�
 1. 获取 RedisStoreClient 实例
 
 ```
-1. 直接初始化 RedisStoreClient 的实现类
-RedisStoreClient redisClient = new RedisStoreClientImpl();
-
-2. 使用工厂方法
+使用工厂方法
 RedisStoreClient storeClient = (RedisStoreClient)StoreClientFactory.getStoreClient("redis-hua");
 redis-hua 是申请存储时选择的 redis 集群的名字
  
