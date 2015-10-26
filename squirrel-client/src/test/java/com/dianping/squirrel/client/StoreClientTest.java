@@ -9,10 +9,18 @@ public class StoreClientTest {
     @Test
     public void testAll() {
         StoreClient storeClient = StoreClientFactory.getStoreClient();
-        Object value = storeClient.set(new StoreKey("myredis", "key"), "abc");
+        Object value = storeClient.set(new StoreKey("myredis", "hua"), "hua");
         assertEquals(value, Boolean.TRUE);
-        value = storeClient.get(new StoreKey("myredis", "key"));
-        assertEquals(value, "abc");
+        value = storeClient.get(new StoreKey("myredis", "hua"));
+        assertEquals(value, "hua");
+        value = storeClient.add(new StoreKey("myredis", "hua"), "hua2");
+        assertEquals(value, Boolean.FALSE);
+        value = storeClient.delete(new StoreKey("myredis", "hua"));
+        assertEquals(value, Boolean.TRUE);
+        value = storeClient.get(new StoreKey("myredis", "hua"));
+        assertNull(value);
+        value = storeClient.add(new StoreKey("myredis", "hua"), "hua2");
+        assertEquals(value, Boolean.TRUE);
     }
 
     @Test

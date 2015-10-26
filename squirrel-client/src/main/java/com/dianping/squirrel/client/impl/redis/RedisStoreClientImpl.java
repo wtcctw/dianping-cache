@@ -32,7 +32,7 @@ public class RedisStoreClientImpl extends AbstractStoreClient implements RedisSt
 
     private static final String OK = "OK";
 
-    private String key;
+    private String storeType;
 
     private RedisClientConfig config;
 
@@ -49,12 +49,12 @@ public class RedisStoreClientImpl extends AbstractStoreClient implements RedisSt
 
     @Override
     public void setKey(String key) {
-        this.key = key;
+        this.storeType = key;
     }
 
     @Override
     public String getKey() {
-        return key;
+        return storeType;
     }
 
     @Override
@@ -69,7 +69,7 @@ public class RedisStoreClientImpl extends AbstractStoreClient implements RedisSt
 
     @Override
     protected <T> T doGet(CacheKeyType categoryConfig, String finalKey) {
-        String value = client.get(key);
+        String value = client.get(finalKey);
         T object = (T) transcoder.decode(value, categoryConfig.getDataTypeClass());
         return object;
     }
@@ -79,9 +79,9 @@ public class RedisStoreClientImpl extends AbstractStoreClient implements RedisSt
         String result = null;
         String str = transcoder.encode(value);
         if (categoryConfig.getDurationSeconds() > 0)
-            result = client.setex(key, categoryConfig.getDurationSeconds(), str);
+            result = client.setex(finalKey, categoryConfig.getDurationSeconds(), str);
         else
-            result = client.set(key, str);
+            result = client.set(finalKey, str);
         return OK.equals(result);
     }
 
@@ -89,34 +89,34 @@ public class RedisStoreClientImpl extends AbstractStoreClient implements RedisSt
     protected Boolean doAdd(CacheKeyType categoryConfig, String finalKey, Object value) {
         String str = transcoder.encode(value);
         if (categoryConfig.getDurationSeconds() > 0) {
-            String result = client.set(key, str, "NX", "EX", categoryConfig.getDurationSeconds());
+            String result = client.set(finalKey, str, "NX", "EX", categoryConfig.getDurationSeconds());
             return OK.equals(result);
         } else {
-            long result = client.setnx(key, str);
+            long result = client.setnx(finalKey, str);
             return 1 == result;
         }
     }
 
     @Override
     protected Boolean doDelete(CacheKeyType categoryConfig, String finalKey) {
-         long result = client.del(key);
+         long result = client.del(finalKey);
          return 1 == result;
     }
 
     @Override
-    public Long doIncrease(CacheKeyType categoryConfig, String key, int amount) {
-        long result = client.incrBy(key, amount);
+    public Long doIncrease(CacheKeyType categoryConfig, String finalKey, int amount) {
+        long result = client.incrBy(finalKey, amount);
         return result;
     }
 
     @Override
-    public Long doDecrease(CacheKeyType categoryConfig, String key, int amount) {
-        long result = client.decrBy(key, amount);
+    public Long doDecrease(CacheKeyType categoryConfig, String finalKey, int amount) {
+        long result = client.decrBy(finalKey, amount);
         return result;
     }
 
     @Override
-    protected <T> Future<T> doAsyncGet(CacheKeyType categoryConfig, String key) {
+    protected <T> Future<T> doAsyncGet(CacheKeyType categoryConfig, String finalKey) {
         // TODO Auto-generated method stub
         return null;
     }
@@ -140,13 +140,13 @@ public class RedisStoreClientImpl extends AbstractStoreClient implements RedisSt
     }
 
     @Override
-    protected <T> Void doAsyncGet(CacheKeyType categoryConfig, String key, StoreCallback<T> callback) {
+    protected <T> Void doAsyncGet(CacheKeyType categoryConfig, String finalKey, StoreCallback<T> callback) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    protected <T> Void doAsyncSet(CacheKeyType categoryConfig, String key, Object value, StoreCallback<T> callback) {
+    protected <T> Void doAsyncSet(CacheKeyType categoryConfig, String finalKey, Object value, StoreCallback<T> callback) {
         // TODO Auto-generated method stub
         return null;
     }
