@@ -2,6 +2,8 @@ package com.dianping.squirrel.client.impl.redis;
 
 import static org.junit.Assert.*;
 
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.junit.Test;
@@ -14,13 +16,13 @@ public class RedisStoreClientImplTest {
     @Test
     public void testCommon() throws InterruptedException {
         RedisStoreClient redisClient = (RedisStoreClient) StoreClientFactory.getStoreClient("redis-hua");
-        StoreKey key = new StoreKey("myredis", "hua");
+        StoreKey key = new StoreKey("myredis", "string");
         Object value = redisClient.delete(key);
         value = redisClient.ttl(key);
         assertEquals(value, -2L);
         value = redisClient.exists(key);
         assertEquals(value, Boolean.FALSE);
-        redisClient.add(key, "hua");
+        redisClient.add(key, "string");
         value = redisClient.exists(key);
         assertEquals(value, Boolean.TRUE);
         value = redisClient.ttl(key);
@@ -36,16 +38,6 @@ public class RedisStoreClientImplTest {
         assertEquals(value, -1L);
         value = redisClient.type(key);
         assertEquals(value, "string");
-    }
-    
-    @Test
-    public void testList() {
-        
-    }
-    
-    @Test
-    public void testSets() {
-        
     }
     
     @Test
@@ -77,6 +69,7 @@ public class RedisStoreClientImplTest {
     public void testHash() {
         RedisStoreClient redisClient = (RedisStoreClient) StoreClientFactory.getStoreClient("redis-hua");
         StoreKey key = new StoreKey("myredis", "hash");
+        redisClient.delete(key);
         Object value = redisClient.hdel(key, "field");
         value = redisClient.hset(key, "field", "value1");
         assertEquals(value, 1L);
@@ -93,6 +86,12 @@ public class RedisStoreClientImplTest {
         value = redisClient.hset(key, "f1", "v1");
         value = redisClient.hset(key, "f2", "v2");
         value = redisClient.hset(key, "f3", "v3");
+        value = redisClient.hkeys(key);
+        assertEquals(((Set)value).size(), 3);
+        value = redisClient.hvals(key);
+        assertEquals(((List)value).size(), 3);
+        value = redisClient.hgetAll(key);
+        assertEquals(((Map)value).size(), 3);
     }
     
     @Test
@@ -125,6 +124,39 @@ public class RedisStoreClientImplTest {
         fail("Not yet implemented");
     }
 
+    @Test
+    public void testList() {
+        RedisStoreClient redisClient = (RedisStoreClient) StoreClientFactory.getStoreClient("redis-hua");
+        StoreKey key = new StoreKey("myredis", "list");
+        redisClient.delete(key);
+        Object value = redisClient.llen(key);
+        assertEquals(value, 0L);
+        value = redisClient.lpush(key, "v1", "v2", "v3");
+        assertEquals(value, 3L);
+        value = redisClient.rpop(key);
+        assertEquals(value, "v1");
+        value = redisClient.llen(key);
+        assertEquals(value, 2L);
+        value = redisClient.lpop(key);
+        assertEquals(value, "v3");
+        value = redisClient.rpush(key, "v4", "v5", "v6");
+        assertEquals(value, 4L);
+        value = redisClient.lindex(key, 0);
+        assertEquals(value, "v2");
+        value = redisClient.lindex(key, -1);
+        assertEquals(value, "v6");
+        value = redisClient.lset(key, 1, "v7");
+        assertEquals(value, Boolean.TRUE);
+        value = redisClient.lrange(key, 0, -1);
+        assertEquals(((List)value).size(), 4);
+        value = redisClient.ltrim(key, 0, 2);
+        assertEquals(value, Boolean.TRUE);
+        value = redisClient.llen(key);
+        assertEquals(value, 3L);
+        value = redisClient.lindex(key, 1);
+        assertEquals(value, "v7");
+    }
+    
     @Test
     public void testRpush() {
         fail("Not yet implemented");
@@ -170,6 +202,29 @@ public class RedisStoreClientImplTest {
         fail("Not yet implemented");
     }
 
+    @Test
+    public void testSets() {
+        RedisStoreClient redisClient = (RedisStoreClient) StoreClientFactory.getStoreClient("redis-hua");
+        StoreKey key = new StoreKey("myredis", "set");
+        redisClient.delete(key);
+        Object value = redisClient.scard(key);
+        assertEquals(value, 0L);
+        value = redisClient.sadd(key, "s1", "s2", "s3");
+        assertEquals(value, 3L);
+        value = redisClient.srem(key, "s4");
+        assertEquals(value, 0L);
+        value = redisClient.srem(key, "s3");
+        assertEquals(value, 1L);
+        value = redisClient.scard(key);
+        assertEquals(value, 2L);
+        value = redisClient.sismember(key, "s5");
+        assertEquals(value, Boolean.FALSE);
+        value = redisClient.sismember(key, "s1");
+        assertEquals(value, Boolean.TRUE);
+        value = redisClient.smembers(key);
+        assertEquals(((Set)value).size(), 2);
+    }
+    
     @Test
     public void testSadd() {
         fail("Not yet implemented");

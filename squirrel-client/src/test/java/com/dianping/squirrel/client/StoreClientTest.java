@@ -7,22 +7,39 @@ import org.junit.Test;
 public class StoreClientTest {
 
     @Test
-    public void testAll() {
+    public void testCRUD() {
         StoreClient storeClient = StoreClientFactory.getStoreClient();
-        Object value = storeClient.set(new StoreKey("myredis", "hua"), "hua");
+        StoreKey key = new StoreKey("myredis", "string");
+        storeClient.delete(key);
+        Object value = storeClient.set(key, "v1");
         assertEquals(value, Boolean.TRUE);
-        value = storeClient.get(new StoreKey("myredis", "hua"));
-        assertEquals(value, "hua");
-        value = storeClient.add(new StoreKey("myredis", "hua"), "hua2");
+        value = storeClient.get(key);
+        assertEquals(value, "v1");
+        value = storeClient.add(key, "v2");
         assertEquals(value, Boolean.FALSE);
-        value = storeClient.delete(new StoreKey("myredis", "hua"));
+        value = storeClient.delete(key);
         assertEquals(value, Boolean.TRUE);
-        value = storeClient.get(new StoreKey("myredis", "hua"));
+        value = storeClient.get(key);
         assertNull(value);
-        value = storeClient.add(new StoreKey("myredis", "hua"), "hua2");
+        value = storeClient.add(key, "v2");
         assertEquals(value, Boolean.TRUE);
     }
 
+    @Test
+    public void testIncrDecr() {
+        StoreClient storeClient = StoreClientFactory.getStoreClient();
+        StoreKey key = new StoreKey("myredis", "integer");
+        storeClient.delete(key);
+        Object value = storeClient.increase(key, 1000);
+        assertEquals(value, 1000L);
+        value = storeClient.increase(key, 1000);
+        assertEquals(value, 2000L);
+        value = storeClient.decrease(key, 2000);
+        assertEquals(value, 0L);
+        value = storeClient.get(key);
+        assertEquals(value, 0);
+    }
+    
     @Test
     public void testGet() {
         StoreClient storeClient = StoreClientFactory.getStoreClient();
