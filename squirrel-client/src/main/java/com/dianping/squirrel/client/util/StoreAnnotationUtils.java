@@ -25,8 +25,8 @@ import java.util.List;
 import org.springframework.util.ReflectionUtils;
 
 import com.dianping.squirrel.client.StoreKey;
-import com.dianping.squirrel.client.annotation.Cache;
-import com.dianping.squirrel.client.annotation.CacheParam;
+import com.dianping.squirrel.client.annotation.Store;
+import com.dianping.squirrel.client.annotation.StoreParam;
 
 /**
  * Cache annotation parser helper utility
@@ -34,7 +34,7 @@ import com.dianping.squirrel.client.annotation.CacheParam;
  * @author guoqing.chen
  * 
  */
-public class CacheAnnotationUtils {
+public class StoreAnnotationUtils {
 
 	/**
 	 * Retrieve the cache key values from entity instance
@@ -46,7 +46,7 @@ public class CacheAnnotationUtils {
 
 		Class<?> cz = entity.getClass();
 
-		Cache cache = cz.getAnnotation(Cache.class);
+		Store cache = cz.getAnnotation(Store.class);
 
 		if (cache == null) {
 			throw new RuntimeException("The entity must be annotated by Cache.");
@@ -59,7 +59,7 @@ public class CacheAnnotationUtils {
 		// Extract annotated fields
 		for (int i = 0; i < fields.length; i++) {
 			Field f = fields[i];
-			CacheParam fCache = f.getAnnotation(CacheParam.class);
+			StoreParam fCache = f.getAnnotation(StoreParam.class);
 			if (fCache != null) {
 				cacheFields.add(new OrderedField(f, i, fCache.order()));
 			}
@@ -97,15 +97,15 @@ public class CacheAnnotationUtils {
 
 	/**
 	 * Generate {@link CacheKey} instance by {@link Method} and arguments.The
-	 * method should be annotated by {@link Cache}
+	 * method should be annotated by {@link Store}
 	 */
-	public static StoreKey getCacheKey(final Method method, final Object[] args) {
+	public static StoreKey getStoreKey(final Method method, final Object[] args) {
 
 		if (method == null || args == null) {
 			throw new IllegalArgumentException("method/argus must not be null.");
 		}
 
-		Cache cache = method.getAnnotation(Cache.class);
+		Store cache = method.getAnnotation(Store.class);
 
 		if (cache == null) {
 			return null;
@@ -119,8 +119,8 @@ public class CacheAnnotationUtils {
 			Annotation[] paramAnnos = annos[i];
 			for (int j = 0; j < paramAnnos.length; j++) {
 				Annotation paramAnno = paramAnnos[j];
-				if (paramAnno instanceof CacheParam) {
-					CacheParam cacheParam = (CacheParam) paramAnno;
+				if (paramAnno instanceof StoreParam) {
+					StoreParam cacheParam = (StoreParam) paramAnno;
 					orderedParams.add(new OrderedField(args[i], i, cacheParam.order()));
 					break;
 				}
@@ -142,14 +142,14 @@ public class CacheAnnotationUtils {
 
 	/**
 	 * Retrieve cache category for class <tt>cz</tt> that have to be annotated
-	 * by {@link Cache}
+	 * by {@link Store}
 	 */
 	public static String getCacheCategory(Class<?> cz) {
 		if (cz == null) {
 			throw new IllegalArgumentException("Parameter cz is null.");
 		}
 
-		Cache cache = cz.getAnnotation(Cache.class);
+		Store cache = cz.getAnnotation(Store.class);
 
 		if (cache == null) {
 			throw new RuntimeException("The class " + cz.getName() + " must be annotated by Cache.");

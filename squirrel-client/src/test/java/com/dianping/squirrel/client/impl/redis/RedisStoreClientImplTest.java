@@ -2,6 +2,7 @@ package com.dianping.squirrel.client.impl.redis;
 
 import static org.junit.Assert.*;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -92,6 +93,14 @@ public class RedisStoreClientImplTest {
         assertEquals(((List)value).size(), 3);
         value = redisClient.hgetAll(key);
         assertEquals(((Map)value).size(), 3);
+        Map<String, Object> values = new HashMap<String, Object>();
+        values.put("f4", "v4");
+        values.put("f5", "v5");
+        values.put("f6", "v6");
+        value = redisClient.hmset(key, values);
+        assertEquals(value, Boolean.TRUE);
+        value = redisClient.hmget(key, "f1", "f3", "f5");
+        assertEquals(((List)value).size(), 3);
     }
     
     @Test
@@ -280,4 +289,32 @@ public class RedisStoreClientImplTest {
         fail("Not yet implemented");
     }
 
+    class Bean {
+        private int id;
+        private String name;
+        
+        public Bean() {}
+        
+        public Bean(int id, String name) {
+            this.setId(id);
+            this.setName(name);
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public int getId() {
+            return id;
+        }
+
+        public void setId(int id) {
+            this.id = id;
+        }
+    }
+    
 }

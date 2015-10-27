@@ -7,13 +7,22 @@
 
 	<xsd:element name="store">
 		<xsd:complexType>
-			<xsd:attribute name="name" type="xsd:string">
+			<xsd:attribute name="id" type="xsd:string" use="optional">
 				<xsd:annotation>
 					<xsd:documentation>
-						<![CDATA[Specify store client name]]>
+						<![CDATA[store client id]]>
 					</xsd:documentation>
 				</xsd:annotation>
 			</xsd:attribute>
+			
+			<xsd:attribute name="store-type" type="xsd:string" use="optional">
+                <xsd:annotation>
+                    <xsd:documentation>
+                        <![CDATA[store type]]>
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:attribute>
+            
 		</xsd:complexType>
 	</xsd:element>
 

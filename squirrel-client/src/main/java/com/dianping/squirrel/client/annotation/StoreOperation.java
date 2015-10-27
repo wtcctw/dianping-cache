@@ -1,5 +1,5 @@
 /**
- * Project: avatar
+ * Project: squirrel
  * 
  * File Created at 2010-8-10
  * $Id$
@@ -18,7 +18,7 @@ package com.dianping.squirrel.client.annotation;
 /**
  * Cache operation
  */
-public enum CacheOperation {
+public enum StoreOperation {
 	/**
 	 * Set and get
 	 */

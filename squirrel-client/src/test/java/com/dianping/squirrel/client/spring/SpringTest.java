@@ -1,4 +1,4 @@
-package com.dianping.squirrel;
+package com.dianping.squirrel.client.spring;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;

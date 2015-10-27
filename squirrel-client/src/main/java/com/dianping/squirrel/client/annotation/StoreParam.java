@@ -36,7 +36,7 @@ import java.lang.annotation.Target;
  */
 @Target( { ElementType.PARAMETER, ElementType.FIELD })
 @Retention(RetentionPolicy.RUNTIME)
-public @interface CacheParam {
+public @interface StoreParam {
 	/**
 	 * Parameter index
 	 */

@@ -22,19 +22,19 @@ import java.lang.annotation.Target;
 
 /**
  * <p>
- * Annotation for cache method and class. If class is annotated by {@link Cache}
+ * Annotation for cache method and class. If class is annotated by {@link Store}
  * ,it will be considered to cache instance,the cache parameters will be made
- * from {@link CacheParam} fields and {@link #fields()} declaring fields.
+ * from {@link StoreParam} fields and {@link #fields()} declaring fields.
  * <p>
  * 
  * <p>
- * Generally, {@link CacheParam} will be convenient and clear, but if want to
+ * Generally, {@link StoreParam} will be convenient and clear, but if want to
  * take fields from super classes and that are not be annotated by
- * {@link CacheParam}, it is useful to declare them through {@link #fields()}.
+ * {@link StoreParam}, it is useful to declare them through {@link #fields()}.
  * </p>
  * 
  * <p>
- * If using {@link CacheParam} the fields order will be decided for
+ * If using {@link StoreParam} the fields order will be decided for
  * <tt>order</tt> property. If order
  * </p>
  * 
@@ -43,7 +43,7 @@ import java.lang.annotation.Target;
  */
 @Target( { ElementType.METHOD, ElementType.TYPE })
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Cache {
+public @interface Store {
 
 	/**
 	 * cache category, correspond to 'name' attribute in cache configuration
@@ -53,7 +53,7 @@ public @interface Cache {
 	/**
 	 * Cache operation for method
 	 */
-	com.dianping.squirrel.client.annotation.CacheOperation operation() default com.dianping.squirrel.client.annotation.CacheOperation.SetAndGet;
+	com.dianping.squirrel.client.annotation.StoreOperation operation() default com.dianping.squirrel.client.annotation.StoreOperation.SetAndGet;
 
 	/**
 	 * Default fields will be cached

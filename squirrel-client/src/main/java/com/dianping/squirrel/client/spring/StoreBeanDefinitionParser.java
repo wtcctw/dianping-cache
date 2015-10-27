@@ -18,7 +18,6 @@ package com.dianping.squirrel.client.spring;
 import org.springframework.aop.config.AopNamespaceUtils;
 import org.springframework.aop.support.DefaultBeanFactoryPointcutAdvisor;
 import org.springframework.aop.support.annotation.AnnotationMatchingPointcut;
-import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanDefinitionHolder;
 import org.springframework.beans.factory.config.ConstructorArgumentValues.ValueHolder;
@@ -32,21 +31,16 @@ import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.util.StringUtils;
 import org.w3c.dom.Element;
 
+import com.dianping.squirrel.client.StoreClient;
+import com.dianping.squirrel.client.StoreClientFactory;
 import com.dianping.squirrel.client.impl.DefaultStoreClient;
 
 /**
- * The meta-data parser for avatar:cache
+ * The meta-data parser for <squirrel:store id="" store-type=""/>
  * 
- * @author guoqing.chen
- * @author danson.liu
- * @author pengshan.zhang
- * @author youngphy.yang
+ * @author enlight.chen
  */
 public class StoreBeanDefinitionParser implements BeanDefinitionParser {
-
-	private static final String CACHE_CONFIGURATION_WEB_SERVICE_ID = "configurationWebService";
-
-	private static final String ONEWAY_CACHE_MANAGE_WEB_SERVICE_ID = "oneWayManageWebService";
 
 	/**
 	 * Bean property
@@ -60,255 +54,167 @@ public class StoreBeanDefinitionParser implements BeanDefinitionParser {
 	/**
 	 * Id attribute name
 	 */
-	private static final String CACHE_SERVICE_ID_ATTR = "id";
+	private static final String STORE_CLIENT_ID_ATTR = "id";
 	/**
 	 * Default cache service id
 	 */
-	private static final String DEFAULT_CACHE_SERVICE_ID = "innerStoreClient";
+	private static final String DEFAULT_STORE_CLIENT_ID = "storeClient";
 
+	private static final String STORE_TYPE_ID_ATTR = "store-type";
+	
 	/**
-	 * Default cache service proxy id
+	 * Store interceptor id attribute
 	 */
-	private static final String DEFAULT_CACHE_SERVICE_PROXY_ID = "storeClient";
-
+	private static final String STORE_INTERCEPTOR_ID_ATTR = "storeInterceptor";
 	/**
-	 * Cache factory bean name
+	 * Default store interceptor id
 	 */
-	private static final String CACHE_CLIENT_FACTORY_ID_ATTR = "factory";
-	/**
-	 * Default cache factory id
-	 */
-	private static final String DEFAULT_CACHE_CLIENT_FACTORY_ID = "cacheClientFactory";
-	/**
-	 * Cache interceptor id attribute
-	 */
-	private static final String CACHE_INTERCEPTOR_ID_ATTR = "cacheInterceptor";
-	/**
-	 * Default cache interceptor id
-	 */
-	private static final String DEFAULT_CACHE_INTERCEPTOR_ID = "cacheInterceptor";
+	private static final String DEFAULT_STORE_INTERCEPTOR_ID = "storeInterceptor";
 	/**
 	 * Cache pointcut id attribute
 	 */
-	private static final String CACHE_POINTCUT_ID_ATTR = "cachePointcut";
+	private static final String STORE_POINTCUT_ID_ATTR = "storePointcut";
 	/**
 	 * Default cache pointcut id
 	 */
-	private static final String DEFAULT_CACHE_POINTCUT_ID = "cachePointcut";
+	private static final String DEFAULT_STORE_POINTCUT_ID = "storePointcut";
 	/**
-	 * Cache interceptor id attribute
+	 * Store interceptor id attribute
 	 */
-	private static final String ADVISOR_ID_ATTR = "cacheAdvisor";
+	private static final String STORE_ADVISOR_ID_ATTR = "storeAdvisor";
 	/**
-	 * Default cache advisor id
+	 * Default store advisor id
 	 */
-	private static final String DEFAULT_ADVISOR_ID = "cacheAdvisor";
+	private static final String DEFAULT_STORE_ADVISOR_ID = "storeAdvisor";
 
 	/**
-	 * default cache item config manager id
+	 * StoreClient id
 	 */
-	private static final String DEFAULT_ITEM_CONFIG_MANAGER_ID = "cacheItemConfigManager";
-
-	private static final String CACHE_ITEM_MANAGER_ID_ATTR = "itemConfigManager";
+	private String storeClientId = DEFAULT_STORE_CLIENT_ID;
 
 	/**
-	 * CacheService id
+	 * Store interceptor id
 	 */
-	private String cacheServiceId = DEFAULT_CACHE_SERVICE_ID;
-
+	private String storeInterceptorId = DEFAULT_STORE_INTERCEPTOR_ID;
 	/**
-	 * CacheService proxy id
+	 * Store pointcut id
 	 */
-	private String cacheServiceProxyId = DEFAULT_CACHE_SERVICE_PROXY_ID;
-
-	/**
-	 * Cache interceptor id
-	 */
-	private String cacheInterceptorId = DEFAULT_CACHE_INTERCEPTOR_ID;
-	/**
-	 * Cache pointcut id
-	 */
-	private String cachePointcutId = DEFAULT_CACHE_POINTCUT_ID;
-
-	/**
-	 * Cache item config manager
-	 */
-	private String cacheItemConfigManager = DEFAULT_ITEM_CONFIG_MANAGER_ID;
-
-	private String cacheClientFactory = DEFAULT_CACHE_CLIENT_FACTORY_ID;
-
-	// private GenericBeanDefinition cacheDefinition = new
-	// GenericBeanDefinition();
+	private String storePointcutId = DEFAULT_STORE_POINTCUT_ID;
 
 	@Override
 	public BeanDefinition parse(Element element, ParserContext parserContext) {
 
-		// Init cache service
-		GenericBeanDefinition cacheDefinition = initCacheServiceDefinition(element,
-				getBeanDefinitionRegistry(parserContext));
+		// Register store client
+		registerStoreClientDefinition(element, getBeanDefinitionRegistry(parserContext));
 
-		// Register the statistics cache interceptor proxy bean
-		registerCacheProxyBean(element, getBeanDefinitionRegistry(parserContext), cacheDefinition);
+		// Register store interceptor
+		registerStoreInterceptorDefinition(element, parserContext);
 
-		// Register cache interceptor
-		registerCacheInterceptorDefinition(element, parserContext);
-
-		// Register cache pointcut
-		registerCachePointcutDefinition(element, parserContext);
+		// Register store pointcut
+		registerStorePointcutDefinition(element, parserContext);
 
 		// register advisor
-		registerAdvisorDefinition(element, parserContext);
+		registerStoreAdvisorDefinition(element, parserContext);
 
 		return null;
 	}
 
 	/**
-	 * Register {@link CacheService} definition. DefaultCacheServiceProxy
-	 * delegates the DefaultCacheService on behalf of the cache hit-rate
-	 * statistics.
+     * Register {@link StoreClient} definition
+     */
+    protected void registerStoreClientDefinition(Element element,
+            BeanDefinitionRegistry beanDefinitionRegistry) {
+        GenericBeanDefinition storeDefinition = new GenericBeanDefinition();
+        storeDefinition.setBeanClass(StoreClientFactory.class);
+        storeDefinition.setFactoryMethodName("getStoreClient");
+
+        String storeType = element.getAttribute(STORE_TYPE_ID_ATTR);
+        if(StringUtils.hasText(storeType)) {
+            storeDefinition.getConstructorArgumentValues().addGenericArgumentValue(storeType);
+        }
+        
+        storeClientId = element.getAttribute(STORE_CLIENT_ID_ATTR);
+        if (!StringUtils.hasText(storeClientId)) {
+            storeClientId = DEFAULT_STORE_CLIENT_ID;
+        }
+
+        BeanDefinitionHolder holder = new BeanDefinitionHolder(storeDefinition, storeClientId);
+        BeanDefinitionReaderUtils.registerBeanDefinition(holder, beanDefinitionRegistry);
+    }
+    
+	/**
+	 * Register {@link StoreClient} definition
 	 */
-	protected GenericBeanDefinition initCacheServiceDefinition(Element element,
+	protected void registerStoreClientDefinition0(Element element,
 			BeanDefinitionRegistry beanDefinitionRegistry) {
-		GenericBeanDefinition cacheDefinition = new GenericBeanDefinition();
-		cacheDefinition.setBeanClass(DefaultStoreClient.class);
-		cacheDefinition.setAutowireCandidate(false);
+		GenericBeanDefinition storeDefinition = new GenericBeanDefinition();
+		storeDefinition.setBeanClass(DefaultStoreClient.class);
+		storeDefinition.setAutowireCandidate(false);
 
-		cacheServiceId = element.getAttribute(CACHE_SERVICE_ID_ATTR);
-
-		if (!StringUtils.hasText(cacheServiceId)) {
-			cacheServiceId = DEFAULT_CACHE_SERVICE_ID;
+		storeClientId = element.getAttribute(STORE_CLIENT_ID_ATTR);
+		if (!StringUtils.hasText(storeClientId)) {
+			storeClientId = DEFAULT_STORE_CLIENT_ID;
 		}
 
-		cacheClientFactory = element.getAttribute(CACHE_CLIENT_FACTORY_ID_ATTR);
-		cacheItemConfigManager = element.getAttribute(CACHE_ITEM_MANAGER_ID_ATTR);
-		if (!StringUtils.hasText(cacheClientFactory) || !StringUtils.hasText(cacheItemConfigManager)) {
-			registerCacheRelatedWebService(beanDefinitionRegistry);
-		}
-
-		return cacheDefinition;
-	}
-
-	protected void registerCacheProxyBean(Element element, BeanDefinitionRegistry beanDefinitionRegistry,
-			GenericBeanDefinition cacheDefinition) {
-		GenericBeanDefinition definition = new GenericBeanDefinition();
-		definition.setBeanClass(org.springframework.aop.framework.ProxyFactoryBean.class);
-		String cacheProxyId = cacheServiceProxyId;
-		// definition.getPropertyValues().addPropertyValue("interceptorNames", new String[] { "monitorInterceptor" });
-		definition.getPropertyValues().addPropertyValue("target", cacheDefinition);
-		BeanDefinitionHolder holder = new BeanDefinitionHolder(definition, cacheProxyId);
-		BeanDefinitionReaderUtils.registerBeanDefinition(holder, beanDefinitionRegistry);
-	}
-
-
-	/**
-	 * @param parserContext
-	 */
-	private void registerCacheRelatedWebService(BeanDefinitionRegistry beanDefinitionRegistry) {
-		registerCacheWebService(beanDefinitionRegistry, CACHE_CONFIGURATION_WEB_SERVICE_ID,
-				"http://service.dianping.com/cacheService/cacheConfigService_1.0.0",
-				"com.dianping.remote.cache.CacheConfigurationWebService", false);
-		// registerCacheWebService(beanDefinitionRegistry,
-		// CACHE_MANAGE_WEB_SERVICE_ID,
-		// "http://service.dianping.com/cacheService/cacheManageService_1.0.0",
-		// "com.dianping.remote.cache.CacheManageWebService", false);
-		registerCacheWebService(beanDefinitionRegistry, ONEWAY_CACHE_MANAGE_WEB_SERVICE_ID,
-				"http://service.dianping.com/cacheService/cacheManageService_1.0.0",
-				"com.dianping.remote.cache.CacheManageWebService", true);
+        BeanDefinitionHolder holder = new BeanDefinitionHolder(storeDefinition, storeClientId);
+        BeanDefinitionReaderUtils.registerBeanDefinition(holder, beanDefinitionRegistry);
 	}
 
 	/**
-	 * @param parserContext
-	 * @param serviceName
-	 *            TODO
-	 * @param serviceInterface
-	 *            TODO
+	 * Register {@link StoreInterceptor} definition
 	 */
-	private void registerCacheWebService(BeanDefinitionRegistry beanDefinitionRegistry, String beanName,
-			String serviceName, String serviceInterface, boolean isOneWay) {
+	private void registerStoreInterceptorDefinition(Element element, ParserContext parserContext) {
 		GenericBeanDefinition definition = new GenericBeanDefinition();
-		definition.setBeanClassName("com.dianping.dpsf.spring.ProxyBeanFactory");
-		definition.setLazyInit(true);
-		definition.setInitMethodName("init");
-		MutablePropertyValues propertyValues = definition.getPropertyValues();
-		propertyValues.addPropertyValue("serviceName", serviceName);
-		propertyValues.addPropertyValue("iface", serviceInterface);
-		propertyValues.addPropertyValue("serialize", "hessian");
-		propertyValues.addPropertyValue("callMethod", isOneWay ? "oneway" : "sync");
-		propertyValues.addPropertyValue("timeout", "10000");
-		BeanDefinitionReaderUtils.registerBeanDefinition(new BeanDefinitionHolder(definition, beanName),
-				beanDefinitionRegistry);
-	}
+		definition.setBeanClass(StoreInterceptor.class);
+		definition.getPropertyValues().addPropertyValue("storeClient", new RuntimeBeanReference(storeClientId));
 
-	/**
-	 * Register {@link CacheInterceptor} definition
-	 */
-	private void registerCacheInterceptorDefinition(Element element, ParserContext parserContext) {
-		GenericBeanDefinition definition = new GenericBeanDefinition();
-		definition.setBeanClass(CacheInterceptor.class);
-
-		// Add reference to CacheService
-		definition.getPropertyValues().addPropertyValue("cacheService", new RuntimeBeanReference(cacheServiceProxyId));
-
-		cacheInterceptorId = element.getAttribute(CACHE_INTERCEPTOR_ID_ATTR);
-
-		if (!StringUtils.hasText(cacheInterceptorId)) {
-			cacheInterceptorId = DEFAULT_CACHE_INTERCEPTOR_ID;
+		storeInterceptorId = element.getAttribute(STORE_INTERCEPTOR_ID_ATTR);
+		if (!StringUtils.hasText(storeInterceptorId)) {
+			storeInterceptorId = DEFAULT_STORE_INTERCEPTOR_ID;
 		}
 
-		BeanDefinitionHolder holder = new BeanDefinitionHolder(definition, this.cacheInterceptorId);
-
+		BeanDefinitionHolder holder = new BeanDefinitionHolder(definition, this.storeInterceptorId);
 		BeanDefinitionReaderUtils.registerBeanDefinition(holder, parserContext.getRegistry());
 	}
 
 	/**
-	 * Create cache pointcut definition
+	 * Create store pointcut definition
 	 */
-	private void registerCachePointcutDefinition(Element element, ParserContext parserContext) {
-
+	private void registerStorePointcutDefinition(Element element, ParserContext parserContext) {
 		GenericBeanDefinition definition = new GenericBeanDefinition();
 		definition.setBeanClass(AnnotationMatchingPointcut.class);
-
 		definition.getConstructorArgumentValues().addGenericArgumentValue(new ValueHolder(null, "java.lang.Class"));
-
 		definition.getConstructorArgumentValues().addGenericArgumentValue(
-				new ValueHolder("com.dianping.squirrel.client.annotation.Cache", "java.lang.Class"));
+				new ValueHolder("com.dianping.squirrel.client.annotation.Store", "java.lang.Class"));
 
-		cachePointcutId = element.getAttribute(CACHE_POINTCUT_ID_ATTR);
-
-		if (!StringUtils.hasText(cachePointcutId)) {
-			cachePointcutId = DEFAULT_CACHE_POINTCUT_ID;
+		storePointcutId = element.getAttribute(STORE_POINTCUT_ID_ATTR);
+		if (!StringUtils.hasText(storePointcutId)) {
+			storePointcutId = DEFAULT_STORE_POINTCUT_ID;
 		}
 
-		BeanDefinitionHolder holder = new BeanDefinitionHolder(definition, this.cachePointcutId);
-
+		BeanDefinitionHolder holder = new BeanDefinitionHolder(definition, this.storePointcutId);
 		BeanDefinitionReaderUtils.registerBeanDefinition(holder, parserContext.getRegistry());
 	}
 
 	/**
 	 * Register {@link DefaultBeanFactoryPointcutAdvisor} definition
 	 */
-	private void registerAdvisorDefinition(Element element, ParserContext parserContext) {
-
+	private void registerStoreAdvisorDefinition(Element element, ParserContext parserContext) {
 		AopNamespaceUtils.registerAspectJAutoProxyCreatorIfNecessary(parserContext, element);
 
 		GenericBeanDefinition definition = new GenericBeanDefinition();
 		definition.setBeanClass(DefaultBeanFactoryPointcutAdvisor.class);
-
 		definition.getPropertyValues().addPropertyValue(ADVICE_BEAN_NAME,
-				new RuntimeBeanNameReference(cacheInterceptorId));
+				new RuntimeBeanNameReference(storeInterceptorId));
+		definition.getPropertyValues().addPropertyValue(POINTCUT, new RuntimeBeanReference(storePointcutId));
 
-		definition.getPropertyValues().addPropertyValue(POINTCUT, new RuntimeBeanReference(cachePointcutId));
-
-		String id = element.getAttribute(ADVISOR_ID_ATTR);
-
+		String id = element.getAttribute(STORE_ADVISOR_ID_ATTR);
 		if (!StringUtils.hasText(id)) {
-			id = DEFAULT_ADVISOR_ID;
+			id = DEFAULT_STORE_ADVISOR_ID;
 		}
 
 		BeanDefinitionHolder holder = new BeanDefinitionHolder(definition, "cacheAdvisor");
-
 		BeanDefinitionReaderUtils.registerBeanDefinition(holder, parserContext.getRegistry());
-
 	}
 
 	private BeanDefinitionRegistry getBeanDefinitionRegistry(ParserContext parserContext) {

@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.dianping.squirrel.client.Store;
 import com.dianping.squirrel.client.StoreClient;
 import com.dianping.squirrel.client.StoreKey;
 
@@ -43,6 +42,15 @@ public interface RedisStoreClient extends StoreClient {
 
 	<T> T hget(StoreKey key, String field);
 
+	/**
+	 * @return list of values for the fields, if some field
+	 *         does not exist, a null value is in the returned list<br>
+	 *         null if the key does not exist or fields are not specified
+	 */
+	List<Object> hmget(StoreKey key, final String... fields);
+	
+	Boolean hmset(StoreKey key, final Map<String, Object> valueMap);
+	
 	/**
 	 * @return the number of fields that were removed
 	 */

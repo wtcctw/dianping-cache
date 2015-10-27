@@ -1,5 +1,7 @@
 package com.dianping.squirrel.client.impl.redis;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -170,9 +172,7 @@ public class RedisStoreClientImpl extends AbstractStoreClient implements RedisSt
             throw new IllegalArgumentException("store key is null");
         }
         final CacheKeyType categoryConfig = configManager.findCacheKeyType(key.getCategory());
-        if(categoryConfig == null) {
-            throw new StoreException("category config is null: " + key.getCategory());
-        }
+        checkNotNull(categoryConfig, "%s's category config is null", key.getCategory());
         final String finalKey = categoryConfig.getKey(key.getParams());
         
         return executeWithMonitor(new Command() {
@@ -191,9 +191,7 @@ public class RedisStoreClientImpl extends AbstractStoreClient implements RedisSt
             throw new IllegalArgumentException("store key is null");
         }
         final CacheKeyType categoryConfig = configManager.findCacheKeyType(key.getCategory());
-        if(categoryConfig == null) {
-            throw new StoreException("category config is null: " + key.getCategory());
-        }
+        checkNotNull(categoryConfig, "%s's category config is null", key.getCategory());
         final String finalKey = categoryConfig.getKey(key.getParams());
         
         return executeWithMonitor(new Command() {
@@ -208,13 +206,9 @@ public class RedisStoreClientImpl extends AbstractStoreClient implements RedisSt
 
     @Override
     public Boolean expire(StoreKey key, final int seconds) {
-        if (key == null) {
-            throw new IllegalArgumentException("store key is null");
-        }
+        checkNotNull(key, "store key is null");
         final CacheKeyType categoryConfig = configManager.findCacheKeyType(key.getCategory());
-        if(categoryConfig == null) {
-            throw new StoreException("category config is null: " + key.getCategory());
-        }
+        checkNotNull(categoryConfig, "%s's category config is null", key.getCategory());
         final String finalKey = categoryConfig.getKey(key.getParams());
         
         return executeWithMonitor(new Command() {
@@ -230,13 +224,9 @@ public class RedisStoreClientImpl extends AbstractStoreClient implements RedisSt
 
     @Override
     public Long ttl(StoreKey key) {
-        if (key == null) {
-            throw new IllegalArgumentException("store key is null");
-        }
+        checkNotNull(key, "store key is null");
         final CacheKeyType categoryConfig = configManager.findCacheKeyType(key.getCategory());
-        if(categoryConfig == null) {
-            throw new StoreException("category config is null: " + key.getCategory());
-        }
+        checkNotNull(categoryConfig, "%s's category config is null", key.getCategory());
         final String finalKey = categoryConfig.getKey(key.getParams());
         
         return executeWithMonitor(new Command() {
@@ -252,13 +242,9 @@ public class RedisStoreClientImpl extends AbstractStoreClient implements RedisSt
 
     @Override
     public Boolean persist(StoreKey key) {
-        if (key == null) {
-            throw new IllegalArgumentException("store key is null");
-        }
+        checkNotNull(key, "store key is null");
         final CacheKeyType categoryConfig = configManager.findCacheKeyType(key.getCategory());
-        if(categoryConfig == null) {
-            throw new StoreException("category config is null: " + key.getCategory());
-        }
+        checkNotNull(categoryConfig, "%s's category config is null", key.getCategory());
         final String finalKey = categoryConfig.getKey(key.getParams());
         
         return executeWithMonitor(new Command() {
@@ -274,16 +260,10 @@ public class RedisStoreClientImpl extends AbstractStoreClient implements RedisSt
 
     @Override
     public Long hset(StoreKey key, final String field, final Object value) {
-        if (key == null) {
-            throw new IllegalArgumentException("store key is null");
-        }
-        if(field == null) {
-            throw new IllegalArgumentException("store field is null");
-        }
+        checkNotNull(key, "store key is null");
+        checkNotNull(field, "hash field is null");
         final CacheKeyType categoryConfig = configManager.findCacheKeyType(key.getCategory());
-        if(categoryConfig == null) {
-            throw new StoreException("category config is null: " + key.getCategory());
-        }
+        checkNotNull(categoryConfig, "%s's category config is null", key.getCategory());
         final String finalKey = categoryConfig.getKey(key.getParams());
         
         return executeWithMonitor(new Command() {
@@ -300,16 +280,10 @@ public class RedisStoreClientImpl extends AbstractStoreClient implements RedisSt
 
     @Override
     public <T> T hget(StoreKey key, final String field) {
-        if (key == null) {
-            throw new IllegalArgumentException("store key is null");
-        }
-        if(field == null) {
-            throw new IllegalArgumentException("store field is null");
-        }
+        checkNotNull(key, "store key is null");
+        checkNotNull(field, "hash field is null");
         final CacheKeyType categoryConfig = configManager.findCacheKeyType(key.getCategory());
-        if(categoryConfig == null) {
-            throw new StoreException("category config is null: " + key.getCategory());
-        }
+        checkNotNull(categoryConfig, "%s's category config is null", key.getCategory());
         final String finalKey = categoryConfig.getKey(key.getParams());
         
         return executeWithMonitor(new Command() {
@@ -327,19 +301,78 @@ public class RedisStoreClientImpl extends AbstractStoreClient implements RedisSt
             
         }, categoryConfig, finalKey, "hget");
     }
+    
+    @Override
+    public List<Object> hmget(StoreKey key, final String... fields) {
+        checkNotNull(key, "store key is null");
+        if(fields == null || fields.length == 0) {
+            return null;
+        }
+        final CacheKeyType categoryConfig = configManager.findCacheKeyType(key.getCategory());
+        checkNotNull(categoryConfig, "%s's category config is null", key.getCategory());
+        final String finalKey = categoryConfig.getKey(key.getParams());
+        
+        return executeWithMonitor(new Command() {
+
+            @Override
+            public Object execute() throws Exception {
+                List<String> values = client.hmget(finalKey, fields);
+                if(values != null) {
+                    List<Object> objects = new ArrayList(values.size());
+                    for(String value : values) {
+                        if(value != null) {
+                            Object object = serializer.fromString(value, Object.class);
+                            objects.add(object);
+                        } else {
+                            objects.add(null);
+                        }
+                    }
+                    return objects;
+                } else {
+                    return null;
+                }
+            }
+            
+        }, categoryConfig, finalKey, "hmget");
+    }
+
+    @Override
+    public Boolean hmset(StoreKey key, final Map<String, Object> objMap) {
+        checkNotNull(key, "store key is null");
+        checkNotNull(objMap, "hash values are null");
+        if(objMap.size() == 0) {
+            return true;
+        }
+        final CacheKeyType categoryConfig = configManager.findCacheKeyType(key.getCategory());
+        checkNotNull(categoryConfig, "%s's category config is null", key.getCategory());
+        final String finalKey = categoryConfig.getKey(key.getParams());
+        
+        return executeWithMonitor(new Command() {
+
+            @Override
+            public Object execute() throws Exception {
+                Map<String, String> strMap = new HashMap<String, String>(objMap.size());
+                for(Map.Entry<String, Object> entry : objMap.entrySet()) {
+                    if(entry.getValue() != null) {
+                        String str = serializer.toString(entry.getValue());
+                        strMap.put(entry.getKey(), str);
+                    }
+                }
+                String result = client.hmset(finalKey, strMap);
+                return "OK".equals(result);
+            }
+            
+        }, categoryConfig, finalKey, "hmset");
+    }
 
     @Override
     public Long hdel(StoreKey key, final String... fields) {
-        if (key == null) {
-            throw new IllegalArgumentException("store key is null");
-        }
+        checkNotNull(key, "store key is null");
         if(fields == null || fields.length == 0) {
             return 0L;
         }
         final CacheKeyType categoryConfig = configManager.findCacheKeyType(key.getCategory());
-        if(categoryConfig == null) {
-            throw new StoreException("category config is null: " + key.getCategory());
-        }
+        checkNotNull(categoryConfig, "%s's category config is null", key.getCategory());
         final String finalKey = categoryConfig.getKey(key.getParams());
         
         return executeWithMonitor(new Command() {
@@ -354,13 +387,9 @@ public class RedisStoreClientImpl extends AbstractStoreClient implements RedisSt
 
     @Override
     public Set<String> hkeys(StoreKey key) {
-        if (key == null) {
-            throw new IllegalArgumentException("store key is null");
-        }
+        checkNotNull(key, "store key is null");
         final CacheKeyType categoryConfig = configManager.findCacheKeyType(key.getCategory());
-        if(categoryConfig == null) {
-            throw new StoreException("category config is null: " + key.getCategory());
-        }
+        checkNotNull(categoryConfig, "%s's category config is null", key.getCategory());
         final String finalKey = categoryConfig.getKey(key.getParams());
         
         return executeWithMonitor(new Command() {
@@ -375,13 +404,9 @@ public class RedisStoreClientImpl extends AbstractStoreClient implements RedisSt
 
     @Override
     public List<Object> hvals(StoreKey key) {
-        if (key == null) {
-            throw new IllegalArgumentException("store key is null");
-        }
+        checkNotNull(key, "store key is null");
         final CacheKeyType categoryConfig = configManager.findCacheKeyType(key.getCategory());
-        if(categoryConfig == null) {
-            throw new StoreException("category config is null: " + key.getCategory());
-        }
+        checkNotNull(categoryConfig, "%s's category config is null", key.getCategory());
         final String finalKey = categoryConfig.getKey(key.getParams());
         
         return executeWithMonitor(new Command() {
@@ -406,13 +431,9 @@ public class RedisStoreClientImpl extends AbstractStoreClient implements RedisSt
 
     @Override
     public Map<String, Object> hgetAll(StoreKey key) {
-        if (key == null) {
-            throw new IllegalArgumentException("store key is null");
-        }
+        checkNotNull(key, "store key is null");
         final CacheKeyType categoryConfig = configManager.findCacheKeyType(key.getCategory());
-        if(categoryConfig == null) {
-            throw new StoreException("category config is null: " + key.getCategory());
-        }
+        checkNotNull(categoryConfig, "%s's category config is null", key.getCategory());
         final String finalKey = categoryConfig.getKey(key.getParams());
         
         return executeWithMonitor(new Command() {
@@ -437,16 +458,12 @@ public class RedisStoreClientImpl extends AbstractStoreClient implements RedisSt
 
     @Override
     public Long rpush(StoreKey key, final Object... objects) {
-        if (key == null) {
-            throw new IllegalArgumentException("store key is null");
-        }
+        checkNotNull(key, "store key is null");
         if(objects == null || objects.length == 0) {
             return -1L;
         }
         final CacheKeyType categoryConfig = configManager.findCacheKeyType(key.getCategory());
-        if(categoryConfig == null) {
-            throw new StoreException("category config is null: " + key.getCategory());
-        }
+        checkNotNull(categoryConfig, "%s's category config is null", key.getCategory());
         final String finalKey = categoryConfig.getKey(key.getParams());
         
         return executeWithMonitor(new Command() {
@@ -469,16 +486,12 @@ public class RedisStoreClientImpl extends AbstractStoreClient implements RedisSt
 
     @Override
     public Long lpush(StoreKey key, final Object... objects) {
-        if (key == null) {
-            throw new IllegalArgumentException("store key is null");
-        }
+        checkNotNull(key, "store key is null");
         if(objects == null || objects.length == 0) {
-            throw new IllegalArgumentException("list value is null");
+            return -1L;
         }
         final CacheKeyType categoryConfig = configManager.findCacheKeyType(key.getCategory());
-        if(categoryConfig == null) {
-            throw new StoreException("category config is null: " + key.getCategory());
-        }
+        checkNotNull(categoryConfig, "%s's category config is null", key.getCategory());
         final String finalKey = categoryConfig.getKey(key.getParams());
         
         return executeWithMonitor(new Command() {
@@ -501,13 +514,9 @@ public class RedisStoreClientImpl extends AbstractStoreClient implements RedisSt
 
     @Override
     public <T> T lpop(StoreKey key) {
-        if (key == null) {
-            throw new IllegalArgumentException("store key is null");
-        }
+        checkNotNull(key, "store key is null");
         final CacheKeyType categoryConfig = configManager.findCacheKeyType(key.getCategory());
-        if(categoryConfig == null) {
-            throw new StoreException("category config is null: " + key.getCategory());
-        }
+        checkNotNull(categoryConfig, "%s's category config is null", key.getCategory());
         final String finalKey = categoryConfig.getKey(key.getParams());
         
         return executeWithMonitor(new Command() {
@@ -527,13 +536,9 @@ public class RedisStoreClientImpl extends AbstractStoreClient implements RedisSt
 
     @Override
     public <T> T rpop(StoreKey key) {
-        if (key == null) {
-            throw new IllegalArgumentException("store key is null");
-        }
+        checkNotNull(key, "store key is null");
         final CacheKeyType categoryConfig = configManager.findCacheKeyType(key.getCategory());
-        if(categoryConfig == null) {
-            throw new StoreException("category config is null: " + key.getCategory());
-        }
+        checkNotNull(categoryConfig, "%s's category config is null", key.getCategory());
         final String finalKey = categoryConfig.getKey(key.getParams());
         
         return executeWithMonitor(new Command() {
@@ -553,13 +558,9 @@ public class RedisStoreClientImpl extends AbstractStoreClient implements RedisSt
 
     @Override
     public <T> T lindex(StoreKey key, final long index) {
-        if (key == null) {
-            throw new IllegalArgumentException("store key is null");
-        }
+        checkNotNull(key, "store key is null");
         final CacheKeyType categoryConfig = configManager.findCacheKeyType(key.getCategory());
-        if(categoryConfig == null) {
-            throw new StoreException("category config is null: " + key.getCategory());
-        }
+        checkNotNull(categoryConfig, "%s's category config is null", key.getCategory());
         final String finalKey = categoryConfig.getKey(key.getParams());
         
         return executeWithMonitor(new Command() {
@@ -579,16 +580,10 @@ public class RedisStoreClientImpl extends AbstractStoreClient implements RedisSt
 
     @Override
     public Boolean lset(StoreKey key, final long index, final Object object) {
-        if (key == null) {
-            throw new IllegalArgumentException("store key is null");
-        }
-        if(object == null) {
-            throw new IllegalArgumentException("value is null");
-        }
+        checkNotNull(key, "store key is null");
+        checkNotNull(key, "value is null");
         final CacheKeyType categoryConfig = configManager.findCacheKeyType(key.getCategory());
-        if(categoryConfig == null) {
-            throw new StoreException("category config is null: " + key.getCategory());
-        }
+        checkNotNull(categoryConfig, "%s's category config is null", key.getCategory());
         final String finalKey = categoryConfig.getKey(key.getParams());
         
         return executeWithMonitor(new Command() {
@@ -608,13 +603,9 @@ public class RedisStoreClientImpl extends AbstractStoreClient implements RedisSt
 
     @Override
     public Long llen(StoreKey key) {
-        if (key == null) {
-            throw new IllegalArgumentException("store key is null");
-        }
+        checkNotNull(key, "store key is null");
         final CacheKeyType categoryConfig = configManager.findCacheKeyType(key.getCategory());
-        if(categoryConfig == null) {
-            throw new StoreException("category config is null: " + key.getCategory());
-        }
+        checkNotNull(categoryConfig, "%s's category config is null", key.getCategory());
         final String finalKey = categoryConfig.getKey(key.getParams());
         
         return executeWithMonitor(new Command() {
@@ -629,13 +620,9 @@ public class RedisStoreClientImpl extends AbstractStoreClient implements RedisSt
 
     @Override
     public List<Object> lrange(StoreKey key, final long start, final long end) {
-        if (key == null) {
-            throw new IllegalArgumentException("store key is null");
-        }
+        checkNotNull(key, "store key is null");
         final CacheKeyType categoryConfig = configManager.findCacheKeyType(key.getCategory());
-        if(categoryConfig == null) {
-            throw new StoreException("category config is null: " + key.getCategory());
-        }
+        checkNotNull(categoryConfig, "%s's category config is null", key.getCategory());
         final String finalKey = categoryConfig.getKey(key.getParams());
         
         return executeWithMonitor(new Command() {
@@ -660,13 +647,9 @@ public class RedisStoreClientImpl extends AbstractStoreClient implements RedisSt
 
     @Override
     public Boolean ltrim(StoreKey key, final long start, final long end) {
-        if (key == null) {
-            throw new IllegalArgumentException("store key is null");
-        }
+        checkNotNull(key, "store key is null");
         final CacheKeyType categoryConfig = configManager.findCacheKeyType(key.getCategory());
-        if(categoryConfig == null) {
-            throw new StoreException("category config is null: " + key.getCategory());
-        }
+        checkNotNull(categoryConfig, "%s's category config is null", key.getCategory());
         final String finalKey = categoryConfig.getKey(key.getParams());
         
         return executeWithMonitor(new Command() {
@@ -682,16 +665,12 @@ public class RedisStoreClientImpl extends AbstractStoreClient implements RedisSt
 
     @Override
     public Long sadd(StoreKey key, final Object... objects) {
-        if (key == null) {
-            throw new IllegalArgumentException("store key is null");
-        }
+        checkNotNull(key, "store key is null");
         if(objects == null || objects.length == 0) {
             return 0L;
         }
         final CacheKeyType categoryConfig = configManager.findCacheKeyType(key.getCategory());
-        if(categoryConfig == null) {
-            throw new StoreException("category config is null: " + key.getCategory());
-        }
+        checkNotNull(categoryConfig, "%s's category config is null", key.getCategory());
         final String finalKey = categoryConfig.getKey(key.getParams());
         
         return executeWithMonitor(new Command() {
@@ -718,16 +697,12 @@ public class RedisStoreClientImpl extends AbstractStoreClient implements RedisSt
 
     @Override
     public Long srem(StoreKey key, final Object... objects) {
-        if (key == null) {
-            throw new IllegalArgumentException("store key is null");
-        }
+        checkNotNull(key, "store key is null");
         if(objects == null || objects.length == 0) {
             return 0L;
         }
         final CacheKeyType categoryConfig = configManager.findCacheKeyType(key.getCategory());
-        if(categoryConfig == null) {
-            throw new StoreException("category config is null: " + key.getCategory());
-        }
+        checkNotNull(categoryConfig, "%s's category config is null", key.getCategory());
         final String finalKey = categoryConfig.getKey(key.getParams());
         
         return executeWithMonitor(new Command() {
@@ -750,13 +725,9 @@ public class RedisStoreClientImpl extends AbstractStoreClient implements RedisSt
 
     @Override
     public Set<Object> smembers(StoreKey key) {
-        if (key == null) {
-            throw new IllegalArgumentException("store key is null");
-        }
+        checkNotNull(key, "store key is null");
         final CacheKeyType categoryConfig = configManager.findCacheKeyType(key.getCategory());
-        if(categoryConfig == null) {
-            throw new StoreException("category config is null: " + key.getCategory());
-        }
+        checkNotNull(categoryConfig, "%s's category config is null", key.getCategory());
         final String finalKey = categoryConfig.getKey(key.getParams());
         
         return executeWithMonitor(new Command() {
@@ -781,13 +752,9 @@ public class RedisStoreClientImpl extends AbstractStoreClient implements RedisSt
 
     @Override
     public Long scard(StoreKey key) {
-        if (key == null) {
-            throw new IllegalArgumentException("store key is null");
-        }
+        checkNotNull(key, "store key is null");
         final CacheKeyType categoryConfig = configManager.findCacheKeyType(key.getCategory());
-        if(categoryConfig == null) {
-            throw new StoreException("category config is null: " + key.getCategory());
-        }
+        checkNotNull(categoryConfig, "%s's category config is null", key.getCategory());
         final String finalKey = categoryConfig.getKey(key.getParams());
         
         return executeWithMonitor(new Command() {
@@ -802,16 +769,10 @@ public class RedisStoreClientImpl extends AbstractStoreClient implements RedisSt
 
     @Override
     public Boolean sismember(StoreKey key, final Object member) {
-        if (key == null) {
-            throw new IllegalArgumentException("store key is null");
-        }
-        if (member == null) {
-            throw new IllegalArgumentException("set member is null");
-        }
+        checkNotNull(key, "store key is null");
+        checkNotNull(member, "set member is null");
         final CacheKeyType categoryConfig = configManager.findCacheKeyType(key.getCategory());
-        if(categoryConfig == null) {
-            throw new StoreException("category config is null: " + key.getCategory());
-        }
+        checkNotNull(categoryConfig, "%s's category config is null", key.getCategory());
         final String finalKey = categoryConfig.getKey(key.getParams());
         
         return executeWithMonitor(new Command() {
