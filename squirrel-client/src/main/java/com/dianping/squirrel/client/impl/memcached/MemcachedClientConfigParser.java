@@ -13,7 +13,7 @@
  * accordance with the terms of the license agreement you entered into
  * with Dianping.com.
  */
-package com.dianping.squirrel.client.config.parser;
+package com.dianping.squirrel.client.impl.memcached;
 
 import java.util.List;
 
@@ -21,9 +21,9 @@ import org.apache.commons.lang.ClassUtils;
 
 import com.dianping.pigeon.config.ConfigManagerLoader;
 import com.dianping.remote.cache.dto.CacheConfigurationDTO;
+import com.dianping.squirrel.client.config.StoreClientConfigParser;
 import com.dianping.squirrel.client.config.zookeeper.CacheMessageManager;
 import com.dianping.squirrel.client.core.CacheClientConfiguration;
-import com.dianping.squirrel.client.impl.memcached.MemcachedClientConfiguration;
 
 /**
  * TODO Comment of MemcachedClientConfigurationParser
@@ -31,7 +31,7 @@ import com.dianping.squirrel.client.impl.memcached.MemcachedClientConfiguration;
  * @author danson.liu
  * 
  */
-public class MemcachedClientConfigurationParser implements CacheClientConfigurationParser {
+public class MemcachedClientConfigParser implements StoreClientConfigParser {
 
 	@Override
 	public CacheClientConfiguration parse(CacheConfigurationDTO detail) {

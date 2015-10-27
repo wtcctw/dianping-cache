@@ -1,4 +1,4 @@
-package com.dianping.squirrel.client.config.parser;
+package com.dianping.squirrel.client.impl.redis;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -6,8 +6,8 @@ import java.util.List;
 import java.util.Map;
 
 import com.dianping.remote.cache.dto.CacheConfigurationDTO;
+import com.dianping.squirrel.client.config.StoreClientConfigParser;
 import com.dianping.squirrel.client.core.CacheClientConfiguration;
-import com.dianping.squirrel.client.impl.redis.RedisClientConfig;
 
 /**
  * Redis cluster URL: redis-cluster://ip1:port1,ip2:port2?param1=value1&param2=value2
@@ -15,7 +15,7 @@ import com.dianping.squirrel.client.impl.redis.RedisClientConfig;
  * @author enlight
  *
  */
-public class RedisClusterClientConfigurationParser implements CacheClientConfigurationParser {
+public class RedisClientConfigParser implements StoreClientConfigParser {
 
     private static final String URL_PREFIX = "redis-cluster://";
     private static final String KEY_READ_TIMEOUT = "readTimeout";

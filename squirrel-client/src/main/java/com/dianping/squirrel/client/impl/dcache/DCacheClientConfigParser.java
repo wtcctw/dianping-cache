@@ -1,13 +1,13 @@
-package com.dianping.squirrel.client.config.parser;
+package com.dianping.squirrel.client.impl.dcache;
 
 import org.apache.commons.lang.ClassUtils;
 import org.codehaus.plexus.util.StringUtils;
 
 import com.dianping.remote.cache.dto.CacheConfigurationDTO;
+import com.dianping.squirrel.client.config.StoreClientConfigParser;
 import com.dianping.squirrel.client.core.CacheClientConfiguration;
-import com.dianping.squirrel.client.impl.dcache.DCacheClientConfig;
 
-public class DCacheClientConfigurationParser implements CacheClientConfigurationParser {
+public class DCacheClientConfigParser implements StoreClientConfigParser {
 
 	String trimValue(String value) {
 		if (value.startsWith("\"") && value.endsWith("\"")) {

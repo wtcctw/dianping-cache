@@ -13,25 +13,22 @@
  * accordance with the terms of the license agreement you entered into
  * with Dianping.com.
  */
-package com.dianping.squirrel.client.config.parser;
+package com.dianping.squirrel.client.config;
 
 import com.dianping.remote.cache.dto.CacheConfigurationDTO;
 import com.dianping.squirrel.client.core.CacheClientConfiguration;
-import com.dianping.squirrel.client.impl.ehcache.EhcacheConfiguration;
 
 /**
- * EhcacheClient Configuration Parser
+ * Parse store client configuration
+ * 
  * @author danson.liu
- *
  */
-public class EhcacheClientConfigurationParser implements CacheClientConfigurationParser {
+public interface StoreClientConfigParser {
 
-	@Override
-	public CacheClientConfiguration parse(CacheConfigurationDTO detail) {
-		//Can extend some ehcache configuration here
-	    EhcacheConfiguration config = new EhcacheConfiguration();
-	    config.setClientClazz(detail.getClientClazz());
-	    return config;
-	}
+	/**
+	 * @param detail
+	 * @return
+	 */
+	CacheClientConfiguration parse(CacheConfigurationDTO detail);
 
 }

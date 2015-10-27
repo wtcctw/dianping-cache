@@ -23,16 +23,15 @@ import org.slf4j.LoggerFactory;
 
 import com.dianping.remote.cache.dto.CacheConfigurationDTO;
 import com.dianping.squirrel.client.StoreClient;
-import com.dianping.squirrel.client.config.parser.CacheClientConfigurationParser;
-import com.dianping.squirrel.client.config.parser.DCacheClientConfigurationParser;
-import com.dianping.squirrel.client.config.parser.EhcacheClientConfigurationParser;
-import com.dianping.squirrel.client.config.parser.MemcachedClientConfigurationParser;
-import com.dianping.squirrel.client.config.parser.RedisClusterClientConfigurationParser;
 import com.dianping.squirrel.client.core.CacheClient;
 import com.dianping.squirrel.client.core.CacheClientConfiguration;
+import com.dianping.squirrel.client.impl.dcache.DCacheClientConfigParser;
 import com.dianping.squirrel.client.impl.dcache.DCacheClientImpl;
+import com.dianping.squirrel.client.impl.ehcache.EhcacheClientConfigParser;
 import com.dianping.squirrel.client.impl.ehcache.EhcacheClientImpl;
+import com.dianping.squirrel.client.impl.memcached.MemcachedClientConfigParser;
 import com.dianping.squirrel.client.impl.memcached.MemcachedClientImpl;
+import com.dianping.squirrel.client.impl.redis.RedisClientConfigParser;
 import com.dianping.squirrel.client.impl.redis.RedisStoreClientImpl;
 import com.dianping.squirrel.common.exception.StoreInitializeException;
 
@@ -44,16 +43,16 @@ import com.dianping.squirrel.common.exception.StoreInitializeException;
  */
 public class CacheClientConfigurationHelper {
 	private static transient Logger logger = LoggerFactory.getLogger(CacheClientConfigurationHelper.class);
-	private static Map<Class, CacheClientConfigurationParser> parserMap = new ConcurrentHashMap<Class, CacheClientConfigurationParser>();
+	private static Map<Class, StoreClientConfigParser> parserMap = new ConcurrentHashMap<Class, StoreClientConfigParser>();
 
 	static {
-		register(MemcachedClientImpl.class, new MemcachedClientConfigurationParser());
-		register(EhcacheClientImpl.class, new EhcacheClientConfigurationParser());
-		register(DCacheClientImpl.class, new DCacheClientConfigurationParser());
-		register(RedisStoreClientImpl.class, new RedisClusterClientConfigurationParser());
+		register(MemcachedClientImpl.class, new MemcachedClientConfigParser());
+		register(EhcacheClientImpl.class, new EhcacheClientConfigParser());
+		register(DCacheClientImpl.class, new DCacheClientConfigParser());
+		register(RedisStoreClientImpl.class, new RedisClientConfigParser());
 	}
 
-	public static void register(Class clientClazz, CacheClientConfigurationParser parser) {
+	public static void register(Class clientClazz, StoreClientConfigParser parser) {
 		parserMap.put(clientClazz, parser);
 	}
 
