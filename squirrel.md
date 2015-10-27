@@ -37,6 +37,8 @@ b. Spring 配置使用方式
     http://www.dianping.com/schema/squirrel http://www.dianping.com/schema/squirrel/squirrel-1.0.xsd">  
 
     <!-- squirrel store annotation -->
+    <!-- <squirrel:store store-type="redis-hua"/> -->
+    <!-- store-type 是可选参数，用于指定存储类型，用于拿到指定存储的客户端 -->
     <squirrel:store />
 
     <!-- spring annotation -->
@@ -178,6 +180,15 @@ public interface RedisStoreClient extends StoreClient {
 
 	Map<String, Object> hgetAll(StoreKey key);
 
+	/**
+	 * @return list of values for the fields, if some field
+	 *         does not exist, a null value is in the returned list<br>
+	 *         null if the key does not exist or fields are not specified
+	 */
+	List<Object> hmget(StoreKey key, final String... fields);
+	
+	Boolean hmset(StoreKey key, final Map<String, Object> valueMap);
+	
 	// list related
 	/**
 	 * Insert the values at the tail of the list stored at key
