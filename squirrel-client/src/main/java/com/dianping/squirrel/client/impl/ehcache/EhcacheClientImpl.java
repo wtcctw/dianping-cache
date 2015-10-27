@@ -32,7 +32,7 @@ import com.dianping.squirrel.client.core.CASResponse;
 import com.dianping.squirrel.client.core.CASValue;
 import com.dianping.squirrel.client.core.CacheCallback;
 import com.dianping.squirrel.client.core.CacheClient;
-import com.dianping.squirrel.client.core.CacheClientConfiguration;
+import com.dianping.squirrel.client.core.StoreClientConfig;
 import com.dianping.squirrel.client.core.CacheFuture;
 import com.dianping.squirrel.client.core.Lifecycle;
 import com.dianping.squirrel.common.config.ConfigManagerLoader;
@@ -191,10 +191,10 @@ public class EhcacheClientImpl implements CacheClient, Lifecycle {
 	}
 
 	/**
-	 * @see com.dianping.squirrel.client.core.InitialConfiguration#initialize(com.dianping.squirrel.client.core.CacheClientConfiguration)
+	 * @see com.dianping.squirrel.client.core.InitialConfiguration#initialize(com.dianping.squirrel.client.core.StoreClientConfig)
 	 */
 	@Override
-	public void initialize(CacheClientConfiguration config) {
+	public void initialize(StoreClientConfig config) {
 		if (config instanceof EhcacheConfiguration) {
 			manager = ((EhcacheConfiguration) config).buildEhcacheManager();
 		}

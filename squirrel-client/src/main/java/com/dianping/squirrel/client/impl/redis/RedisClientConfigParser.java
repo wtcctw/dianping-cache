@@ -7,7 +7,7 @@ import java.util.Map;
 
 import com.dianping.remote.cache.dto.CacheConfigurationDTO;
 import com.dianping.squirrel.client.config.StoreClientConfigParser;
-import com.dianping.squirrel.client.core.CacheClientConfiguration;
+import com.dianping.squirrel.client.core.StoreClientConfig;
 
 /**
  * Redis cluster URL: redis-cluster://ip1:port1,ip2:port2?param1=value1&param2=value2
@@ -26,7 +26,7 @@ public class RedisClientConfigParser implements StoreClientConfigParser {
     private static final int DEFAULT_MAX_REDIRECTS = 3;
     
     @Override
-    public CacheClientConfiguration parse(CacheConfigurationDTO detail) {
+    public StoreClientConfig parse(CacheConfigurationDTO detail) {
         String url = detail.getServers();
         if(url == null || !url.startsWith(URL_PREFIX)) {
             return null;

@@ -43,8 +43,8 @@ import com.dianping.squirrel.client.core.CASResponse;
 import com.dianping.squirrel.client.core.CASValue;
 import com.dianping.squirrel.client.core.CacheCallback;
 import com.dianping.squirrel.client.core.CacheClient;
-import com.dianping.squirrel.client.core.CacheClientConfiguration;
-import com.dianping.squirrel.client.core.KeyAware;
+import com.dianping.squirrel.client.core.StoreClientConfig;
+import com.dianping.squirrel.client.core.StoreTypeAware;
 import com.dianping.squirrel.client.core.Lifecycle;
 import com.dianping.squirrel.common.config.ConfigChangeListener;
 import com.dianping.squirrel.common.config.ConfigManager;
@@ -64,7 +64,7 @@ import com.dianping.squirrel.common.util.RetryLoop.RetryResponse;
  * @author xiang.wu
  * 
  */
-public class MemcachedClientImpl implements CacheClient, Lifecycle, KeyAware {
+public class MemcachedClientImpl implements CacheClient, Lifecycle, StoreTypeAware {
 
 	/**
 	 * in milliseconds
@@ -183,17 +183,17 @@ public class MemcachedClientImpl implements CacheClient, Lifecycle, KeyAware {
 	}
 
 	@Override
-	public String getKey() {
+	public String getStoreType() {
 		return key;
 	}
 
 	@Override
-	public void setKey(String key) {
+	public void setStoreType(String key) {
 		this.key = key;
 	}
 
 	@Override
-	public void initialize(CacheClientConfiguration config) {
+	public void initialize(StoreClientConfig config) {
 		this.config = (MemcachedClientConfiguration) config;
 		NodeMonitor.getInstance().clear(key);
 	}
@@ -509,14 +509,14 @@ public class MemcachedClientImpl implements CacheClient, Lifecycle, KeyAware {
 					opQueueMaxBlockTime);
 			if (config.getTranscoder() != null) {
 				if (config.getTranscoder() instanceof HessianTranscoder) {
-					((HessianTranscoder) config.getTranscoder()).setCacheType(this.getKey());
+					((HessianTranscoder) config.getTranscoder()).setCacheType(this.getStoreType());
 				}
 				connectionFactory.setTranscoder(config.getTranscoder());
 			} else {
 				// set transcoder to HessianTranscoder:
 				// 1. fast
 				// 2. Fixed bug in https://bugs.launchpad.net/play/+bug/503349
-				connectionFactory.setTranscoder(new HessianTranscoder(this.getKey()));
+				connectionFactory.setTranscoder(new HessianTranscoder(this.getStoreType()));
 			}
 			String servers = config.getServers();
 			if (servers == null) {
@@ -682,7 +682,7 @@ public class MemcachedClientImpl implements CacheClient, Lifecycle, KeyAware {
 			try {
 				client.set(CacheKeyUtils.reformKey(key, true), expiration + hotKeyExpiration, value);
 			} catch (RuntimeException e) {
-				Cat.logEvent("Cache." + this.getKey(), category + ":setBackupFail", "-1",
+				Cat.logEvent("Cache." + this.getStoreType(), category + ":setBackupFail", "-1",
 						"key=" + key + "&error=" + e.getMessage());
 			}
 		}
@@ -693,7 +693,7 @@ public class MemcachedClientImpl implements CacheClient, Lifecycle, KeyAware {
 			try {
 				getWriteClient().delete(CacheKeyUtils.reformKey(key, true));
 			} catch (RuntimeException e) {
-				Cat.logEvent("Cache." + this.getKey(), category + ":removeBackupFail", "-1", "key=" + key + "&error="
+				Cat.logEvent("Cache." + this.getStoreType(), category + ":removeBackupFail", "-1", "key=" + key + "&error="
 						+ e.getMessage());
 			}
 		}
@@ -737,17 +737,17 @@ public class MemcachedClientImpl implements CacheClient, Lifecycle, KeyAware {
 			try {
 				result = doGet(lastVersionCacheKey, category);
 				if (result != null) {
-					Cat.logEvent("Cache." + this.getKey(), category + ":getLast", "0", lastVersionCacheKey);
+					Cat.logEvent("Cache." + this.getStoreType(), category + ":getLast", "0", lastVersionCacheKey);
 				} else {
-					Cat.logEvent("Cache." + this.getKey(), category + ":getLastMissed", "-1", lastVersionCacheKey);
+					Cat.logEvent("Cache." + this.getStoreType(), category + ":getLastMissed", "-1", lastVersionCacheKey);
 				}
 			} catch (TimeoutException e) {
-				Cat.logEvent("Cache." + this.getKey(), category + ":getLastTimeout", "-1", lastVersionCacheKey);
+				Cat.logEvent("Cache." + this.getStoreType(), category + ":getLastTimeout", "-1", lastVersionCacheKey);
 				logger.error("memcached get last key {} timeout", lastVersionCacheKey);
 				throw e;
 			}
 		} else {
-			Cat.logEvent("Cache." + this.getKey(), category + ":lockAfterClear", "0", key);
+			Cat.logEvent("Cache." + this.getStoreType(), category + ":lockAfterClear", "0", key);
 			logger.info("memcached locked {} after clear category", lockKey);
 			result = null;
 		}
@@ -769,17 +769,17 @@ public class MemcachedClientImpl implements CacheClient, Lifecycle, KeyAware {
 			try {
 				result = doGet(hotKey, category);
 				if (result != null) {
-					Cat.logEvent("Cache." + this.getKey(), category + ":getHot", "0", hotKey);
+					Cat.logEvent("Cache." + this.getStoreType(), category + ":getHot", "0", hotKey);
 				} else {
-					Cat.logEvent("Cache." + this.getKey(), category + ":getHotMissed", "-1", hotKey);
+					Cat.logEvent("Cache." + this.getStoreType(), category + ":getHotMissed", "-1", hotKey);
 				}
 			} catch (TimeoutException e) {
-				Cat.logEvent("Cache." + this.getKey(), category + ":getHotTimeout", "-1", hotKey);
+				Cat.logEvent("Cache." + this.getStoreType(), category + ":getHotTimeout", "-1", hotKey);
 				logger.error("memcached get hot key {} timeout", hotKey);
 				throw e;
 			}
 		} else {
-			Cat.logEvent("Cache." + this.getKey(), category + ":lockAfterExp", "0", key);
+			Cat.logEvent("Cache." + this.getStoreType(), category + ":lockAfterExp", "0", key);
 			logger.info("memcached locked {} after expiration", lockKey);
 			result = null;
 		}

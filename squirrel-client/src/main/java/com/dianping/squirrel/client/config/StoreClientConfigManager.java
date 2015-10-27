@@ -31,7 +31,7 @@ import com.dianping.remote.cache.dto.CacheConfigurationsDTO;
 import com.dianping.squirrel.client.StoreClient;
 import com.dianping.squirrel.client.config.zookeeper.CacheCuratorClient;
 import com.dianping.squirrel.client.core.CacheClientBuilder;
-import com.dianping.squirrel.client.core.CacheClientConfiguration;
+import com.dianping.squirrel.client.core.StoreClientConfig;
 import com.dianping.squirrel.client.core.CacheConfiguration;
 import com.dianping.squirrel.client.impl.dcache.DCacheClientImpl;
 import com.dianping.squirrel.client.impl.redis.RedisStoreClientImpl;
@@ -46,11 +46,11 @@ import com.dianping.squirrel.common.util.PathUtils;
  * @author danson.liu
  * 
  */
-public class RemoteCacheClientFactory implements CacheClientFactory {
+public class StoreClientConfigManager {
 
-	private static transient Logger logger = LoggerFactory.getLogger(RemoteCacheClientFactory.class);
+	private static transient Logger logger = LoggerFactory.getLogger(StoreClientConfigManager.class);
 
-	private ConcurrentMap<String, CacheClientConfiguration> configMap = new ConcurrentHashMap<String, CacheClientConfiguration>();
+	private ConcurrentMap<String, StoreClientConfig> configMap = new ConcurrentHashMap<String, StoreClientConfig>();
 
 	private Set<String> usedCacheServices = new ConcurrentSkipListSet<String>();
 
@@ -60,9 +60,9 @@ public class RemoteCacheClientFactory implements CacheClientFactory {
 	
 	private ConfigManager configManager = ConfigManagerLoader.getConfigManager();
 
-	private static RemoteCacheClientFactory instance;
+	private static StoreClientConfigManager instance;
 	
-	private RemoteCacheClientFactory() {
+	private StoreClientConfigManager() {
 	    try {
             init();
         } catch (Exception e) {
@@ -70,18 +70,17 @@ public class RemoteCacheClientFactory implements CacheClientFactory {
         }
 	}
 	
-	public static RemoteCacheClientFactory getInstance() {
+	public static StoreClientConfigManager getInstance() {
 	    if(instance == null) {
-	        synchronized(RemoteCacheClientFactory.class) {
+	        synchronized(StoreClientConfigManager.class) {
 	            if(instance == null) {
-	                instance = new RemoteCacheClientFactory();
+	                instance = new StoreClientConfigManager();
 	            }
 	        }
 	    }
 	    return instance;
 	}
 	
-	@Override
 	public StoreClient findCacheClient(String cacheKey) {
 	    if(StringUtils.isBlank(cacheKey)) {
 	        throw new NullPointerException("cache service is empty");
@@ -92,9 +91,8 @@ public class RemoteCacheClientFactory implements CacheClientFactory {
 		return init(cacheKey);
 	}
 
-	@Override
 	public StoreClient init(String cacheKey) {
-		CacheClientConfiguration config = configMap.get(cacheKey);
+		StoreClientConfig config = configMap.get(cacheKey);
 		if (config == null) {
 			synchronized (this) {
 				config = configMap.get(cacheKey);
@@ -127,13 +125,11 @@ public class RemoteCacheClientFactory implements CacheClientFactory {
 		return serviceConfig;
 	}
 
-	@Override
 	public Set<String> getCacheClientKeys() {
 		return usedCacheServices;
 	}
 
-	@Override
-	public CacheClientConfiguration getCacheClientConfig(String cacheKey) {
+	public StoreClientConfig getCacheClientConfig(String cacheKey) {
 		return configMap.get(cacheKey);
 	}
 
@@ -168,7 +164,7 @@ public class RemoteCacheClientFactory implements CacheClientFactory {
 	 * @param configuration
 	 * @throws StoreInitializeException
 	 */
-	private synchronized CacheClientConfiguration registerCache(CacheConfigurationDTO configuration) throws StoreInitializeException {
+	private synchronized StoreClientConfig registerCache(CacheConfigurationDTO configuration) throws StoreInitializeException {
 		logger.warn("register cache service: " + configuration);
 		String cacheKey = configuration.getCacheKey();
 
@@ -197,7 +193,7 @@ public class RemoteCacheClientFactory implements CacheClientFactory {
 		    }
 		}
 		
-		CacheClientConfiguration cacheClientConfig = CacheClientConfigurationHelper.parse(configuration);
+		StoreClientConfig cacheClientConfig = StoreClientConfigHelper.parse(configuration);
 		if (cacheClientConfig != null) {
 		    configMap.put(cacheKey, cacheClientConfig);
 		}

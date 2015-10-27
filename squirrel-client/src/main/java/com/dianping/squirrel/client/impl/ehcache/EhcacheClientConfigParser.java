@@ -17,7 +17,7 @@ package com.dianping.squirrel.client.impl.ehcache;
 
 import com.dianping.remote.cache.dto.CacheConfigurationDTO;
 import com.dianping.squirrel.client.config.StoreClientConfigParser;
-import com.dianping.squirrel.client.core.CacheClientConfiguration;
+import com.dianping.squirrel.client.core.StoreClientConfig;
 
 /**
  * EhcacheClient Configuration Parser
@@ -27,7 +27,7 @@ import com.dianping.squirrel.client.core.CacheClientConfiguration;
 public class EhcacheClientConfigParser implements StoreClientConfigParser {
 
 	@Override
-	public CacheClientConfiguration parse(CacheConfigurationDTO detail) {
+	public StoreClientConfig parse(CacheConfigurationDTO detail) {
 		//Can extend some ehcache configuration here
 	    EhcacheConfiguration config = new EhcacheConfiguration();
 	    config.setClientClazz(detail.getClientClazz());

@@ -19,8 +19,8 @@ import redis.clients.jedis.JedisCluster;
 import com.dianping.squirrel.client.StoreCallback;
 import com.dianping.squirrel.client.StoreKey;
 import com.dianping.squirrel.client.config.CacheKeyType;
-import com.dianping.squirrel.client.core.CacheClientConfiguration;
-import com.dianping.squirrel.client.core.KeyAware;
+import com.dianping.squirrel.client.core.StoreClientConfig;
+import com.dianping.squirrel.client.core.StoreTypeAware;
 import com.dianping.squirrel.client.core.Lifecycle;
 import com.dianping.squirrel.client.core.Transcoder;
 import com.dianping.squirrel.client.impl.AbstractStoreClient;
@@ -28,7 +28,7 @@ import com.dianping.squirrel.common.exception.StoreException;
 import com.dianping.squirrel.common.serialize.Serializer;
 import com.dianping.squirrel.common.serialize.SerializerFactory;
 
-public class RedisStoreClientImpl extends AbstractStoreClient implements RedisStoreClient, Lifecycle, KeyAware {
+public class RedisStoreClientImpl extends AbstractStoreClient implements RedisStoreClient, Lifecycle, StoreTypeAware {
 
     private static Logger logger = LoggerFactory.getLogger(RedisStoreClientImpl.class);
 
@@ -45,17 +45,17 @@ public class RedisStoreClientImpl extends AbstractStoreClient implements RedisSt
     private Serializer serializer = SerializerFactory.getSerializer("hessian");
 
     @Override
-    public void initialize(CacheClientConfiguration config) {
+    public void initialize(StoreClientConfig config) {
         this.config = (RedisClientConfig) config;
     }
 
     @Override
-    public void setKey(String key) {
+    public void setStoreType(String key) {
         this.storeType = key;
     }
 
     @Override
-    public String getKey() {
+    public String getStoreType() {
         return storeType;
     }
 

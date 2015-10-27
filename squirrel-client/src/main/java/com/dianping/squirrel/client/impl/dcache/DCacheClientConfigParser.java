@@ -5,7 +5,7 @@ import org.codehaus.plexus.util.StringUtils;
 
 import com.dianping.remote.cache.dto.CacheConfigurationDTO;
 import com.dianping.squirrel.client.config.StoreClientConfigParser;
-import com.dianping.squirrel.client.core.CacheClientConfiguration;
+import com.dianping.squirrel.client.core.StoreClientConfig;
 
 public class DCacheClientConfigParser implements StoreClientConfigParser {
 
@@ -17,7 +17,7 @@ public class DCacheClientConfigParser implements StoreClientConfigParser {
 	}
 
 	@Override
-	public CacheClientConfiguration parse(CacheConfigurationDTO detail) {
+	public StoreClientConfig parse(CacheConfigurationDTO detail) {
 		DCacheClientConfig config = new DCacheClientConfig();
 		String servers = detail.getServers();
 		if (StringUtils.isBlank(servers)) {

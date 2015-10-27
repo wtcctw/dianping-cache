@@ -19,7 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.dianping.remote.cache.dto.CacheConfigurationDTO;
-import com.dianping.squirrel.client.config.RemoteCacheClientFactory;
+import com.dianping.squirrel.client.config.StoreClientConfigManager;
 
 /**
  * Cache Configuration Update Listener
@@ -34,8 +34,8 @@ public class CacheConfigurationUpdateListener {
 	public void handleMessage(CacheConfigurationDTO configurationDTO) {
 		if (configurationDTO != null) {
 			try {
-			    if(RemoteCacheClientFactory.getInstance().getCacheClientConfig(configurationDTO.getCacheKey()) != null) {
-			        RemoteCacheClientFactory.getInstance().updateCache(configurationDTO);
+			    if(StoreClientConfigManager.getInstance().getCacheClientConfig(configurationDTO.getCacheKey()) != null) {
+			        StoreClientConfigManager.getInstance().updateCache(configurationDTO);
 					logger.warn("cache service config updated to: " + configurationDTO);
 			    } else {
 			        logger.error("cache service config not found: " + configurationDTO);

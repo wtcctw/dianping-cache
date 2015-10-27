@@ -27,7 +27,7 @@ public interface Lifecycle {
     /**
      * Initialize the cache client
      */
-    void initialize(CacheClientConfiguration config);
+    void initialize(StoreClientConfig config);
     
 	/**
 	 * Start the Object

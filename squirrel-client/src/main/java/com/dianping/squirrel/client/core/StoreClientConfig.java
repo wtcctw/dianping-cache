@@ -24,7 +24,7 @@ import com.dianping.squirrel.common.exception.StoreInitializeException;
  * @author guoqing.chen
  * 
  */
-public interface CacheClientConfiguration {
+public interface StoreClientConfig {
 
 	void init() throws StoreInitializeException;
 	

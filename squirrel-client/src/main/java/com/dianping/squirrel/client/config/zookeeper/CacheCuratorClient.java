@@ -26,8 +26,8 @@ import com.dianping.pigeon.threadpool.NamedThreadFactory;
 import com.dianping.remote.cache.dto.CacheConfigurationDTO;
 import com.dianping.remote.cache.dto.CacheKeyConfigurationDTO;
 import com.dianping.remote.cache.dto.CacheKeyTypeVersionUpdateDTO;
-import com.dianping.squirrel.client.config.RemoteCacheClientFactory;
-import com.dianping.squirrel.client.config.RemoteCacheItemConfigManager;
+import com.dianping.squirrel.client.config.StoreClientConfigManager;
+import com.dianping.squirrel.client.config.StoreCategoryConfigManager;
 import com.dianping.squirrel.client.config.zookeeper.CacheEvent.CacheEventType;
 import com.dianping.squirrel.common.config.ConfigChangeListener;
 import com.dianping.squirrel.common.config.ConfigManager;
@@ -267,7 +267,7 @@ public class CacheCuratorClient {
 	}
 
 	private void syncAllServices() throws Exception {
-		Set<String> cacheServices = RemoteCacheClientFactory.getInstance().getCacheClientKeys();
+		Set<String> cacheServices = StoreClientConfigManager.getInstance().getCacheClientKeys();
 		Transaction t = Cat.getManager().getPeekTransaction();
 		if (t != null) {
 			t.addData("services", StringUtils.join(cacheServices, ','));
@@ -281,7 +281,7 @@ public class CacheCuratorClient {
 	}
 
 	private void syncAllCategories() throws Exception {
-		Set<String> cacheCategories = RemoteCacheItemConfigManager.getInstance().getCacheItemKeys();
+		Set<String> cacheCategories = StoreCategoryConfigManager.getInstance().getCacheItemKeys();
 		Transaction t = Cat.getManager().getPeekTransaction();
 		if (t != null) {
 			t.addData("categories", StringUtils.join(cacheCategories, ','));
@@ -312,7 +312,7 @@ public class CacheCuratorClient {
 	}
 
 	private void logServices() throws Exception {
-		Set<String> cacheServices = RemoteCacheClientFactory.getInstance().getCacheClientKeys();
+		Set<String> cacheServices = StoreClientConfigManager.getInstance().getCacheClientKeys();
 		if (!CollectionUtils.isEmpty(cacheServices)) {
 			String appName = configManager.getAppName();
 			if (StringUtils.isNotEmpty(appName)) {
@@ -325,7 +325,7 @@ public class CacheCuratorClient {
 	}
 
 	private void logCategories() throws Exception {
-		Set<String> cacheCategories = RemoteCacheItemConfigManager.getInstance().getCacheItemKeys();
+		Set<String> cacheCategories = StoreCategoryConfigManager.getInstance().getCacheItemKeys();
 		if (!CollectionUtils.isEmpty(cacheCategories)) {
 			String appName = configManager.getAppName();
 			if (StringUtils.isNotEmpty(appName)) {

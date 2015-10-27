@@ -16,9 +16,9 @@ import org.slf4j.LoggerFactory;
 import com.dianping.squirrel.client.core.CASResponse;
 import com.dianping.squirrel.client.core.CASValue;
 import com.dianping.squirrel.client.core.CacheCallback;
-import com.dianping.squirrel.client.core.CacheClientConfiguration;
+import com.dianping.squirrel.client.core.StoreClientConfig;
 import com.dianping.squirrel.client.core.CacheFuture;
-import com.dianping.squirrel.client.core.KeyAware;
+import com.dianping.squirrel.client.core.StoreTypeAware;
 import com.dianping.squirrel.client.core.Lifecycle;
 import com.dianping.squirrel.common.config.ConfigChangeListener;
 import com.dianping.squirrel.common.config.ConfigManager;
@@ -37,7 +37,7 @@ import com.qq.cloud.component.dcache.client.kv.DCacheKVClientAPI;
 import com.qq.cloud.component.dcache.client.kv.InputValue;
 import com.qq.cloud.component.dcache.client.kv.KVCacheResult;
 
-public class DCacheClientImpl implements DCacheClient, Lifecycle, KeyAware {
+public class DCacheClientImpl implements DCacheClient, Lifecycle, StoreTypeAware {
 
 	private static ConfigManager configManager = ConfigManagerLoader.getConfigManager();
 	private static final String KEY_READ_TIMEOUT = "avatar-cache.dcache.timeout.read";
@@ -65,17 +65,17 @@ public class DCacheClientImpl implements DCacheClient, Lifecycle, KeyAware {
 	private String key;
 
 	@Override
-	public void initialize(CacheClientConfiguration config) {
+	public void initialize(StoreClientConfig config) {
 		this.config = (DCacheClientConfig) config;
 	}
 
 	@Override
-	public void setKey(String key) {
+	public void setStoreType(String key) {
 		this.key = key;
 	}
 
 	@Override
-	public String getKey() {
+	public String getStoreType() {
 		return this.key;
 	}
 

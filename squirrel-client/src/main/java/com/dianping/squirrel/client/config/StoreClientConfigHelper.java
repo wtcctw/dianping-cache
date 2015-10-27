@@ -24,7 +24,7 @@ import org.slf4j.LoggerFactory;
 import com.dianping.remote.cache.dto.CacheConfigurationDTO;
 import com.dianping.squirrel.client.StoreClient;
 import com.dianping.squirrel.client.core.CacheClient;
-import com.dianping.squirrel.client.core.CacheClientConfiguration;
+import com.dianping.squirrel.client.core.StoreClientConfig;
 import com.dianping.squirrel.client.impl.dcache.DCacheClientConfigParser;
 import com.dianping.squirrel.client.impl.dcache.DCacheClientImpl;
 import com.dianping.squirrel.client.impl.ehcache.EhcacheClientConfigParser;
@@ -41,8 +41,8 @@ import com.dianping.squirrel.common.exception.StoreInitializeException;
  * @author danson.liu
  * 
  */
-public class CacheClientConfigurationHelper {
-	private static transient Logger logger = LoggerFactory.getLogger(CacheClientConfigurationHelper.class);
+public class StoreClientConfigHelper {
+	private static transient Logger logger = LoggerFactory.getLogger(StoreClientConfigHelper.class);
 	private static Map<Class, StoreClientConfigParser> parserMap = new ConcurrentHashMap<Class, StoreClientConfigParser>();
 
 	static {
@@ -60,10 +60,10 @@ public class CacheClientConfigurationHelper {
 	 * @param detail
 	 * @return
 	 */
-	public static CacheClientConfiguration parse(CacheConfigurationDTO detail) throws StoreInitializeException {
+	public static StoreClientConfig parse(CacheConfigurationDTO detail) throws StoreInitializeException {
 		try {
 			Class clientClazz = Class.forName(detail.getClientClazz());
-			CacheClientConfiguration config = parserMap.get(clientClazz).parse(detail);
+			StoreClientConfig config = parserMap.get(clientClazz).parse(detail);
 			config.init();
 			return config;
 		} catch (ClassNotFoundException e) {

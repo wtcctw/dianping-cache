@@ -19,7 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.dianping.remote.cache.dto.CacheKeyConfigurationDTO;
-import com.dianping.squirrel.client.config.RemoteCacheItemConfigManager;
+import com.dianping.squirrel.client.config.StoreCategoryConfigManager;
 
 /**
  * Cache Key Configuration Update Listener
@@ -34,13 +34,13 @@ public class CacheKeyConfigUpdateListener {
 	public void handleMessage(CacheKeyConfigurationDTO configurationDTO) {
 		if (configurationDTO != null) {
 			try {
-			    if(RemoteCacheItemConfigManager.getInstance().getCacheKeyType(configurationDTO.getCategory()) != null) {
+			    if(StoreCategoryConfigManager.getInstance().getCacheKeyType(configurationDTO.getCategory()) != null) {
 			        if(configurationDTO.getVersion() == -1) {
 			            // category is removed
-			            RemoteCacheItemConfigManager.getInstance().removeCacheKeyType(configurationDTO.getCategory());
+			            StoreCategoryConfigManager.getInstance().removeCacheKeyType(configurationDTO.getCategory());
 			            logger.warn("cache category [" + configurationDTO.getCategory() + "] is removed");
 			        } else {
-			            RemoteCacheItemConfigManager.getInstance().updateConfig(configurationDTO);
+			            StoreCategoryConfigManager.getInstance().updateConfig(configurationDTO);
 			            logger.warn("cache category config upadted to: " + configurationDTO);
 			        }
 			    } else {

@@ -10,8 +10,8 @@ import com.dianping.remote.cache.dto.CacheConfigurationDTO;
 import com.dianping.remote.cache.dto.CacheKeyConfigurationDTO;
 import com.dianping.remote.cache.dto.CacheKeyTypeVersionUpdateDTO;
 import com.dianping.remote.cache.dto.SingleCacheRemoveDTO;
-import com.dianping.squirrel.client.config.RemoteCacheClientFactory;
-import com.dianping.squirrel.client.config.RemoteCacheItemConfigManager;
+import com.dianping.squirrel.client.config.StoreClientConfigManager;
+import com.dianping.squirrel.client.config.StoreCategoryConfigManager;
 import com.dianping.squirrel.client.core.CacheConfigurationListener;
 import com.dianping.squirrel.common.util.PathUtils;
 
@@ -85,20 +85,20 @@ public class CacheMessageManager implements CacheConfigurationListener {
 	}
 
 	public static boolean isInterestedMessage(CacheKeyTypeVersionUpdateDTO versionChange) {
-		return RemoteCacheItemConfigManager.getInstance().getCacheKeyType(versionChange.getMsgValue()) != null;
+		return StoreCategoryConfigManager.getInstance().getCacheKeyType(versionChange.getMsgValue()) != null;
 	}
 
 	public static boolean isInterestedMessage(CacheConfigurationDTO serviceChange) {
-		return RemoteCacheClientFactory.getInstance().getCacheClientConfig(serviceChange.getCacheKey()) != null;
+		return StoreClientConfigManager.getInstance().getCacheClientConfig(serviceChange.getCacheKey()) != null;
 	}
 
 	public static boolean isInterestedMessage(CacheKeyConfigurationDTO categoryChange) {
-		return RemoteCacheItemConfigManager.getInstance().getCacheKeyType(categoryChange.getCategory()) != null;
+		return StoreCategoryConfigManager.getInstance().getCacheKeyType(categoryChange.getCategory()) != null;
 	}
 
 	public static boolean isInterestedMessage(SingleCacheRemoveDTO keyRemove) {
 		String category = PathUtils.getCategoryFromKey(keyRemove.getCacheKey());
-		return RemoteCacheItemConfigManager.getInstance().getCacheKeyType(category) != null;
+		return StoreCategoryConfigManager.getInstance().getCacheKeyType(category) != null;
 	}
 
 	public boolean isCategoryChanged(String category, int recentSeconds) {

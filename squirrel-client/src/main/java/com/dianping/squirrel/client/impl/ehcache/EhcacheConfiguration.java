@@ -17,7 +17,7 @@ import java.net.URL;
 
 import net.sf.ehcache.CacheManager;
 
-import com.dianping.squirrel.client.core.CacheClientConfiguration;
+import com.dianping.squirrel.client.core.StoreClientConfig;
 import com.dianping.squirrel.common.exception.StoreInitializeException;
 
 /**
@@ -26,7 +26,7 @@ import com.dianping.squirrel.common.exception.StoreInitializeException;
  * @author pengshan.zhang
  * 
  */
-public class EhcacheConfiguration implements CacheClientConfiguration {
+public class EhcacheConfiguration implements StoreClientConfig {
 
 	/**
 	 * Default ehcache configuration file

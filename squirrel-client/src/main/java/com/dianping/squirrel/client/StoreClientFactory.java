@@ -2,11 +2,10 @@ package com.dianping.squirrel.client;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.dianping.squirrel.client.config.CacheClientFactory;
-import com.dianping.squirrel.client.config.CacheItemConfigManager;
+import com.dianping.squirrel.client.config.StoreCategoryConfigManager;
 import com.dianping.squirrel.client.config.CacheKeyType;
-import com.dianping.squirrel.client.config.RemoteCacheClientFactory;
-import com.dianping.squirrel.client.config.RemoteCacheItemConfigManager;
+import com.dianping.squirrel.client.config.StoreCategoryConfigManager;
+import com.dianping.squirrel.client.config.StoreClientConfigManager;
 import com.dianping.squirrel.client.impl.DefaultStoreClient;
 import com.dianping.squirrel.common.exception.StoreInitializeException;
 
@@ -14,9 +13,9 @@ public class StoreClientFactory {
 
 	private static StoreClient storeClient = null;
 
-	private static CacheClientFactory clientFactory = RemoteCacheClientFactory.getInstance();
+	private static StoreClientConfigManager clientConfigManager = StoreClientConfigManager.getInstance();
 	
-	private static CacheItemConfigManager categoryConfigManager = RemoteCacheItemConfigManager.getInstance();
+	private static StoreCategoryConfigManager categoryConfigManager = StoreCategoryConfigManager.getInstance();
 	
 	static {
 		try {
@@ -33,7 +32,7 @@ public class StoreClientFactory {
 	
 	public static StoreClient getStoreClient(String storeType) {
         checkNotNull(storeType, "store type is null");
-        StoreClient storeClient = clientFactory.findCacheClient(storeType);
+        StoreClient storeClient = clientConfigManager.findCacheClient(storeType);
         return storeClient;
     }
 	
@@ -42,7 +41,7 @@ public class StoreClientFactory {
         CacheKeyType categoryConfig = categoryConfigManager.findCacheKeyType(category);
         checkNotNull(categoryConfig, "%s's category config is null", category);
         checkNotNull(categoryConfig.getCacheType(), "%s's category store type is null", category);
-        StoreClient storeClient = clientFactory.findCacheClient(categoryConfig.getCacheType());
+        StoreClient storeClient = clientConfigManager.findCacheClient(categoryConfig.getCacheType());
         return storeClient;
     }
 	

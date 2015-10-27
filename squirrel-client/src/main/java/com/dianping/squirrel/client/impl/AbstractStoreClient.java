@@ -13,9 +13,9 @@ import com.dianping.cat.message.Transaction;
 import com.dianping.squirrel.client.StoreCallback;
 import com.dianping.squirrel.client.StoreClient;
 import com.dianping.squirrel.client.StoreKey;
-import com.dianping.squirrel.client.config.CacheItemConfigManager;
+import com.dianping.squirrel.client.config.StoreCategoryConfigManager;
 import com.dianping.squirrel.client.config.CacheKeyType;
-import com.dianping.squirrel.client.config.RemoteCacheItemConfigManager;
+import com.dianping.squirrel.client.config.StoreCategoryConfigManager;
 import com.dianping.squirrel.client.log.LoggerLoader;
 import com.dianping.squirrel.client.monitor.StatusHolder;
 import com.dianping.squirrel.client.monitor.TimeMonitor;
@@ -29,10 +29,10 @@ public abstract class AbstractStoreClient implements StoreClient {
         LoggerLoader.init();
     }
     
-	protected CacheItemConfigManager configManager;
+	protected StoreCategoryConfigManager configManager;
 
 	public AbstractStoreClient() {
-		configManager = RemoteCacheItemConfigManager.getInstance();
+		configManager = StoreCategoryConfigManager.getInstance();
 	}
 	
 	@Override

@@ -23,7 +23,7 @@ import com.dianping.pigeon.config.ConfigManagerLoader;
 import com.dianping.remote.cache.dto.CacheConfigurationDTO;
 import com.dianping.squirrel.client.config.StoreClientConfigParser;
 import com.dianping.squirrel.client.config.zookeeper.CacheMessageManager;
-import com.dianping.squirrel.client.core.CacheClientConfiguration;
+import com.dianping.squirrel.client.core.StoreClientConfig;
 
 /**
  * TODO Comment of MemcachedClientConfigurationParser
@@ -34,7 +34,7 @@ import com.dianping.squirrel.client.core.CacheClientConfiguration;
 public class MemcachedClientConfigParser implements StoreClientConfigParser {
 
 	@Override
-	public CacheClientConfiguration parse(CacheConfigurationDTO detail) {
+	public StoreClientConfig parse(CacheConfigurationDTO detail) {
 		MemcachedClientConfiguration config = new MemcachedClientConfiguration();
 		config.setCacheConfigurationListener(CacheMessageManager.getInstance());
 		String transcoderClass = ConfigManagerLoader.getConfigManager().getStringValue(

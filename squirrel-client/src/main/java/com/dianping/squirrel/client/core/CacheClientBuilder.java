@@ -35,7 +35,7 @@ public class CacheClientBuilder {
 	 */
 	private static Map<String, StoreClient> caches = new ConcurrentHashMap<String, StoreClient>();
 
-	public static StoreClient getCacheClient(String key, CacheClientConfiguration config) {
+	public static StoreClient getCacheClient(String key, StoreClientConfig config) {
 		if (key == null) {
 			throw new IllegalArgumentException("Cache key is null.");
 		}
@@ -53,7 +53,7 @@ public class CacheClientBuilder {
 	 * cached to HashMap for multiple retrieves. Every key will only be built
 	 * for one instance.
 	 */
-	public synchronized static StoreClient buildCacheClient(String key, CacheClientConfiguration config) {
+	public synchronized static StoreClient buildCacheClient(String key, StoreClientConfig config) {
 		if (key == null) {
 			throw new IllegalArgumentException("Cache key is null.");
 		}
@@ -100,8 +100,8 @@ public class CacheClientBuilder {
 			throw new IllegalArgumentException(e);
 		}
 
-		if (cacheClient instanceof KeyAware) {
-			((KeyAware) cacheClient).setKey(key);
+		if (cacheClient instanceof StoreTypeAware) {
+			((StoreTypeAware) cacheClient).setStoreType(key);
 		}
 
 		if (cacheClient instanceof Lifecycle) {

@@ -1,5 +1,5 @@
 /**
- * Project: avatar-cache
+ * Project: squirrel
  * 
  * File Created at 2010-7-12
  * $Id$
@@ -15,24 +15,10 @@
  */
 package com.dianping.squirrel.client.core;
 
-/**
- * The object that implements this interface will be set key. Generally, the
- * cache client implementations will drive from this interface for configuration
- * purpose.
- * 
- * @author guoqing.chen
- * 
- */
-public interface KeyAware {
+public interface StoreTypeAware {
 
-	/**
-	 * Set cache client unique key(the key be used to indicate the client
-	 * instance.)
-	 */
-	void setKey(String key);
+	void setStoreType(String key);
 
-	/**
-	 * Retrieve the unique key
-	 */
-	String getKey();
+	String getStoreType();
+	
 }

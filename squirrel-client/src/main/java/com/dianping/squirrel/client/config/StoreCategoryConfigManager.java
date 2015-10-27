@@ -43,9 +43,9 @@ import com.dianping.squirrel.common.util.PathUtils;
  * @author danson.liu
  * 
  */
-public class RemoteCacheItemConfigManager implements CacheItemConfigManager {
+public class StoreCategoryConfigManager {
 
-	private static transient Logger logger = LoggerFactory.getLogger(RemoteCacheItemConfigManager.class);
+	private static transient Logger logger = LoggerFactory.getLogger(StoreCategoryConfigManager.class);
 
 	private CacheCuratorClient cacheCuratorClient = CacheCuratorClient.getInstance();
 
@@ -57,9 +57,9 @@ public class RemoteCacheItemConfigManager implements CacheItemConfigManager {
 
 	private ConfigManager configManager = ConfigManagerLoader.getConfigManager();
 
-	private static RemoteCacheItemConfigManager instance;
+	private static StoreCategoryConfigManager instance;
     
-    private RemoteCacheItemConfigManager() {
+    private StoreCategoryConfigManager() {
         try {
             init();
         } catch (Exception e) {
@@ -67,23 +67,21 @@ public class RemoteCacheItemConfigManager implements CacheItemConfigManager {
         }
     }
     
-    public static RemoteCacheItemConfigManager getInstance() {
+    public static StoreCategoryConfigManager getInstance() {
         if(instance == null) {
-            synchronized(RemoteCacheClientFactory.class) {
+            synchronized(StoreClientConfigManager.class) {
                 if(instance == null) {
-                    instance = new RemoteCacheItemConfigManager();
+                    instance = new StoreCategoryConfigManager();
                 }
             }
         }
         return instance;
     }
 	    
-	@Override
 	public CacheKeyType getCacheKeyType(String category) {
 		return cacheKeyTypes.get(category);
 	}
 
-	@Override
 	public CacheKeyType init(String category) {
 		CacheKeyType cacheKeyType = cacheKeyTypes.get(category);
 		if (cacheKeyType == null) {
@@ -106,7 +104,6 @@ public class RemoteCacheItemConfigManager implements CacheItemConfigManager {
 		return cacheKeyType;
 	}
 
-	@Override
 	public CacheKeyType findCacheKeyType(String category) {
 	    if(StringUtils.isBlank(category)) {
 	        throw new NullPointerException("cache category is empty");
@@ -178,12 +175,10 @@ public class RemoteCacheItemConfigManager implements CacheItemConfigManager {
 		return cacheKeyType;
 	}
 
-	@Override
 	public Set<String> getCacheItemKeys() {
 		return usedCategories;
 	}
 
-	@Override
 	public void removeCacheKeyType(String category) {
 		cacheKeyTypes.remove(category);
 	}
