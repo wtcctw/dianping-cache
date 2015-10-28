@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Future;
 
+import com.dianping.squirrel.client.core.StoreCallback;
 import com.dianping.squirrel.common.exception.StoreException;
 
 public interface StoreClient {

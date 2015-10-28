@@ -9,10 +9,10 @@ import java.util.concurrent.Future;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.dianping.squirrel.client.StoreCallback;
 import com.dianping.squirrel.client.StoreClient;
 import com.dianping.squirrel.client.StoreClientFactory;
 import com.dianping.squirrel.client.StoreKey;
+import com.dianping.squirrel.client.core.StoreCallback;
 import com.dianping.squirrel.client.log.LoggerLoader;
 import com.dianping.squirrel.client.monitor.SizeMonitor;
 import com.dianping.squirrel.client.monitor.StatusHolder;

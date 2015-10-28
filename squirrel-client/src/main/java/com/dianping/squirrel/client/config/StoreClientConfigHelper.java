@@ -26,7 +26,7 @@ import com.dianping.squirrel.client.StoreClient;
 import com.dianping.squirrel.client.core.CacheClient;
 import com.dianping.squirrel.client.core.StoreClientConfig;
 import com.dianping.squirrel.client.impl.dcache.DCacheClientConfigParser;
-import com.dianping.squirrel.client.impl.dcache.DCacheClientImpl;
+import com.dianping.squirrel.client.impl.dcache.DCacheStoreClientImpl;
 import com.dianping.squirrel.client.impl.ehcache.EhcacheClientConfigParser;
 import com.dianping.squirrel.client.impl.ehcache.EhcacheClientImpl;
 import com.dianping.squirrel.client.impl.memcached.MemcachedClientConfigParser;
@@ -48,7 +48,7 @@ public class StoreClientConfigHelper {
 	static {
 		register(MemcachedClientImpl.class, new MemcachedClientConfigParser());
 		register(EhcacheClientImpl.class, new EhcacheClientConfigParser());
-		register(DCacheClientImpl.class, new DCacheClientConfigParser());
+		register(DCacheStoreClientImpl.class, new DCacheClientConfigParser());
 		register(RedisStoreClientImpl.class, new RedisClientConfigParser());
 	}
 

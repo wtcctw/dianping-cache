@@ -5,7 +5,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-public class CacheFuture<T> implements Future<T> {
+public class StoreFuture<T> implements Future<T> {
 
 	private T result = null;
 	private boolean done = false;
@@ -13,7 +13,7 @@ public class CacheFuture<T> implements Future<T> {
 	private String key = null;
 	private Throwable e = null;
 
-	public CacheFuture(String key) {
+	public StoreFuture(String key) {
 		this.key = key;
 		start = System.currentTimeMillis();
 	}

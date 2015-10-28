@@ -33,7 +33,7 @@ import com.dianping.squirrel.client.core.CASValue;
 import com.dianping.squirrel.client.core.CacheCallback;
 import com.dianping.squirrel.client.core.CacheClient;
 import com.dianping.squirrel.client.core.StoreClientConfig;
-import com.dianping.squirrel.client.core.CacheFuture;
+import com.dianping.squirrel.client.core.StoreFuture;
 import com.dianping.squirrel.client.core.Lifecycle;
 import com.dianping.squirrel.common.config.ConfigManagerLoader;
 import com.dianping.squirrel.common.exception.StoreException;
@@ -155,7 +155,7 @@ public class EhcacheClientImpl implements CacheClient, Lifecycle {
 
 	public Future<Boolean> asyncDelete(String key, boolean isHot, String category) throws StoreException {
 		boolean result = findCache(category).remove(key);
-		CacheFuture<Boolean> future = new CacheFuture<Boolean>(key);
+		StoreFuture<Boolean> future = new StoreFuture<Boolean>(key);
 		future.onSuccess(result);
 		return future;
 	}
@@ -349,7 +349,7 @@ public class EhcacheClientImpl implements CacheClient, Lifecycle {
 					new Element(key, value, Boolean.FALSE, Integer.valueOf(0), Integer.valueOf(expiration)));
 			result = true;
 		}
-		CacheFuture<Boolean> future = new CacheFuture<Boolean>(key);
+		StoreFuture<Boolean> future = new StoreFuture<Boolean>(key);
 		future.onSuccess(result);
 		return future;
 	}
@@ -446,7 +446,7 @@ public class EhcacheClientImpl implements CacheClient, Lifecycle {
 				findCache(category).remove(lastVersionKey + "_bak");
 			}
 		}
-		CacheFuture<Boolean> future = new CacheFuture<Boolean>(key);
+		StoreFuture<Boolean> future = new StoreFuture<Boolean>(key);
 		future.onSuccess(true);
 		return future;
 	}
@@ -484,7 +484,7 @@ public class EhcacheClientImpl implements CacheClient, Lifecycle {
 	@Override
 	public <T> Future<T> asyncGet(String key, Class dataType, boolean isHot, String category) throws StoreException {
 		T result = (T) get(key, category, false);
-		CacheFuture<T> future = new CacheFuture<T>(key);
+		StoreFuture<T> future = new StoreFuture<T>(key);
 		future.onSuccess(result);
 		return future;
 	}

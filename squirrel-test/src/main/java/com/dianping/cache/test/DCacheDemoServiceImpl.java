@@ -10,7 +10,7 @@ import javax.annotation.Resource;
 
 import com.dianping.avatar.cache.CacheService;
 import com.dianping.pigeon.remoting.provider.config.annotation.Service;
-import com.dianping.squirrel.client.impl.dcache.DCacheClient;
+import com.dianping.squirrel.client.impl.dcache.DCacheStoreClient;
 import com.qq.cloud.component.dcache.client.api.BatchCacheResult;
 import com.qq.cloud.component.dcache.client.api.CacheResult;
 import com.qq.cloud.component.dcache.client.api.ConditionStatement;
@@ -38,7 +38,7 @@ public class DCacheDemoServiceImpl implements DCacheDemoService {
 
 	private DCacheClientAPI getDCacheClientAPI() {
 		// 需指定cache类型，这里是dcache，如果是其他dcache集群，需指定具体集群名称，如dcache-mobile
-		return ((DCacheClient) cacheService.getCacheClient("dcache")).getClient();
+		return ((DCacheStoreClient) cacheService.getCacheClient("dcache")).getClient();
 	}
 
 	public void put() {

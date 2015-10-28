@@ -16,10 +16,10 @@ import org.slf4j.LoggerFactory;
 
 import redis.clients.jedis.JedisCluster;
 
-import com.dianping.squirrel.client.StoreCallback;
 import com.dianping.squirrel.client.StoreKey;
 import com.dianping.squirrel.client.config.CacheKeyType;
 import com.dianping.squirrel.client.core.Lifecycle;
+import com.dianping.squirrel.client.core.StoreCallback;
 import com.dianping.squirrel.client.core.StoreClientConfig;
 import com.dianping.squirrel.client.core.StoreTypeAware;
 import com.dianping.squirrel.client.core.Transcoder;
@@ -143,7 +143,7 @@ public class RedisStoreClientImpl extends AbstractStoreClient implements RedisSt
     }
 
     @Override
-    protected <T> Void doAsyncSet(CacheKeyType categoryConfig, String finalKey, Object value, StoreCallback<T> callback) {
+    protected Void doAsyncSet(CacheKeyType categoryConfig, String finalKey, Object value, StoreCallback<Boolean> callback) {
         // TODO Auto-generated method stub
         return null;
     }

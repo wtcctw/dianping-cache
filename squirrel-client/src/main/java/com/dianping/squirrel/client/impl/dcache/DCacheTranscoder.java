@@ -28,7 +28,7 @@ import com.dianping.squirrel.client.monitor.SizeMonitor;
  * @author danson.liu
  * 
  */
-public class HessianTranscoder extends BaseSerializingTranscoder implements Transcoder<Object> {
+public class DCacheTranscoder extends BaseSerializingTranscoder implements Transcoder<Object> {
 
 	static final int COMPRESSED = 2;
 
@@ -49,11 +49,11 @@ public class HessianTranscoder extends BaseSerializingTranscoder implements Tran
 
 	private static final String EVENT_NAME_RESPONSE_SIZE = "Cache.dcache.readSize";
 
-	public HessianTranscoder() {
+	public DCacheTranscoder() {
 		this(CachedData.MAX_SIZE);
 	}
 
-	public HessianTranscoder(int max) {
+	public DCacheTranscoder(int max) {
 		super(max);
 	}
 

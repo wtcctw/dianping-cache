@@ -10,12 +10,12 @@ import java.util.concurrent.TimeoutException;
 import com.dianping.cat.Cat;
 import com.dianping.cat.message.Message;
 import com.dianping.cat.message.Transaction;
-import com.dianping.squirrel.client.StoreCallback;
 import com.dianping.squirrel.client.StoreClient;
 import com.dianping.squirrel.client.StoreKey;
 import com.dianping.squirrel.client.config.StoreCategoryConfigManager;
 import com.dianping.squirrel.client.config.CacheKeyType;
 import com.dianping.squirrel.client.config.StoreCategoryConfigManager;
+import com.dianping.squirrel.client.core.StoreCallback;
 import com.dianping.squirrel.client.log.LoggerLoader;
 import com.dianping.squirrel.client.monitor.StatusHolder;
 import com.dianping.squirrel.client.monitor.TimeMonitor;
@@ -73,7 +73,7 @@ public abstract class AbstractStoreClient implements StoreClient {
 		}, categoryConfig, finalKey, "get");
 	}
 
-	protected abstract <T> T doGet(CacheKeyType categoryConfig, String finalKey);
+	protected abstract <T> T doGet(CacheKeyType categoryConfig, String finalKey) throws Exception;
 	
 	@Override
 	public Boolean set(StoreKey key, final Object value) throws StoreException {
@@ -99,7 +99,7 @@ public abstract class AbstractStoreClient implements StoreClient {
 		}, categoryConfig, finalKey, "set");
 	}
 
-	protected abstract Boolean doSet(CacheKeyType categoryConfig, String finalKey, Object value);
+	protected abstract Boolean doSet(CacheKeyType categoryConfig, String finalKey, Object value) throws Exception;
 
 	@Override
 	public Boolean add(StoreKey key, final Object value) throws StoreException {
@@ -125,7 +125,7 @@ public abstract class AbstractStoreClient implements StoreClient {
 		}, categoryConfig, finalKey, "add");
 	}
 
-	protected abstract Boolean doAdd(CacheKeyType categoryConfig, String finalKey, Object value);
+	protected abstract Boolean doAdd(CacheKeyType categoryConfig, String finalKey, Object value) throws Exception;
 	
 	@Override
 	public Boolean delete(StoreKey key) throws StoreException {
@@ -148,7 +148,7 @@ public abstract class AbstractStoreClient implements StoreClient {
 		}, categoryConfig, finalKey, "delete");
 	}
 
-	protected abstract Boolean doDelete(CacheKeyType categoryConfig, String finalKey);
+	protected abstract Boolean doDelete(CacheKeyType categoryConfig, String finalKey) throws Exception;
 	
 	@Override
 	public <T> Future<T> asyncGet(StoreKey key) throws StoreException {
@@ -171,7 +171,7 @@ public abstract class AbstractStoreClient implements StoreClient {
         }, categoryConfig, finalKey, "asyncGet");
 	}
 	
-	protected abstract <T> Future<T> doAsyncGet(CacheKeyType categoryConfig, String key);
+	protected abstract <T> Future<T> doAsyncGet(CacheKeyType categoryConfig, String finalKey) throws Exception;
 
 	@Override
 	public Future<Boolean> asyncSet(StoreKey key, final Object value) throws StoreException {
@@ -197,7 +197,7 @@ public abstract class AbstractStoreClient implements StoreClient {
         }, categoryConfig, finalKey, "asyncSet");
 	}
 
-	protected abstract Future<Boolean> doAsyncSet(CacheKeyType categoryConfig, String finalKey, Object value);
+	protected abstract Future<Boolean> doAsyncSet(CacheKeyType categoryConfig, String finalKey, Object value) throws Exception;
 
     @Override
 	public Future<Boolean> asyncAdd(StoreKey key, final Object value) throws StoreException {
@@ -223,7 +223,7 @@ public abstract class AbstractStoreClient implements StoreClient {
         }, categoryConfig, finalKey, "asyncAdd");
 	}
 
-	protected abstract Future<Boolean> doAsyncAdd(CacheKeyType categoryConfig, String finalKey, Object value);
+	protected abstract Future<Boolean> doAsyncAdd(CacheKeyType categoryConfig, String finalKey, Object value) throws Exception;
 
     @Override
 	public Future<Boolean> asyncDelete(StoreKey key) throws StoreException {
@@ -246,7 +246,7 @@ public abstract class AbstractStoreClient implements StoreClient {
         }, categoryConfig, finalKey, "asyncDelete");
 	}
 
-	protected abstract Future<Boolean> doAsyncDelete(CacheKeyType categoryConfig, String finalKey);
+	protected abstract Future<Boolean> doAsyncDelete(CacheKeyType categoryConfig, String finalKey) throws Exception;
 
     @Override
 	public <T> Void asyncGet(StoreKey key, final StoreCallback<T> callback) {
@@ -269,7 +269,7 @@ public abstract class AbstractStoreClient implements StoreClient {
         }, categoryConfig, finalKey, "asyncGet");
 	}
 
-    protected abstract <T> Void doAsyncGet(CacheKeyType categoryConfig, String key, StoreCallback<T> callback);
+    protected abstract <T> Void doAsyncGet(CacheKeyType categoryConfig, String finalKey, StoreCallback<T> callback) throws Exception;
     
 	@Override
 	public Void asyncSet(StoreKey key, final Object value, final StoreCallback<Boolean> callback) {
@@ -295,7 +295,7 @@ public abstract class AbstractStoreClient implements StoreClient {
         }, categoryConfig, finalKey, "asyncSet");
 	}
 
-	protected abstract <T> Void doAsyncSet(CacheKeyType categoryConfig, String key, Object value, StoreCallback<T> callback);
+	protected abstract Void doAsyncSet(CacheKeyType categoryConfig, String finalKey, Object value, StoreCallback<Boolean> callback) throws Exception;
 	
 	@Override
 	public Void asyncAdd(StoreKey key, final Object value, final StoreCallback<Boolean> callback) {
@@ -321,7 +321,7 @@ public abstract class AbstractStoreClient implements StoreClient {
         }, categoryConfig, finalKey, "asyncAdd");
     }
 
-    protected abstract Void doAsyncAdd(CacheKeyType categoryConfig, String finalKey, Object value, StoreCallback<Boolean> callback);
+    protected abstract Void doAsyncAdd(CacheKeyType categoryConfig, String finalKey, Object value, StoreCallback<Boolean> callback) throws Exception;
 
 	@Override
 	public Void asyncDelete(StoreKey key, final StoreCallback<Boolean> callback) {
@@ -344,7 +344,7 @@ public abstract class AbstractStoreClient implements StoreClient {
         }, categoryConfig, finalKey, "asyncDelete");
     }
 
-    protected abstract Void doAsyncDelete(CacheKeyType categoryConfig, String finalKey, StoreCallback<Boolean> callback);
+    protected abstract Void doAsyncDelete(CacheKeyType categoryConfig, String finalKey, StoreCallback<Boolean> callback) throws Exception;
 
 	@Override
 	public Long increase(StoreKey key, final int amount) throws StoreException {

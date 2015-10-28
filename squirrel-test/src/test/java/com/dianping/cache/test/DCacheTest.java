@@ -15,8 +15,8 @@ import com.dianping.avatar.cache.CacheService;
 import com.dianping.avatar.cache.CacheServiceFactory;
 import com.dianping.squirrel.client.core.CacheCallback;
 import com.dianping.squirrel.client.impl.dcache.DCacheClientConfig;
-import com.dianping.squirrel.client.impl.dcache.DCacheClientImpl;
-import com.dianping.squirrel.client.impl.dcache.HessianTranscoder;
+import com.dianping.squirrel.client.impl.dcache.DCacheStoreClientImpl;
+import com.dianping.squirrel.client.impl.dcache.DCacheTranscoder;
 
 public class DCacheTest {
 
@@ -26,14 +26,14 @@ public class DCacheTest {
     
     @Test
     public void test0() throws Exception {
-        final DCacheClientImpl dcache = new DCacheClientImpl();
+        final DCacheStoreClientImpl dcache = new DCacheStoreClientImpl();
         DCacheClientConfig config = new DCacheClientConfig();
         config.setClientClazz("com.dianping.cache.memcached.MemcachedClientImpl");
         config.setModule("testimage");
         config.setProxy("DCache.testProxyServer.ProxyObj");
         config.setLocator("taf.tafregistry.QueryObj@tcp -h 192.168.215.157 -p 17890");
         config.setPersistent(true);
-        config.setTranscoderClass(HessianTranscoder.class);
+        config.setTranscoderClass(DCacheTranscoder.class);
         dcache.initialize(config);
         dcache.start();
         
