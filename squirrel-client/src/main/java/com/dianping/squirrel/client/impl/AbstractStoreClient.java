@@ -430,7 +430,9 @@ public abstract class AbstractStoreClient implements StoreClient {
 		}
 		StatusHolder.flowIn(storeType, category, action);
 		long begin = System.nanoTime();
+		int second = (int) (begin / 1000000000 % 60) + 1;
 		try {
+		    Cat.getProducer().logEvent("Store." + storeType + ".qps", "S"+second);
 			Object result = command.execute();
 			TimeMonitor.getInstance().logTime(storeType, category, action, System.nanoTime() - begin);
 			return (T) result;

@@ -1,6 +1,7 @@
 package com.dianping.squirrel.client.impl.redis;
 
 import com.dianping.squirrel.client.core.Transcoder;
+import com.dianping.squirrel.client.monitor.SizeMonitor;
 import com.dianping.squirrel.common.compress.Compressor;
 import com.dianping.squirrel.common.compress.Compressor.CompressType;
 import com.dianping.squirrel.common.compress.CompressorFactory;
@@ -50,27 +51,30 @@ public class RedisStringTranscoder implements Transcoder<String> {
 
     @Override
     public <T> String encode(T object) {
+        String serialized = null;
         if(object instanceof Long) {
-            return object.toString();
-        }
-        if(object instanceof Integer) {
-            return TRANSCODE_PREFIX + (char)COMPRESS_NONE + (char)SERIALIZE_INT + 
+            serialized = object.toString();
+        } else if(object instanceof Integer) {
+            serialized = TRANSCODE_PREFIX + (char)COMPRESS_NONE + (char)SERIALIZE_INT + 
                             object.toString();
-        }
-        if(object instanceof String) {
-            return TRANSCODE_PREFIX + (char)COMPRESS_NONE + (char)SERIALIZE_STRING + 
+        } else if(object instanceof String) {
+            serialized = TRANSCODE_PREFIX + (char)COMPRESS_NONE + (char)SERIALIZE_STRING + 
                             (String)object;
+        } else {
+            try {
+                String value = serializer.toString(object);
+                serialized = TRANSCODE_PREFIX + (char)COMPRESS_NONE + (char)SERIALIZE_HESSIAN + value;
+            } catch (SerializeException e) {
+                throw new StoreTranscodeException(e);
+            }
         }
-        try {
-            String value = serializer.toString(object);
-            return TRANSCODE_PREFIX + (char)COMPRESS_NONE + (char)SERIALIZE_HESSIAN + value;
-        } catch (SerializeException e) {
-            throw new StoreTranscodeException(e);
-        }
+        SizeMonitor.getInstance().logRequestSize("Store.redis.writeSize", serialized.length());
+        return serialized;
     }
 
     @Override
     public <T> T decode(String data) {
+        SizeMonitor.getInstance().logResponseSize("Store.redis.readSize", data.length());
         if(data.startsWith(TRANSCODE_PREFIX)) {
             byte compressType = (byte) data.charAt(2);
             if(compressType != 0) {

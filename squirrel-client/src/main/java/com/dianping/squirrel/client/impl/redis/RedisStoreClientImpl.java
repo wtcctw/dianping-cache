@@ -24,8 +24,6 @@ import com.dianping.squirrel.client.core.StoreClientConfig;
 import com.dianping.squirrel.client.core.StoreTypeAware;
 import com.dianping.squirrel.client.core.Transcoder;
 import com.dianping.squirrel.client.impl.AbstractStoreClient;
-import com.dianping.squirrel.common.serialize.Serializer;
-import com.dianping.squirrel.common.serialize.SerializerFactory;
 
 public class RedisStoreClientImpl extends AbstractStoreClient implements RedisStoreClient, Lifecycle, StoreTypeAware {
 
@@ -40,8 +38,6 @@ public class RedisStoreClientImpl extends AbstractStoreClient implements RedisSt
     private JedisCluster client;
 
     private Transcoder<String> transcoder = new RedisStringTranscoder();
-
-    private Serializer serializer = SerializerFactory.getSerializer("hessian");
 
     @Override
     public void initialize(StoreClientConfig config) {
@@ -269,7 +265,7 @@ public class RedisStoreClientImpl extends AbstractStoreClient implements RedisSt
 
             @Override
             public Object execute() throws Exception {
-                String serialized = serializer.toString(value);
+                String serialized = transcoder.encode(value);
                 Long result = client.hset(finalKey, field, serialized);
                 return result;
             }
@@ -291,7 +287,7 @@ public class RedisStoreClientImpl extends AbstractStoreClient implements RedisSt
             public Object execute() throws Exception {
                 String value = client.hget(finalKey, field);
                 if(value != null) {
-                    T object = (T) serializer.fromString(value);
+                    T object = transcoder.decode(value);
                     return object;
                 } else {
                     return null;
@@ -317,10 +313,10 @@ public class RedisStoreClientImpl extends AbstractStoreClient implements RedisSt
             public Object execute() throws Exception {
                 List<String> values = client.hmget(finalKey, fields);
                 if(values != null) {
-                    List<Object> objects = new ArrayList(values.size());
+                    List<Object> objects = new ArrayList<Object>(values.size());
                     for(String value : values) {
                         if(value != null) {
-                            Object object = serializer.fromString(value);
+                            Object object = transcoder.decode(value);
                             objects.add(object);
                         } else {
                             objects.add(null);
@@ -353,7 +349,7 @@ public class RedisStoreClientImpl extends AbstractStoreClient implements RedisSt
                 Map<String, String> strMap = new HashMap<String, String>(objMap.size());
                 for(Map.Entry<String, Object> entry : objMap.entrySet()) {
                     if(entry.getValue() != null) {
-                        String str = serializer.toString(entry.getValue());
+                        String str = transcoder.encode(entry.getValue());
                         strMap.put(entry.getKey(), str);
                     }
                 }
@@ -416,7 +412,7 @@ public class RedisStoreClientImpl extends AbstractStoreClient implements RedisSt
                 if (values != null && values.size() > 0) {
                     List<Object> objects = new ArrayList<Object>(values.size());
                     for (String value : values) {
-                        Object object = serializer.fromString(value);
+                        Object object = transcoder.decode(value);
                         objects.add(object);
                     }
                     return objects;
@@ -443,7 +439,7 @@ public class RedisStoreClientImpl extends AbstractStoreClient implements RedisSt
                 if (map != null && map.size() > 0) {
                     Map<String, Object> objMap = new HashMap<String, Object>(map.size());
                     for (Map.Entry<String, String> entry : map.entrySet()) {
-                        Object object = serializer.fromString(entry.getValue());
+                        Object object = transcoder.decode(entry.getValue());
                         objMap.put(entry.getKey(), object);
                     }
                     return objMap;
@@ -493,7 +489,7 @@ public class RedisStoreClientImpl extends AbstractStoreClient implements RedisSt
                     if (object == null) {
                         throw new IllegalArgumentException("one of the list values is null");
                     }
-                    strings[i] = serializer.toString(object);
+                    strings[i] = transcoder.encode(object);
                 }
                 return client.rpush(finalKey, strings);
             }
@@ -521,7 +517,7 @@ public class RedisStoreClientImpl extends AbstractStoreClient implements RedisSt
                     if (object == null) {
                         throw new IllegalArgumentException("one of the list values is null");
                     }
-                    strings[i] = serializer.toString(object);
+                    strings[i] = transcoder.encode(object);
                 }
                 return client.lpush(finalKey, strings);
             }
@@ -542,7 +538,7 @@ public class RedisStoreClientImpl extends AbstractStoreClient implements RedisSt
             public Object execute() throws Exception {
                 String value = client.lpop(finalKey);
                 if (value != null) {
-                    T object = (T) serializer.fromString(value);
+                    T object = transcoder.decode(value);
                     return object;
                 }
                 return null;
@@ -564,7 +560,7 @@ public class RedisStoreClientImpl extends AbstractStoreClient implements RedisSt
             public Object execute() throws Exception {
                 String value = client.rpop(finalKey);
                 if (value != null) {
-                    T object = (T) serializer.fromString(value);
+                    T object = transcoder.decode(value);
                     return object;
                 }
                 return null;
@@ -586,7 +582,7 @@ public class RedisStoreClientImpl extends AbstractStoreClient implements RedisSt
             public Object execute() throws Exception {
                 String value = client.lindex(finalKey, index);
                 if (value != null) {
-                    T object = (T) serializer.fromString(value);
+                    T object = transcoder.decode(value);
                     return object;
                 }
                 return null;
@@ -607,7 +603,7 @@ public class RedisStoreClientImpl extends AbstractStoreClient implements RedisSt
 
             @Override
             public Object execute() throws Exception {
-                String value = serializer.toString(object);
+                String value = transcoder.encode(object);
                 if (value != null) {
                     String result = client.lset(finalKey, index, value);
                     return "OK".equals(result);
@@ -650,7 +646,7 @@ public class RedisStoreClientImpl extends AbstractStoreClient implements RedisSt
                 if (strList != null && strList.size() > 0) {
                     List<Object> objList = new ArrayList<Object>(strList.size());
                     for (String str : strList) {
-                        Object obj = serializer.fromString(str);
+                        Object obj = transcoder.decode(str);
                         objList.add(obj);
                     }
                     return objList;
@@ -701,7 +697,7 @@ public class RedisStoreClientImpl extends AbstractStoreClient implements RedisSt
                         if (object == null) {
                             throw new IllegalArgumentException("one of the set values is null");
                         }
-                        strings[i] = serializer.toString(object);
+                        strings[i] = transcoder.encode(object);
                     }
                     return client.sadd(finalKey, strings);
                 } else {
@@ -732,7 +728,7 @@ public class RedisStoreClientImpl extends AbstractStoreClient implements RedisSt
                     if (object == null) {
                         throw new IllegalArgumentException("one of the set values is null");
                     }
-                    strings[i] = serializer.toString(object);
+                    strings[i] = transcoder.encode(object);
                 }
                 return client.srem(finalKey, strings);
             }
@@ -755,7 +751,7 @@ public class RedisStoreClientImpl extends AbstractStoreClient implements RedisSt
                 if (strSet != null && strSet.size() > 0) {
                     Set<Object> objSet = new HashSet<Object>(strSet.size());
                     for (String str : strSet) {
-                        Object obj = serializer.fromString(str);
+                        Object obj = transcoder.decode(str);
                         objSet.add(obj);
                     }
                     return objSet;
@@ -796,7 +792,7 @@ public class RedisStoreClientImpl extends AbstractStoreClient implements RedisSt
 
             @Override
             public Object execute() throws Exception {
-                String str = serializer.toString(member);
+                String str = transcoder.encode(member);
                 return client.sismember(finalKey, str);
             }
             

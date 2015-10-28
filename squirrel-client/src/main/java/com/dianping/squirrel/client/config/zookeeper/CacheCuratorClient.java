@@ -47,7 +47,7 @@ public class CacheCuratorClient {
 	public static final String KEY_ZOOKEEPER_FAIL_LIMIT = "avatar-cache.zookeeper.fail.limit";
     public static final int DEFAULT_ZOOKEEPER_FAIL_LIMIT = 300;
 	public static final String KEY_ZOOKEEPER_PUSH_STEP = "avatar-cache.zookeeper.push.step";
-	public static final long DEFAULT_ZOOKEEPER_PUSH_STEP = 2;
+	public static final long DEFAULT_ZOOKEEPER_PUSH_STEP = 10;
 	public static final String WEB_CACHE = "web";
 
 	private static Logger logger = LoggerFactory.getLogger(CacheCuratorClient.class);
