@@ -30,7 +30,7 @@ public class MemcachedTranscoder implements Transcoder<CachedData>{
     }
 
     @Override
-    public <T> T decode(CachedData data, Class<T> clazz) {
+    public <T> T decode(CachedData data) {
         // TODO Auto-generated method stub
         return null;
     }

@@ -61,6 +61,8 @@ public interface RedisStoreClient extends StoreClient {
 	List<Object> hvals(StoreKey key);
 
 	Map<String, Object> hgetAll(StoreKey key);
+	
+	Long hincrBy(StoreKey key, String field, int amount);
 
 	// list related
 	/**

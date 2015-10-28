@@ -19,12 +19,11 @@ import redis.clients.jedis.JedisCluster;
 import com.dianping.squirrel.client.StoreCallback;
 import com.dianping.squirrel.client.StoreKey;
 import com.dianping.squirrel.client.config.CacheKeyType;
+import com.dianping.squirrel.client.core.Lifecycle;
 import com.dianping.squirrel.client.core.StoreClientConfig;
 import com.dianping.squirrel.client.core.StoreTypeAware;
-import com.dianping.squirrel.client.core.Lifecycle;
 import com.dianping.squirrel.client.core.Transcoder;
 import com.dianping.squirrel.client.impl.AbstractStoreClient;
-import com.dianping.squirrel.common.exception.StoreException;
 import com.dianping.squirrel.common.serialize.Serializer;
 import com.dianping.squirrel.common.serialize.SerializerFactory;
 
@@ -40,7 +39,7 @@ public class RedisStoreClientImpl extends AbstractStoreClient implements RedisSt
 
     private JedisCluster client;
 
-    private Transcoder<String> transcoder = new RedisTranscoder();
+    private Transcoder<String> transcoder = new RedisStringTranscoder();
 
     private Serializer serializer = SerializerFactory.getSerializer("hessian");
 
@@ -72,7 +71,7 @@ public class RedisStoreClientImpl extends AbstractStoreClient implements RedisSt
     @Override
     protected <T> T doGet(CacheKeyType categoryConfig, String finalKey) {
         String value = client.get(finalKey);
-        T object = (T) transcoder.decode(value, categoryConfig.getDataTypeClass());
+        T object = transcoder.decode(value);
         return object;
     }
 
@@ -292,7 +291,7 @@ public class RedisStoreClientImpl extends AbstractStoreClient implements RedisSt
             public Object execute() throws Exception {
                 String value = client.hget(finalKey, field);
                 if(value != null) {
-                    T object = (T) serializer.fromString(value, Object.class);
+                    T object = (T) serializer.fromString(value);
                     return object;
                 } else {
                     return null;
@@ -321,7 +320,7 @@ public class RedisStoreClientImpl extends AbstractStoreClient implements RedisSt
                     List<Object> objects = new ArrayList(values.size());
                     for(String value : values) {
                         if(value != null) {
-                            Object object = serializer.fromString(value, Object.class);
+                            Object object = serializer.fromString(value);
                             objects.add(object);
                         } else {
                             objects.add(null);
@@ -417,7 +416,7 @@ public class RedisStoreClientImpl extends AbstractStoreClient implements RedisSt
                 if (values != null && values.size() > 0) {
                     List<Object> objects = new ArrayList<Object>(values.size());
                     for (String value : values) {
-                        Object object = serializer.fromString(value, Object.class);
+                        Object object = serializer.fromString(value);
                         objects.add(object);
                     }
                     return objects;
@@ -444,7 +443,7 @@ public class RedisStoreClientImpl extends AbstractStoreClient implements RedisSt
                 if (map != null && map.size() > 0) {
                     Map<String, Object> objMap = new HashMap<String, Object>(map.size());
                     for (Map.Entry<String, String> entry : map.entrySet()) {
-                        Object object = serializer.fromString(entry.getValue(), Object.class);
+                        Object object = serializer.fromString(entry.getValue());
                         objMap.put(entry.getKey(), object);
                     }
                     return objMap;
@@ -456,6 +455,24 @@ public class RedisStoreClientImpl extends AbstractStoreClient implements RedisSt
         }, categoryConfig, finalKey, "hgetAll");
     }
 
+    @Override
+    public Long hincrBy(StoreKey key, final String field, final int amount) {
+        checkNotNull(key, "store key is null");
+        checkNotNull(field, "hash field is null");
+        final CacheKeyType categoryConfig = configManager.findCacheKeyType(key.getCategory());
+        checkNotNull(categoryConfig, "%s's category config is null", key.getCategory());
+        final String finalKey = categoryConfig.getKey(key.getParams());
+        
+        return executeWithMonitor(new Command() {
+
+            @Override
+            public Object execute() throws Exception {
+                return client.hincrBy(finalKey, field, amount);
+            }
+            
+        }, categoryConfig, finalKey, "hincrBy");
+    }
+    
     @Override
     public Long rpush(StoreKey key, final Object... objects) {
         checkNotNull(key, "store key is null");
@@ -525,7 +542,7 @@ public class RedisStoreClientImpl extends AbstractStoreClient implements RedisSt
             public Object execute() throws Exception {
                 String value = client.lpop(finalKey);
                 if (value != null) {
-                    T object = (T) serializer.fromString(value, Object.class);
+                    T object = (T) serializer.fromString(value);
                     return object;
                 }
                 return null;
@@ -547,7 +564,7 @@ public class RedisStoreClientImpl extends AbstractStoreClient implements RedisSt
             public Object execute() throws Exception {
                 String value = client.rpop(finalKey);
                 if (value != null) {
-                    T object = (T) serializer.fromString(value, Object.class);
+                    T object = (T) serializer.fromString(value);
                     return object;
                 }
                 return null;
@@ -569,7 +586,7 @@ public class RedisStoreClientImpl extends AbstractStoreClient implements RedisSt
             public Object execute() throws Exception {
                 String value = client.lindex(finalKey, index);
                 if (value != null) {
-                    T object = (T) serializer.fromString(value, Object.class);
+                    T object = (T) serializer.fromString(value);
                     return object;
                 }
                 return null;
@@ -633,7 +650,7 @@ public class RedisStoreClientImpl extends AbstractStoreClient implements RedisSt
                 if (strList != null && strList.size() > 0) {
                     List<Object> objList = new ArrayList<Object>(strList.size());
                     for (String str : strList) {
-                        Object obj = serializer.fromString(str, Object.class);
+                        Object obj = serializer.fromString(str);
                         objList.add(obj);
                     }
                     return objList;
@@ -738,7 +755,7 @@ public class RedisStoreClientImpl extends AbstractStoreClient implements RedisSt
                 if (strSet != null && strSet.size() > 0) {
                     Set<Object> objSet = new HashSet<Object>(strSet.size());
                     for (String str : strSet) {
-                        Object obj = serializer.fromString(str, Object.class);
+                        Object obj = serializer.fromString(str);
                         objSet.add(obj);
                     }
                     return objSet;
