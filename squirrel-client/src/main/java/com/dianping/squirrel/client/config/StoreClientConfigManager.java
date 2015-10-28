@@ -213,7 +213,8 @@ public class StoreClientConfigManager {
 	}
 	
 	private void initCacheServices() {
-        if (PathUtils.isZookeeperEnabled()) {
+	    // TODO open the switch after all clients are supported
+        if (PathUtils.isZookeeperEnabled() && false) {
             String appName = configManager.getAppName();
             if (StringUtils.isNotEmpty(appName)) {
                 try {

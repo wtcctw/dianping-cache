@@ -13,7 +13,7 @@
     http://www.dianping.com/schema/squirrel http://www.dianping.com/schema/squirrel/squirrel-1.0.xsd">  
 
     <!-- squirrel store annotation -->
-    <squirrel:store />
+    <squirrel:store store-type="redis-credit"/>
 
     <!-- spring annotation -->
     <context:component-scan base-package="com.dianping" />  

@@ -191,7 +191,8 @@ public class StoreCategoryConfigManager {
 	}
 	
 	private void initCacheCategories() {
-	    if (PathUtils.isZookeeperEnabled()) {
+	    // TODO: enable this switch after all clients are supported
+	    if (PathUtils.isZookeeperEnabled() && false) {
             String appName = configManager.getAppName();
             if (StringUtils.isNotEmpty(appName)) {
                 try {
