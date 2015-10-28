@@ -37,7 +37,7 @@ public interface CacheClient {
             throws StoreException;
 
     void asyncSet(String key, Object value, int expiration, boolean isHot, String category,
-            CacheCallback<Boolean> callback);
+            StoreCallback<Boolean> callback);
 
     boolean set(String key, Object value, int expiration, boolean isHot, String category) throws StoreException,
             TimeoutException;
@@ -68,7 +68,7 @@ public interface CacheClient {
             throws StoreException;
 
     void asyncAdd(String key, Object value, int expiration, boolean isHot, String category,
-            CacheCallback<Boolean> callback);
+            StoreCallback<Boolean> callback);
 
     /**
      * Replace an object with the given value if there is already a value for
@@ -100,13 +100,13 @@ public interface CacheClient {
 
     <T> Future<T> asyncGet(final String key, Class dataType, final boolean isHot, final String category) throws StoreException;
 
-    <T> void asyncGet(final String key, Class dataType, final boolean isHot, final String category, final CacheCallback<T> callback);
+    <T> void asyncGet(final String key, Class dataType, final boolean isHot, final String category, final StoreCallback<T> callback);
 
     <T> void asyncBatchGet(final Collection<String> keys, Class dataType, final boolean isHot, final Map<String, String> categories,
-            final CacheCallback<Map<String, T>> callback);
+            final StoreCallback<Map<String, T>> callback);
     
     <T> void asyncBatchSet(final List<String> keys, final List<T> values, final int expiration, final boolean isHot, final String category, 
-            final CacheCallback<Boolean> callback);
+            final StoreCallback<Boolean> callback);
     
     <T> boolean batchSet(final List<String> keys, final List<T> values, final int expiration, final boolean isHot, final String category)
             throws StoreException, TimeoutException;

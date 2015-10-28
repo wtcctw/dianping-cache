@@ -29,7 +29,7 @@ public class EhcacheClientConfigParser implements StoreClientConfigParser {
 	@Override
 	public StoreClientConfig parse(CacheConfigurationDTO detail) {
 		//Can extend some ehcache configuration here
-	    EhcacheConfiguration config = new EhcacheConfiguration();
+	    EhcacheClientConfig config = new EhcacheClientConfig();
 	    config.setClientClazz(detail.getClientClazz());
 	    return config;
 	}

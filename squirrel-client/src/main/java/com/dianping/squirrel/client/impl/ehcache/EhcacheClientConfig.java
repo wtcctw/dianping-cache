@@ -26,7 +26,7 @@ import com.dianping.squirrel.common.exception.StoreInitializeException;
  * @author pengshan.zhang
  * 
  */
-public class EhcacheConfiguration implements StoreClientConfig {
+public class EhcacheClientConfig implements StoreClientConfig {
 
 	/**
 	 * Default ehcache configuration file

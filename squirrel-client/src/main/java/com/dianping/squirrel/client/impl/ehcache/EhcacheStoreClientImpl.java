@@ -30,7 +30,7 @@ import net.sf.ehcache.management.ManagementService;
 
 import com.dianping.squirrel.client.core.CASResponse;
 import com.dianping.squirrel.client.core.CASValue;
-import com.dianping.squirrel.client.core.CacheCallback;
+import com.dianping.squirrel.client.core.StoreCallback;
 import com.dianping.squirrel.client.core.CacheClient;
 import com.dianping.squirrel.client.core.StoreClientConfig;
 import com.dianping.squirrel.client.core.StoreFuture;
@@ -46,7 +46,7 @@ import com.google.common.eventbus.EventBus;
  * @author jinhua.liang
  * 
  */
-public class EhcacheClientImpl implements CacheClient, Lifecycle {
+public class EhcacheStoreClientImpl implements CacheClient, Lifecycle {
 
 	public static final EventBus eventBus = new EventBus();
 
@@ -195,8 +195,8 @@ public class EhcacheClientImpl implements CacheClient, Lifecycle {
 	 */
 	@Override
 	public void initialize(StoreClientConfig config) {
-		if (config instanceof EhcacheConfiguration) {
-			manager = ((EhcacheConfiguration) config).buildEhcacheManager();
+		if (config instanceof EhcacheClientConfig) {
+			manager = ((EhcacheClientConfig) config).buildEhcacheManager();
 		}
 		if (manager == null) {
 			manager = CacheManager.create();
@@ -453,7 +453,7 @@ public class EhcacheClientImpl implements CacheClient, Lifecycle {
 
 	@Override
 	public void asyncSet(String key, Object value, int expiration, boolean isHot, String category,
-			final CacheCallback<Boolean> callback) {
+			final StoreCallback<Boolean> callback) {
 		try {
 			asyncSet(key, value, expiration, isHot, category);
 			if (callback != null) {
@@ -468,7 +468,7 @@ public class EhcacheClientImpl implements CacheClient, Lifecycle {
 
 	@Override
 	public void asyncAdd(String key, Object value, int expiration, boolean isHot, String category,
-			CacheCallback<Boolean> callback) {
+			StoreCallback<Boolean> callback) {
 		try {
 			boolean result = add(key, value, expiration, isHot, category);
 			if (callback != null) {
@@ -490,7 +490,7 @@ public class EhcacheClientImpl implements CacheClient, Lifecycle {
 	}
 
 	@Override
-	public <T> void asyncGet(String key, Class dataType, boolean isHot, String category, CacheCallback<T> callback) {
+	public <T> void asyncGet(String key, Class dataType, boolean isHot, String category, StoreCallback<T> callback) {
 		try {
 			T result = (T) get(key, category, false);
 			if (callback != null) {
@@ -505,7 +505,7 @@ public class EhcacheClientImpl implements CacheClient, Lifecycle {
 
 	@Override
 	public <T> void asyncBatchGet(Collection<String> keys, Class dataType, boolean isHot, Map<String, String> categories,
-			CacheCallback<Map<String, T>> callback) {
+	                              StoreCallback<Map<String, T>> callback) {
 		try {
 			Map<String, T> results = getBulk(keys, dataType, isHot, categories, false);
 			if (callback != null) {
@@ -520,7 +520,7 @@ public class EhcacheClientImpl implements CacheClient, Lifecycle {
 
     @Override
     public <T> void asyncBatchSet(List<String> keys, List<T> values, int expiration, boolean isHot, String category,
-            CacheCallback<Boolean> callback) {
+                                  StoreCallback<Boolean> callback) {
         try {
             for(int i=0; i<keys.size(); i++) {
                 String key = keys.get(i);

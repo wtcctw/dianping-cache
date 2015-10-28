@@ -41,7 +41,7 @@ import com.dianping.cat.Cat;
 import com.dianping.cat.message.Message;
 import com.dianping.squirrel.client.core.CASResponse;
 import com.dianping.squirrel.client.core.CASValue;
-import com.dianping.squirrel.client.core.CacheCallback;
+import com.dianping.squirrel.client.core.StoreCallback;
 import com.dianping.squirrel.client.core.CacheClient;
 import com.dianping.squirrel.client.core.StoreClientConfig;
 import com.dianping.squirrel.client.core.StoreTypeAware;
@@ -861,7 +861,7 @@ public class MemcachedClientImpl implements CacheClient, Lifecycle, StoreTypeAwa
 
 	@Override
 	public void asyncSet(String key, Object value, int expiration, boolean isHot, String category,
-			CacheCallback<Boolean> callback) {
+	                     StoreCallback<Boolean> callback) {
 		try {
 			asyncSet(key, value, expiration, isHot, category);
 			if (callback != null) {
@@ -876,7 +876,7 @@ public class MemcachedClientImpl implements CacheClient, Lifecycle, StoreTypeAwa
 
 	@Override
 	public void asyncAdd(String key, Object value, int expiration, boolean isHot, String category,
-			CacheCallback<Boolean> callback) {
+	                     StoreCallback<Boolean> callback) {
 		try {
 			asyncAdd(key, value, expiration, isHot, category);
 			if (callback != null) {
@@ -904,7 +904,7 @@ public class MemcachedClientImpl implements CacheClient, Lifecycle, StoreTypeAwa
 	}
 
 	@Override
-	public <T> void asyncGet(final String key, final Class dataType, final boolean isHot, final String category, final CacheCallback<T> callback) {
+	public <T> void asyncGet(final String key, final Class dataType, final boolean isHot, final String category, final StoreCallback<T> callback) {
 	    String finalKey = CacheKeyUtils.nextCacheKey(key, isHot, hotKeyHitRange);
         GetFuture<T> future = null;
         final MemcachedClient client = getReadClient();
@@ -934,7 +934,7 @@ public class MemcachedClientImpl implements CacheClient, Lifecycle, StoreTypeAwa
 
 	@Override
 	public <T> void asyncBatchGet(final Collection<String> keys, Class dataType, boolean isHot, Map<String, String> categories,
-			final CacheCallback<Map<String, T>> callback) {
+			final StoreCallback<Map<String, T>> callback) {
 
         MemcachedClient client = getReadClient();
         
@@ -969,7 +969,7 @@ public class MemcachedClientImpl implements CacheClient, Lifecycle, StoreTypeAwa
 
     @Override
     public <T> void asyncBatchSet(List<String> keys, List<T> values, int expiration, boolean isHot, String category,
-            CacheCallback<Boolean> callback) {
+                                  StoreCallback<Boolean> callback) {
         throw new UnsupportedOperationException("spymemcached doesn't support async batch set");
     }
     

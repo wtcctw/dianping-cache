@@ -16,7 +16,6 @@ import org.slf4j.LoggerFactory;
 import com.dianping.squirrel.client.config.CacheKeyType;
 import com.dianping.squirrel.client.core.CASResponse;
 import com.dianping.squirrel.client.core.CASValue;
-import com.dianping.squirrel.client.core.CacheCallback;
 import com.dianping.squirrel.client.core.StoreCallback;
 import com.dianping.squirrel.client.core.StoreClientConfig;
 import com.dianping.squirrel.client.core.StoreFuture;
