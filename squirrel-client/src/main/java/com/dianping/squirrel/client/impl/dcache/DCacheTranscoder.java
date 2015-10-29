@@ -19,8 +19,11 @@ import net.spy.memcached.CachedData;
 import net.spy.memcached.transcoders.BaseSerializingTranscoder;
 import net.spy.memcached.transcoders.Transcoder;
 
-import com.dianping.squirrel.client.impl.memcached.HessianSerializer;
 import com.dianping.squirrel.client.monitor.SizeMonitor;
+import com.dianping.squirrel.common.exception.StoreTranscodeException;
+import com.dianping.squirrel.common.serialize.SerializeException;
+import com.dianping.squirrel.common.serialize.Serializer;
+import com.dianping.squirrel.common.serialize.SerializerFactory;
 
 /**
  * HessianTranscoder that serializes and compresses objects.
@@ -43,7 +46,7 @@ public class DCacheTranscoder extends BaseSerializingTranscoder implements Trans
 
 	private int compressionThreshold = DEFAULT_COMPRESSION_THRESHOLD;
 
-	private HessianSerializer hessianSerializer = new HessianSerializer();
+	private Serializer hessianSerializer = SerializerFactory.getSerializer("hessian");
 
 	private static final String EVENT_NAME_REQUEST_SIZE = "Cache.dcache.writeSize";
 
@@ -70,7 +73,12 @@ public class DCacheTranscoder extends BaseSerializingTranscoder implements Trans
 		if (result[0] instanceof String) {
 			b = encodeString((String) result[0]);
 		} else {
-			b = hessianSerializer.serialize(result[0]);
+			try {
+                b = hessianSerializer.toBytes(result[0]);
+            } catch (SerializeException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
 		}
 		if (b != null) {
 			if (b.length > compressionThreshold) {
@@ -112,7 +120,11 @@ public class DCacheTranscoder extends BaseSerializingTranscoder implements Trans
 		SizeMonitor.getInstance().logResponseSize(EVENT_NAME_RESPONSE_SIZE, data.length);
 
 		if ((d.getFlags() & HESSERIALIZED) != 0) {
-			rv = hessianSerializer.deserialize(data);
+			try {
+                rv = hessianSerializer.fromBytes(data);
+            } catch (SerializeException e) {
+                throw new StoreTranscodeException(e);
+            }
 		} else if ((d.getFlags() & SPECIAL_STRING) != 0) {
 			rv = decodeString(data);
 			if (d.getFlags() == (SPECIAL_INT | SPECIAL_STRING)) {

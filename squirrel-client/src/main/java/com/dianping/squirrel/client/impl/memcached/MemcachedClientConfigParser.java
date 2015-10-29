@@ -35,7 +35,7 @@ public class MemcachedClientConfigParser implements StoreClientConfigParser {
 
 	@Override
 	public StoreClientConfig parse(CacheConfigurationDTO detail) {
-		MemcachedClientConfiguration config = new MemcachedClientConfiguration();
+		MemcachedClientConfig config = new MemcachedClientConfig();
 		config.setCacheConfigurationListener(CacheMessageManager.getInstance());
 		String transcoderClass = ConfigManagerLoader.getConfigManager().getStringValue(
 		        "avatar-cache.memcached.transcoder.class", detail.getTranscoderClazz());

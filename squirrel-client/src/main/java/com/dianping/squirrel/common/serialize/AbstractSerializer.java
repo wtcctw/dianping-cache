@@ -2,6 +2,8 @@ package com.dianping.squirrel.common.serialize;
 
 public abstract  class AbstractSerializer implements Serializer {
 
+    protected static final String CHARSET = "ISO8859-1";
+    
     @Override
     public String toString(Object object) throws SerializeException {
         try {
@@ -13,7 +15,10 @@ public abstract  class AbstractSerializer implements Serializer {
         }
     }
 
-    protected abstract String doToString(Object object) throws Exception;
+    protected String doToString(Object object) throws Exception {
+        byte[] bytes = doToBytes(object);
+        return new String(bytes, CHARSET);
+    }
 
     @Override
     public byte[] toBytes(Object object) throws SerializeException {
@@ -39,7 +44,10 @@ public abstract  class AbstractSerializer implements Serializer {
         }
     }
 
-    protected abstract Object doFromString(String string) throws Exception;
+    protected Object doFromString(String string) throws Exception {
+        byte[] bytes = string.getBytes(CHARSET);
+        return doFromBytes(bytes);
+    }
 
     @Override
     public Object fromBytes(byte[] bytes) throws SerializeException {

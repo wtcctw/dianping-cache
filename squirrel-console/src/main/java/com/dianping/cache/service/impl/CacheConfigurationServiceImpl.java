@@ -59,7 +59,7 @@ import com.dianping.remote.cache.dto.CacheKeyTypeVersionUpdateDTO;
 import com.dianping.remote.cache.dto.SingleCacheRemoveDTO;
 import com.dianping.squirrel.client.core.CacheClient;
 import com.dianping.squirrel.client.core.CacheClientBuilder;
-import com.dianping.squirrel.client.impl.memcached.MemcachedClientConfiguration;
+import com.dianping.squirrel.client.impl.memcached.MemcachedClientConfig;
 import com.dianping.squirrel.common.config.ConfigChangeListener;
 import com.dianping.squirrel.common.config.ConfigManagerLoader;
 
@@ -256,7 +256,7 @@ public class CacheConfigurationServiceImpl implements CacheConfigurationService,
 			try {
 				if ("com.dianping.cache.memcached.MemcachedClientImpl".equals(clientClazz)) {
 					if (clearDistributed) {
-						MemcachedClientConfiguration config = new MemcachedClientConfiguration();
+						MemcachedClientConfig config = new MemcachedClientConfig();
 						config.setServerList(configuration.getServerList());
 						Class<?> transcoderClazz = Class.forName(configuration.getTranscoderClazz());
 						config.setTranscoderClass(transcoderClazz);

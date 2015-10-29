@@ -158,7 +158,7 @@ public class MemcachedClientImpl implements CacheClient, Lifecycle, StoreTypeAwa
 	/**
 	 * Spymemcached client configuration
 	 */
-	private MemcachedClientConfiguration config;
+	private MemcachedClientConfig config;
 
 	private static final int POOLSIZE_READ = configManager.getIntValue("avatar-cache.spymemcached.poolsize.read", 3) > 0 ? configManager
 			.getIntValue("avatar-cache.spymemcached.poolsize.read", 3) : 3;
@@ -194,7 +194,7 @@ public class MemcachedClientImpl implements CacheClient, Lifecycle, StoreTypeAwa
 
 	@Override
 	public void initialize(StoreClientConfig config) {
-		this.config = (MemcachedClientConfiguration) config;
+		this.config = (MemcachedClientConfig) config;
 		NodeMonitor.getInstance().clear(key);
 	}
 

@@ -15,14 +15,13 @@
  */
 package com.dianping.squirrel.client.impl.memcached;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
 import net.spy.memcached.transcoders.Transcoder;
 
-import com.dianping.squirrel.client.core.StoreClientConfig;
 import com.dianping.squirrel.client.core.CacheConfigurationListener;
+import com.dianping.squirrel.client.core.StoreClientConfig;
 import com.dianping.squirrel.common.exception.StoreInitializeException;
 
 /**
@@ -31,7 +30,7 @@ import com.dianping.squirrel.common.exception.StoreInitializeException;
  * @author guoqing.chen
  * 
  */
-public class MemcachedClientConfiguration implements StoreClientConfig {
+public class MemcachedClientConfig implements StoreClientConfig {
 
 	/**
 	 * All servers

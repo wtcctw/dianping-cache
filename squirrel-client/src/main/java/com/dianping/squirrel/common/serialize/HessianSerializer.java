@@ -26,39 +26,12 @@ public class HessianSerializer extends AbstractSerializer {
             close(h2os);
         }
     }
-    
-    @Override
-    public String doToString(Object object) throws Exception {
-        Hessian2Output h2os = null;
-        try {
-            ByteArrayOutputStream bos = new ByteArrayOutputStream();
-            h2os = new Hessian2Output(bos);
-            h2os.writeObject(object);
-            h2os.flush();
-            return new String(bos.toByteArray(), "ISO8859-1");
-        } finally {
-            close(h2os);
-        }
-    }
 
     @Override
     public Object doFromBytes(byte[] bytes) throws Exception {
         Hessian2Input h2is = null;
         try {
             ByteArrayInputStream bis = new ByteArrayInputStream(bytes);
-            h2is = new Hessian2Input(bis);
-            Object rv = h2is.readObject();
-            return rv;
-        } finally {
-            close(h2is);
-        }
-    }
-    
-    @Override
-    public Object doFromString(String bytes) throws Exception {
-        Hessian2Input h2is = null;
-        try {
-            ByteArrayInputStream bis = new ByteArrayInputStream(bytes.getBytes("ISO8859-1"));
             h2is = new Hessian2Input(bis);
             Object rv = h2is.readObject();
             return rv;
