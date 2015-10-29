@@ -4,8 +4,8 @@ import java.util.List;
 import java.util.concurrent.TimeoutException;
 
 import com.dianping.cache.exception.CacheException;
-import com.dianping.squirrel.client.core.CASResponse;
-import com.dianping.squirrel.client.core.CASValue;
+import com.dianping.squirrel.client.impl.memcached.CASResponse;
+import com.dianping.squirrel.client.impl.memcached.CASValue;
 
 public interface CacheDemoService {
 

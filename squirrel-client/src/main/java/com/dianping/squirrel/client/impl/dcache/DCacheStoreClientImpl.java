@@ -14,14 +14,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.dianping.squirrel.client.config.CacheKeyType;
-import com.dianping.squirrel.client.core.CASResponse;
-import com.dianping.squirrel.client.core.CASValue;
 import com.dianping.squirrel.client.core.StoreCallback;
 import com.dianping.squirrel.client.core.StoreClientConfig;
 import com.dianping.squirrel.client.core.StoreFuture;
 import com.dianping.squirrel.client.core.StoreTypeAware;
 import com.dianping.squirrel.client.core.Lifecycle;
 import com.dianping.squirrel.client.impl.AbstractStoreClient;
+import com.dianping.squirrel.client.impl.memcached.CASResponse;
+import com.dianping.squirrel.client.impl.memcached.CASValue;
 import com.dianping.squirrel.common.config.ConfigChangeListener;
 import com.dianping.squirrel.common.config.ConfigManager;
 import com.dianping.squirrel.common.config.ConfigManagerLoader;

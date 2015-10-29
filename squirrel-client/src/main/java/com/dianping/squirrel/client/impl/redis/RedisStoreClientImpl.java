@@ -67,8 +67,12 @@ public class RedisStoreClientImpl extends AbstractStoreClient implements RedisSt
     @Override
     protected <T> T doGet(CacheKeyType categoryConfig, String finalKey) {
         String value = client.get(finalKey);
-        T object = transcoder.decode(value);
-        return object;
+        if(value != null) {
+            T object = transcoder.decode(value);
+            return object;
+        } else {
+            return null;
+        }
     }
 
     @Override
@@ -182,9 +186,7 @@ public class RedisStoreClientImpl extends AbstractStoreClient implements RedisSt
 
     @Override
     public String type(StoreKey key) {
-        if (key == null) {
-            throw new IllegalArgumentException("store key is null");
-        }
+        checkNotNull(key, "store key is null");
         final CacheKeyType categoryConfig = configManager.findCacheKeyType(key.getCategory());
         checkNotNull(categoryConfig, "%s's category config is null", key.getCategory());
         final String finalKey = categoryConfig.getKey(key.getParams());

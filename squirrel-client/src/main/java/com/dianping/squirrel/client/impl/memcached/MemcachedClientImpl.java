@@ -39,13 +39,15 @@ import org.slf4j.LoggerFactory;
 
 import com.dianping.cat.Cat;
 import com.dianping.cat.message.Message;
-import com.dianping.squirrel.client.core.CASResponse;
-import com.dianping.squirrel.client.core.CASValue;
+import com.dianping.squirrel.client.StoreKey;
+import com.dianping.squirrel.client.config.CacheKeyType;
 import com.dianping.squirrel.client.core.StoreCallback;
 import com.dianping.squirrel.client.core.CacheClient;
 import com.dianping.squirrel.client.core.StoreClientConfig;
 import com.dianping.squirrel.client.core.StoreTypeAware;
 import com.dianping.squirrel.client.core.Lifecycle;
+import com.dianping.squirrel.client.impl.AbstractStoreClient;
+import com.dianping.squirrel.client.impl.AbstractStoreClient.Command;
 import com.dianping.squirrel.common.config.ConfigChangeListener;
 import com.dianping.squirrel.common.config.ConfigManager;
 import com.dianping.squirrel.common.config.ConfigManagerLoader;
@@ -54,6 +56,7 @@ import com.dianping.squirrel.common.exception.StoreInitializeException;
 import com.dianping.squirrel.common.util.CacheKeyUtils;
 import com.dianping.squirrel.common.util.RetryLoop;
 import com.dianping.squirrel.common.util.RetryLoop.RetryResponse;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * The memcached client implementation adaptor(sypmemcached)
@@ -64,7 +67,7 @@ import com.dianping.squirrel.common.util.RetryLoop.RetryResponse;
  * @author xiang.wu
  * 
  */
-public class MemcachedClientImpl implements CacheClient, Lifecycle, StoreTypeAware {
+public class MemcachedClientImpl extends AbstractStoreClient implements MemcachedStoreClient, Lifecycle, StoreTypeAware {
 
 	/**
 	 * in milliseconds
@@ -146,7 +149,7 @@ public class MemcachedClientImpl implements CacheClient, Lifecycle, StoreTypeAwa
 	/**
 	 * Memcached client unique key
 	 */
-	private String key;
+	private String storeType;
 
 	/**
 	 * Memcached client
@@ -184,71 +187,56 @@ public class MemcachedClientImpl implements CacheClient, Lifecycle, StoreTypeAwa
 
 	@Override
 	public String getStoreType() {
-		return key;
+		return storeType;
 	}
 
 	@Override
-	public void setStoreType(String key) {
-		this.key = key;
+	public void setStoreType(String storeType) {
+		this.storeType = storeType;
 	}
 
 	@Override
 	public void initialize(StoreClientConfig config) {
 		this.config = (MemcachedClientConfig) config;
-		NodeMonitor.getInstance().clear(key);
+		NodeMonitor.getInstance().clear(storeType);
 	}
 
 	@Override
-	public boolean add(String key, Object value, int expiration, long timeout, boolean isHot, String category)
-			throws StoreException, TimeoutException {
-		String k = getCacheKey(key, isHot);
-		Object v = getCacheValue(value, expiration, isHot);
-		MemcachedClient client = getWriteClient();
-		try {
-			OperationFuture<Boolean> future = client.add(k, expiration, v);
-			if (future != null) {
-				boolean result = future.get(timeout, TimeUnit.MILLISECONDS);
-				if (result) {
-					asyncSetBackupKey(key, value, expiration, isHot, category);
-				}
-				NodeMonitor.getInstance().logNode(client, k, MSG_SUCCESS, category);
-				return result;
-			}
-		} catch(CheckedOperationTimeoutException e) {
-		    NodeMonitor.getInstance().logNode(client, k, MSG_TIMEOUT, category);
-            throw new TimeoutException(e.getMessage());
-		} catch (Exception e) {
-			NodeMonitor.getInstance().logNode(client, k, MSG_EXCEPTION, category);
-			throw new StoreException(e);
-		}
-		NodeMonitor.getInstance().logNode(client, k, MSG_EXCEPTION, category);
-		return false;
-	}
+	public <T> CASValue<T> gets(StoreKey key) throws StoreException {
+	    checkNotNull(key, "store key is null");
+        final CacheKeyType categoryConfig = super.configManager.findCacheKeyType(key.getCategory());
+        checkNotNull(categoryConfig, "%s's category config is null", key.getCategory());
+        final String finalKey = categoryConfig.getKey(key.getParams());
+        
+        return executeWithMonitor(new Command() {
 
-	@Override
-	public boolean add(String key, Object value, int expiration, boolean isHot, String category) throws StoreException,
-			TimeoutException {
-		return add(key, value, expiration, timeoutAdd, isHot, category);
+            @Override
+            public Object execute() throws Exception {
+                return doGets(categoryConfig, finalKey);
+            }
+            
+        }, categoryConfig, finalKey, "gets");
 	}
-
+	
 	@Override
-	public Future<Boolean> asyncAdd(String key, Object value, int expiration, boolean isHot, String category)
-			throws StoreException {
-		String k = getCacheKey(key, isHot);
-		Object v = getCacheValue(value, expiration, isHot);
-		MemcachedClient client = getWriteClient();
-		try {
-			Future<Boolean> future = client.add(k, expiration, v);
-			NodeMonitor.getInstance().logNode(client, k, MSG_SUCCESS, category);
-			return future;
-		} catch (Exception e) {
-			NodeMonitor.getInstance().logNode(client, k, MSG_EXCEPTION, category);
-			throw new StoreException(e);
-		}
+	public CASResponse cas(StoreKey key, final long casId, final Object value) throws StoreException {
+	    checkNotNull(key, "store key is null");
+	    checkNotNull(value, "value is null");
+        final CacheKeyType categoryConfig = super.configManager.findCacheKeyType(key.getCategory());
+        checkNotNull(categoryConfig, "%s's category config is null", key.getCategory());
+        final String finalKey = categoryConfig.getKey(key.getParams());
+        
+        return executeWithMonitor(new Command() {
+
+            @Override
+            public Object execute() throws Exception {
+                return doCas(categoryConfig, finalKey, casId, value);
+            }
+            
+        }, categoryConfig, finalKey, "cas");
 	}
-
-	@Override
-	public <T> CASValue<T> gets(String key, String category) throws StoreException, TimeoutException {
+	
+	public <T> CASValue<T> doGets(CacheKeyType categoryConfig, String key) throws StoreException, TimeoutException {
 		String reformedKey = CacheKeyUtils.reformKey(key);
 		MemcachedClient client = getReadClient();
 		try {
@@ -257,19 +245,18 @@ public class MemcachedClientImpl implements CacheClient, Lifecycle, StoreTypeAwa
 			if (v != null) {
 				casValue = new CASValue<T>(v.getCas(), v.getValue());
 			}
-			NodeMonitor.getInstance().logNode(client, reformedKey, MSG_SUCCESS, category);
+			NodeMonitor.getInstance().logNode(client, reformedKey, MSG_SUCCESS, categoryConfig.getCategory());
 			return casValue;
 		} catch (OperationTimeoutException e) {
-			NodeMonitor.getInstance().logNode(client, reformedKey, MSG_TIMEOUT, category);
+			NodeMonitor.getInstance().logNode(client, reformedKey, MSG_TIMEOUT, categoryConfig.getCategory());
 			throw new TimeoutException(e.getMessage());
 		} catch (Exception e) {
-			NodeMonitor.getInstance().logNode(client, reformedKey, MSG_EXCEPTION, category);
+			NodeMonitor.getInstance().logNode(client, reformedKey, MSG_EXCEPTION, categoryConfig.getCategory());
 			throw new StoreException(e);
 		}
 	}
 
-	@Override
-	public CASResponse cas(String key, long casId, Object value, String category) throws StoreException,
+	public CASResponse doCas(CacheKeyType categoryConfig, String key, long casId, Object value) throws StoreException,
 			TimeoutException {
 		String reformedKey = CacheKeyUtils.reformKey(key);
 		MemcachedClient client = getWriteClient();
@@ -279,52 +266,44 @@ public class MemcachedClientImpl implements CacheClient, Lifecycle, StoreTypeAwa
 			if (r != null) {
 				casResponse = CASResponse.valueOf(r.name());
 			}
-			NodeMonitor.getInstance().logNode(client, reformedKey, MSG_SUCCESS, category);
+			NodeMonitor.getInstance().logNode(client, reformedKey, MSG_SUCCESS, categoryConfig.getCategory());
 			return casResponse;
 		} catch (OperationTimeoutException e) {
-			NodeMonitor.getInstance().logNode(client, reformedKey, MSG_TIMEOUT, category);
+			NodeMonitor.getInstance().logNode(client, reformedKey, MSG_TIMEOUT, categoryConfig.getCategory());
 			throw new TimeoutException(e.getMessage());
 		} catch (Exception e) {
-			NodeMonitor.getInstance().logNode(client, reformedKey, MSG_EXCEPTION, category);
+			NodeMonitor.getInstance().logNode(client, reformedKey, MSG_EXCEPTION, categoryConfig.getCategory());
 			throw new StoreException(e);
 		}
 	}
 
-	@Override
-	public <T> Map<String, T> getBulk(Collection<String> keys, Class dataType, boolean isHot, Map<String, String> categories,
-			boolean timeoutAware) throws Exception {
-		keys = CacheKeyUtils.reformKeys(keys);
-		MemcachedClient client = getReadClient();
-		Map<String, T> result = null;
-		TimeoutException timeoutException = null;
-		try {
-			// use timeout to eliminate memcached servers' crash
-			result = (Map<String, T>) doGetBulk(client, keys, timeoutMGet);
-			NodeMonitor.getInstance().logNode(client, keys, MSG_SUCCESS, "");
-		} catch (TimeoutException e) {
-			timeoutException = e;
-			result = null;
-			NodeMonitor.getInstance().logNode(client, keys, MSG_TIMEOUT, "");
-		} catch (Exception e) {
-			NodeMonitor.getInstance().logNode(client, keys, MSG_EXCEPTION, "");
-			throw e;
-		}
-		if (timeoutAware && timeoutException != null && result == null) {
-			throw timeoutException;
-		}
-		if (result == null || result.isEmpty()) {
-			return result;
-		}
-		return CacheKeyUtils.reformBackKeys(result);
-	}
-
-	@Override
-	public Future<Boolean> asyncDelete(String key, boolean isHot, String category) throws StoreException {
-		String reformedKey = getCacheKey(key, isHot);
-		Future<Boolean> future = getWriteClient().delete(reformedKey);
-		asyncRemoveBackupKey(key, isHot, category);
-		return future;
-	}
+//	@Override
+//	public <T> Map<String, T> getBulk(Collection<String> keys, Class dataType, boolean isHot, Map<String, String> categories,
+//			boolean timeoutAware) throws Exception {
+//		keys = CacheKeyUtils.reformKeys(keys);
+//		MemcachedClient client = getReadClient();
+//		Map<String, T> result = null;
+//		TimeoutException timeoutException = null;
+//		try {
+//			// use timeout to eliminate memcached servers' crash
+//			result = (Map<String, T>) doGetBulk(client, keys, timeoutMGet);
+//			NodeMonitor.getInstance().logNode(client, keys, MSG_SUCCESS, "");
+//		} catch (TimeoutException e) {
+//			timeoutException = e;
+//			result = null;
+//			NodeMonitor.getInstance().logNode(client, keys, MSG_TIMEOUT, "");
+//		} catch (Exception e) {
+//			NodeMonitor.getInstance().logNode(client, keys, MSG_EXCEPTION, "");
+//			throw e;
+//		}
+//		if (timeoutAware && timeoutException != null && result == null) {
+//			throw timeoutException;
+//		}
+//		if (result == null || result.isEmpty()) {
+//			return result;
+//		}
+//		return CacheKeyUtils.reformBackKeys(result);
+//	}
 
 	public boolean delete(String key, boolean isHot, String category) throws StoreException, TimeoutException {
 		return this.delete(key, isHot, category, timeoutSet);
@@ -351,111 +330,6 @@ public class MemcachedClientImpl implements CacheClient, Lifecycle, StoreTypeAwa
 		} catch (Exception e) {
 			NodeMonitor.getInstance().logNode(client, key, MSG_EXCEPTION, category);
 			throw new StoreException(e);
-		}
-	}
-
-	@Override
-	public void replace(String key, Object value, int expiration, boolean isHot, String category) throws Exception {
-		String reformedKey = getCacheKey(key, isHot);
-		getWriteClient().replace(reformedKey, expiration, value);
-	}
-
-	@Override
-	public Future<Boolean> asyncSet(String key, Object value, int expiration, boolean isHot, String category)
-			throws StoreException {
-		String k = getCacheKey(key, isHot);
-		Object v = getCacheValue(value, expiration, isHot);
-		MemcachedClient client = getWriteClient();
-		try {
-			Future<Boolean> future = client.set(k, expiration, v);
-			asyncSetBackupKey(k, value, expiration, isHot, category);
-			NodeMonitor.getInstance().logNode(client, k, MSG_SUCCESS, category);
-			return future;
-		} catch (RuntimeException e) {
-			NodeMonitor.getInstance().logNode(client, k, MSG_EXCEPTION, category);
-			throw new StoreException(e);
-		}
-	}
-
-	@Override
-	public long decrement(String key, int amount, String category) throws StoreException, TimeoutException {
-		String reformedKey = CacheKeyUtils.reformKey(key);
-		MemcachedClient client = getWriteClient();
-		try {
-			long value = client.decr(reformedKey, amount);
-			NodeMonitor.getInstance().logNode(client, reformedKey, MSG_SUCCESS, category);
-			return value;
-		} catch (OperationTimeoutException e) {
-			NodeMonitor.getInstance().logNode(client, reformedKey, MSG_TIMEOUT, category);
-			throw new TimeoutException(e.getMessage());
-		} catch (Exception e) {
-			NodeMonitor.getInstance().logNode(client, reformedKey, MSG_EXCEPTION, category);
-			throw new StoreException(e);
-		}
-	}
-
-	@Override
-	public long decrement(String key, int amount, String category, long def) throws StoreException, TimeoutException {
-		String reformedKey = CacheKeyUtils.reformKey(key);
-		MemcachedClient client = getWriteClient();
-		try {
-			long value = client.decr(reformedKey, amount, def);
-			NodeMonitor.getInstance().logNode(client, reformedKey, MSG_SUCCESS, category);
-			return value;
-		} catch (OperationTimeoutException e) {
-			NodeMonitor.getInstance().logNode(client, reformedKey, MSG_TIMEOUT, category);
-			throw new TimeoutException(e.getMessage());
-		} catch (Exception e) {
-			NodeMonitor.getInstance().logNode(client, reformedKey, MSG_EXCEPTION, category);
-			throw new StoreException(e);
-		}
-	}
-
-	@Override
-	public long increment(String key, int amount, String category) throws StoreException, TimeoutException {
-		String reformedKey = CacheKeyUtils.reformKey(key);
-		MemcachedClient client = getWriteClient();
-		try {
-			long value = client.incr(reformedKey, amount);
-			NodeMonitor.getInstance().logNode(client, reformedKey, MSG_SUCCESS, category);
-			return value;
-		} catch (OperationTimeoutException e) {
-			NodeMonitor.getInstance().logNode(client, reformedKey, MSG_TIMEOUT, category);
-			throw new TimeoutException(e.getMessage());
-		} catch (Exception e) {
-			NodeMonitor.getInstance().logNode(client, reformedKey, MSG_EXCEPTION, category);
-			throw new StoreException(e);
-		}
-	}
-
-	@Override
-	public long increment(String key, int amount, String category, long def) throws StoreException, TimeoutException {
-		String reformedKey = CacheKeyUtils.reformKey(key);
-		MemcachedClient client = getWriteClient();
-		try {
-			long value = client.incr(reformedKey, amount, def);
-			NodeMonitor.getInstance().logNode(client, reformedKey, MSG_SUCCESS, category);
-			return value;
-		} catch (OperationTimeoutException e) {
-			NodeMonitor.getInstance().logNode(client, reformedKey, MSG_TIMEOUT, category);
-			throw new TimeoutException(e.getMessage());
-		} catch (Exception e) {
-			NodeMonitor.getInstance().logNode(client, reformedKey, MSG_EXCEPTION, category);
-			throw new StoreException(e);
-		}
-	}
-
-	@Override
-	public void clear() {
-		if (enableClear) {
-			if (writeClient != null) {
-				writeClient.flush();
-			}
-			if (writeClients != null) {
-				for (MemcachedClient client : writeClients) {
-					client.flush();
-				}
-			}
 		}
 	}
 
@@ -508,15 +382,15 @@ public class MemcachedClientImpl implements CacheClient, Lifecycle, StoreTypeAwa
 			ExtendedConnectionFactory connectionFactory = new ExtendedKetamaConnectionFactory(opQueueLen, readBufSize,
 					opQueueMaxBlockTime);
 			if (config.getTranscoder() != null) {
-				if (config.getTranscoder() instanceof HessianTranscoder) {
-					((HessianTranscoder) config.getTranscoder()).setCacheType(this.getStoreType());
+				if (config.getTranscoder() instanceof MemcachedTranscoder) {
+					((MemcachedTranscoder) config.getTranscoder()).setCacheType(this.getStoreType());
 				}
 				connectionFactory.setTranscoder(config.getTranscoder());
 			} else {
 				// set transcoder to HessianTranscoder:
 				// 1. fast
 				// 2. Fixed bug in https://bugs.launchpad.net/play/+bug/503349
-				connectionFactory.setTranscoder(new HessianTranscoder(this.getStoreType()));
+				connectionFactory.setTranscoder(new MemcachedTranscoder(this.getStoreType()));
 			}
 			String servers = config.getServers();
 			if (servers == null) {
@@ -553,7 +427,7 @@ public class MemcachedClientImpl implements CacheClient, Lifecycle, StoreTypeAwa
 				writeClient = new MemcachedClient(connectionFactory, AddrUtil.getAddresses(writeServer));
 			}
 			try {
-				NodeMonitor.getInstance().addNodes(this.key, getMemcachedClient());
+				NodeMonitor.getInstance().addNodes(storeType, getMemcachedClient());
 			} catch (Exception e) {
 				logger.warn("", e);
 			}
@@ -611,60 +485,6 @@ public class MemcachedClientImpl implements CacheClient, Lifecycle, StoreTypeAwa
 			}
 		}
 		return memcachedClients;
-	}
-
-	@Override
-	public boolean isDistributed() {
-		return true;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.dianping.cache.core.CacheClient#get(java.lang.String,
-	 * java.lang.String)
-	 */
-	@SuppressWarnings("unchecked")
-	@Override
-	public <T> T get(String key, Class dataType, String category) throws Exception {
-		try {
-			return (T) get(key, Object.class, false, category, false);
-		} catch (TimeoutException e) {
-			return null;
-		}
-	}
-
-	@Override
-	public boolean set(String key, Object value, int expiration, long timeout, boolean isHot, String category)
-			throws StoreException, TimeoutException {
-		String k = getCacheKey(key, isHot);
-		Object v = getCacheValue(value, expiration, isHot);
-		MemcachedClient client = getWriteClient();
-		try {
-			OperationFuture<Boolean> future = client.set(k, expiration, v);
-			if (future != null) {
-				boolean success = future.get(timeout, TimeUnit.MILLISECONDS);
-				if (success) {
-					asyncSetBackupKey(k, value, expiration, isHot, category);
-				}
-				NodeMonitor.getInstance().logNode(client, k, MSG_SUCCESS, category);
-				return success;
-			}
-		} catch (CheckedOperationTimeoutException e) {
-			NodeMonitor.getInstance().logNode(client, k, MSG_TIMEOUT, category);
-			throw new TimeoutException(e.getMessage());
-		} catch (Exception e) {
-			NodeMonitor.getInstance().logNode(client, k, MSG_EXCEPTION, category);
-			throw new StoreException(e);
-		}
-		NodeMonitor.getInstance().logNode(client, k, MSG_EXCEPTION, category);
-		return false;
-	}
-
-	@Override
-	public boolean set(String key, Object value, int expiration, boolean isHot, String category) throws StoreException,
-			TimeoutException {
-		return set(key, value, expiration, timeoutSet, isHot, category);
 	}
 
 	private String getCacheKey(String key, boolean isHot) {
@@ -786,53 +606,6 @@ public class MemcachedClientImpl implements CacheClient, Lifecycle, StoreTypeAwa
 		return result;
 	}
 
-	@Override
-	public <T> T get(String key, Class dataType, boolean isHot, String category, boolean timeoutAware) throws Exception {
-		TimeoutException timeoutException = null;
-		Object result = null;
-		String finalKey = CacheKeyUtils.nextCacheKey(key, isHot, hotKeyHitRange);
-		try {
-			result = doGet(finalKey, category);
-		} catch (TimeoutException e) {
-			logger.error("memcached get {} timeout", key);
-			timeoutException = e;
-			result = null;
-		}
-		if (isHot) {
-			if (result == null && timeoutException == null) {
-				if (finalKey.endsWith(CacheKeyUtils.SUFFIX_HOT)) {
-					try {
-						result = doGet(getCacheKey(key, isHot), category);
-					} catch (TimeoutException e) {
-						timeoutException = e;
-						result = null;
-					}
-				}
-			}
-			if (result == null && timeoutException == null) {
-				if (this.config.isVersionChanged(category, hotKeyRecentSeconds)) {
-					try {
-						result = getLastValue(key, isHot, category);
-					} catch (TimeoutException e) {
-						timeoutException = e;
-						result = null;
-					}
-				} else {
-					try {
-						result = getBackupValue(key, isHot, category);
-					} catch (TimeoutException e) {
-						timeoutException = e;
-						result = null;
-					}
-				}
-			}
-		}
-		if (timeoutAware && timeoutException != null && result == null) {
-			throw timeoutException;
-		}
-		return (T) result;
-	}
-
 	private <T> Map<String, Object> doGetBulk(MemcachedClient client, Collection<String> key, long timeout)
 			throws Exception {
 		Map<String, Object> result = null;
@@ -859,100 +632,27 @@ public class MemcachedClientImpl implements CacheClient, Lifecycle, StoreTypeAwa
 		return result;
 	}
 
-	@Override
-	public void asyncSet(String key, Object value, int expiration, boolean isHot, String category,
-	                     StoreCallback<Boolean> callback) {
-		try {
-			asyncSet(key, value, expiration, isHot, category);
-			if (callback != null) {
-				callback.onSuccess(true);
-			}
-		} catch (Throwable e) {
-			if (callback != null) {
-				callback.onFailure("", e);
-			}
-		}
-	}
-
-	@Override
-	public void asyncAdd(String key, Object value, int expiration, boolean isHot, String category,
-	                     StoreCallback<Boolean> callback) {
-		try {
-			asyncAdd(key, value, expiration, isHot, category);
-			if (callback != null) {
-				callback.onSuccess(true);
-			}
-		} catch (Throwable e) {
-			if (callback != null) {
-				callback.onFailure("", e);
-			}
-		}
-	}
-
-	@Override
-	public <T> Future<T> asyncGet(String key, Class dataType, boolean isHot, String category) throws StoreException {
-		String finalKey = CacheKeyUtils.nextCacheKey(key, isHot, hotKeyHitRange);
-		Future<T> future = null;
-		MemcachedClient client = getReadClient();
-		try {
-			future = (Future<T>) client.asyncGet(finalKey);
-		} catch (Exception e) {
-			NodeMonitor.getInstance().logNode(client, key, MSG_EXCEPTION, category);
-			throw new StoreException(e);
-		}
-		return future;
-	}
-
-	@Override
-	public <T> void asyncGet(final String key, final Class dataType, final boolean isHot, final String category, final StoreCallback<T> callback) {
-	    String finalKey = CacheKeyUtils.nextCacheKey(key, isHot, hotKeyHitRange);
-        GetFuture<T> future = null;
-        final MemcachedClient client = getReadClient();
-        
-        future = (GetFuture<T>) client.asyncGet(finalKey);
-        future.addListener(new GetCompletionListener() {
-
-            @Override
-            public void onComplete(GetFuture<?> future) throws Exception {
-                OperationStatus status = future.getStatus();
-                if(status.isSuccess() || status.getStatusCode() == StatusCode.ERR_NOT_FOUND) {
-                    T result = (T) future.get();
-                    NodeMonitor.getInstance().logNode(client, key, MSG_SUCCESS, category);
-                    callback.onSuccess(result);
-                } else {
-                    if(status.getStatusCode() == StatusCode.TIMEDOUT) {
-                        NodeMonitor.getInstance().logNode(client, key, MSG_TIMEOUT, category);
-                    } else {
-                        NodeMonitor.getInstance().logNode(client, key, MSG_EXCEPTION, category);
-                    }
-                    callback.onFailure("get " + key + " " + status.getMessage(), null);
-                }
-            }
-            
-        });
-	}
-
-	@Override
-	public <T> void asyncBatchGet(final Collection<String> keys, Class dataType, boolean isHot, Map<String, String> categories,
-			final StoreCallback<Map<String, T>> callback) {
-
-        MemcachedClient client = getReadClient();
-        
-        BulkFuture<Map<String, Object>> future = client.asyncGetBulk(keys);
-        future.addListener(new BulkGetCompletionListener() {
-            
-            @Override
-            public void onComplete(BulkGetFuture<?> future) throws Exception {
-                OperationStatus status = future.getStatus();
-                if(status.isSuccess() || status.getStatusCode() == StatusCode.ERR_NOT_FOUND) {
-                    Map<String, T> result = (Map<String, T>) future.get();
-                    callback.onSuccess(result);
-                } else {
-                    callback.onFailure("mget " + keyList(keys) + "failed: " + status.getMessage(), null);
-                }
-            }
-        });
-	}
+//	@Override
+//	public <T> void asyncBatchGet(final Collection<String> keys, Class dataType, boolean isHot, Map<String, String> categories,
+//			final StoreCallback<Map<String, T>> callback) {
+//
+//        MemcachedClient client = getReadClient();
+//        
+//        BulkFuture<Map<String, Object>> future = client.asyncGetBulk(keys);
+//        future.addListener(new BulkGetCompletionListener() {
+//            
+//            @Override
+//            public void onComplete(BulkGetFuture<?> future) throws Exception {
+//                OperationStatus status = future.getStatus();
+//                if(status.isSuccess() || status.getStatusCode() == StatusCode.ERR_NOT_FOUND) {
+//                    Map<String, T> result = (Map<String, T>) future.get();
+//                    callback.onSuccess(result);
+//                } else {
+//                    callback.onFailure("mget " + keyList(keys) + "failed: " + status.getMessage(), null);
+//                }
+//            }
+//        });
+//	}
 	
 	private String keyList(Collection<String> keys) {
 	    int i=0;
@@ -968,15 +668,298 @@ public class MemcachedClientImpl implements CacheClient, Lifecycle, StoreTypeAwa
 	}
 
     @Override
-    public <T> void asyncBatchSet(List<String> keys, List<T> values, int expiration, boolean isHot, String category,
-                                  StoreCallback<Boolean> callback) {
-        throw new UnsupportedOperationException("spymemcached doesn't support async batch set");
+    protected <T> T doGet(CacheKeyType categoryConfig, String key) throws Exception {
+        boolean isHot = categoryConfig.isHot();
+        String category = categoryConfig.getCategory();
+        TimeoutException timeoutException = null;
+        Object result = null;
+        String finalKey = CacheKeyUtils.nextCacheKey(key, isHot, hotKeyHitRange);
+        try {
+            result = doGet(finalKey, category);
+        } catch (TimeoutException e) {
+            logger.error("memcached get {} timeout", key);
+            timeoutException = e;
+            result = null;
+        }
+        if (isHot) {
+            if (result == null && timeoutException == null) {
+                if (finalKey.endsWith(CacheKeyUtils.SUFFIX_HOT)) {
+                    try {
+                        result = doGet(getCacheKey(key, isHot), category);
+                    } catch (TimeoutException e) {
+                        timeoutException = e;
+                        result = null;
+                    }
+                }
+            }
+            if (result == null && timeoutException == null) {
+                if (this.config.isVersionChanged(category, hotKeyRecentSeconds)) {
+                    try {
+                        result = getLastValue(key, isHot, category);
+                    } catch (TimeoutException e) {
+                        timeoutException = e;
+                        result = null;
+                    }
+                } else {
+                    try {
+                        result = getBackupValue(key, isHot, category);
+                    } catch (TimeoutException e) {
+                        timeoutException = e;
+                        result = null;
+                    }
+                }
+            }
+        }
+        if (timeoutException != null && result == null) {
+            throw timeoutException;
+        }
+        return (T) result;
     }
-    
+
     @Override
-    public <T> boolean batchSet(List<String> keys, List<T> values, int expiration, boolean isHot, String category) 
-    throws TimeoutException, StoreException {
-        throw new UnsupportedOperationException("spymemcached doesn't support batch set");
+    protected Boolean doSet(CacheKeyType categoryConfig, String key, Object value) throws Exception {
+        boolean isHot = categoryConfig.isHot();
+        String category = categoryConfig.getCategory();
+        int expiration = categoryConfig.getDurationSeconds();
+        String k = getCacheKey(key, isHot);
+        Object v = getCacheValue(value, expiration, isHot);
+        MemcachedClient client = getWriteClient();
+        try {
+            OperationFuture<Boolean> future = client.set(k, expiration, v);
+            if (future != null) {
+                boolean success = future.get(timeoutSet, TimeUnit.MILLISECONDS);
+                if (success) {
+                    asyncSetBackupKey(k, value, expiration, isHot, category);
+                }
+                NodeMonitor.getInstance().logNode(client, k, MSG_SUCCESS, category);
+                return success;
+            }
+        } catch (CheckedOperationTimeoutException e) {
+            NodeMonitor.getInstance().logNode(client, k, MSG_TIMEOUT, category);
+            throw new TimeoutException(e.getMessage());
+        } catch (Exception e) {
+            NodeMonitor.getInstance().logNode(client, k, MSG_EXCEPTION, category);
+            throw new StoreException(e);
+        }
+        NodeMonitor.getInstance().logNode(client, k, MSG_EXCEPTION, category);
+        return false;
+    }
+
+    @Override
+    protected Boolean doAdd(CacheKeyType categoryConfig, String finalKey, Object value) throws Exception {
+        boolean isHot = categoryConfig.isHot();
+        int expiration = categoryConfig.getDurationSeconds();
+        String category = categoryConfig.getCategory();
+        
+        String k = getCacheKey(finalKey, isHot);
+        Object v = getCacheValue(value, expiration, isHot);
+        MemcachedClient client = getWriteClient();
+        try {
+            OperationFuture<Boolean> future = client.add(k, expiration, v);
+            if (future != null) {
+                boolean result = future.get(timeoutAdd, TimeUnit.MILLISECONDS);
+                if (result) {
+                    asyncSetBackupKey(finalKey, value, expiration, isHot, category);
+                }
+                NodeMonitor.getInstance().logNode(client, k, MSG_SUCCESS, category);
+                return result;
+            }
+        } catch(CheckedOperationTimeoutException e) {
+            NodeMonitor.getInstance().logNode(client, k, MSG_TIMEOUT, category);
+            throw new TimeoutException(e.getMessage());
+        } catch (Exception e) {
+            NodeMonitor.getInstance().logNode(client, k, MSG_EXCEPTION, category);
+            throw new StoreException(e);
+        }
+        NodeMonitor.getInstance().logNode(client, k, MSG_EXCEPTION, category);
+        return false;
+    }
+
+    @Override
+    protected Boolean doDelete(CacheKeyType categoryConfig, String finalKey) throws Exception {
+        boolean isHot = categoryConfig.isHot();
+        String category = categoryConfig.getCategory();
+        MemcachedClient client = getWriteClient();
+        try {
+            String reformedKey = getCacheKey(finalKey, isHot);
+            Future<Boolean> future = client.delete(reformedKey);
+            if (future != null) {
+                boolean result = future.get(timeoutSet, TimeUnit.MILLISECONDS);
+                if (result) {
+                    asyncRemoveBackupKey(finalKey, isHot, category);
+                }
+                NodeMonitor.getInstance().logNode(client, finalKey, MSG_SUCCESS, category);
+                return result;
+            }
+            return false;
+        } catch (CheckedOperationTimeoutException e) {
+            NodeMonitor.getInstance().logNode(client, finalKey, MSG_TIMEOUT, category);
+            throw new TimeoutException(e.getMessage());
+        } catch (Exception e) {
+            NodeMonitor.getInstance().logNode(client, finalKey, MSG_EXCEPTION, category);
+            throw new StoreException(e);
+        }
+    }
+
+    @Override
+    protected <T> Future<T> doAsyncGet(CacheKeyType categoryConfig, String key) throws Exception {
+        String finalKey = CacheKeyUtils.nextCacheKey(key, categoryConfig.isHot(), hotKeyHitRange);
+        MemcachedClient client = getReadClient();
+        try {
+            Future<T> future = (Future<T>) client.asyncGet(finalKey);
+            return future;
+        } catch (Exception e) {
+            NodeMonitor.getInstance().logNode(client, key, MSG_EXCEPTION, categoryConfig.getCategory());
+            throw new StoreException(e);
+        }
+    }
+
+    @Override
+    protected Future<Boolean> doAsyncSet(CacheKeyType categoryConfig, String key, Object value) throws Exception {
+        boolean isHot = categoryConfig.isHot();
+        String category = categoryConfig.getCategory();
+        int expiration = categoryConfig.getDurationSeconds();
+        String k = getCacheKey(key, isHot);
+        Object v = getCacheValue(value, expiration, isHot);
+        MemcachedClient client = getWriteClient();
+        try {
+            Future<Boolean> future = client.set(k, expiration, v);
+            asyncSetBackupKey(k, value, expiration, isHot, category);
+            NodeMonitor.getInstance().logNode(client, k, MSG_SUCCESS, category);
+            return future;
+        } catch (RuntimeException e) {
+            NodeMonitor.getInstance().logNode(client, k, MSG_EXCEPTION, category);
+            throw new StoreException(e);
+        }
+    }
+
+    @Override
+    protected Future<Boolean> doAsyncAdd(CacheKeyType categoryConfig, String key, Object value) throws Exception {
+        boolean isHot = categoryConfig.isHot();
+        String category = categoryConfig.getCategory();
+        int expiration = categoryConfig.getDurationSeconds();
+        String k = getCacheKey(key, isHot);
+        Object v = getCacheValue(value, expiration, isHot);
+        MemcachedClient client = getWriteClient();
+        try {
+            Future<Boolean> future = client.add(k, expiration, v);
+            NodeMonitor.getInstance().logNode(client, k, MSG_SUCCESS, category);
+            return future;
+        } catch (Exception e) {
+            NodeMonitor.getInstance().logNode(client, k, MSG_EXCEPTION, category);
+            throw new StoreException(e);
+        }
+    }
+
+    @Override
+    protected Future<Boolean> doAsyncDelete(CacheKeyType categoryConfig, String key) throws Exception {
+        String reformedKey = getCacheKey(key, categoryConfig.isHot());
+        Future<Boolean> future = getWriteClient().delete(reformedKey);
+        asyncRemoveBackupKey(key, categoryConfig.isHot(), categoryConfig.getCategory());
+        return future;
+    }
+
+    @Override
+    protected <T> Void doAsyncGet(final CacheKeyType categoryConfig, final String key, final StoreCallback<T> callback) {
+        String finalKey = CacheKeyUtils.nextCacheKey(key, categoryConfig.isHot(), hotKeyHitRange);
+        GetFuture<T> future = null;
+        final MemcachedClient client = getReadClient();
+        
+        future = (GetFuture<T>) client.asyncGet(finalKey);
+        future.addListener(new GetCompletionListener() {
+    
+            @Override
+            public void onComplete(GetFuture<?> future) throws Exception {
+                OperationStatus status = future.getStatus();
+                if(status.isSuccess() || status.getStatusCode() == StatusCode.ERR_NOT_FOUND) {
+                    T result = (T) future.get();
+                    NodeMonitor.getInstance().logNode(client, key, MSG_SUCCESS, categoryConfig.getCategory());
+                    callback.onSuccess(result);
+                } else {
+                    if(status.getStatusCode() == StatusCode.TIMEDOUT) {
+                        NodeMonitor.getInstance().logNode(client, key, MSG_TIMEOUT, categoryConfig.getCategory());
+                        callback.onFailure("memcached async get key " + key + " timeout", 
+                                           new TimeoutException("memcached async get key " + key + " timeout"));
+                    } else {
+                        NodeMonitor.getInstance().logNode(client, key, MSG_EXCEPTION, categoryConfig.getCategory());
+                        callback.onFailure("memcached async get key " + key + " failed, error: " + status.getMessage(), null);
+                    }
+                }
+            }
+            
+        });
+        return null;
+    }
+
+    @Override
+    protected Void doAsyncSet(CacheKeyType categoryConfig, String key, Object value,
+                              StoreCallback<Boolean> callback) throws Exception {
+        try {
+            doAsyncSet(categoryConfig, key, value);
+            if (callback != null) {
+                callback.onSuccess(true);
+            }
+        } catch (Throwable e) {
+            if (callback != null) {
+                callback.onFailure("", e);
+            }
+        }
+        return null;
+    }
+
+    @Override
+    protected Void doAsyncAdd(CacheKeyType categoryConfig, String key, Object value,
+                              StoreCallback<Boolean> callback) throws Exception {
+        try {
+            doAsyncAdd(categoryConfig, key, value);
+            if (callback != null) {
+                callback.onSuccess(true);
+            }
+        } catch (Throwable e) {
+            if (callback != null) {
+                callback.onFailure("", e);
+            }
+        }
+        return null;
+    }
+
+    @Override
+    protected Void doAsyncDelete(CacheKeyType categoryConfig, String finalKey, StoreCallback<Boolean> callback)
+                                                                                                               throws Exception {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    protected Long doIncrease(CacheKeyType categoryConfig, String finalKey, int amount) throws Exception {
+        MemcachedClient client = getWriteClient();
+        try {
+            long value = client.incr(finalKey, amount, 0L);
+            NodeMonitor.getInstance().logNode(client, finalKey, MSG_SUCCESS, categoryConfig.getCategory());
+            return value;
+        } catch (OperationTimeoutException e) {
+            NodeMonitor.getInstance().logNode(client, finalKey, MSG_TIMEOUT, categoryConfig.getCategory());
+            throw new TimeoutException(e.getMessage());
+        } catch (Exception e) {
+            NodeMonitor.getInstance().logNode(client, finalKey, MSG_EXCEPTION, categoryConfig.getCategory());
+            throw new StoreException(e);
+        }
+    }
+
+    @Override
+    protected Long doDecrease(CacheKeyType categoryConfig, String finalKey, int amount) throws Exception {
+        MemcachedClient client = getWriteClient();
+        try {
+            long value = client.decr(finalKey, amount, 0L);
+            NodeMonitor.getInstance().logNode(client, finalKey, MSG_SUCCESS, categoryConfig.getCategory());
+            return value;
+        } catch (OperationTimeoutException e) {
+            NodeMonitor.getInstance().logNode(client, finalKey, MSG_TIMEOUT, categoryConfig.getCategory());
+            throw new TimeoutException(e.getMessage());
+        } catch (Exception e) {
+            NodeMonitor.getInstance().logNode(client, finalKey, MSG_EXCEPTION, categoryConfig.getCategory());
+            throw new StoreException(e);
+        }
     }
     
 }

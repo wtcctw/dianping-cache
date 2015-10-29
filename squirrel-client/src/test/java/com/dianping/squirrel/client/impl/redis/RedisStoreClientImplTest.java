@@ -113,6 +113,50 @@ public class RedisStoreClientImplTest {
     }
     
     @Test
+    public void testHashUser() {
+        RedisStoreClient redisClient = (RedisStoreClient) StoreClientFactory.getStoreClient("redis-hua");
+        StoreKey key = new StoreKey("myredis", "user");
+        User u1 = new User("user1", "city1", "dpid1", "bankcard1");
+        User u2 = new User("user2", "city2", "dpid2", "bankcard2");
+        User u3 = new User("user3", "city3", "dpid3", "bankcard3");
+        User u4 = new User("user4", "city4", "dpid4", "bankcard4");
+        User u5 = new User("user5", "city5", "dpid5", "bankcard5");
+        User u6 = new User("user6", "city6", "dpid6", "bankcard6");
+        
+        redisClient.delete(key);
+        Object value = redisClient.hdel(key, "field");
+        value = redisClient.hset(key, "field", u1);
+        assertEquals(value, 1L);
+        value = redisClient.hset(key, "field", u2);
+        assertEquals(value, 0L);
+        value = redisClient.hget(key, "field");
+        assertEquals(value, u2);
+        value = redisClient.hdel(key, "field");
+        assertEquals(value, 1L);
+        value = redisClient.hget(key, "field");
+        assertEquals(value, null);
+        value = redisClient.hkeys(key);
+        assertEquals(((Set)value).size(), 0);
+        value = redisClient.hset(key, "f1", u1);
+        value = redisClient.hset(key, "f2", u2);
+        value = redisClient.hset(key, "f3", u3);
+        value = redisClient.hkeys(key);
+        assertEquals(((Set)value).size(), 3);
+        value = redisClient.hvals(key);
+        assertEquals(((List)value).size(), 3);
+        value = redisClient.hgetAll(key);
+        assertEquals(((Map)value).size(), 3);
+        Map<String, Object> values = new HashMap<String, Object>();
+        values.put("f4", u4);
+        values.put("f5", u5);
+        values.put("f6", u6);
+        value = redisClient.hmset(key, values);
+        assertEquals(value, Boolean.TRUE);
+        value = redisClient.hmget(key, "f1", "f3", "f5");
+        assertEquals(((List)value).size(), 3);
+    }
+    
+    @Test
     public void testHashString() {
         RedisStoreClient redisClient = (RedisStoreClient) StoreClientFactory.getStoreClient("redis-hua");
         StoreKey key = new StoreKey("myredis", "hash");

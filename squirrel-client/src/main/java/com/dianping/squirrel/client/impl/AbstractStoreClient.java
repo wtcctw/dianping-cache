@@ -367,7 +367,7 @@ public abstract class AbstractStoreClient implements StoreClient {
         }, categoryConfig, finalKey, "increase");
 	}
 
-	protected abstract Long doIncrease(CacheKeyType categoryConfig, String finalKey, int amount);
+	protected abstract Long doIncrease(CacheKeyType categoryConfig, String finalKey, int amount) throws Exception;
 
     @Override
 	public Long decrease(StoreKey key, final int amount) throws StoreException {
@@ -390,7 +390,7 @@ public abstract class AbstractStoreClient implements StoreClient {
         }, categoryConfig, finalKey, "decrease");
     }
 
-    protected abstract Long doDecrease(CacheKeyType categoryConfig, String finalKey, int amount);
+    protected abstract Long doDecrease(CacheKeyType categoryConfig, String finalKey, int amount) throws Exception;
 
 	@Override
 	public <T> Map<StoreKey, T> multiGet(List<StoreKey> keys)

@@ -13,8 +13,8 @@ import com.dianping.avatar.cache.CacheKey;
 import com.dianping.avatar.cache.CacheService;
 import com.dianping.cache.exception.CacheException;
 import com.dianping.pigeon.remoting.provider.config.annotation.Service;
-import com.dianping.squirrel.client.core.CASResponse;
-import com.dianping.squirrel.client.core.CASValue;
+import com.dianping.squirrel.client.impl.memcached.CASResponse;
+import com.dianping.squirrel.client.impl.memcached.CASValue;
 
 @Service(url = "com.dianping.cache.test.EhcacheDemoService")
 public class EhcacheDemoServiceImpl implements CacheDemoService {

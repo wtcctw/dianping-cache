@@ -21,6 +21,8 @@ import java.util.Map;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeoutException;
 
+import com.dianping.squirrel.client.impl.memcached.CASResponse;
+import com.dianping.squirrel.client.impl.memcached.CASValue;
 import com.dianping.squirrel.common.exception.StoreException;
 
 /**

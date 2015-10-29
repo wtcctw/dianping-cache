@@ -1,4 +1,4 @@
-package com.dianping.squirrel.client.core;
+package com.dianping.squirrel.client.impl.memcached;
 
 public class CASValue<T> {
 	private final long cas;

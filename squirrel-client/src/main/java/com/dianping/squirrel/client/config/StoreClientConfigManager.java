@@ -31,9 +31,10 @@ import com.dianping.remote.cache.dto.CacheConfigurationsDTO;
 import com.dianping.squirrel.client.StoreClient;
 import com.dianping.squirrel.client.config.zookeeper.CacheCuratorClient;
 import com.dianping.squirrel.client.core.CacheClientBuilder;
-import com.dianping.squirrel.client.core.StoreClientConfig;
 import com.dianping.squirrel.client.core.CacheConfiguration;
+import com.dianping.squirrel.client.core.StoreClientConfig;
 import com.dianping.squirrel.client.impl.dcache.DCacheStoreClientImpl;
+import com.dianping.squirrel.client.impl.dcache.DCacheTranscoder;
 import com.dianping.squirrel.client.impl.redis.RedisStoreClientImpl;
 import com.dianping.squirrel.common.config.ConfigManager;
 import com.dianping.squirrel.common.config.ConfigManagerLoader;
@@ -170,7 +171,7 @@ public class StoreClientConfigManager {
 
 		if (cacheKey.startsWith("dcache")) {
 		    configuration.setClientClazz(DCacheStoreClientImpl.class.getName());
-		    configuration.setTranscoderClazz(com.dianping.squirrel.client.impl.dcache.DCacheTranscoder.class.getName());
+		    configuration.setTranscoderClazz(DCacheTranscoder.class.getName());
 		}
 		if (cacheKey.startsWith("redis")) {
             configuration.setClientClazz(RedisStoreClientImpl.class.getName());

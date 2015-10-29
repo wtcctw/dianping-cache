@@ -15,8 +15,8 @@ import com.dianping.avatar.tracker.ExecutionContextHolder;
 import com.dianping.avatar.tracker.TrackerContext;
 import com.dianping.cache.exception.CacheException;
 import com.dianping.pigeon.remoting.provider.config.annotation.Service;
-import com.dianping.squirrel.client.core.CASResponse;
-import com.dianping.squirrel.client.core.CASValue;
+import com.dianping.squirrel.client.impl.memcached.CASResponse;
+import com.dianping.squirrel.client.impl.memcached.CASValue;
 
 @Service(url = "com.dianping.cache.test.DCacheKVDemoService")
 public class DCacheKVDemoServiceImpl implements CacheDemoService {

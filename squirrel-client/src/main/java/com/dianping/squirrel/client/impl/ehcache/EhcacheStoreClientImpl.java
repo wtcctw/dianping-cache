@@ -28,13 +28,13 @@ import net.sf.ehcache.Element;
 import net.sf.ehcache.constructs.blocking.BlockingCache;
 import net.sf.ehcache.management.ManagementService;
 
-import com.dianping.squirrel.client.core.CASResponse;
-import com.dianping.squirrel.client.core.CASValue;
 import com.dianping.squirrel.client.core.StoreCallback;
 import com.dianping.squirrel.client.core.CacheClient;
 import com.dianping.squirrel.client.core.StoreClientConfig;
 import com.dianping.squirrel.client.core.StoreFuture;
 import com.dianping.squirrel.client.core.Lifecycle;
+import com.dianping.squirrel.client.impl.memcached.CASResponse;
+import com.dianping.squirrel.client.impl.memcached.CASValue;
 import com.dianping.squirrel.common.config.ConfigManagerLoader;
 import com.dianping.squirrel.common.exception.StoreException;
 import com.google.common.eventbus.EventBus;
