@@ -54,13 +54,9 @@ public abstract class AbstractStoreClient implements StoreClient {
     
 	@Override
 	public <T> T get(StoreKey key) throws StoreException {
-		if (key == null) {
-			throw new IllegalArgumentException("store key is null");
-		}
+	    checkNotNull(key, "store key is null");
 		final CacheKeyType categoryConfig = configManager.findCacheKeyType(key.getCategory());
-		if(categoryConfig == null) {
-			throw new StoreException("category config is null: " + key.getCategory());
-		}
+		checkNotNull(categoryConfig, "%s's category config is null", key.getCategory());
 		final String finalKey = categoryConfig.getKey(key.getParams());
 		
 		return executeWithMonitor(new Command() {
@@ -77,16 +73,10 @@ public abstract class AbstractStoreClient implements StoreClient {
 	
 	@Override
 	public Boolean set(StoreKey key, final Object value) throws StoreException {
-		if (key == null) {
-			throw new IllegalArgumentException("store key is null");
-		}
-		if(value == null) {
-			throw new IllegalArgumentException("value is null");
-		}
+	    checkNotNull(key, "store key is null");
+        checkNotNull(value, "value is null");
 		final CacheKeyType categoryConfig = configManager.findCacheKeyType(key.getCategory());
-		if (categoryConfig == null) {
-			throw new StoreException("category config is null: " + key.getCategory());
-		}
+		checkNotNull(categoryConfig, "%s's category config is null", key.getCategory());
 		final String finalKey = categoryConfig.getKey(key.getParams());
 		
 		return executeWithMonitor(new Command() {
@@ -103,16 +93,10 @@ public abstract class AbstractStoreClient implements StoreClient {
 
 	@Override
 	public Boolean add(StoreKey key, final Object value) throws StoreException {
-		if (key == null) {
-			throw new IllegalArgumentException("store key is null");
-		}
-		if(value == null) {
-			throw new IllegalArgumentException("value is null");
-		}
+	    checkNotNull(key, "store key is null");
+        checkNotNull(value, "value is null");
 		final CacheKeyType categoryConfig = configManager.findCacheKeyType(key.getCategory());
-		if (categoryConfig == null) {
-			throw new StoreException("category config is null: " + key.getCategory());
-		}
+		checkNotNull(categoryConfig, "%s's category config is null", key.getCategory());
 		final String finalKey = categoryConfig.getKey(key.getParams());
 		
 		return executeWithMonitor(new Command() {
@@ -129,13 +113,9 @@ public abstract class AbstractStoreClient implements StoreClient {
 	
 	@Override
 	public Boolean delete(StoreKey key) throws StoreException {
-		if (key == null) {
-			throw new IllegalArgumentException("store key is null");
-		}
+	    checkNotNull(key, "store key is null");
 		final CacheKeyType categoryConfig = configManager.findCacheKeyType(key.getCategory());
-		if(categoryConfig == null) {
-			throw new StoreException("category config is null: " + key.getCategory());
-		}
+		checkNotNull(categoryConfig, "%s's category config is null", key.getCategory());
 		final String finalKey = categoryConfig.getKey(key.getParams());
 		
 		return executeWithMonitor(new Command() {
@@ -152,13 +132,9 @@ public abstract class AbstractStoreClient implements StoreClient {
 	
 	@Override
 	public <T> Future<T> asyncGet(StoreKey key) throws StoreException {
-	    if (key == null) {
-            throw new IllegalArgumentException("store key is null");
-        }
+	    checkNotNull(key, "store key is null");
         final CacheKeyType categoryConfig = configManager.findCacheKeyType(key.getCategory());
-        if(categoryConfig == null) {
-            throw new StoreException("category config is null: " + key.getCategory());
-        }
+        checkNotNull(categoryConfig, "%s's category config is null", key.getCategory());
         final String finalKey = categoryConfig.getKey(key.getParams());
         
         return executeWithMonitor(new Command() {
@@ -175,16 +151,10 @@ public abstract class AbstractStoreClient implements StoreClient {
 
 	@Override
 	public Future<Boolean> asyncSet(StoreKey key, final Object value) throws StoreException {
-	    if (key == null) {
-            throw new IllegalArgumentException("store key is null");
-        }
-        if(value == null) {
-            throw new IllegalArgumentException("value is null");
-        }
+	    checkNotNull(key, "store key is null");
+        checkNotNull(value, "value is null");
         final CacheKeyType categoryConfig = configManager.findCacheKeyType(key.getCategory());
-        if (categoryConfig == null) {
-            throw new StoreException("category config is null: " + key.getCategory());
-        }
+        checkNotNull(categoryConfig, "%s's category config is null", key.getCategory());
         final String finalKey = categoryConfig.getKey(key.getParams());
         
         return executeWithMonitor(new Command() {
@@ -201,16 +171,10 @@ public abstract class AbstractStoreClient implements StoreClient {
 
     @Override
 	public Future<Boolean> asyncAdd(StoreKey key, final Object value) throws StoreException {
-        if (key == null) {
-            throw new IllegalArgumentException("store key is null");
-        }
-        if(value == null) {
-            throw new IllegalArgumentException("value is null");
-        }
+        checkNotNull(key, "store key is null");
+        checkNotNull(value, "value is null");
         final CacheKeyType categoryConfig = configManager.findCacheKeyType(key.getCategory());
-        if (categoryConfig == null) {
-            throw new StoreException("category config is null: " + key.getCategory());
-        }
+        checkNotNull(categoryConfig, "%s's category config is null", key.getCategory());
         final String finalKey = categoryConfig.getKey(key.getParams());
         
         return executeWithMonitor(new Command() {
@@ -227,13 +191,9 @@ public abstract class AbstractStoreClient implements StoreClient {
 
     @Override
 	public Future<Boolean> asyncDelete(StoreKey key) throws StoreException {
-        if (key == null) {
-            throw new IllegalArgumentException("store key is null");
-        }
+        checkNotNull(key, "store key is null");
         final CacheKeyType categoryConfig = configManager.findCacheKeyType(key.getCategory());
-        if (categoryConfig == null) {
-            throw new StoreException("category config is null: " + key.getCategory());
-        }
+        checkNotNull(categoryConfig, "%s's category config is null", key.getCategory());
         final String finalKey = categoryConfig.getKey(key.getParams());
         
         return executeWithMonitor(new Command() {
@@ -250,13 +210,9 @@ public abstract class AbstractStoreClient implements StoreClient {
 
     @Override
 	public <T> Void asyncGet(StoreKey key, final StoreCallback<T> callback) {
-        if (key == null) {
-            throw new IllegalArgumentException("store key is null");
-        }
+        checkNotNull(key, "store key is null");
         final CacheKeyType categoryConfig = configManager.findCacheKeyType(key.getCategory());
-        if(categoryConfig == null) {
-            throw new StoreException("category config is null: " + key.getCategory());
-        }
+        checkNotNull(categoryConfig, "%s's category config is null", key.getCategory());
         final String finalKey = categoryConfig.getKey(key.getParams());
         
         return executeWithMonitor(new Command() {
@@ -273,16 +229,10 @@ public abstract class AbstractStoreClient implements StoreClient {
     
 	@Override
 	public Void asyncSet(StoreKey key, final Object value, final StoreCallback<Boolean> callback) {
-	    if (key == null) {
-            throw new IllegalArgumentException("store key is null");
-        }
-        if(value == null) {
-            throw new IllegalArgumentException("value is null");
-        }
+	    checkNotNull(key, "store key is null");
+	    checkNotNull(value, "value is null");
         final CacheKeyType categoryConfig = configManager.findCacheKeyType(key.getCategory());
-        if (categoryConfig == null) {
-            throw new StoreException("category config is null: " + key.getCategory());
-        }
+        checkNotNull(categoryConfig, "%s's category config is null", key.getCategory());
         final String finalKey = categoryConfig.getKey(key.getParams());
         
         return executeWithMonitor(new Command() {
@@ -299,16 +249,10 @@ public abstract class AbstractStoreClient implements StoreClient {
 	
 	@Override
 	public Void asyncAdd(StoreKey key, final Object value, final StoreCallback<Boolean> callback) {
-	    if (key == null) {
-            throw new IllegalArgumentException("store key is null");
-        }
-        if(value == null) {
-            throw new IllegalArgumentException("value is null");
-        }
+	    checkNotNull(key, "store key is null");
+        checkNotNull(value, "value is null");
         final CacheKeyType categoryConfig = configManager.findCacheKeyType(key.getCategory());
-        if (categoryConfig == null) {
-            throw new StoreException("category config is null: " + key.getCategory());
-        }
+        checkNotNull(categoryConfig, "%s's category config is null", key.getCategory());
         final String finalKey = categoryConfig.getKey(key.getParams());
         
         return executeWithMonitor(new Command() {
@@ -325,13 +269,9 @@ public abstract class AbstractStoreClient implements StoreClient {
 
 	@Override
 	public Void asyncDelete(StoreKey key, final StoreCallback<Boolean> callback) {
-	    if (key == null) {
-            throw new IllegalArgumentException("store key is null");
-        }
+	    checkNotNull(key, "store key is null");
         final CacheKeyType categoryConfig = configManager.findCacheKeyType(key.getCategory());
-        if (categoryConfig == null) {
-            throw new StoreException("category config is null: " + key.getCategory());
-        }
+        checkNotNull(categoryConfig, "%s's category config is null", key.getCategory());
         final String finalKey = categoryConfig.getKey(key.getParams());
         
         return executeWithMonitor(new Command() {
@@ -348,13 +288,9 @@ public abstract class AbstractStoreClient implements StoreClient {
 
 	@Override
 	public Long increase(StoreKey key, final int amount) throws StoreException {
-	    if (key == null) {
-            throw new IllegalArgumentException("store key is null");
-        }
+	    checkNotNull(key, "store key is null");
         final CacheKeyType categoryConfig = configManager.findCacheKeyType(key.getCategory());
-        if (categoryConfig == null) {
-            throw new StoreException("category config is null: " + key.getCategory());
-        }
+        checkNotNull(categoryConfig, "%s's category config is null", key.getCategory());
         final String finalKey = categoryConfig.getKey(key.getParams());
         
         return executeWithMonitor(new Command() {
@@ -371,13 +307,9 @@ public abstract class AbstractStoreClient implements StoreClient {
 
     @Override
 	public Long decrease(StoreKey key, final int amount) throws StoreException {
-        if (key == null) {
-            throw new IllegalArgumentException("store key is null");
-        }
+        checkNotNull(key, "store key is null");
         final CacheKeyType categoryConfig = configManager.findCacheKeyType(key.getCategory());
-        if (categoryConfig == null) {
-            throw new StoreException("category config is null: " + key.getCategory());
-        }
+        checkNotNull(categoryConfig, "%s's category config is null", key.getCategory());
         final String finalKey = categoryConfig.getKey(key.getParams());
         
         return executeWithMonitor(new Command() {

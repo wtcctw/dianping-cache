@@ -67,7 +67,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @author xiang.wu
  * 
  */
-public class MemcachedClientImpl extends AbstractStoreClient implements MemcachedStoreClient, Lifecycle, StoreTypeAware {
+public class MemcachedStoreClientImpl extends AbstractStoreClient implements MemcachedStoreClient, Lifecycle, StoreTypeAware {
 
 	/**
 	 * in milliseconds
@@ -123,7 +123,7 @@ public class MemcachedClientImpl extends AbstractStoreClient implements Memcache
 
 	private static int hotkeyLockTime = configManager.getIntValue(KEY_HOTKEY_LOCKTIME, 30);
 
-	private static Logger logger = LoggerFactory.getLogger(MemcachedClientImpl.class);
+	private static Logger logger = LoggerFactory.getLogger(MemcachedStoreClientImpl.class);
 
 	private static final boolean enableClear = configManager.getBooleanValue("avatar-cache.memcached.clear.enable",
 			false);

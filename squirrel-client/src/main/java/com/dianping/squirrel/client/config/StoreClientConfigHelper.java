@@ -30,7 +30,7 @@ import com.dianping.squirrel.client.impl.dcache.DCacheStoreClientImpl;
 import com.dianping.squirrel.client.impl.ehcache.EhcacheClientConfigParser;
 import com.dianping.squirrel.client.impl.ehcache.EhcacheStoreClientImpl;
 import com.dianping.squirrel.client.impl.memcached.MemcachedClientConfigParser;
-import com.dianping.squirrel.client.impl.memcached.MemcachedClientImpl;
+import com.dianping.squirrel.client.impl.memcached.MemcachedStoreClientImpl;
 import com.dianping.squirrel.client.impl.redis.RedisClientConfigParser;
 import com.dianping.squirrel.client.impl.redis.RedisStoreClientImpl;
 import com.dianping.squirrel.common.exception.StoreInitializeException;
@@ -46,7 +46,7 @@ public class StoreClientConfigHelper {
 	private static Map<Class, StoreClientConfigParser> parserMap = new ConcurrentHashMap<Class, StoreClientConfigParser>();
 
 	static {
-		register(MemcachedClientImpl.class, new MemcachedClientConfigParser());
+		register(MemcachedStoreClientImpl.class, new MemcachedClientConfigParser());
 		register(EhcacheStoreClientImpl.class, new EhcacheClientConfigParser());
 		register(DCacheStoreClientImpl.class, new DCacheClientConfigParser());
 		register(RedisStoreClientImpl.class, new RedisClientConfigParser());

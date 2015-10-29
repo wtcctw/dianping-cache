@@ -55,7 +55,7 @@ import com.dianping.cache.util.NetUtil;
 import com.dianping.cache.util.RequestUtil;
 import com.dianping.core.type.PageModel;
 import com.dianping.squirrel.client.core.CacheClient;
-import com.dianping.squirrel.client.impl.memcached.MemcachedClientImpl;
+import com.dianping.squirrel.client.impl.memcached.MemcachedStoreClientImpl;
 
 @Controller
 public class CacheManagerController extends AbstractCacheController {
@@ -843,8 +843,8 @@ public class CacheManagerController extends AbstractCacheController {
 		Object o = cacheService.get(finalKey);
 		paras.put("result", o);
 		CacheClient cc = cacheService.getCacheClient(key.getCacheType());
-		if(cc instanceof MemcachedClientImpl){
-			MemcachedClient mcc = ((MemcachedClientImpl) cc).getReadClient();
+		if(cc instanceof MemcachedStoreClientImpl){
+			MemcachedClient mcc = ((MemcachedStoreClientImpl) cc).getReadClient();
 			MemcachedNode mn = mcc.getNodeLocator().getPrimary(finalKey);
 			paras.put("address", mn.getSocketAddress());
 		}
