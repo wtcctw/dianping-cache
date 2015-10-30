@@ -28,11 +28,13 @@ import net.sf.ehcache.Element;
 import net.sf.ehcache.constructs.blocking.BlockingCache;
 import net.sf.ehcache.management.ManagementService;
 
+import com.dianping.squirrel.client.config.CacheKeyType;
 import com.dianping.squirrel.client.core.StoreCallback;
 import com.dianping.squirrel.client.core.CacheClient;
 import com.dianping.squirrel.client.core.StoreClientConfig;
 import com.dianping.squirrel.client.core.StoreFuture;
 import com.dianping.squirrel.client.core.Lifecycle;
+import com.dianping.squirrel.client.impl.AbstractStoreClient;
 import com.dianping.squirrel.client.impl.memcached.CASResponse;
 import com.dianping.squirrel.client.impl.memcached.CASValue;
 import com.dianping.squirrel.common.config.ConfigManagerLoader;
@@ -40,13 +42,14 @@ import com.dianping.squirrel.common.exception.StoreException;
 import com.google.common.eventbus.EventBus;
 
 /**
- * EhcacheClientImpl 4 avatar local cache!
+ * EhcacheStoreClientImpl for squirrel local cache
  * 
  * @author pengshan.zhang
  * @author jinhua.liang
+ * @author enlight.chen
  * 
  */
-public class EhcacheStoreClientImpl implements CacheClient, Lifecycle {
+public class EhcacheStoreClientImpl extends AbstractStoreClient implements Lifecycle {
 
 	public static final EventBus eventBus = new EventBus();
 
@@ -69,24 +72,6 @@ public class EhcacheStoreClientImpl implements CacheClient, Lifecycle {
 		eventBus.post(new EhcacheEvent(manager));
 	}
 
-	/**
-	 * @see com.dianping.squirrel.client.core.CacheClient#add()
-	 */
-	@Override
-	public boolean add(String key, Object value, int expiration, long timeout, boolean isHot, String category)
-			throws StoreException, TimeoutException {
-		if (!findCache(category).isKeyInCache(key)) {
-			findCache(category).put(
-					new Element(key, value, Boolean.FALSE, Integer.valueOf(0), Integer.valueOf(expiration)));
-			return true;
-		}
-		return false;
-	}
-
-	/**
-	 * @see com.dianping.squirrel.client.core.CacheClient#clear()
-	 */
-	@Override
 	public void clear() {
 		defaultBlockingCache.removeAll();
 		for (String cacheName : manager.getCacheNames()) {
@@ -94,63 +79,9 @@ public class EhcacheStoreClientImpl implements CacheClient, Lifecycle {
 		}
 	}
 
-	/**
-	 * @see com.dianping.squirrel.client.core.CacheClient#decrement(java.lang.String, int)
-	 */
-	@Override
-	public long decrement(String key, int amount, String category) {
-		Element element = findCache(category).get(key);
-		if (element != null) {
-			Object value = element.getObjectValue();
-			if (value instanceof Long) {
-				findCache(category).remove(key);
-				long newValue = (Long) value - amount;
-				findCache(category).put(
-						new Element(key, newValue, Boolean.FALSE, Integer.valueOf(0), Integer.valueOf(element
-								.getTimeToLive())));
-				return newValue;
-			}
-		}
-		return -1;
-	}
-
-	public <T> T get(String key, String category, boolean timeoutAware) {
-		Element element = findCache(category).get(key);
+	public <T> T get(CacheKeyType categoryConfig, String key) {
+		Element element = findCache(categoryConfig.getCategory()).get(key);
 		return (T) (element == null ? null : element.getObjectValue());
-	}
-
-	/**
-	 * @see com.dianping.squirrel.client.core.CacheClient#increment(java.lang.String, int)
-	 */
-	@Override
-	public long increment(String key, int amount, String category) {
-		Element element = findCache(category).get(key);
-		if (element != null) {
-			Object value = element.getObjectValue();
-			if (value instanceof Long) {
-				findCache(category).remove(key);
-				long newValue = (Long) value + amount;
-				findCache(category).put(
-						new Element(key, newValue, Boolean.FALSE, Integer.valueOf(0), Integer.valueOf(element
-								.getTimeToLive())));
-				return newValue;
-			}
-		}
-		return -1;
-	}
-
-	/**
-	 * @see com.dianping.squirrel.client.core.CacheClient#remove(java.lang.String)
-	 */
-	@Override
-	public boolean delete(String key, boolean isHot, String category) throws StoreException, TimeoutException {
-		return findCache(category).remove(key);
-	}
-
-	@Override
-	public boolean delete(String key, boolean isHot, String category, long timeout) throws StoreException,
-			TimeoutException {
-		return findCache(category).remove(key);
 	}
 
 	public Future<Boolean> asyncDelete(String key, boolean isHot, String category) throws StoreException {
@@ -160,21 +91,6 @@ public class EhcacheStoreClientImpl implements CacheClient, Lifecycle {
 		return future;
 	}
 
-	/**
-	 * @see com.dianping.squirrel.client.core.CacheClient#replace(java.lang.String,
-	 *      java.lang.Object, int)
-	 */
-	@Override
-	public void replace(String key, Object value, int expiration, boolean isHot, String category) {
-		if (findCache(category).isKeyInCache(key)) {
-			findCache(category).put(
-					new Element(key, value, Boolean.FALSE, Integer.valueOf(0), Integer.valueOf(expiration)));
-		}
-	}
-
-	/**
-	 * @see com.dianping.squirrel.client.core.Lifecycle#stop()
-	 */
 	@Override
 	public void stop() {
 		manager.shutdown();
@@ -208,54 +124,6 @@ public class EhcacheStoreClientImpl implements CacheClient, Lifecycle {
 	@Override
 	public boolean isDistributed() {
 		return false;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.dianping.cache.core.CacheClient#get(java.lang.String, boolean)
-	 */
-	@SuppressWarnings("unchecked")
-	@Override
-	public <T> T get(String key, Class dataType, boolean isHot, String category, boolean timeoutAware) {
-		T result = (T) get(key, category, timeoutAware);
-
-		if (isHot) {
-			if (result == null) {
-				Element element = findCache(category).putIfAbsent(
-						new Element(key + "_lock", true, Boolean.FALSE, Integer.valueOf(0), Integer
-								.valueOf(getHotkeyLockTime())));
-				boolean locked = (element == null);
-				// try {
-				// lock.lock();
-				// if (findCache(category).get(key + "_lock") == null) {
-				// findCache(category).put(
-				// new Element(key + "_lock", true, Boolean.FALSE,
-				// Integer.valueOf(0), Integer
-				// .valueOf(getHotkeyLockTime())));
-				// locked = true;
-				// }
-				// } finally {
-				// lock.unlock();
-				// }
-
-				if (locked) {
-					return null;
-				} else {
-					// 批量清理时，因为version升级了，所以bak数据要考虑从上一个版本中查找
-					result = (T) get(key + "_bak", category, timeoutAware);
-					if (result == null) {
-						String lastVersionKey = genLastVersionCacheKey(key);
-						if (!key.equals(lastVersionKey)) {
-							result = (T) get(lastVersionKey + "_bak", category, timeoutAware);
-						}
-					}
-					return result;
-				}
-			}
-		}
-
-		return result;
 	}
 
 	private String genLastVersionCacheKey(String currentVersionCacheKey) {
@@ -311,241 +179,210 @@ public class EhcacheStoreClientImpl implements CacheClient, Lifecycle {
 		return cache;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.dianping.cache.core.CacheClient#get(java.lang.String,
-	 * java.lang.String)
-	 */
-	@Override
-	public <T> T get(String key, Class dataType, String category) {
-		return (T) get(key, category, false);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.dianping.cache.core.CacheClient#getBulk(java.util.Collection,
-	 * java.util.Map, boolean)
-	 */
-	@SuppressWarnings("unchecked")
-	@Override
-	public <T> Map<String, T> getBulk(Collection<String> keys, Class dataType, boolean isHot, Map<String, String> categories,
-			boolean timeoutAware) {
-		Map<String, T> map = new HashMap<String, T>();
-		for (String key : keys) {
-			Element element = findCache(categories == null ? null : categories.get(key)).get(key);
-			map.put(key, (element == null ? null : (T) element.getObjectValue()));
-		}
-		return map;
-	}
-
-	@Override
-	public Future<Boolean> asyncAdd(String key, Object value, int expiration, boolean isHot, String category)
-			throws StoreException {
-		boolean result = false;
-		if (!findCache(category).isKeyInCache(key)) {
-			findCache(category).put(
-					new Element(key, value, Boolean.FALSE, Integer.valueOf(0), Integer.valueOf(expiration)));
-			result = true;
-		}
-		StoreFuture<Boolean> future = new StoreFuture<Boolean>(key);
-		future.onSuccess(result);
-		return future;
-	}
-
-	@Override
-	public boolean add(String key, Object value, int expiration, boolean isHot, String category) throws StoreException,
-			TimeoutException {
-		return add(key, value, expiration, -1, isHot, category);
-	}
-
-	@Override
-	public long increment(String key, int amount, String category, long def) throws StoreException, TimeoutException {
-		Element element = findCache(category).get(key);
-		if (element != null) {
-			Object value = element.getObjectValue();
-			if (value instanceof Long) {
-				findCache(category).remove(key);
-				long newValue = (Long) value + amount;
-				findCache(category).put(
-						new Element(key, newValue, Boolean.FALSE, Integer.valueOf(0), Integer.valueOf(element
-								.getTimeToLive())));
-				return newValue;
-			} else {
-				return -1;
-			}
-		} else {
-			long newValue = def;
-			findCache(category).put(
-					new Element(key, newValue, Boolean.FALSE, Integer.valueOf(0), Integer.valueOf(element
-							.getTimeToLive())));
-			return newValue;
-		}
-	}
-
-	@Override
-	public long decrement(String key, int amount, String category, long def) throws StoreException, TimeoutException {
-		Element element = findCache(category).get(key);
-		if (element != null) {
-			Object value = element.getObjectValue();
-			if (value instanceof Long) {
-				findCache(category).remove(key);
-				long newValue = (Long) value - amount;
-				findCache(category).put(
-						new Element(key, newValue, Boolean.FALSE, Integer.valueOf(0), Integer.valueOf(element
-								.getTimeToLive())));
-				return newValue;
-			} else {
-				return -1;
-			}
-		} else {
-			long newValue = def;
-			findCache(category).put(
-					new Element(key, newValue, Boolean.FALSE, Integer.valueOf(0), Integer.valueOf(element
-							.getTimeToLive())));
-			return def;
-		}
-	}
-
-	@Override
-	public <T> CASValue<T> gets(String key, String category) throws StoreException, TimeoutException {
-		throw new StoreException("operation not supported");
-	}
-
-	@Override
-	public CASResponse cas(String key, long casId, Object value, String category) throws StoreException,
-			TimeoutException {
-		throw new StoreException("operation not supported");
-	}
-
-	@Override
-	public boolean set(String key, Object value, int expiration, boolean isHot, String category) throws StoreException,
-			TimeoutException {
-		return this.set(key, value, expiration, -1l, isHot, category);
-	}
-
-	@Override
-	public boolean set(String key, Object value, int expiration, long timeout, boolean isHot, String category)
-			throws StoreException, TimeoutException {
-		this.asyncSet(key, value, expiration, isHot, category);
-		return true;
-	}
-
-	@Override
-	public Future<Boolean> asyncSet(String key, Object value, int expiration, boolean isHot, String category)
-			throws StoreException {
-		findCache(category)
-				.put(new Element(key, value, Boolean.FALSE, Integer.valueOf(0), Integer.valueOf(expiration)));
-		if (isHot) {
-			findCache(category).put(
-					new Element(key + "_bak", value, Boolean.TRUE, Integer.valueOf(0), Integer.valueOf(0)));
-			String lastVersionKey = genLastVersionCacheKey(key);
-			// 当版本升级后，要清理上一个版本的hotkey数据
-			if (!key.equals(lastVersionKey)) {
-				findCache(category).remove(lastVersionKey + "_bak");
-			}
-		}
-		StoreFuture<Boolean> future = new StoreFuture<Boolean>(key);
-		future.onSuccess(true);
-		return future;
-	}
-
-	@Override
-	public void asyncSet(String key, Object value, int expiration, boolean isHot, String category,
-			final StoreCallback<Boolean> callback) {
-		try {
-			asyncSet(key, value, expiration, isHot, category);
-			if (callback != null) {
-				callback.onSuccess(true);
-			}
-		} catch (Throwable e) {
-			if (callback != null) {
-				callback.onFailure("", e);
-			}
-		}
-	}
-
-	@Override
-	public void asyncAdd(String key, Object value, int expiration, boolean isHot, String category,
-			StoreCallback<Boolean> callback) {
-		try {
-			boolean result = add(key, value, expiration, isHot, category);
-			if (callback != null) {
-				callback.onSuccess(result);
-			}
-		} catch (Throwable e) {
-			if (callback != null) {
-				callback.onFailure("", e);
-			}
-		}
-	}
-
-	@Override
-	public <T> Future<T> asyncGet(String key, Class dataType, boolean isHot, String category) throws StoreException {
-		T result = (T) get(key, category, false);
-		StoreFuture<T> future = new StoreFuture<T>(key);
-		future.onSuccess(result);
-		return future;
-	}
-
-	@Override
-	public <T> void asyncGet(String key, Class dataType, boolean isHot, String category, StoreCallback<T> callback) {
-		try {
-			T result = (T) get(key, category, false);
-			if (callback != null) {
-				callback.onSuccess(result);
-			}
-		} catch (Throwable e) {
-			if (callback != null) {
-				callback.onFailure("", e);
-			}
-		}
-	}
-
-	@Override
-	public <T> void asyncBatchGet(Collection<String> keys, Class dataType, boolean isHot, Map<String, String> categories,
-	                              StoreCallback<Map<String, T>> callback) {
-		try {
-			Map<String, T> results = getBulk(keys, dataType, isHot, categories, false);
-			if (callback != null) {
-				callback.onSuccess(results);
-			}
-		} catch (Throwable e) {
-			if (callback != null) {
-				callback.onFailure("", e);
-			}
-		}
-	}
+//	@SuppressWarnings("unchecked")
+//	@Override
+//	public <T> Map<String, T> getBulk(Collection<String> keys, Class dataType, boolean isHot, Map<String, String> categories,
+//			boolean timeoutAware) {
+//		Map<String, T> map = new HashMap<String, T>();
+//		for (String key : keys) {
+//			Element element = findCache(categories == null ? null : categories.get(key)).get(key);
+//			map.put(key, (element == null ? null : (T) element.getObjectValue()));
+//		}
+//		return map;
+//	}
+//
+//	@Override
+//	public <T> void asyncBatchGet(Collection<String> keys, Class dataType, boolean isHot, Map<String, String> categories,
+//	                              StoreCallback<Map<String, T>> callback) {
+//		try {
+//			Map<String, T> results = getBulk(keys, dataType, isHot, categories, false);
+//			if (callback != null) {
+//				callback.onSuccess(results);
+//			}
+//		} catch (Throwable e) {
+//			if (callback != null) {
+//				callback.onFailure("", e);
+//			}
+//		}
+//	}
+//
+//    @Override
+//    public <T> void asyncBatchSet(List<String> keys, List<T> values, int expiration, boolean isHot, String category,
+//                                  StoreCallback<Boolean> callback) {
+//        try {
+//            for(int i=0; i<keys.size(); i++) {
+//                String key = keys.get(i);
+//                T value = values.get(i);
+//                set(key, value, expiration, isHot, category);
+//            }
+//        } catch (Exception e) {
+//            if(callback != null) {
+//                callback.onFailure("ehcache async batch set failed", e);
+//            }
+//        }
+//        if(callback != null) {
+//            callback.onSuccess(true);
+//        }
+//    }
+//    
+//    @Override
+//    public <T> boolean batchSet(List<String> keys, List<T> values, int expiration, boolean isHot, String category)
+//    throws TimeoutException, StoreException {
+//        for(int i=0; i<keys.size(); i++) {
+//            String key = keys.get(i);
+//            T value = values.get(i);
+//            set(key, value, expiration, isHot, category);
+//        }
+//        return true;
+//    }
 
     @Override
-    public <T> void asyncBatchSet(List<String> keys, List<T> values, int expiration, boolean isHot, String category,
-                                  StoreCallback<Boolean> callback) {
-        try {
-            for(int i=0; i<keys.size(); i++) {
-                String key = keys.get(i);
-                T value = values.get(i);
-                set(key, value, expiration, isHot, category);
-            }
-        } catch (Exception e) {
-            if(callback != null) {
-                callback.onFailure("ehcache async batch set failed", e);
+    protected <T> T doGet(CacheKeyType categoryConfig, String key) throws Exception {
+        String category = categoryConfig.getCategory();
+        T result = get(categoryConfig, key);
+
+        if (categoryConfig.isHot()) {
+            if (result == null) {
+                Element element = findCache(category).putIfAbsent(
+                        new Element(key + "_lock", true, false, 0, getHotkeyLockTime()));
+                boolean locked = (element == null);
+
+                if (locked) {
+                    return null;
+                } else {
+                    // 批量清理时，因为version升级了，所以bak数据要考虑从上一个版本中查找
+                    result = get(categoryConfig, key + "_bak");
+                    if (result == null) {
+                        String lastVersionKey = genLastVersionCacheKey(key);
+                        if (!key.equals(lastVersionKey)) {
+                            result = get(categoryConfig, lastVersionKey + "_bak");
+                        }
+                    }
+                    return result;
+                }
             }
         }
-        if(callback != null) {
-            callback.onSuccess(true);
-        }
+
+        return result;
     }
-    
+
     @Override
-    public <T> boolean batchSet(List<String> keys, List<T> values, int expiration, boolean isHot, String category)
-    throws TimeoutException, StoreException {
-        for(int i=0; i<keys.size(); i++) {
-            String key = keys.get(i);
-            T value = values.get(i);
-            set(key, value, expiration, isHot, category);
+    protected Boolean doSet(CacheKeyType categoryConfig, String key, Object value) throws Exception {
+        String category = categoryConfig.getCategory();
+        findCache(category).put(new Element(key, value, false, 0, categoryConfig.getDurationSeconds()));
+        if (categoryConfig.isHot()) {
+            findCache(category).put(new Element(key + "_bak", value, true, 0, 0));
+            String lastVersionKey = genLastVersionCacheKey(key);
+            // 当版本升级后，要清理上一个版本的hotkey数据
+            if (!key.equals(lastVersionKey)) {
+                findCache(category).remove(lastVersionKey + "_bak");
+            }
         }
         return true;
+    }
+
+    @Override
+    protected Boolean doAdd(CacheKeyType categoryConfig, String key, Object value) throws Exception {
+        String category = categoryConfig.getCategory();
+        Element element = findCache(category).
+                        putIfAbsent(new Element(key, value, false, 0, categoryConfig.getDurationSeconds()));
+        if(element == null) {
+            if (categoryConfig.isHot()) {
+                findCache(category).put(new Element(key + "_bak", value, true, 0, 0));
+                String lastVersionKey = genLastVersionCacheKey(key);
+                // 当版本升级后，要清理上一个版本的hotkey数据
+                if (!key.equals(lastVersionKey)) {
+                    findCache(category).remove(lastVersionKey + "_bak");
+                }
+            }
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    @Override
+    protected Boolean doDelete(CacheKeyType categoryConfig, String finalKey) throws Exception {
+        return findCache(categoryConfig.getCategory()).remove(finalKey);
+    }
+
+    @Override
+    protected <T> Future<T> doAsyncGet(CacheKeyType categoryConfig, String key) throws Exception {
+        T result = doGet(categoryConfig, key);
+        StoreFuture<T> future = new StoreFuture<T>(key);
+        future.onSuccess(result);
+        return future;
+    }
+
+    @Override
+    protected Future<Boolean> doAsyncSet(CacheKeyType categoryConfig, String key, Object value) throws Exception {
+        boolean result = doSet(categoryConfig, key, value);
+        StoreFuture<Boolean> future = new StoreFuture<Boolean>(key);
+        future.onSuccess(result);
+        return future;
+    }
+
+    @Override
+    protected Future<Boolean> doAsyncAdd(CacheKeyType categoryConfig, String key, Object value) throws Exception {
+        boolean result = doAdd(categoryConfig, key, value);
+        StoreFuture<Boolean> future = new StoreFuture<Boolean>(key);
+        future.onSuccess(result);
+        return future;
+    }
+
+    @Override
+    protected Future<Boolean> doAsyncDelete(CacheKeyType categoryConfig, String key) throws Exception {
+        boolean result = doDelete(categoryConfig, key);
+        StoreFuture<Boolean> future = new StoreFuture<Boolean>(key);
+        future.onSuccess(result);
+        return future;
+    }
+
+    @Override
+    protected <T> Void doAsyncGet(CacheKeyType categoryConfig, String finalKey, StoreCallback<T> callback)
+                                                                                                          throws Exception {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    protected Void doAsyncSet(CacheKeyType categoryConfig, String finalKey, Object value,
+                              StoreCallback<Boolean> callback) throws Exception {
+        boolean result = doSet(categoryConfig, finalKey, value);
+        if (callback != null) {
+            callback.onSuccess(result);
+        }
+        return null;
+    }
+
+    @Override
+    protected Void doAsyncAdd(CacheKeyType categoryConfig, String finalKey, Object value,
+                              StoreCallback<Boolean> callback) throws Exception {
+        boolean result = doAdd(categoryConfig, finalKey, value);
+        if(callback != null) {
+            callback.onSuccess(result);
+        }
+        return null;
+    }
+
+    @Override
+    protected Void doAsyncDelete(CacheKeyType categoryConfig, String finalKey, 
+                                 StoreCallback<Boolean> callback) throws Exception {
+        boolean result = doDelete(categoryConfig, finalKey);
+        if(callback != null) {
+            callback.onSuccess(result);
+        }
+        return null;
+    }
+
+    @Override
+    protected Long doIncrease(CacheKeyType categoryConfig, String finalKey, int amount) throws Exception {
+        throw new UnsupportedOperationException("ehcache does not support increase operation");
+    }
+
+    @Override
+    protected Long doDecrease(CacheKeyType categoryConfig, String key, int amount) throws Exception {
+        throw new UnsupportedOperationException("ehcache does not support decrease operation");
     }
     
 }

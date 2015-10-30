@@ -287,4 +287,9 @@ public class DefaultStoreClient implements StoreClient {
         }
     }
 
+    @Override
+    public boolean isDistributed() {
+        return false;
+    }
+
 }

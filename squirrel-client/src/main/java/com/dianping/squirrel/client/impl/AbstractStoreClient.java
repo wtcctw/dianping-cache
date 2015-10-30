@@ -350,6 +350,11 @@ public abstract class AbstractStoreClient implements StoreClient {
 		return  null;
 	}
 
+    @Override
+    public boolean isDistributed() {
+        return true;
+    }
+    
 	protected <T> T executeWithMonitor(Command command, CacheKeyType categoryConfig, String finalKey, String action) {
 		String storeType = categoryConfig.getCacheType();
 		String category = categoryConfig.getCategory();

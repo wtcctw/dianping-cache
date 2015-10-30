@@ -52,5 +52,7 @@ public interface StoreClient {
 
     // final key operations
     public Boolean delete(String finalKey) throws StoreException;
+    
+    public boolean isDistributed();
 
 }
