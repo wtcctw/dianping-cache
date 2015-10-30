@@ -385,4 +385,8 @@ public class EhcacheStoreClientImpl extends AbstractStoreClient implements Lifec
         throw new UnsupportedOperationException("ehcache does not support decrease operation");
     }
     
+    protected boolean needMonitor(String cacheType) {
+        return false;
+    }
+    
 }
