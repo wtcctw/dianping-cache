@@ -13,6 +13,7 @@ import java.util.concurrent.TimeoutException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.dianping.squirrel.client.StoreKey;
 import com.dianping.squirrel.client.config.CacheKeyType;
 import com.dianping.squirrel.client.core.StoreCallback;
 import com.dianping.squirrel.client.core.StoreClientConfig;
@@ -145,153 +146,6 @@ public class DCacheStoreClientImpl extends AbstractStoreClient implements DCache
 	public DCacheClientAPI getClient() {
 		return client;
 	}
-
-//	@Override
-//	public <T> Map<String, T> getBulk(Collection<String> keys, Class dataType, boolean isHot, Map<String, String> categories,
-//			boolean timeoutAware) throws Exception {
-//		keys = CacheKeyUtils.reformKeys(keys);
-//		Map<String, T> result = null;
-//		List<Object> list = new ArrayList<Object>(keys.size());
-//		for (String k : keys) {
-//			list.add(k);
-//		}
-//		String category = null;
-//		if (categories != null && !categories.isEmpty()) {
-//			category = categories.values().iterator().next();
-//		}
-//		try {
-//			BatchKVCacheResult batchResult = getKVClient().batchGet(list);
-//			if (batchResult != null) {
-//				if (batchResult.getCode() == DCacheConst.ET_SUCC) {
-//					result = new HashMap<String, T>();
-//					Map<Object, CacheValue> resultMap = batchResult.getValueMap();
-//					Set<Entry<Object, CacheValue>> entrySet = resultMap.entrySet();
-//					for (Entry<Object, CacheValue> entry : entrySet) {
-//						CacheValue keyResult = entry.getValue();
-//						result.put((String) entry.getKey(), (T) keyResult.getValue());
-//					}
-//					return CacheKeyUtils.reformBackKeys(result);
-//				} else if (batchResult.getCode() == DCacheConst.ET_KEY_INVALID
-//						|| batchResult.getCode() == DCacheConst.ET_INPUT_PARAM_ERROR) {
-//					return null;
-//				}
-//			}
-//			throw new StoreException("dcache operation failed, error code:"
-//					+ (result == null ? "" : batchResult.getCode()));
-//		} catch (Exception e) {
-//			if (e instanceof StoreException) {
-//				throw e;
-//			} else {
-//				throw new StoreException(e);
-//			}
-//		}
-//	}
-//
-//	@Override
-//	public <T> void asyncBatchGet(Collection<String> keys, Class dataType, boolean isHot, Map<String, String> categories,
-//			final CacheCallback<Map<String, T>> callback) {
-//		try {
-//			ClientCallback<BatchKVCacheResult> dcacheCallback = new ClientCallback<BatchKVCacheResult>() {
-//
-//				@Override
-//				public void onCompleted(BatchKVCacheResult result) {
-//					if (result.getCode() == DCacheConst.ET_SUCC) {
-//						Map<Object, CacheValue> dcacheResults = result.getValueMap();
-//						Map<String, T> results = new HashMap<String, T>(dcacheResults.size());
-//						for (Object k : dcacheResults.keySet()) {
-//							results.put(k.toString(), (T) dcacheResults.get(k).getValue());
-//						}
-//						callback.onSuccess(results);
-//					} else {
-//						callback.onFailure("DCache result code:" + result.getCode(), null);
-//					}
-//				}
-//
-//				@Override
-//				public void onException(Throwable th) {
-//					callback.onFailure("DCache error", th);
-//				}
-//
-//				@Override
-//				public void onTimeout() {
-//					callback.onFailure("DCache timeout", new TimeoutException("DCache timeout"));
-//				}
-//
-//			};
-//			List<Object> keyList = new ArrayList<Object>(keys.size());
-//			for (String key : keys) {
-//				keyList.add(key);
-//			}
-//			getKVClient().asyncBatchGet(keyList, dcacheCallback);
-//		} catch (Exception e) {
-//			callback.onFailure("", e);
-//		}
-//	}
-//
-//    @Override
-//    public <T> void asyncBatchSet(List<String> keys, List<T> values, int expiration, boolean isHot, String category,
-//            final CacheCallback<Boolean> callback) {
-//        ClientCallback<BatchKVCacheResult> dcacheCallback = null;
-//        if(callback != null) {
-//            dcacheCallback = new ClientCallback<BatchKVCacheResult>() {
-//
-//                @Override
-//                public void onCompleted(BatchKVCacheResult result) {
-//                    if (result.getCode() == DCacheConst.ET_SUCC) {
-//                        callback.onSuccess(true);
-//                    } else {
-//                        callback.onFailure("dcache batchset error code:" + result.getCode(), null);
-//                    }
-//                }
-//
-//                @Override
-//                public void onException(Throwable th) {
-//                    callback.onFailure("dcache batchset error", th);
-//                }
-//
-//                @Override
-//                public void onTimeout() {
-//                    callback.onFailure("dcache batchset timeout", new TimeoutException("dcache batchset timeout"));
-//                }
-//
-//            };
-//        }
-//        
-//        try {
-//            Map<Object, InputValue> kvs = new HashMap<Object, InputValue>();
-//            for(int i=0; i<keys.size(); i++) {
-//                String key = keys.get(i);
-//                InputValue iv = getInputValue(values.get(i), expiration);
-//                kvs.put(key, iv);
-//            }
-//            getKVClient().asyncBatchSet(kvs, dcacheCallback);
-//        } catch (Exception e) {
-//            callback.onFailure("", e);
-//        }
-//    }
-//    
-//    @Override
-//    public <T> boolean batchSet(List<String> keys, List<T> values, int expiration, boolean isHot, String category)
-//            throws StoreException, TimeoutException {
-//        BatchKVCacheResult result = null;
-//        Map<Object, InputValue> kvs = new HashMap<Object, InputValue>();
-//        for(int i=0; i<keys.size(); i++) {
-//            String key = keys.get(i);
-//            InputValue iv = getInputValue(values.get(i), expiration);
-//            kvs.put(key, iv);
-//        }
-//        try {
-//            result = getKVClient().batchSet(kvs);
-//            if(result.getCode() == DCacheConst.ET_SUCC) {
-//                return true;
-//            }
-//            throw new StoreException("dcache batch set failed, error code: " + result.getCode());
-//        } catch(TimeoutException e) {
-//            throw e;
-//        } catch (Exception e) {
-//            throw new StoreException(e);
-//        }
-//    }
     
     private InputValue getInputValue(Object value, int expiration) {
         if(expiration <= 0) {
@@ -627,6 +481,124 @@ public class DCacheStoreClientImpl extends AbstractStoreClient implements DCache
     @Override
     protected Long doDecrease(CacheKeyType categoryConfig, String finalKey, int amount) {
         throw new UnsupportedOperationException("dcache does not support decrease operation");
+    }
+
+    @Override
+    protected <T> Map<String, T> doMultiGet(CacheKeyType categoryConfig, List<String> keys) throws Exception {
+        Map<String, T> result = null;
+        List<Object> list = new ArrayList<Object>(keys);
+        
+        BatchKVCacheResult batchResult = getKVClient().batchGet(list);
+        if (batchResult != null) {
+            if (batchResult.getCode() == DCacheConst.ET_SUCC) {
+                result = new HashMap<String, T>();
+                Map<Object, CacheValue> resultMap = batchResult.getValueMap();
+                Set<Entry<Object, CacheValue>> entrySet = resultMap.entrySet();
+                for (Entry<Object, CacheValue> entry : entrySet) {
+                    CacheValue keyResult = entry.getValue();
+                    result.put((String) entry.getKey(), (T) keyResult.getValue());
+                }
+                return result;
+            } else if (batchResult.getCode() == DCacheConst.ET_KEY_INVALID
+                || batchResult.getCode() == DCacheConst.ET_INPUT_PARAM_ERROR) {
+                return null;
+            }
+        }
+        throw new StoreException("dcache operation failed, error code: "
+            + (result == null ? "" : batchResult.getCode()));
+    }
+
+    @Override
+    protected <T> Void doAsyncMultiGet(CacheKeyType categoryConfig, List<String> finalKeyList,
+                                       final StoreCallback<Map<String, T>> callback) throws Exception {
+        ClientCallback<BatchKVCacheResult> dcacheCallback = new ClientCallback<BatchKVCacheResult>() {
+
+            @Override
+            public void onCompleted(BatchKVCacheResult result) {
+                if (result.getCode() == DCacheConst.ET_SUCC) {
+                    Map<Object, CacheValue> dcacheResults = result.getValueMap();
+                    Map<String, T> results = new HashMap<String, T>(dcacheResults.size());
+                    for (Object k : dcacheResults.keySet()) {
+                        results.put(k.toString(), (T) dcacheResults.get(k).getValue());
+                    }
+                    callback.onSuccess(results);
+                } else {
+                    callback.onFailure("dcache async multi get failed, result code: " + result.getCode(), null);
+                }
+            }
+
+            @Override
+            public void onException(Throwable th) {
+                callback.onFailure("dcache async multi get failed", th);
+            }
+
+            @Override
+            public void onTimeout() {
+                callback.onFailure("dcache async multi get timeout", new TimeoutException("dcache async multi get timeout"));
+            }
+
+        };
+        
+        List<Object> keyList = new ArrayList<Object>(finalKeyList);
+        getKVClient().asyncBatchGet(keyList, dcacheCallback);
+        return null;
+    }
+
+    @Override
+    protected <T> Boolean doMultiSet(CacheKeyType categoryConfig, List<String> keys, List<T> values) throws Exception {
+        BatchKVCacheResult result = null;
+        Map<Object, InputValue> kvs = new HashMap<Object, InputValue>();
+        for (int i = 0; i < keys.size(); i++) {
+            String key = keys.get(i);
+            InputValue iv = getInputValue(values.get(i), categoryConfig.getDurationSeconds());
+            kvs.put(key, iv);
+        }
+        
+        result = getKVClient().batchSet(kvs);
+        if (result.getCode() == DCacheConst.ET_SUCC) {
+            return true;
+        }
+        throw new StoreException("dcache multi set failed, error code: " + result.getCode());
+    }
+
+    @Override
+    public <T> Void doAsyncMultiSet(CacheKeyType categoryConfig, List<String> keys, List<T> values,
+                                    final StoreCallback<Boolean> callback) throws Exception {
+        ClientCallback<BatchKVCacheResult> dcacheCallback = null;
+        if (callback != null) {
+            dcacheCallback = new ClientCallback<BatchKVCacheResult>() {
+
+                @Override
+                public void onCompleted(BatchKVCacheResult result) {
+                    if (result.getCode() == DCacheConst.ET_SUCC) {
+                        callback.onSuccess(true);
+                    } else {
+                        callback.onFailure("dcache async multi set failed, error code: " + result.getCode(), null);
+                    }
+                }
+
+                @Override
+                public void onException(Throwable th) {
+                    callback.onFailure("dcache async multi set failed", th);
+                }
+
+                @Override
+                public void onTimeout() {
+                    callback.onFailure("dcache async multi set timeout", new TimeoutException("dcache async multi set timeout"));
+                }
+
+            };
+        }
+
+        Map<Object, InputValue> kvs = new HashMap<Object, InputValue>();
+        int expiration = categoryConfig.getDurationSeconds();
+        for (int i = 0; i < keys.size(); i++) {
+            String key = keys.get(i);
+            InputValue iv = getInputValue(values.get(i), expiration);
+            kvs.put(key, iv);
+        }
+        getKVClient().asyncBatchSet(kvs, dcacheCallback);
+        return null;
     }
 
 }

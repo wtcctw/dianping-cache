@@ -13,12 +13,10 @@
 package com.dianping.squirrel.client.impl.ehcache;
 
 import java.lang.management.ManagementFactory;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Future;
-import java.util.concurrent.TimeoutException;
 
 import javax.management.MBeanServer;
 
@@ -29,14 +27,11 @@ import net.sf.ehcache.constructs.blocking.BlockingCache;
 import net.sf.ehcache.management.ManagementService;
 
 import com.dianping.squirrel.client.config.CacheKeyType;
+import com.dianping.squirrel.client.core.Lifecycle;
 import com.dianping.squirrel.client.core.StoreCallback;
-import com.dianping.squirrel.client.core.CacheClient;
 import com.dianping.squirrel.client.core.StoreClientConfig;
 import com.dianping.squirrel.client.core.StoreFuture;
-import com.dianping.squirrel.client.core.Lifecycle;
 import com.dianping.squirrel.client.impl.AbstractStoreClient;
-import com.dianping.squirrel.client.impl.memcached.CASResponse;
-import com.dianping.squirrel.client.impl.memcached.CASValue;
 import com.dianping.squirrel.common.config.ConfigManagerLoader;
 import com.dianping.squirrel.common.exception.StoreException;
 import com.google.common.eventbus.EventBus;
@@ -179,63 +174,6 @@ public class EhcacheStoreClientImpl extends AbstractStoreClient implements Lifec
 		return cache;
 	}
 
-//	@SuppressWarnings("unchecked")
-//	@Override
-//	public <T> Map<String, T> getBulk(Collection<String> keys, Class dataType, boolean isHot, Map<String, String> categories,
-//			boolean timeoutAware) {
-//		Map<String, T> map = new HashMap<String, T>();
-//		for (String key : keys) {
-//			Element element = findCache(categories == null ? null : categories.get(key)).get(key);
-//			map.put(key, (element == null ? null : (T) element.getObjectValue()));
-//		}
-//		return map;
-//	}
-//
-//	@Override
-//	public <T> void asyncBatchGet(Collection<String> keys, Class dataType, boolean isHot, Map<String, String> categories,
-//	                              StoreCallback<Map<String, T>> callback) {
-//		try {
-//			Map<String, T> results = getBulk(keys, dataType, isHot, categories, false);
-//			if (callback != null) {
-//				callback.onSuccess(results);
-//			}
-//		} catch (Throwable e) {
-//			if (callback != null) {
-//				callback.onFailure("", e);
-//			}
-//		}
-//	}
-//
-//    @Override
-//    public <T> void asyncBatchSet(List<String> keys, List<T> values, int expiration, boolean isHot, String category,
-//                                  StoreCallback<Boolean> callback) {
-//        try {
-//            for(int i=0; i<keys.size(); i++) {
-//                String key = keys.get(i);
-//                T value = values.get(i);
-//                set(key, value, expiration, isHot, category);
-//            }
-//        } catch (Exception e) {
-//            if(callback != null) {
-//                callback.onFailure("ehcache async batch set failed", e);
-//            }
-//        }
-//        if(callback != null) {
-//            callback.onSuccess(true);
-//        }
-//    }
-//    
-//    @Override
-//    public <T> boolean batchSet(List<String> keys, List<T> values, int expiration, boolean isHot, String category)
-//    throws TimeoutException, StoreException {
-//        for(int i=0; i<keys.size(); i++) {
-//            String key = keys.get(i);
-//            T value = values.get(i);
-//            set(key, value, expiration, isHot, category);
-//        }
-//        return true;
-//    }
-
     @Override
     protected <T> T doGet(CacheKeyType categoryConfig, String key) throws Exception {
         String category = categoryConfig.getCategory();
@@ -339,9 +277,10 @@ public class EhcacheStoreClientImpl extends AbstractStoreClient implements Lifec
     }
 
     @Override
-    protected <T> Void doAsyncGet(CacheKeyType categoryConfig, String finalKey, StoreCallback<T> callback)
-                                                                                                          throws Exception {
-        // TODO Auto-generated method stub
+    protected <T> Void doAsyncGet(CacheKeyType categoryConfig, String finalKey, 
+                                  StoreCallback<T> callback) throws Exception {
+        T result = doGet(categoryConfig, finalKey);
+        callback.onSuccess(result);
         return null;
     }
 
@@ -349,9 +288,7 @@ public class EhcacheStoreClientImpl extends AbstractStoreClient implements Lifec
     protected Void doAsyncSet(CacheKeyType categoryConfig, String finalKey, Object value,
                               StoreCallback<Boolean> callback) throws Exception {
         boolean result = doSet(categoryConfig, finalKey, value);
-        if (callback != null) {
-            callback.onSuccess(result);
-        }
+        callback.onSuccess(result);
         return null;
     }
 
@@ -359,9 +296,7 @@ public class EhcacheStoreClientImpl extends AbstractStoreClient implements Lifec
     protected Void doAsyncAdd(CacheKeyType categoryConfig, String finalKey, Object value,
                               StoreCallback<Boolean> callback) throws Exception {
         boolean result = doAdd(categoryConfig, finalKey, value);
-        if(callback != null) {
-            callback.onSuccess(result);
-        }
+        callback.onSuccess(result);
         return null;
     }
 
@@ -369,9 +304,7 @@ public class EhcacheStoreClientImpl extends AbstractStoreClient implements Lifec
     protected Void doAsyncDelete(CacheKeyType categoryConfig, String finalKey, 
                                  StoreCallback<Boolean> callback) throws Exception {
         boolean result = doDelete(categoryConfig, finalKey);
-        if(callback != null) {
-            callback.onSuccess(result);
-        }
+        callback.onSuccess(result);
         return null;
     }
 
@@ -387,6 +320,42 @@ public class EhcacheStoreClientImpl extends AbstractStoreClient implements Lifec
     
     protected boolean needMonitor(String cacheType) {
         return false;
+    }
+
+    @Override
+    protected <T> Map<String, T> doMultiGet(CacheKeyType categoryConfig, List<String> finalKeyList) throws Exception {
+        Map<String, T> map = new HashMap<String, T>();
+        for (String key : finalKeyList) {
+            T result = doGet(categoryConfig, key);
+            map.put(key, result);
+        }
+        return map;
+    }
+
+    @Override
+    protected <T> Void doAsyncMultiGet(CacheKeyType categoryConfig, List<String> finalKeyList,
+                                       StoreCallback<Map<String, T>> callback) throws Exception {
+        Map<String, T> result = doMultiGet(categoryConfig, finalKeyList);
+        callback.onSuccess(result);
+        return null;
+    }
+
+    @Override
+    protected <T> Boolean doMultiSet(CacheKeyType categoryConfig, List<String> keys, List<T> values) throws Exception {
+        for (int i = 0; i < keys.size(); i++) {
+            String key = keys.get(i);
+            T value = values.get(i);
+            doSet(categoryConfig, key, value);
+        }
+        return true;
+    }
+
+    @Override
+    public <T> Void doAsyncMultiSet(CacheKeyType categoryConfig, List<String> keys, List<T> values,
+                                    StoreCallback<Boolean> callback) throws Exception {
+        doMultiSet(categoryConfig, keys, values);
+        callback.onSuccess(true);
+        return null;
     }
     
 }

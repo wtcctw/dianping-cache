@@ -165,6 +165,34 @@ public class RedisStoreClientImpl extends AbstractStoreClient implements RedisSt
         return null;
     }
     
+
+    @Override
+    protected <T> Map<String, T> doMultiGet(CacheKeyType categoryConfig, List<String> finalKeyList) throws Exception {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    protected <T> Void doAsyncMultiGet(CacheKeyType categoryConfig, List<String> finalKeyList,
+                                       StoreCallback<Map<String, T>> callback) throws Exception {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    protected <T> Boolean doMultiSet(CacheKeyType categoryConfig, List<String> finalKeyList, 
+                                     List<T> values) throws Exception {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public <T> Void doAsyncMultiSet(CacheKeyType categoryConfig, List<String> keys, List<T> values,
+                                    StoreCallback<Boolean> callback) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+    
     @Override
     public Boolean exists(StoreKey key) {
         if (key == null) {

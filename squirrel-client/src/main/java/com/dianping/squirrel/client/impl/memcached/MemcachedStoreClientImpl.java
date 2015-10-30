@@ -924,8 +924,8 @@ public class MemcachedStoreClientImpl extends AbstractStoreClient implements Mem
     }
 
     @Override
-    protected Void doAsyncDelete(CacheKeyType categoryConfig, String finalKey, StoreCallback<Boolean> callback)
-                                                                                                               throws Exception {
+    protected Void doAsyncDelete(CacheKeyType categoryConfig, String finalKey, 
+                                 StoreCallback<Boolean> callback) throws Exception {
         // TODO Auto-generated method stub
         return null;
     }
@@ -960,6 +960,58 @@ public class MemcachedStoreClientImpl extends AbstractStoreClient implements Mem
             NodeMonitor.getInstance().logNode(client, finalKey, MSG_EXCEPTION, categoryConfig.getCategory());
             throw new StoreException(e);
         }
+    }
+
+    @Override
+    protected <T> Map<String, T> doMultiGet(CacheKeyType categoryConfig, List<String> keys) throws Exception {
+        MemcachedClient client = getReadClient();
+        try {
+            // use timeout to eliminate memcached servers' crash
+            Map<String, T> result = (Map<String, T>) doGetBulk(client, keys, timeoutMGet);
+            NodeMonitor.getInstance().logNode(client, keys, MSG_SUCCESS, "");
+            return result;
+        } catch (TimeoutException e) {
+            NodeMonitor.getInstance().logNode(client, keys, MSG_TIMEOUT, "");
+            throw e;
+        } catch (Exception e) {
+            NodeMonitor.getInstance().logNode(client, keys, MSG_EXCEPTION, "");
+            throw e;
+        }
+    }
+
+    @Override
+    protected <T> Void doAsyncMultiGet(CacheKeyType categoryConfig, final List<String> keys,
+                                       final StoreCallback<Map<String, T>> callback) throws Exception {
+        MemcachedClient client = getReadClient();
+
+        BulkFuture<Map<String, Object>> future = client.asyncGetBulk(keys);
+        future.addListener(new BulkGetCompletionListener() {
+
+            @Override
+            public void onComplete(BulkGetFuture<?> future) throws Exception {
+                OperationStatus status = future.getStatus();
+                if (status.isSuccess() || status.getStatusCode() == StatusCode.ERR_NOT_FOUND) {
+                    Map<String, T> result = (Map<String, T>) future.get();
+                    callback.onSuccess(result);
+                } else {
+                    callback.onFailure("memcached async multi mget failed, error: " + status.getMessage(), null);
+                }
+            }
+            
+        });
+        return null;
+    }
+
+    @Override
+    protected <T> Boolean doMultiSet(CacheKeyType categoryConfig, List<String> finalKeyList, 
+                                     List<T> values) throws Exception {
+        throw new UnsupportedOperationException("memcached does not support multi set");
+    }
+
+    @Override
+    public <T> Void doAsyncMultiSet(CacheKeyType categoryConfig, List<String> keys, List<T> values,
+                                    StoreCallback<Boolean> callback) throws Exception {
+        throw new UnsupportedOperationException("memcached does not support async multi set");
     }
     
 }
