@@ -296,6 +296,8 @@ public class DCacheStoreClientImpl extends AbstractStoreClient implements DCache
             public void onCompleted(KVCacheResult result) {
                 if (result.getCode() == DCacheConst.ET_SUCC) {
                     future.onSuccess(true);
+                } else if(result.getCode() == DCacheConst.ET_DATA_VER_MISMATCH) {
+                    future.onSuccess(false);
                 } else {
                     future.onFailure(new StoreException("dcache async add failed, error code: " + result.getCode()));
                 }

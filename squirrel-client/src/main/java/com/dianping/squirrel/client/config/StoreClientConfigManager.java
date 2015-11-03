@@ -35,6 +35,7 @@ import com.dianping.squirrel.client.core.CacheConfiguration;
 import com.dianping.squirrel.client.core.StoreClientConfig;
 import com.dianping.squirrel.client.impl.dcache.DCacheStoreClientImpl;
 import com.dianping.squirrel.client.impl.dcache.DCacheTranscoder;
+import com.dianping.squirrel.client.impl.ehcache.EhcacheStoreClientImpl;
 import com.dianping.squirrel.client.impl.memcached.MemcachedStoreClientImpl;
 import com.dianping.squirrel.client.impl.redis.RedisStoreClientImpl;
 import com.dianping.squirrel.common.config.ConfigManager;
@@ -177,6 +178,8 @@ public class StoreClientConfigManager {
 		    configuration.setTranscoderClazz(DCacheTranscoder.class.getName());
 		} else if (cacheKey.startsWith("redis")) {
             configuration.setClientClazz(RedisStoreClientImpl.class.getName());
+        } else if(cacheKey.startsWith("web") || cacheKey.startsWith("ehcache")) {
+            configuration.setClientClazz(EhcacheStoreClientImpl.class.getName());
         }
 		
 		StoreClientConfig cacheClientConfig = StoreClientConfigHelper.parse(configuration);
