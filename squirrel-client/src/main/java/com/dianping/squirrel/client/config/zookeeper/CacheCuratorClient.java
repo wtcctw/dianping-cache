@@ -248,7 +248,7 @@ public class CacheCuratorClient {
 
 	private void _syncAll() throws Exception {
 		if (PathUtils.isZookeeperEnabled() && isZookeeperConnected()) {
-			Transaction t = Cat.getProducer().newTransaction("Cache.sync", "syncAll");
+			Transaction t = Cat.getProducer().newTransaction("Store.sync", "syncAll");
 			try {
 				syncAllServices();
 				syncAllCategories();

@@ -6,6 +6,7 @@ import java.io.UnsupportedEncodingException;
 
 import org.junit.Test;
 
+import com.dianping.squirrel.client.impl.Bean;
 import com.dianping.squirrel.common.serialize.HessianSerializer;
 
 public class RedisStringTranscoderTest {

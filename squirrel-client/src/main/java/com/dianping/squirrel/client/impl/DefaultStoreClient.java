@@ -1,7 +1,9 @@
 package com.dianping.squirrel.client.impl;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Future;
@@ -12,6 +14,8 @@ import org.slf4j.LoggerFactory;
 import com.dianping.squirrel.client.StoreClient;
 import com.dianping.squirrel.client.StoreClientFactory;
 import com.dianping.squirrel.client.StoreKey;
+import com.dianping.squirrel.client.config.CacheKeyType;
+import com.dianping.squirrel.client.config.StoreCategoryConfigManager;
 import com.dianping.squirrel.client.core.StoreCallback;
 import com.dianping.squirrel.client.log.LoggerLoader;
 import com.dianping.squirrel.client.monitor.SizeMonitor;
@@ -249,29 +253,80 @@ public class DefaultStoreClient implements StoreClient {
 	@Override
 	public <T> Map<StoreKey, T> multiGet(List<StoreKey> keys)
 			throws StoreException {
-		// TODO Auto-generated method stub
-		return null;
+	    checkNotNull(keys, "store key list is null");
+        if(keys.size() == 0) {
+            return Collections.EMPTY_MAP;
+        }
+        
+        StoreClient storeClient = StoreClientFactory.getStoreClientByCategory(keys.get(0).getCategory());
+        checkNotNull(storeClient, "no store client for category %s", keys.get(0).getCategory());
+        if(enable) {
+            return storeClient.multiGet(keys);
+        } else {
+            return null;
+        }
 	}
 
 	@Override
 	public <T> Void asyncMultiGet(List<StoreKey> keys,
 			StoreCallback<Map<StoreKey, T>> callback) {
-		// TODO Auto-generated method stub
-		return null;
+	    checkNotNull(keys, "store key list is null");
+        checkNotNull(callback, "callback is null");
+        if(keys.size() == 0) {
+            callback.onSuccess(Collections.EMPTY_MAP);
+            return null;
+        }
+        
+        String category = keys.get(0).getCategory();
+        StoreClient storeClient = StoreClientFactory.getStoreClientByCategory(category);
+        checkNotNull(storeClient, "no store client for category %s", category);
+        if(enable) {
+            return storeClient.asyncMultiGet(keys, callback);
+        } else {
+            return null;
+        }
 	}
 
 	@Override
 	public <T> Boolean multiSet(List<StoreKey> keys, List<T> values)
 			throws StoreException {
-		// TODO Auto-generated method stub
-		return false;
+	    checkNotNull(keys, "store key list is null");
+        checkNotNull(values, "value list is null");
+        checkArgument(keys.size() == values.size(), "key size is not equal to value size");
+        if(keys.size() == 0) {
+            return false;
+        }
+        
+        String category = keys.get(0).getCategory();
+        StoreClient storeClient = StoreClientFactory.getStoreClientByCategory(category);
+        checkNotNull(storeClient, "no store client for category %s", category);
+        if(enable) {
+            return storeClient.multiSet(keys, values);
+        } else {
+            return null;
+        }
 	}
 
 	@Override
 	public <T> Void asyncMultiSet(List<StoreKey> keys, List<T> values,
 			StoreCallback<Boolean> callback) {
-		// TODO Auto-generated method stub
-		return null;
+	    checkNotNull(keys, "store key list is null");
+        checkNotNull(values, "value list is null");
+        checkNotNull(callback, "callback is null");
+        checkArgument(keys.size() == values.size(), "key size is not equal to value size");
+        if(keys.size() == 0) {
+            callback.onSuccess(true);
+            return null;
+        }
+        
+        String category = keys.get(0).getCategory();
+        StoreClient storeClient = StoreClientFactory.getStoreClientByCategory(category);
+        checkNotNull(storeClient, "no store client for category %s", category);
+        if(enable) {
+            return storeClient.asyncMultiSet(keys, values, callback);
+        } else {
+            return null;
+        }
 	}
 
     @Override
@@ -285,6 +340,14 @@ public class DefaultStoreClient implements StoreClient {
         } else {
             return false;
         }
+    }
+    
+    @Override
+    public String getFinalKey(StoreKey storeKey) {
+        checkNotNull(storeKey, "store key is null");
+        CacheKeyType categoryConfig = StoreCategoryConfigManager.getInstance().findCacheKeyType(storeKey.getCategory());
+        checkNotNull(categoryConfig, "%s's category config is null", storeKey.getCategory());
+        return categoryConfig.getKey(storeKey.getParams());
     }
 
     @Override

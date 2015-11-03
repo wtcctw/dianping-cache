@@ -35,6 +35,7 @@ import com.dianping.squirrel.client.core.CacheConfiguration;
 import com.dianping.squirrel.client.core.StoreClientConfig;
 import com.dianping.squirrel.client.impl.dcache.DCacheStoreClientImpl;
 import com.dianping.squirrel.client.impl.dcache.DCacheTranscoder;
+import com.dianping.squirrel.client.impl.memcached.MemcachedStoreClientImpl;
 import com.dianping.squirrel.client.impl.redis.RedisStoreClientImpl;
 import com.dianping.squirrel.common.config.ConfigManager;
 import com.dianping.squirrel.common.config.ConfigManagerLoader;
@@ -169,30 +170,14 @@ public class StoreClientConfigManager {
 		logger.warn("register cache service: " + configuration);
 		String cacheKey = configuration.getCacheKey();
 
-		if (cacheKey.startsWith("dcache")) {
+		if(cacheKey.startsWith("memcache")) {
+		    configuration.setClientClazz(MemcachedStoreClientImpl.class.getName());
+		} else if (cacheKey.startsWith("dcache")) {
 		    configuration.setClientClazz(DCacheStoreClientImpl.class.getName());
 		    configuration.setTranscoderClazz(DCacheTranscoder.class.getName());
-		}
-		if (cacheKey.startsWith("redis")) {
+		} else if (cacheKey.startsWith("redis")) {
             configuration.setClientClazz(RedisStoreClientImpl.class.getName());
         }
-		// deprecated
-		if ("com.dianping.cache.memcached.HessianTranscoder".equals(configuration.getTranscoderClazz())) {
-		    String classLocal = null;
-		    String transcoderClassLocal = null;
-		    String classKey = "avatar-cache.class$" + configuration.getClientClazz();
-		    String transcoderClassKey = "avatar-cache.transcoderclass$" + configuration.getTranscoderClazz();
-		    
-		    classLocal = ConfigManagerLoader.getConfigManager().getStringValue(classKey);
-		    transcoderClassLocal = ConfigManagerLoader.getConfigManager().getStringValue(transcoderClassKey);
-		    
-		    if (StringUtils.isNotBlank(classLocal)) {
-		        configuration.setClientClazz(classLocal);
-		    }
-		    if (StringUtils.isNotBlank(transcoderClassLocal)) {
-		        configuration.setTranscoderClazz(transcoderClassLocal);
-		    }
-		}
 		
 		StoreClientConfig cacheClientConfig = StoreClientConfigHelper.parse(configuration);
 		if (cacheClientConfig != null) {

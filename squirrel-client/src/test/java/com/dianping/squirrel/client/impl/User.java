@@ -1,4 +1,4 @@
-package com.dianping.squirrel.client.impl.redis;
+package com.dianping.squirrel.client.impl;
 
 import java.io.Serializable;
 import java.util.ArrayList;

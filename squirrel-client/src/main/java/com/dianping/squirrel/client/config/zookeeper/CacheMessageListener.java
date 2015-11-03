@@ -33,7 +33,7 @@ public class CacheMessageListener implements CuratorListener {
 
     private static Logger logger = LoggerFactory.getLogger(CacheMessageListener.class);
 
-    public static final String CAT_EVENT_TYPE = "Cache.notifications";
+    public static final String CAT_EVENT_TYPE = "Store.notifications";
     public static final String CACHE_SERVICE_PATH = "/dp/cache/service/";
     public static final String CACHE_CATEGORY_PATH = "/dp/cache/category/";
     public static final String VERSION_SUFFIX = "/version";

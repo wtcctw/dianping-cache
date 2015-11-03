@@ -487,7 +487,15 @@ public abstract class AbstractStoreClient implements StoreClient {
 
 	public abstract <T> Void doAsyncMultiSet(CacheKeyType categoryConfig, List<String> keys, List<T> values, 
 	                                         StoreCallback<Boolean> callback) throws Exception;
-	
+
+    @Override
+    public String getFinalKey(StoreKey storeKey) {
+        checkNotNull(storeKey, "store key is null");
+        CacheKeyType categoryConfig = configManager.findCacheKeyType(storeKey.getCategory());
+        checkNotNull(categoryConfig, "%s's category config is null", storeKey.getCategory());
+        return categoryConfig.getKey(storeKey.getParams());
+    }
+    
     @Override
     public boolean isDistributed() {
         return true;
@@ -596,5 +604,5 @@ public abstract class AbstractStoreClient implements StoreClient {
 	    Object execute() throws Exception;
 	    
 	}
-	
+
 }

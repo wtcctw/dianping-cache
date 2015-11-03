@@ -11,13 +11,19 @@ import org.junit.Test;
 
 import com.dianping.squirrel.client.StoreClientFactory;
 import com.dianping.squirrel.client.StoreKey;
+import com.dianping.squirrel.client.impl.Bean;
+import com.dianping.squirrel.client.impl.User;
 
 public class RedisStoreClientImplTest {
     
+    private static final String STORE_TYPE = "redis-hua";
+    
+    private static final String CATEGORY = "myredis";
+    
     @Test
     public void testCommon() throws InterruptedException {
-        RedisStoreClient redisClient = (RedisStoreClient) StoreClientFactory.getStoreClient("redis-hua");
-        StoreKey key = new StoreKey("myredis", "string");
+        RedisStoreClient redisClient = (RedisStoreClient) StoreClientFactory.getStoreClient(STORE_TYPE);
+        StoreKey key = new StoreKey(CATEGORY, "string");
         Object value = redisClient.delete(key);
         value = redisClient.ttl(key);
         assertEquals(value, -2L);
@@ -74,8 +80,8 @@ public class RedisStoreClientImplTest {
 
     @Test
     public void testHash() {
-        RedisStoreClient redisClient = (RedisStoreClient) StoreClientFactory.getStoreClient("redis-hua");
-        StoreKey key = new StoreKey("myredis", "hash");
+        RedisStoreClient redisClient = (RedisStoreClient) StoreClientFactory.getStoreClient(STORE_TYPE);
+        StoreKey key = new StoreKey(CATEGORY, "hash");
         Bean v1 = new Bean(1, "b1");
         Bean v2 = new Bean(2, "b2");
         Bean v3 = new Bean(3, "b3");
@@ -114,8 +120,8 @@ public class RedisStoreClientImplTest {
     
     @Test
     public void testHashUser() {
-        RedisStoreClient redisClient = (RedisStoreClient) StoreClientFactory.getStoreClient("redis-hua");
-        StoreKey key = new StoreKey("myredis", "user");
+        RedisStoreClient redisClient = (RedisStoreClient) StoreClientFactory.getStoreClient(STORE_TYPE);
+        StoreKey key = new StoreKey(CATEGORY, "user");
         User u1 = new User("user1", "city1", "dpid1", "bankcard1");
         User u2 = new User("user2", "city2", "dpid2", "bankcard2");
         User u3 = new User("user3", "city3", "dpid3", "bankcard3");
@@ -158,8 +164,8 @@ public class RedisStoreClientImplTest {
     
     @Test
     public void testHashString() {
-        RedisStoreClient redisClient = (RedisStoreClient) StoreClientFactory.getStoreClient("redis-hua");
-        StoreKey key = new StoreKey("myredis", "hash");
+        RedisStoreClient redisClient = (RedisStoreClient) StoreClientFactory.getStoreClient(STORE_TYPE);
+        StoreKey key = new StoreKey(CATEGORY, "hash");
         redisClient.delete(key);
         Object value = redisClient.hdel(key, "field");
         value = redisClient.hset(key, "field", "value1");
@@ -225,8 +231,8 @@ public class RedisStoreClientImplTest {
 
     @Test
     public void testList() {
-        RedisStoreClient redisClient = (RedisStoreClient) StoreClientFactory.getStoreClient("redis-hua");
-        StoreKey key = new StoreKey("myredis", "list");
+        RedisStoreClient redisClient = (RedisStoreClient) StoreClientFactory.getStoreClient(STORE_TYPE);
+        StoreKey key = new StoreKey(CATEGORY, "list");
         redisClient.delete(key);
         Object value = redisClient.llen(key);
         assertEquals(value, 0L);
@@ -303,8 +309,8 @@ public class RedisStoreClientImplTest {
 
     @Test
     public void testSets() {
-        RedisStoreClient redisClient = (RedisStoreClient) StoreClientFactory.getStoreClient("redis-hua");
-        StoreKey key = new StoreKey("myredis", "set");
+        RedisStoreClient redisClient = (RedisStoreClient) StoreClientFactory.getStoreClient(STORE_TYPE);
+        StoreKey key = new StoreKey(CATEGORY, "set");
         redisClient.delete(key);
         Object value = redisClient.scard(key);
         assertEquals(value, 0L);

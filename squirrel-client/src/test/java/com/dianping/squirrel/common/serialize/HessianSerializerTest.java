@@ -4,7 +4,7 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
-import com.dianping.squirrel.client.impl.redis.Bean;
+import com.dianping.squirrel.client.impl.Bean;
 
 public class HessianSerializerTest {
 

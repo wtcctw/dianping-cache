@@ -38,7 +38,7 @@ public class MemcachedClientConfigParser implements StoreClientConfigParser {
 		MemcachedClientConfig config = new MemcachedClientConfig();
 		config.setCacheConfigurationListener(CacheMessageManager.getInstance());
 		String transcoderClass = ConfigManagerLoader.getConfigManager().getStringValue(
-		        "avatar-cache.memcached.transcoder.class", detail.getTranscoderClazz());
+		        "avatar-cache.memcached.transcoder.class", "com.dianping.squirrel.client.impl.memcached.MemcachedTranscoder");
 
 		if (transcoderClass != null && !transcoderClass.trim().isEmpty()) {
 			try {

@@ -30,6 +30,7 @@ import net.spy.memcached.internal.BulkGetFuture;
 import net.spy.memcached.internal.CheckedOperationTimeoutException;
 import net.spy.memcached.internal.GetCompletionListener;
 import net.spy.memcached.internal.GetFuture;
+import net.spy.memcached.internal.OperationCompletionListener;
 import net.spy.memcached.internal.OperationFuture;
 import net.spy.memcached.ops.OperationStatus;
 import net.spy.memcached.ops.StatusCode;
@@ -502,7 +503,7 @@ public class MemcachedStoreClientImpl extends AbstractStoreClient implements Mem
 			try {
 				client.set(CacheKeyUtils.reformKey(key, true), expiration + hotKeyExpiration, value);
 			} catch (RuntimeException e) {
-				Cat.logEvent("Cache." + this.getStoreType(), category + ":setBackupFail", "-1",
+				Cat.logEvent("Store." + this.getStoreType(), category + ":setBackupFail", "-1",
 						"key=" + key + "&error=" + e.getMessage());
 			}
 		}
@@ -513,7 +514,7 @@ public class MemcachedStoreClientImpl extends AbstractStoreClient implements Mem
 			try {
 				getWriteClient().delete(CacheKeyUtils.reformKey(key, true));
 			} catch (RuntimeException e) {
-				Cat.logEvent("Cache." + this.getStoreType(), category + ":removeBackupFail", "-1", "key=" + key + "&error="
+				Cat.logEvent("Store." + this.getStoreType(), category + ":removeBackupFail", "-1", "key=" + key + "&error="
 						+ e.getMessage());
 			}
 		}
@@ -557,17 +558,17 @@ public class MemcachedStoreClientImpl extends AbstractStoreClient implements Mem
 			try {
 				result = doGet(lastVersionCacheKey, category);
 				if (result != null) {
-					Cat.logEvent("Cache." + this.getStoreType(), category + ":getLast", "0", lastVersionCacheKey);
+					Cat.logEvent("Store." + this.getStoreType(), category + ":getLast", "0", lastVersionCacheKey);
 				} else {
-					Cat.logEvent("Cache." + this.getStoreType(), category + ":getLastMissed", "-1", lastVersionCacheKey);
+					Cat.logEvent("Store." + this.getStoreType(), category + ":getLastMissed", "-1", lastVersionCacheKey);
 				}
 			} catch (TimeoutException e) {
-				Cat.logEvent("Cache." + this.getStoreType(), category + ":getLastTimeout", "-1", lastVersionCacheKey);
+				Cat.logEvent("Store." + this.getStoreType(), category + ":getLastTimeout", "-1", lastVersionCacheKey);
 				logger.error("memcached get last key {} timeout", lastVersionCacheKey);
 				throw e;
 			}
 		} else {
-			Cat.logEvent("Cache." + this.getStoreType(), category + ":lockAfterClear", "0", key);
+			Cat.logEvent("Store." + this.getStoreType(), category + ":lockAfterClear", "0", key);
 			logger.info("memcached locked {} after clear category", lockKey);
 			result = null;
 		}
@@ -589,17 +590,17 @@ public class MemcachedStoreClientImpl extends AbstractStoreClient implements Mem
 			try {
 				result = doGet(hotKey, category);
 				if (result != null) {
-					Cat.logEvent("Cache." + this.getStoreType(), category + ":getHot", "0", hotKey);
+					Cat.logEvent("Store." + this.getStoreType(), category + ":getHot", "0", hotKey);
 				} else {
-					Cat.logEvent("Cache." + this.getStoreType(), category + ":getHotMissed", "-1", hotKey);
+					Cat.logEvent("Store." + this.getStoreType(), category + ":getHotMissed", "-1", hotKey);
 				}
 			} catch (TimeoutException e) {
-				Cat.logEvent("Cache." + this.getStoreType(), category + ":getHotTimeout", "-1", hotKey);
+				Cat.logEvent("Store." + this.getStoreType(), category + ":getHotTimeout", "-1", hotKey);
 				logger.error("memcached get hot key {} timeout", hotKey);
 				throw e;
 			}
 		} else {
-			Cat.logEvent("Cache." + this.getStoreType(), category + ":lockAfterExp", "0", key);
+			Cat.logEvent("Store." + this.getStoreType(), category + ":lockAfterExp", "0", key);
 			logger.info("memcached locked {} after expiration", lockKey);
 			result = null;
 		}
@@ -802,11 +803,11 @@ public class MemcachedStoreClientImpl extends AbstractStoreClient implements Mem
     }
 
     @Override
-    protected <T> Future<T> doAsyncGet(CacheKeyType categoryConfig, String key) throws Exception {
+    protected <T> GetFuture<T> doAsyncGet(CacheKeyType categoryConfig, String key) throws Exception {
         String finalKey = CacheKeyUtils.nextCacheKey(key, categoryConfig.isHot(), hotKeyHitRange);
         MemcachedClient client = getReadClient();
         try {
-            Future<T> future = (Future<T>) client.asyncGet(finalKey);
+            GetFuture<T> future = (GetFuture<T>) client.asyncGet(finalKey);
             return future;
         } catch (Exception e) {
             NodeMonitor.getInstance().logNode(client, key, MSG_EXCEPTION, categoryConfig.getCategory());
@@ -815,7 +816,7 @@ public class MemcachedStoreClientImpl extends AbstractStoreClient implements Mem
     }
 
     @Override
-    protected Future<Boolean> doAsyncSet(CacheKeyType categoryConfig, String key, Object value) throws Exception {
+    protected OperationFuture<Boolean> doAsyncSet(CacheKeyType categoryConfig, String key, Object value) throws Exception {
         boolean isHot = categoryConfig.isHot();
         String category = categoryConfig.getCategory();
         int expiration = categoryConfig.getDurationSeconds();
@@ -823,7 +824,7 @@ public class MemcachedStoreClientImpl extends AbstractStoreClient implements Mem
         Object v = getCacheValue(value, expiration, isHot);
         MemcachedClient client = getWriteClient();
         try {
-            Future<Boolean> future = client.set(k, expiration, v);
+            OperationFuture<Boolean> future = client.set(k, expiration, v);
             asyncSetBackupKey(k, value, expiration, isHot, category);
             NodeMonitor.getInstance().logNode(client, k, MSG_SUCCESS, category);
             return future;
@@ -834,7 +835,7 @@ public class MemcachedStoreClientImpl extends AbstractStoreClient implements Mem
     }
 
     @Override
-    protected Future<Boolean> doAsyncAdd(CacheKeyType categoryConfig, String key, Object value) throws Exception {
+    protected OperationFuture<Boolean> doAsyncAdd(CacheKeyType categoryConfig, String key, Object value) throws Exception {
         boolean isHot = categoryConfig.isHot();
         String category = categoryConfig.getCategory();
         int expiration = categoryConfig.getDurationSeconds();
@@ -842,7 +843,7 @@ public class MemcachedStoreClientImpl extends AbstractStoreClient implements Mem
         Object v = getCacheValue(value, expiration, isHot);
         MemcachedClient client = getWriteClient();
         try {
-            Future<Boolean> future = client.add(k, expiration, v);
+            OperationFuture<Boolean> future = client.add(k, expiration, v);
             NodeMonitor.getInstance().logNode(client, k, MSG_SUCCESS, category);
             return future;
         } catch (Exception e) {
@@ -852,20 +853,17 @@ public class MemcachedStoreClientImpl extends AbstractStoreClient implements Mem
     }
 
     @Override
-    protected Future<Boolean> doAsyncDelete(CacheKeyType categoryConfig, String key) throws Exception {
+    protected OperationFuture<Boolean> doAsyncDelete(CacheKeyType categoryConfig, String key) throws Exception {
         String reformedKey = getCacheKey(key, categoryConfig.isHot());
-        Future<Boolean> future = getWriteClient().delete(reformedKey);
+        OperationFuture<Boolean> future = getWriteClient().delete(reformedKey);
         asyncRemoveBackupKey(key, categoryConfig.isHot(), categoryConfig.getCategory());
         return future;
     }
 
     @Override
-    protected <T> Void doAsyncGet(final CacheKeyType categoryConfig, final String key, final StoreCallback<T> callback) {
-        String finalKey = CacheKeyUtils.nextCacheKey(key, categoryConfig.isHot(), hotKeyHitRange);
-        GetFuture<T> future = null;
+    protected <T> Void doAsyncGet(final CacheKeyType categoryConfig, final String key, final StoreCallback<T> callback) throws Exception {
+        GetFuture<T> future = doAsyncGet(categoryConfig, key);
         final MemcachedClient client = getReadClient();
-        
-        future = (GetFuture<T>) client.asyncGet(finalKey);
         future.addListener(new GetCompletionListener() {
     
             @Override
@@ -892,41 +890,92 @@ public class MemcachedStoreClientImpl extends AbstractStoreClient implements Mem
     }
 
     @Override
-    protected Void doAsyncSet(CacheKeyType categoryConfig, String key, Object value,
-                              StoreCallback<Boolean> callback) throws Exception {
-        try {
-            doAsyncSet(categoryConfig, key, value);
-            if (callback != null) {
-                callback.onSuccess(true);
+    protected Void doAsyncSet(final CacheKeyType categoryConfig, final String key, Object value,
+                              final StoreCallback<Boolean> callback) throws Exception {
+        OperationFuture<Boolean> future = doAsyncSet(categoryConfig, key, value);
+        final MemcachedClient client = getReadClient();
+        future.addListener(new OperationCompletionListener() {
+
+            @Override
+            public void onComplete(OperationFuture<?> future) throws Exception {
+                OperationStatus status = future.getStatus();
+                if(status.isSuccess()) {
+                    Boolean result = (Boolean) future.get();
+                    NodeMonitor.getInstance().logNode(client, key, MSG_SUCCESS, categoryConfig.getCategory());
+                    callback.onSuccess(result);
+                } else {
+                    if(status.getStatusCode() == StatusCode.TIMEDOUT) {
+                        NodeMonitor.getInstance().logNode(client, key, MSG_TIMEOUT, categoryConfig.getCategory());
+                        callback.onFailure("memcached async set key " + key + " timeout", 
+                                           new TimeoutException("memcached async set key " + key + " timeout"));
+                    } else {
+                        NodeMonitor.getInstance().logNode(client, key, MSG_EXCEPTION, categoryConfig.getCategory());
+                        callback.onFailure("memcached async set key " + key + " failed, error: " + status.getMessage(), null);
+                    }
+                }
             }
-        } catch (Throwable e) {
-            if (callback != null) {
-                callback.onFailure("", e);
-            }
-        }
+            
+        });
         return null;
     }
 
     @Override
-    protected Void doAsyncAdd(CacheKeyType categoryConfig, String key, Object value,
-                              StoreCallback<Boolean> callback) throws Exception {
-        try {
-            doAsyncAdd(categoryConfig, key, value);
-            if (callback != null) {
-                callback.onSuccess(true);
+    protected Void doAsyncAdd(final CacheKeyType categoryConfig, final String key, Object value,
+                              final StoreCallback<Boolean> callback) throws Exception {
+        OperationFuture<Boolean> future = doAsyncAdd(categoryConfig, key, value);
+        final MemcachedClient client = getReadClient();
+        future.addListener(new OperationCompletionListener() {
+
+            @Override
+            public void onComplete(OperationFuture<?> future) throws Exception {
+                OperationStatus status = future.getStatus();
+                if(status.isSuccess() || status.getStatusCode() == StatusCode.ERR_EXISTS) {
+                    Boolean result = (Boolean) future.get();
+                    NodeMonitor.getInstance().logNode(client, key, MSG_SUCCESS, categoryConfig.getCategory());
+                    callback.onSuccess(result);
+                } else {
+                    if(status.getStatusCode() == StatusCode.TIMEDOUT) {
+                        NodeMonitor.getInstance().logNode(client, key, MSG_TIMEOUT, categoryConfig.getCategory());
+                        callback.onFailure("memcached async add key " + key + " timeout", 
+                                           new TimeoutException("memcached async set key " + key + " timeout"));
+                    } else {
+                        NodeMonitor.getInstance().logNode(client, key, MSG_EXCEPTION, categoryConfig.getCategory());
+                        callback.onFailure("memcached async add key " + key + " failed, error: " + status.getMessage(), null);
+                    }
+                }
             }
-        } catch (Throwable e) {
-            if (callback != null) {
-                callback.onFailure("", e);
-            }
-        }
+            
+        });
         return null;
     }
 
     @Override
-    protected Void doAsyncDelete(CacheKeyType categoryConfig, String finalKey, 
-                                 StoreCallback<Boolean> callback) throws Exception {
-        // TODO Auto-generated method stub
+    protected Void doAsyncDelete(final CacheKeyType categoryConfig, final String key, 
+                                 final StoreCallback<Boolean> callback) throws Exception {
+        OperationFuture<Boolean> future = doAsyncDelete(categoryConfig, key);
+        final MemcachedClient client = getReadClient();
+        future.addListener(new OperationCompletionListener() {
+
+            @Override
+            public void onComplete(OperationFuture<?> future) throws Exception {
+                OperationStatus status = future.getStatus();
+                if(status.isSuccess() || status.getStatusCode() == StatusCode.ERR_NOT_FOUND) {
+                    Boolean result = (Boolean) future.get();
+                    NodeMonitor.getInstance().logNode(client, key, MSG_SUCCESS, categoryConfig.getCategory());
+                    callback.onSuccess(result);
+                } else {
+                    if(status.getStatusCode() == StatusCode.TIMEDOUT) {
+                        NodeMonitor.getInstance().logNode(client, key, MSG_TIMEOUT, categoryConfig.getCategory());
+                        callback.onFailure("memcached async delete key " + key + " timeout", 
+                                           new TimeoutException("memcached async set key " + key + " timeout"));
+                    } else {
+                        NodeMonitor.getInstance().logNode(client, key, MSG_EXCEPTION, categoryConfig.getCategory());
+                        callback.onFailure("memcached async delete key " + key + " failed, error: " + status.getMessage(), null);
+                    }
+                }
+            }
+            
+        });
         return null;
     }
 
@@ -934,7 +983,7 @@ public class MemcachedStoreClientImpl extends AbstractStoreClient implements Mem
     protected Long doIncrease(CacheKeyType categoryConfig, String finalKey, int amount) throws Exception {
         MemcachedClient client = getWriteClient();
         try {
-            long value = client.incr(finalKey, amount, 0L);
+            long value = client.incr(finalKey, amount, (long)amount);
             NodeMonitor.getInstance().logNode(client, finalKey, MSG_SUCCESS, categoryConfig.getCategory());
             return value;
         } catch (OperationTimeoutException e) {
@@ -950,7 +999,7 @@ public class MemcachedStoreClientImpl extends AbstractStoreClient implements Mem
     protected Long doDecrease(CacheKeyType categoryConfig, String finalKey, int amount) throws Exception {
         MemcachedClient client = getWriteClient();
         try {
-            long value = client.decr(finalKey, amount, 0L);
+            long value = client.decr(finalKey, amount, (long)(0-amount));
             NodeMonitor.getInstance().logNode(client, finalKey, MSG_SUCCESS, categoryConfig.getCategory());
             return value;
         } catch (OperationTimeoutException e) {

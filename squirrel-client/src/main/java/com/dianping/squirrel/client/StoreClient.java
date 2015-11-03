@@ -51,6 +51,8 @@ public interface StoreClient {
 	<T> Void asyncMultiSet(List<StoreKey> keys, List<T> values, StoreCallback<Boolean> callback);
 
     // final key operations
+	public String getFinalKey(StoreKey storeKey);
+	
     public Boolean delete(String finalKey) throws StoreException;
     
     public boolean isDistributed();
