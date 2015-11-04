@@ -12,6 +12,8 @@
  */
 package com.dianping.squirrel.client.impl.memcached;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -42,22 +44,20 @@ import com.dianping.cat.Cat;
 import com.dianping.cat.message.Message;
 import com.dianping.squirrel.client.StoreKey;
 import com.dianping.squirrel.client.config.CacheKeyType;
+import com.dianping.squirrel.client.core.Lifecycle;
 import com.dianping.squirrel.client.core.StoreCallback;
-import com.dianping.squirrel.client.core.CacheClient;
 import com.dianping.squirrel.client.core.StoreClientConfig;
 import com.dianping.squirrel.client.core.StoreTypeAware;
-import com.dianping.squirrel.client.core.Lifecycle;
 import com.dianping.squirrel.client.impl.AbstractStoreClient;
-import com.dianping.squirrel.client.impl.AbstractStoreClient.Command;
 import com.dianping.squirrel.common.config.ConfigChangeListener;
 import com.dianping.squirrel.common.config.ConfigManager;
 import com.dianping.squirrel.common.config.ConfigManagerLoader;
 import com.dianping.squirrel.common.exception.StoreException;
 import com.dianping.squirrel.common.exception.StoreInitializeException;
+import com.dianping.squirrel.common.exception.StoreTimeoutException;
 import com.dianping.squirrel.common.util.CacheKeyUtils;
 import com.dianping.squirrel.common.util.RetryLoop;
 import com.dianping.squirrel.common.util.RetryLoop.RetryResponse;
-import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * The memcached client implementation adaptor(sypmemcached)
@@ -237,7 +237,7 @@ public class MemcachedStoreClientImpl extends AbstractStoreClient implements Mem
         }, categoryConfig, finalKey, "cas");
 	}
 	
-	public <T> CASValue<T> doGets(CacheKeyType categoryConfig, String key) throws StoreException, TimeoutException {
+	public <T> CASValue<T> doGets(CacheKeyType categoryConfig, String key) throws StoreException {
 		String reformedKey = CacheKeyUtils.reformKey(key);
 		MemcachedClient client = getReadClient();
 		try {
@@ -250,15 +250,14 @@ public class MemcachedStoreClientImpl extends AbstractStoreClient implements Mem
 			return casValue;
 		} catch (OperationTimeoutException e) {
 			NodeMonitor.getInstance().logNode(client, reformedKey, MSG_TIMEOUT, categoryConfig.getCategory());
-			throw new TimeoutException(e.getMessage());
+			throw new StoreTimeoutException(e.getMessage());
 		} catch (Exception e) {
 			NodeMonitor.getInstance().logNode(client, reformedKey, MSG_EXCEPTION, categoryConfig.getCategory());
 			throw new StoreException(e);
 		}
 	}
 
-	public CASResponse doCas(CacheKeyType categoryConfig, String key, long casId, Object value) throws StoreException,
-			TimeoutException {
+	public CASResponse doCas(CacheKeyType categoryConfig, String key, long casId, Object value) throws StoreException {
 		String reformedKey = CacheKeyUtils.reformKey(key);
 		MemcachedClient client = getWriteClient();
 		try {
@@ -271,40 +270,12 @@ public class MemcachedStoreClientImpl extends AbstractStoreClient implements Mem
 			return casResponse;
 		} catch (OperationTimeoutException e) {
 			NodeMonitor.getInstance().logNode(client, reformedKey, MSG_TIMEOUT, categoryConfig.getCategory());
-			throw new TimeoutException(e.getMessage());
+			throw new StoreTimeoutException(e.getMessage());
 		} catch (Exception e) {
 			NodeMonitor.getInstance().logNode(client, reformedKey, MSG_EXCEPTION, categoryConfig.getCategory());
 			throw new StoreException(e);
 		}
 	}
-
-//	@Override
-//	public <T> Map<String, T> getBulk(Collection<String> keys, Class dataType, boolean isHot, Map<String, String> categories,
-//			boolean timeoutAware) throws Exception {
-//		keys = CacheKeyUtils.reformKeys(keys);
-//		MemcachedClient client = getReadClient();
-//		Map<String, T> result = null;
-//		TimeoutException timeoutException = null;
-//		try {
-//			// use timeout to eliminate memcached servers' crash
-//			result = (Map<String, T>) doGetBulk(client, keys, timeoutMGet);
-//			NodeMonitor.getInstance().logNode(client, keys, MSG_SUCCESS, "");
-//		} catch (TimeoutException e) {
-//			timeoutException = e;
-//			result = null;
-//			NodeMonitor.getInstance().logNode(client, keys, MSG_TIMEOUT, "");
-//		} catch (Exception e) {
-//			NodeMonitor.getInstance().logNode(client, keys, MSG_EXCEPTION, "");
-//			throw e;
-//		}
-//		if (timeoutAware && timeoutException != null && result == null) {
-//			throw timeoutException;
-//		}
-//		if (result == null || result.isEmpty()) {
-//			return result;
-//		}
-//		return CacheKeyUtils.reformBackKeys(result);
-//	}
 
 	public boolean delete(String key, boolean isHot, String category) throws StoreException, TimeoutException {
 		return this.delete(key, isHot, category, timeoutSet);
@@ -327,7 +298,7 @@ public class MemcachedStoreClientImpl extends AbstractStoreClient implements Mem
 			return false;
 		} catch (CheckedOperationTimeoutException e) {
 			NodeMonitor.getInstance().logNode(client, key, MSG_TIMEOUT, category);
-			throw new TimeoutException(e.getMessage());
+			throw new StoreTimeoutException(e.getMessage());
 		} catch (Exception e) {
 			NodeMonitor.getInstance().logNode(client, key, MSG_EXCEPTION, category);
 			throw new StoreException(e);
@@ -633,41 +604,6 @@ public class MemcachedStoreClientImpl extends AbstractStoreClient implements Mem
 		return result;
 	}
 
-//	@Override
-//	public <T> void asyncBatchGet(final Collection<String> keys, Class dataType, boolean isHot, Map<String, String> categories,
-//			final StoreCallback<Map<String, T>> callback) {
-//
-//        MemcachedClient client = getReadClient();
-//        
-//        BulkFuture<Map<String, Object>> future = client.asyncGetBulk(keys);
-//        future.addListener(new BulkGetCompletionListener() {
-//            
-//            @Override
-//            public void onComplete(BulkGetFuture<?> future) throws Exception {
-//                OperationStatus status = future.getStatus();
-//                if(status.isSuccess() || status.getStatusCode() == StatusCode.ERR_NOT_FOUND) {
-//                    Map<String, T> result = (Map<String, T>) future.get();
-//                    callback.onSuccess(result);
-//                } else {
-//                    callback.onFailure("mget " + keyList(keys) + "failed: " + status.getMessage(), null);
-//                }
-//            }
-//        });
-//	}
-	
-	private String keyList(Collection<String> keys) {
-	    int i=0;
-	    StringBuilder buf = new StringBuilder(128);
-	    for(String key : keys) {
-	        buf.append(key);
-	        if(++i < 5)
-	            buf.append(',');
-	        else 
-	            buf.append("...");
-	    }
-	    return buf.toString();
-	}
-
     @Override
     protected <T> T doGet(CacheKeyType categoryConfig, String key) throws Exception {
         boolean isHot = categoryConfig.isHot();
@@ -876,11 +812,10 @@ public class MemcachedStoreClientImpl extends AbstractStoreClient implements Mem
                 } else {
                     if(status.getStatusCode() == StatusCode.TIMEDOUT) {
                         NodeMonitor.getInstance().logNode(client, key, MSG_TIMEOUT, categoryConfig.getCategory());
-                        callback.onFailure("memcached async get key " + key + " timeout", 
-                                           new TimeoutException("memcached async get key " + key + " timeout"));
+                        callback.onFailure(new StoreTimeoutException("memcached async get key " + key + " timeout"));
                     } else {
                         NodeMonitor.getInstance().logNode(client, key, MSG_EXCEPTION, categoryConfig.getCategory());
-                        callback.onFailure("memcached async get key " + key + " failed, error: " + status.getMessage(), null);
+                        callback.onFailure(new StoreException("memcached async get key " + key + " failed, error: " + status.getMessage()));
                     }
                 }
             }
@@ -906,11 +841,10 @@ public class MemcachedStoreClientImpl extends AbstractStoreClient implements Mem
                 } else {
                     if(status.getStatusCode() == StatusCode.TIMEDOUT) {
                         NodeMonitor.getInstance().logNode(client, key, MSG_TIMEOUT, categoryConfig.getCategory());
-                        callback.onFailure("memcached async set key " + key + " timeout", 
-                                           new TimeoutException("memcached async set key " + key + " timeout"));
+                        callback.onFailure(new StoreTimeoutException("memcached async set key " + key + " timeout"));
                     } else {
                         NodeMonitor.getInstance().logNode(client, key, MSG_EXCEPTION, categoryConfig.getCategory());
-                        callback.onFailure("memcached async set key " + key + " failed, error: " + status.getMessage(), null);
+                        callback.onFailure(new StoreException("memcached async set key " + key + " failed, error: " + status.getMessage()));
                     }
                 }
             }
@@ -936,11 +870,10 @@ public class MemcachedStoreClientImpl extends AbstractStoreClient implements Mem
                 } else {
                     if(status.getStatusCode() == StatusCode.TIMEDOUT) {
                         NodeMonitor.getInstance().logNode(client, key, MSG_TIMEOUT, categoryConfig.getCategory());
-                        callback.onFailure("memcached async add key " + key + " timeout", 
-                                           new TimeoutException("memcached async set key " + key + " timeout"));
+                        callback.onFailure(new StoreTimeoutException("memcached async add key " + key + " timeout"));
                     } else {
                         NodeMonitor.getInstance().logNode(client, key, MSG_EXCEPTION, categoryConfig.getCategory());
-                        callback.onFailure("memcached async add key " + key + " failed, error: " + status.getMessage(), null);
+                        callback.onFailure(new StoreException("memcached async add key " + key + " failed, error: " + status.getMessage()));
                     }
                 }
             }
@@ -966,11 +899,10 @@ public class MemcachedStoreClientImpl extends AbstractStoreClient implements Mem
                 } else {
                     if(status.getStatusCode() == StatusCode.TIMEDOUT) {
                         NodeMonitor.getInstance().logNode(client, key, MSG_TIMEOUT, categoryConfig.getCategory());
-                        callback.onFailure("memcached async delete key " + key + " timeout", 
-                                           new TimeoutException("memcached async set key " + key + " timeout"));
+                        callback.onFailure(new StoreTimeoutException("memcached async delete key " + key + " timeout"));
                     } else {
                         NodeMonitor.getInstance().logNode(client, key, MSG_EXCEPTION, categoryConfig.getCategory());
-                        callback.onFailure("memcached async delete key " + key + " failed, error: " + status.getMessage(), null);
+                        callback.onFailure(new StoreException("memcached async delete key " + key + " failed, error: " + status.getMessage()));
                     }
                 }
             }
@@ -988,7 +920,7 @@ public class MemcachedStoreClientImpl extends AbstractStoreClient implements Mem
             return value;
         } catch (OperationTimeoutException e) {
             NodeMonitor.getInstance().logNode(client, finalKey, MSG_TIMEOUT, categoryConfig.getCategory());
-            throw new TimeoutException(e.getMessage());
+            throw new StoreTimeoutException(e.getMessage());
         } catch (Exception e) {
             NodeMonitor.getInstance().logNode(client, finalKey, MSG_EXCEPTION, categoryConfig.getCategory());
             throw new StoreException(e);
@@ -1004,7 +936,7 @@ public class MemcachedStoreClientImpl extends AbstractStoreClient implements Mem
             return value;
         } catch (OperationTimeoutException e) {
             NodeMonitor.getInstance().logNode(client, finalKey, MSG_TIMEOUT, categoryConfig.getCategory());
-            throw new TimeoutException(e.getMessage());
+            throw new StoreTimeoutException(e.getMessage());
         } catch (Exception e) {
             NodeMonitor.getInstance().logNode(client, finalKey, MSG_EXCEPTION, categoryConfig.getCategory());
             throw new StoreException(e);
@@ -1021,10 +953,10 @@ public class MemcachedStoreClientImpl extends AbstractStoreClient implements Mem
             return result;
         } catch (TimeoutException e) {
             NodeMonitor.getInstance().logNode(client, keys, MSG_TIMEOUT, "");
-            throw e;
+            throw new StoreTimeoutException(e);
         } catch (Exception e) {
             NodeMonitor.getInstance().logNode(client, keys, MSG_EXCEPTION, "");
-            throw e;
+            throw new StoreException(e);
         }
     }
 
@@ -1042,8 +974,10 @@ public class MemcachedStoreClientImpl extends AbstractStoreClient implements Mem
                 if (status.isSuccess() || status.getStatusCode() == StatusCode.ERR_NOT_FOUND) {
                     Map<String, T> result = (Map<String, T>) future.get();
                     callback.onSuccess(result);
+                } else if(status.getStatusCode() == StatusCode.TIMEDOUT) {
+                    callback.onFailure(new StoreTimeoutException("memcached async multi get timeout"));
                 } else {
-                    callback.onFailure("memcached async multi mget failed, error: " + status.getMessage(), null);
+                    callback.onFailure(new StoreException("memcached async multi get failed, error: " + status.getMessage()));
                 }
             }
             

@@ -176,7 +176,7 @@ public class MemcachedStoreClientImplTest {
             }
 
             @Override
-            public void onFailure(String msg, Throwable e) {
+            public void onFailure(Throwable e) {
                 holder.exception = e;
                 latch.countDown();
             }
@@ -203,7 +203,7 @@ public class MemcachedStoreClientImplTest {
             }
 
             @Override
-            public void onFailure(String msg, Throwable e) {
+            public void onFailure(Throwable e) {
                 holder.exception = e;
                 latch.countDown();
             }
@@ -233,7 +233,7 @@ public class MemcachedStoreClientImplTest {
             }
 
             @Override
-            public void onFailure(String msg, Throwable e) {
+            public void onFailure(Throwable e) {
                 holder.exception = e;
                 latch.countDown();
             }
@@ -263,7 +263,7 @@ public class MemcachedStoreClientImplTest {
             }
 
             @Override
-            public void onFailure(String msg, Throwable e) {
+            public void onFailure(Throwable e) {
                 holder.exception = e;
                 latch.countDown();
                 e.printStackTrace();
@@ -357,7 +357,7 @@ public class MemcachedStoreClientImplTest {
             }
 
             @Override
-            public void onFailure(String msg, Throwable e) {
+            public void onFailure(Throwable e) {
                 holder.exception = e;
                 latch.countDown();
             }

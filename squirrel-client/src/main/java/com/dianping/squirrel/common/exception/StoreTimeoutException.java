@@ -12,4 +12,8 @@ public class StoreTimeoutException extends StoreException {
 		super(message, e);
 	}
 
+    public StoreTimeoutException(String message) {
+        super(message);
+    }
+
 }

@@ -9,6 +9,8 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
+import junit.framework.TestCase;
+
 import org.junit.Test;
 
 import com.dianping.squirrel.client.StoreClient;
@@ -16,18 +18,33 @@ import com.dianping.squirrel.client.StoreClientFactory;
 import com.dianping.squirrel.client.StoreKey;
 import com.dianping.squirrel.client.core.StoreCallback;
 
-public class DefaultStoreClientTest {
+public class DefaultStoreClientTest extends TestCase {
     
-    private static final String CATEGORY = "mymemcache";
+    private static final String[] CATEGORIES = {
+            "mymemcache", "mydcache", "myredis", "myehcache"
+    };
+    
+    static String CATEGORY = "mymemcache";
     
     private static final String VALUE = "dp@123456";
     
     private static final Bean BEAN = new Bean(12345678, "BEAN@12345678");
-   
+
     @Test
     public void testGet() {
+        StoreClient client = StoreClientFactory.getStoreClient();
+        StoreKey key = new StoreKey(CATEGORY, "test");
+        client.delete(key);
+        Object result = client.get(key);
+        assertNull(result);
+        client.set(key, VALUE);
+        result = client.get(key);
+        assertEquals(VALUE, result);
+        client.set(key, BEAN);
+        result = client.get(key);
+        assertEquals(BEAN, result);
     }
-
+    
     @Test
     public void testSet() {
         StoreClient client = StoreClientFactory.getStoreClient();
@@ -55,7 +72,7 @@ public class DefaultStoreClientTest {
     }
 
     @Test
-    public void testDeleteStoreKey() {
+    public void testDelete() {
         StoreClient client = StoreClientFactory.getStoreClient();
         StoreKey key = new StoreKey(CATEGORY, "test");
         Object result = client.set(key, VALUE);
@@ -64,6 +81,8 @@ public class DefaultStoreClientTest {
         assertEquals(Boolean.TRUE, result);
         result = client.get(key);
         assertNull(result);
+        result = client.delete(key);
+        assertEquals(Boolean.FALSE, result);
     }
 
     @Test
@@ -117,11 +136,11 @@ public class DefaultStoreClientTest {
         client.set(key, BEAN);
         Future<Boolean> future = client.asyncDelete(key);
         assertNotNull(future);
-        Boolean result = future.get(1000, TimeUnit.MILLISECONDS);
+        Boolean result = future.get(60000, TimeUnit.MILLISECONDS);
         assertEquals(Boolean.TRUE, result);
         future = client.asyncDelete(key);
         assertNotNull(future);
-        result = future.get(1000, TimeUnit.MILLISECONDS);
+        result = future.get(60000, TimeUnit.MILLISECONDS);
         assertEquals(Boolean.FALSE, result);
     }
 
@@ -142,7 +161,7 @@ public class DefaultStoreClientTest {
             }
 
             @Override
-            public void onFailure(String msg, Throwable e) {
+            public void onFailure(Throwable e) {
                 holder.exception = e;
                 latch.countDown();
             }
@@ -169,7 +188,7 @@ public class DefaultStoreClientTest {
             }
 
             @Override
-            public void onFailure(String msg, Throwable e) {
+            public void onFailure(Throwable e) {
                 holder.exception = e;
                 latch.countDown();
             }
@@ -199,7 +218,7 @@ public class DefaultStoreClientTest {
             }
 
             @Override
-            public void onFailure(String msg, Throwable e) {
+            public void onFailure(Throwable e) {
                 holder.exception = e;
                 latch.countDown();
             }
@@ -229,7 +248,7 @@ public class DefaultStoreClientTest {
             }
 
             @Override
-            public void onFailure(String msg, Throwable e) {
+            public void onFailure(Throwable e) {
                 holder.exception = e;
                 latch.countDown();
                 e.printStackTrace();
@@ -323,7 +342,7 @@ public class DefaultStoreClientTest {
             }
 
             @Override
-            public void onFailure(String msg, Throwable e) {
+            public void onFailure(Throwable e) {
                 holder.exception = e;
                 latch.countDown();
             }

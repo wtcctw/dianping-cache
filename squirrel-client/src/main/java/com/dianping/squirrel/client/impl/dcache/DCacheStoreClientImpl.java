@@ -28,6 +28,7 @@ import com.dianping.squirrel.common.config.ConfigManager;
 import com.dianping.squirrel.common.config.ConfigManagerLoader;
 import com.dianping.squirrel.common.exception.StoreException;
 import com.dianping.squirrel.common.exception.StoreInitializeException;
+import com.dianping.squirrel.common.exception.StoreTimeoutException;
 import com.dianping.squirrel.common.util.CacheKeyUtils;
 import com.qq.cloud.component.dcache.client.api.ClientCallback;
 import com.qq.cloud.component.dcache.client.api.ClientFactory;
@@ -360,19 +361,21 @@ public class DCacheStoreClientImpl extends AbstractStoreClient implements DCache
             public void onCompleted(KVCacheResult result) {
                 if (result.getCode() == DCacheConst.ET_SUCC) {
                     callback.onSuccess((T) result.getValue());
+                } else if(result.getCode() == DCacheConst.ET_NO_DATA) {
+                    callback.onSuccess(null);
                 } else {
-                    callback.onFailure("dcache async get failed, error code: " + result.getCode(), null);
+                    callback.onFailure(new StoreException("dcache async get failed, error code: " + result.getCode()));
                 }
             }
 
             @Override
             public void onException(Throwable th) {
-                callback.onFailure("dcache async get failed", th);
+                callback.onFailure(new StoreException(th));
             }
 
             @Override
             public void onTimeout() {
-                callback.onFailure("dcache async get timeout", new TimeoutException("dcache async get timeout"));
+                callback.onFailure(new StoreTimeoutException("dcache async get timeout"));
             }
 
         };
@@ -389,18 +392,18 @@ public class DCacheStoreClientImpl extends AbstractStoreClient implements DCache
                 if (result.getCode() == DCacheConst.ET_SUCC) {
                     callback.onSuccess(true);
                 } else {
-                    callback.onFailure("dcache async set failed, error code: " + result.getCode(), null);
+                    callback.onFailure(new StoreException("dcache async set failed, error code: " + result.getCode()));
                 }
             }
 
             @Override
             public void onException(Throwable th) {
-                callback.onFailure("dcache async set failed", th);
+                callback.onFailure(new StoreException("dcache async set failed", th));
             }
 
             @Override
             public void onTimeout() {
-                callback.onFailure("dcache async set timeout", new TimeoutException("dcache async set timeout"));
+                callback.onFailure(new StoreTimeoutException("dcache async set timeout"));
             }
 
         };
@@ -423,18 +426,18 @@ public class DCacheStoreClientImpl extends AbstractStoreClient implements DCache
                 if (result.getCode() == DCacheConst.ET_SUCC) {
                     callback.onSuccess(true);
                 } else {
-                    callback.onFailure("dcache async add failed, error code: " + result.getCode(), null);
+                    callback.onFailure(new StoreException("dcache async add failed, error code: " + result.getCode()));
                 }
             }
 
             @Override
             public void onException(Throwable th) {
-                callback.onFailure("dcache async add failed", th);
+                callback.onFailure(new StoreException("dcache async add failed", th));
             }
 
             @Override
             public void onTimeout() {
-                callback.onFailure("dcache async add timeout", new TimeoutException("dcache async add timeout"));
+                callback.onFailure(new StoreTimeoutException("dcache async add timeout"));
             }
 
         };
@@ -456,18 +459,18 @@ public class DCacheStoreClientImpl extends AbstractStoreClient implements DCache
                         || result.getCode() == DCacheConst.ET_KEY_TYPE_ERR) {
                     callback.onSuccess(false);
                 } else {
-                    callback.onFailure("dcache async delete failed, error code: " + result.getCode(), null);
+                    callback.onFailure(new StoreException("dcache async delete failed, error code: " + result.getCode()));
                 }
             }
 
             @Override
             public void onException(Throwable th) {
-                callback.onFailure("dcache async delete failed", th);
+                callback.onFailure(new StoreException("dcache async delete failed", th));
             }
 
             @Override
             public void onTimeout() {
-                callback.onFailure("dcache async delete timeout", new TimeoutException("dcache async delete timeout"));
+                callback.onFailure(new StoreTimeoutException("dcache async delete timeout"));
             }
 
         };
@@ -525,18 +528,18 @@ public class DCacheStoreClientImpl extends AbstractStoreClient implements DCache
                     }
                     callback.onSuccess(results);
                 } else {
-                    callback.onFailure("dcache async multi get failed, result code: " + result.getCode(), null);
+                    callback.onFailure(new StoreException("dcache async multi get failed, result code: " + result.getCode()));
                 }
             }
 
             @Override
             public void onException(Throwable th) {
-                callback.onFailure("dcache async multi get failed", th);
+                callback.onFailure(new StoreException("dcache async multi get failed", th));
             }
 
             @Override
             public void onTimeout() {
-                callback.onFailure("dcache async multi get timeout", new TimeoutException("dcache async multi get timeout"));
+                callback.onFailure(new StoreTimeoutException("dcache async multi get timeout"));
             }
 
         };
@@ -575,18 +578,18 @@ public class DCacheStoreClientImpl extends AbstractStoreClient implements DCache
                     if (result.getCode() == DCacheConst.ET_SUCC) {
                         callback.onSuccess(true);
                     } else {
-                        callback.onFailure("dcache async multi set failed, error code: " + result.getCode(), null);
+                        callback.onFailure(new StoreException("dcache async multi set failed, error code: " + result.getCode()));
                     }
                 }
 
                 @Override
                 public void onException(Throwable th) {
-                    callback.onFailure("dcache async multi set failed", th);
+                    callback.onFailure(new StoreException("dcache async multi set failed", th));
                 }
 
                 @Override
                 public void onTimeout() {
-                    callback.onFailure("dcache async multi set timeout", new TimeoutException("dcache async multi set timeout"));
+                    callback.onFailure(new StoreTimeoutException("dcache async multi set timeout"));
                 }
 
             };

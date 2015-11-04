@@ -327,7 +327,9 @@ public class EhcacheStoreClientImpl extends AbstractStoreClient implements Lifec
         Map<String, T> map = new HashMap<String, T>();
         for (String key : finalKeyList) {
             T result = doGet(categoryConfig, key);
-            map.put(key, result);
+            if(result != null) {
+                map.put(key, result);
+            }
         }
         return map;
     }

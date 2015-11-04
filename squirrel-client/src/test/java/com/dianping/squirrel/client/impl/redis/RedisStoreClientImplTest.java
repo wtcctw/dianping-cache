@@ -310,21 +310,21 @@ public class RedisStoreClientImplTest {
     @Test
     public void testSets() {
         RedisStoreClient redisClient = (RedisStoreClient) StoreClientFactory.getStoreClient(STORE_TYPE);
-        StoreKey key = new StoreKey(CATEGORY, "set");
+        StoreKey key = new StoreKey("oPpmGuided", "set");
         redisClient.delete(key);
         Object value = redisClient.scard(key);
         assertEquals(value, 0L);
-        value = redisClient.sadd(key, "s1", "s2", "s3");
+        value = redisClient.sadd(key, 111, 222, 333);
         assertEquals(value, 3L);
-        value = redisClient.srem(key, "s4");
+        value = redisClient.srem(key, 444);
         assertEquals(value, 0L);
-        value = redisClient.srem(key, "s3");
+        value = redisClient.srem(key, 333);
         assertEquals(value, 1L);
         value = redisClient.scard(key);
         assertEquals(value, 2L);
-        value = redisClient.sismember(key, "s5");
+        value = redisClient.sismember(key, 555);
         assertEquals(value, Boolean.FALSE);
-        value = redisClient.sismember(key, "s1");
+        value = redisClient.sismember(key, 111);
         assertEquals(value, Boolean.TRUE);
         value = redisClient.smembers(key);
         assertEquals(((Set)value).size(), 2);

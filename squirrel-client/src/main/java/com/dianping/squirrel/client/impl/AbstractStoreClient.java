@@ -26,7 +26,6 @@ import com.dianping.squirrel.client.util.KeyHolder;
 import com.dianping.squirrel.common.exception.StoreException;
 import com.dianping.squirrel.common.exception.StoreTimeoutException;
 import com.dianping.squirrel.common.util.PathUtils;
-import com.google.common.base.Preconditions;
 
 public abstract class AbstractStoreClient implements StoreClient {
 
@@ -401,8 +400,8 @@ public abstract class AbstractStoreClient implements StoreClient {
                     }
 
                     @Override
-                    public void onFailure(String msg, Throwable e) {
-                        callback.onFailure(msg, e);
+                    public void onFailure(Throwable e) {
+                        callback.onFailure(e);
                     }
                     
                 };

@@ -4,6 +4,6 @@ public interface StoreCallback<T> {
 
     public void onSuccess(T result);
 
-    public void onFailure(String msg, Throwable e);
+    public void onFailure(Throwable e);
     
 }
