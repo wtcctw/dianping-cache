@@ -17,7 +17,7 @@ import java.net.URL;
 
 import net.sf.ehcache.CacheManager;
 
-import com.dianping.squirrel.client.core.StoreClientConfig;
+import com.dianping.squirrel.client.config.StoreClientConfig;
 import com.dianping.squirrel.common.exception.StoreInitializeException;
 
 /**

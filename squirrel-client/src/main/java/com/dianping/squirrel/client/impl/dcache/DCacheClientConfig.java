@@ -17,7 +17,7 @@ package com.dianping.squirrel.client.impl.dcache;
 
 import net.spy.memcached.transcoders.Transcoder;
 
-import com.dianping.squirrel.client.core.StoreClientConfig;
+import com.dianping.squirrel.client.config.StoreClientConfig;
 import com.dianping.squirrel.common.exception.StoreInitializeException;
 
 public class DCacheClientConfig implements StoreClientConfig {

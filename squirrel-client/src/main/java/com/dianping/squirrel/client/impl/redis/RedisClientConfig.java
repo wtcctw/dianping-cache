@@ -5,7 +5,7 @@ import java.util.List;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 
-import com.dianping.squirrel.client.core.StoreClientConfig;
+import com.dianping.squirrel.client.config.StoreClientConfig;
 import com.dianping.squirrel.common.exception.StoreInitializeException;
 
 public class RedisClientConfig implements StoreClientConfig {

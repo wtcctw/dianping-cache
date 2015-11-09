@@ -58,7 +58,7 @@ import com.dianping.remote.cache.dto.CacheConfigurationDTO;
 import com.dianping.remote.cache.dto.CacheKeyTypeVersionUpdateDTO;
 import com.dianping.remote.cache.dto.SingleCacheRemoveDTO;
 import com.dianping.squirrel.client.core.CacheClient;
-import com.dianping.squirrel.client.core.CacheClientBuilder;
+import com.dianping.squirrel.client.core.StoreClientBuilder;
 import com.dianping.squirrel.client.impl.memcached.MemcachedClientConfig;
 import com.dianping.squirrel.common.config.ConfigChangeListener;
 import com.dianping.squirrel.common.config.ConfigManagerLoader;
@@ -170,7 +170,7 @@ public class CacheConfigurationServiceImpl implements CacheConfigurationService,
 			}
 			cacheMessageProducer.sendMessageToTopic(translator.translate(updated));
 			String cacheKey = config.getCacheKey();
-			CacheClientBuilder.closeCacheClient(cacheKey);
+			StoreClientBuilder.closeStoreClient(cacheKey);
 			com.dianping.squirrel.client.core.CacheConfiguration.removeCache(cacheKey);
 			com.dianping.squirrel.client.core.CacheConfiguration.addCache(cacheKey, updated.getClientClazz());
 			logConfigurationUpdate(oldConfig, updated, true);
@@ -188,7 +188,7 @@ public class CacheConfigurationServiceImpl implements CacheConfigurationService,
 		try {
 			configFound = find(cacheKey);
 			if (configFound != null) {
-				CacheClientBuilder.closeCacheClient(cacheKey);
+				StoreClientBuilder.closeStoreClient(cacheKey);
 				com.dianping.squirrel.client.core.CacheConfiguration.removeCache(cacheKey);
 				configurationDao.delete(cacheKey);
 				logConfigurationDelete(configFound, true);
@@ -260,7 +260,7 @@ public class CacheConfigurationServiceImpl implements CacheConfigurationService,
 						config.setServerList(configuration.getServerList());
 						Class<?> transcoderClazz = Class.forName(configuration.getTranscoderClazz());
 						config.setTranscoderClass(transcoderClazz);
-						CacheClient cacheClient = CacheClientBuilder.buildCacheClient(cacheType, config);
+						CacheClient cacheClient = StoreClientBuilder.buildStoreClient(cacheType, config);
 						String[] keyList = StringUtils.splitByWholeSeparator(key, CACHE_FINAL_KEY_SEP);
 						if (keyList != null) {
 							for (String singleKey : keyList) {

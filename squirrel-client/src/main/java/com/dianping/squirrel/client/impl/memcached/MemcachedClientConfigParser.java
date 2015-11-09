@@ -21,9 +21,9 @@ import org.apache.commons.lang.ClassUtils;
 
 import com.dianping.pigeon.config.ConfigManagerLoader;
 import com.dianping.remote.cache.dto.CacheConfigurationDTO;
+import com.dianping.squirrel.client.config.StoreClientConfig;
 import com.dianping.squirrel.client.config.StoreClientConfigParser;
 import com.dianping.squirrel.client.config.zookeeper.CacheMessageManager;
-import com.dianping.squirrel.client.core.StoreClientConfig;
 
 /**
  * TODO Comment of MemcachedClientConfigurationParser

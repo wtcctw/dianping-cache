@@ -16,7 +16,9 @@ import com.dianping.squirrel.client.StoreClient;
 import com.dianping.squirrel.client.StoreKey;
 import com.dianping.squirrel.client.config.CacheKeyType;
 import com.dianping.squirrel.client.config.StoreCategoryConfigManager;
+import com.dianping.squirrel.client.config.StoreClientConfigListener;
 import com.dianping.squirrel.client.core.StoreCallback;
+import com.dianping.squirrel.client.core.StoreTypeAware;
 import com.dianping.squirrel.client.log.LoggerLoader;
 import com.dianping.squirrel.client.monitor.HitRateMonitor;
 import com.dianping.squirrel.client.monitor.KeyCountMonitor;
@@ -27,7 +29,7 @@ import com.dianping.squirrel.common.exception.StoreException;
 import com.dianping.squirrel.common.exception.StoreTimeoutException;
 import com.dianping.squirrel.common.util.PathUtils;
 
-public abstract class AbstractStoreClient implements StoreClient {
+public abstract class AbstractStoreClient implements StoreClient, StoreTypeAware, StoreClientConfigListener {
 
     static {
         LoggerLoader.init();
@@ -35,6 +37,8 @@ public abstract class AbstractStoreClient implements StoreClient {
     
 	protected StoreCategoryConfigManager configManager;
 
+	protected String storeType;
+	
 	public AbstractStoreClient() {
 		configManager = StoreCategoryConfigManager.getInstance();
 	}
@@ -597,7 +601,17 @@ public abstract class AbstractStoreClient implements StoreClient {
 	protected boolean needMonitor(String cacheType) {
 		return true;
 	}
-	
+
+    @Override
+    public void setStoreType(String storeType) {
+        this.storeType = storeType;
+    }
+
+    @Override
+    public String getStoreType() {
+        return storeType;
+    }
+    
 	public static interface Command {
 
 	    Object execute() throws Exception;

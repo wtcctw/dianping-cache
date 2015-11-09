@@ -18,9 +18,9 @@ import redis.clients.jedis.JedisCluster;
 
 import com.dianping.squirrel.client.StoreKey;
 import com.dianping.squirrel.client.config.CacheKeyType;
+import com.dianping.squirrel.client.config.StoreClientConfig;
 import com.dianping.squirrel.client.core.Lifecycle;
 import com.dianping.squirrel.client.core.StoreCallback;
-import com.dianping.squirrel.client.core.StoreClientConfig;
 import com.dianping.squirrel.client.core.StoreTypeAware;
 import com.dianping.squirrel.client.core.Transcoder;
 import com.dianping.squirrel.client.impl.AbstractStoreClient;
@@ -31,11 +31,9 @@ public class RedisStoreClientImpl extends AbstractStoreClient implements RedisSt
 
     private static final String OK = "OK";
 
-    private String storeType;
-
     private RedisClientConfig config;
 
-    private JedisCluster client;
+    private volatile JedisCluster client;
 
     private Transcoder<String> transcoder = new RedisStringTranscoder();
 
@@ -45,15 +43,15 @@ public class RedisStoreClientImpl extends AbstractStoreClient implements RedisSt
     }
 
     @Override
-    public void setStoreType(String key) {
-        this.storeType = key;
+    public void configChanged(StoreClientConfig config) {
+        logger.info("redis store client config changed: " + config);
+        this.config = (RedisClientConfig)config;
+        JedisCluster oldClient = this.client;
+        JedisCluster newClient = RedisClientFactory.createClient(this.config);
+        this.client = newClient;
+        oldClient.close();
     }
-
-    @Override
-    public String getStoreType() {
-        return storeType;
-    }
-
+    
     @Override
     public void start() {
         client = RedisClientFactory.createClient(config);

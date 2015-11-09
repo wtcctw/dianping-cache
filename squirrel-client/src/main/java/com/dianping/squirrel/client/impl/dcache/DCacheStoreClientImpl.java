@@ -15,8 +15,8 @@ import org.slf4j.LoggerFactory;
 
 import com.dianping.squirrel.client.StoreKey;
 import com.dianping.squirrel.client.config.CacheKeyType;
+import com.dianping.squirrel.client.config.StoreClientConfig;
 import com.dianping.squirrel.client.core.StoreCallback;
-import com.dianping.squirrel.client.core.StoreClientConfig;
 import com.dianping.squirrel.client.core.StoreFuture;
 import com.dianping.squirrel.client.core.StoreTypeAware;
 import com.dianping.squirrel.client.core.Lifecycle;
@@ -43,6 +43,8 @@ import com.qq.cloud.component.dcache.client.kv.KVCacheResult;
 
 public class DCacheStoreClientImpl extends AbstractStoreClient implements DCacheStoreClient, Lifecycle, StoreTypeAware {
 
+    private static Logger logger = LoggerFactory.getLogger(DCacheStoreClientImpl.class);
+
 	private static ConfigManager configManager = ConfigManagerLoader.getConfigManager();
 	private static final String KEY_READ_TIMEOUT = "avatar-cache.dcache.timeout.read";
 	private static final String KEY_CONNECT_TIMEOUT = "avatar-cache.dcache.timeout.connect";
@@ -58,29 +60,13 @@ public class DCacheStoreClientImpl extends AbstractStoreClient implements DCache
 	private static int callbackCoreSize = configManager.getIntValue(KEY_CALLBACK_CORESIZE, 5);
 	private static int callbackMaxSize = configManager.getIntValue(KEY_CALLBACK_MAXSIZE, 16);
 
-	private static Logger logger = LoggerFactory.getLogger(DCacheStoreClientImpl.class);
-
 	private DCacheClientConfig config;
 
-	DCacheKVClientAPI kvClient;
-
-	DCacheClientAPI client;
-
-	private String storeType;
+	private volatile DCacheKVClientAPI kvClient;
 
 	@Override
 	public void initialize(StoreClientConfig config) {
 		this.config = (DCacheClientConfig) config;
-	}
-
-	@Override
-	public void setStoreType(String storeType) {
-		this.storeType = storeType;
-	}
-
-	@Override
-	public String getStoreType() {
-		return storeType;
 	}
 
 	@Override
@@ -89,7 +75,7 @@ public class DCacheStoreClientImpl extends AbstractStoreClient implements DCache
 		try {
 			ConfigManagerLoader.getConfigManager().registerConfigChangeListener(new ConfigChangeHandler());
 		} catch (Exception e) {
-			logger.warn("", e);
+			logger.warn("failed to register config change listener in dcache store client", e);
 		}
 	}
 
@@ -110,11 +96,8 @@ public class DCacheStoreClientImpl extends AbstractStoreClient implements DCache
 		try {
 			kvClient = ClientFactory.getKvClientAPI(this.config.getModule(), this.config.getProxy(),
 					this.config.getLocator(), connectionConfig);
-
-			client = ClientFactory.getClientAPI(this.config.getModule(), this.config.getProxy(),
-					this.config.getLocator(), connectionConfig);
 		} catch (Exception e) {
-			throw new StoreInitializeException("error while initializing dcache", e);
+			throw new StoreInitializeException("failed to initialize dcache store client", e);
 		}
 	}
 
@@ -137,15 +120,10 @@ public class DCacheStoreClientImpl extends AbstractStoreClient implements DCache
 
 	@Override
 	public void stop() {
-
 	}
 
 	public DCacheKVClientAPI getKVClient() {
 		return kvClient;
-	}
-
-	public DCacheClientAPI getClient() {
-		return client;
 	}
     
     private InputValue getInputValue(Object value, int expiration) {
@@ -604,6 +582,12 @@ public class DCacheStoreClientImpl extends AbstractStoreClient implements DCache
         }
         getKVClient().asyncBatchSet(kvs, dcacheCallback);
         return null;
+    }
+
+    @Override
+    public void configChanged(StoreClientConfig config) {
+        logger.info("dcache store client config changed: " + config);
+        initClient();
     }
 
 }

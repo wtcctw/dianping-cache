@@ -24,7 +24,6 @@ import org.slf4j.LoggerFactory;
 import com.dianping.remote.cache.dto.CacheConfigurationDTO;
 import com.dianping.squirrel.client.StoreClient;
 import com.dianping.squirrel.client.core.CacheClient;
-import com.dianping.squirrel.client.core.StoreClientConfig;
 import com.dianping.squirrel.client.impl.dcache.DCacheClientConfigParser;
 import com.dianping.squirrel.client.impl.dcache.DCacheStoreClientImpl;
 import com.dianping.squirrel.client.impl.ehcache.EhcacheClientConfigParser;

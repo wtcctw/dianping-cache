@@ -27,9 +27,9 @@ import net.sf.ehcache.constructs.blocking.BlockingCache;
 import net.sf.ehcache.management.ManagementService;
 
 import com.dianping.squirrel.client.config.CacheKeyType;
+import com.dianping.squirrel.client.config.StoreClientConfig;
 import com.dianping.squirrel.client.core.Lifecycle;
 import com.dianping.squirrel.client.core.StoreCallback;
-import com.dianping.squirrel.client.core.StoreClientConfig;
 import com.dianping.squirrel.client.core.StoreFuture;
 import com.dianping.squirrel.client.impl.AbstractStoreClient;
 import com.dianping.squirrel.common.config.ConfigManagerLoader;
@@ -102,7 +102,7 @@ public class EhcacheStoreClientImpl extends AbstractStoreClient implements Lifec
 	}
 
 	/**
-	 * @see com.dianping.squirrel.client.core.InitialConfiguration#initialize(com.dianping.squirrel.client.core.StoreClientConfig)
+	 * @see com.dianping.squirrel.client.core.InitialConfiguration#initialize(com.dianping.squirrel.client.config.StoreClientConfig)
 	 */
 	@Override
 	public void initialize(StoreClientConfig config) {
@@ -358,6 +358,11 @@ public class EhcacheStoreClientImpl extends AbstractStoreClient implements Lifec
         doMultiSet(categoryConfig, keys, values);
         callback.onSuccess(true);
         return null;
+    }
+
+    @Override
+    public void configChanged(StoreClientConfig config) {
+        // TODO: can trigger ehcache config reload etc.
     }
     
 }

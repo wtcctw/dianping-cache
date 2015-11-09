@@ -15,6 +15,12 @@
  */
 package com.dianping.squirrel.client.config;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -27,12 +33,10 @@ import org.slf4j.LoggerFactory;
 import com.dianping.pigeon.remoting.ServiceFactory;
 import com.dianping.remote.cache.CacheConfigurationWebService;
 import com.dianping.remote.cache.dto.CacheConfigurationDTO;
-import com.dianping.remote.cache.dto.CacheConfigurationsDTO;
 import com.dianping.squirrel.client.StoreClient;
 import com.dianping.squirrel.client.config.zookeeper.CacheCuratorClient;
-import com.dianping.squirrel.client.core.CacheClientBuilder;
 import com.dianping.squirrel.client.core.CacheConfiguration;
-import com.dianping.squirrel.client.core.StoreClientConfig;
+import com.dianping.squirrel.client.core.StoreClientBuilder;
 import com.dianping.squirrel.client.impl.dcache.DCacheStoreClientImpl;
 import com.dianping.squirrel.client.impl.dcache.DCacheTranscoder;
 import com.dianping.squirrel.client.impl.ehcache.EhcacheStoreClientImpl;
@@ -40,8 +44,10 @@ import com.dianping.squirrel.client.impl.memcached.MemcachedStoreClientImpl;
 import com.dianping.squirrel.client.impl.redis.RedisStoreClientImpl;
 import com.dianping.squirrel.common.config.ConfigManager;
 import com.dianping.squirrel.common.config.ConfigManagerLoader;
+import com.dianping.squirrel.common.exception.StoreException;
 import com.dianping.squirrel.common.exception.StoreInitializeException;
 import com.dianping.squirrel.common.util.PathUtils;
+
 
 /**
  * Remote centralized managed cache client config
@@ -57,13 +63,13 @@ public class StoreClientConfigManager {
 
 	private Set<String> usedCacheServices = new ConcurrentSkipListSet<String>();
 
-	private CacheConfigurationWebService configurationWebService;
-
 	private CacheCuratorClient cacheCuratorClient = CacheCuratorClient.getInstance();
 	
 	private ConfigManager configManager = ConfigManagerLoader.getConfigManager();
 
 	private static StoreClientConfigManager instance;
+	
+	private Map<String, List<StoreClientConfigListener>> configListenerMap = new HashMap<String, List<StoreClientConfigListener>>();
 	
 	private StoreClientConfigManager() {
 	    try {
@@ -84,6 +90,34 @@ public class StoreClientConfigManager {
 	    return instance;
 	}
 	
+	public void addConfigListener(String storeType, StoreClientConfigListener listener) {
+	    checkNotNull(storeType, "store type is null");
+	    checkNotNull(listener, "client config listener is null");
+	    synchronized(configListenerMap) {
+	        List<StoreClientConfigListener> listeners = configListenerMap.get(storeType);
+	        if(listeners == null) {
+	            listeners = new ArrayList<StoreClientConfigListener>();
+	            configListenerMap.put(storeType, listeners);
+	        }
+	        listeners.add(listener);
+	    }
+	}
+	
+	private void fireConfigChanged(String storeType, StoreClientConfig clientConfig) {
+	    synchronized(configListenerMap) {
+	        List<StoreClientConfigListener> listeners = configListenerMap.get(storeType);
+            if(listeners != null) {
+                for(StoreClientConfigListener listener : listeners) {
+                    try {
+                        listener.configChanged(clientConfig);
+                    } catch(Throwable t) {
+                        logger.error("failed to notify client config change: " + clientConfig, t);
+                    }
+                }
+            }
+	    }
+    }
+	
 	public StoreClient findCacheClient(String cacheKey) {
 	    if(StringUtils.isBlank(cacheKey)) {
 	        throw new NullPointerException("cache service is empty");
@@ -94,38 +128,37 @@ public class StoreClientConfigManager {
 		return init(cacheKey);
 	}
 
-	public StoreClient init(String cacheKey) {
-		StoreClientConfig config = configMap.get(cacheKey);
-		if (config == null) {
+	public StoreClient init(String cacheKey) throws StoreException {
+		StoreClientConfig clientConfig = configMap.get(cacheKey);
+		if (clientConfig == null) {
 			synchronized (this) {
-				config = configMap.get(cacheKey);
-				if (config == null) {
-					CacheConfigurationDTO serviceConfig = loadCacheClientConfig(cacheKey);
-					if (serviceConfig == null) {
-						throw new IllegalArgumentException("failed to get cache service config: " + cacheKey);
-					}
-					logger.info("loaded cache service config: " + serviceConfig);
-					config = registerCache(serviceConfig);
+			    clientConfig = configMap.get(cacheKey);
+				if (clientConfig == null) {
+					CacheConfigurationDTO configDto;
+                    try {
+                        configDto = loadCacheClientConfig(cacheKey);
+                    } catch (Exception e) {
+                        throw new StoreException("failed to load store client config: " + cacheKey, e);
+                    }
+                    if (configDto == null) {
+                        throw new StoreException("store client config is null: " + cacheKey);
+                    }
+                    clientConfig = parse(configDto);
+                    if(clientConfig != null) {
+                        configMap.put(cacheKey, clientConfig);
+                    }
 				}
 			}
 		}
-		if (config != null) {
-			return CacheClientBuilder.buildCacheClient(cacheKey, config);
+		if(clientConfig != null) {
+		    return StoreClientBuilder.buildStoreClient(cacheKey, clientConfig);
 		}
 		return null;
 	}
 
-	private CacheConfigurationDTO loadCacheClientConfig(String cacheKey) {
-		CacheConfigurationDTO serviceConfig = null;
-		try {
-			serviceConfig = cacheCuratorClient.getServiceConfig(cacheKey);
-		} catch (Exception e) {
-			logger.error("failed to get cache service config from zookeeper: " + cacheKey, e);
-		}
-		if (serviceConfig == null) {
-			serviceConfig = configurationWebService.getCacheConfiguration(cacheKey);
-		}
-		return serviceConfig;
+	private CacheConfigurationDTO loadCacheClientConfig(String cacheKey) throws Exception {
+	    CacheConfigurationDTO serviceConfig = cacheCuratorClient.getServiceConfig(cacheKey);
+	    return serviceConfig;
 	}
 
 	public Set<String> getCacheClientKeys() {
@@ -136,33 +169,35 @@ public class StoreClientConfigManager {
 		return configMap.get(cacheKey);
 	}
 
-	/**
-	 * poll configuration from remote cache server
-	 * 
-	 * @throws StoreInitializeException
-	 */
-	private void pollConfigurationFromServer() throws StoreInitializeException {
-		try {
-			configMap.clear();
-			CacheConfigurationsDTO configurations = configurationWebService.getCacheConfigurations();
-			for (String key : configurations.keys()) {
-				registerCache(configurations.getConfiguration(key));
-			}
-		} catch (StoreInitializeException e) {
-			logger.error("", e);
-			throw e;
-		} catch (Exception e) {
-			String errorMsg = "Poll cache configuration from cache server failed.";
-			logger.error(errorMsg, e);
-			throw new RuntimeException(errorMsg, e);
-		}
+	public void updateCache(CacheConfigurationDTO configDto) throws StoreInitializeException {
+//		registerCache(configurationDTO);
+	    checkNotNull(configDto, "store config dto is null");
+	    StoreClientConfig clientConfig = parse(configDto);
+	    if(clientConfig != null) {
+	        configMap.put(configDto.getCacheKey(), clientConfig);
+	        fireConfigChanged(configDto.getCacheKey(), clientConfig);
+	    }
 	}
+	
+	private StoreClientConfig parse(CacheConfigurationDTO configDto) {
+	    String storeType = configDto.getCacheKey();
 
-	public void updateCache(CacheConfigurationDTO configurationDTO) throws StoreInitializeException {
-		registerCache(configurationDTO);
-	}
+        if(storeType.startsWith("memcache")) {
+            configDto.setClientClazz(MemcachedStoreClientImpl.class.getName());
+        } else if (storeType.startsWith("dcache")) {
+            configDto.setClientClazz(DCacheStoreClientImpl.class.getName());
+            configDto.setTranscoderClazz(DCacheTranscoder.class.getName());
+        } else if (storeType.startsWith("redis")) {
+            configDto.setClientClazz(RedisStoreClientImpl.class.getName());
+        } else if(storeType.startsWith("web") || storeType.startsWith("ehcache")) {
+            configDto.setClientClazz(EhcacheStoreClientImpl.class.getName());
+        }
+        
+        StoreClientConfig clientConfig = StoreClientConfigHelper.parse(configDto);
+        return clientConfig;
+    }
 
-	/**
+    /**
 	 * @param key
 	 * @param configuration
 	 * @throws StoreInitializeException
@@ -189,20 +224,17 @@ public class StoreClientConfigManager {
 		
 		CacheConfiguration.removeCache(cacheKey);
 		CacheConfiguration.addCache(cacheKey, configuration.getClientClazz());
-		CacheClientBuilder.closeCacheClient(cacheKey);
+		StoreClientBuilder.closeStoreClient(cacheKey);
 
 		return cacheClientConfig;
 	}
 
 	public void init() throws Exception {
-	    configurationWebService = ServiceFactory.getService(
-                "http://service.dianping.com/cacheService/cacheConfigService_1.0.0",
-                CacheConfigurationWebService.class, 10000);
 		initCacheServices();
 	}
 	
 	private void initCacheServices() {
-	    // TODO open the switch after all clients are supported
+	    // TODO test
         if (PathUtils.isZookeeperEnabled() && false) {
             String appName = configManager.getAppName();
             if (StringUtils.isNotEmpty(appName)) {

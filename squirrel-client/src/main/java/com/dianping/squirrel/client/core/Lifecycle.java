@@ -15,6 +15,8 @@
  */
 package com.dianping.squirrel.client.core;
 
+import com.dianping.squirrel.client.config.StoreClientConfig;
+
 /**
  * Life cycle interface for representing Object that can be managed. Generally,
  * it will be extended by CacheClient implementation for destroy.

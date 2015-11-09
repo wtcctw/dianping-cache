@@ -18,6 +18,8 @@ package com.dianping.squirrel.client.config;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.commons.lang.builder.ToStringBuilder;
+import org.apache.commons.lang.builder.ToStringStyle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -292,6 +294,18 @@ public class CacheKeyType {
 	    buf.append('_').append(version);
 	    String key = buf.toString();
 	    return key.indexOf(' ') == -1 ? key : key.replace(" ", "@+~");
+	}
+	
+	public String toString() {
+	    return new ToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE)
+	            .append("category", category)
+	            .append("duration", duration)
+	            .append("template", indexTemplate)
+	            .append("storeType", cacheType)
+	            .append("version", version)
+	            .append("isHot", isHot)
+	            .append("extension", extension)
+	            .toString();
 	}
 	
 }
