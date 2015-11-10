@@ -90,7 +90,7 @@ public abstract class AbstractStoreClient implements StoreClient, StoreTypeAware
 			public Object execute() throws Exception {
 				Object result = doGet(categoryConfig, finalKey);
 				if(result == null) {
-				    Cat.getProducer().logEvent("Store." + categoryConfig.getCacheType(), categoryConfig.getCategory() + ":missed");
+				    Cat.getProducer().logEvent("Squirrel." + categoryConfig.getCacheType(), categoryConfig.getCategory() + ":missed");
 				}
 				return result;
 			}
@@ -527,7 +527,7 @@ public abstract class AbstractStoreClient implements StoreClient, StoreTypeAware
 		
 		Transaction t = null;
 		if (needMonitor(storeType)) {
-			t = Cat.getProducer().newTransaction("Store." + storeType, category + ":" + action);
+			t = Cat.getProducer().newTransaction("Squirrel." + storeType, category + ":" + action);
 			t.addData("finalKey", finalKey);
 			t.setStatus(Message.SUCCESS);
 		}
@@ -535,13 +535,13 @@ public abstract class AbstractStoreClient implements StoreClient, StoreTypeAware
 		long begin = System.nanoTime();
 		int second = (int) (begin / 1000000000 % 60) + 1;
 		try {
-		    Cat.getProducer().logEvent("Store." + storeType + ".qps", "S"+second);
+		    Cat.getProducer().logEvent("Squirrel." + storeType + ".qps", "S"+second);
 			Object result = command.execute();
 			TimeMonitor.getInstance().logTime(storeType, category, action, System.nanoTime() - begin);
 			return (T) result;
 		} catch (TimeoutException e) {
 			TimeMonitor.getInstance().logTime(storeType, category, action, System.nanoTime() - begin, "timeout");
-			Cat.getProducer().logEvent("Store." + storeType, category + ":timeout");
+			Cat.getProducer().logEvent("Squirrel." + storeType, category + ":timeout");
 			StoreTimeoutException ste = new StoreTimeoutException(e);
 			if (t != null) {
 				t.setStatus(ste);
@@ -574,7 +574,7 @@ public abstract class AbstractStoreClient implements StoreClient, StoreTypeAware
         
         Transaction t = null;
         if (needMonitor(storeType)) {
-            t = Cat.getProducer().newTransaction("Store." + storeType, category + ":" + action);
+            t = Cat.getProducer().newTransaction("Squirrel." + storeType, category + ":" + action);
             KeyCountMonitor.getInstance().logKeyCount(storeType, category, action, keys.size());
             t.setStatus(Message.SUCCESS);
         }
@@ -582,13 +582,13 @@ public abstract class AbstractStoreClient implements StoreClient, StoreTypeAware
         long begin = System.nanoTime();
         int second = (int) (begin / 1000000000 % 60) + 1;
         try {
-            Cat.getProducer().logEvent("Store." + storeType + ".qps", "S"+second);
+            Cat.getProducer().logEvent("Squirrel." + storeType + ".qps", "S"+second);
             Object result = command.execute();
             TimeMonitor.getInstance().logTime(storeType, category, action, System.nanoTime() - begin);
             return (T) result;
         } catch (TimeoutException e) {
             TimeMonitor.getInstance().logTime(storeType, category, action, System.nanoTime() - begin, "timeout");
-            Cat.getProducer().logEvent("Store." + storeType, category + ":timeout", Message.SUCCESS, "");
+            Cat.getProducer().logEvent("Squirrel." + storeType, category + ":timeout", Message.SUCCESS, "");
             StoreTimeoutException ste = new StoreTimeoutException(e);
             if (t != null) {
                 t.setStatus(ste);

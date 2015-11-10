@@ -48,9 +48,9 @@ public class DCacheTranscoder extends BaseSerializingTranscoder implements Trans
 
 	private Serializer hessianSerializer = SerializerFactory.getSerializer("hessian");
 
-	private static final String EVENT_NAME_REQUEST_SIZE = "Store.dcache.writeSize";
+	private static final String EVENT_NAME_REQUEST_SIZE = "Squirrel.dcache.writeSize";
 
-	private static final String EVENT_NAME_RESPONSE_SIZE = "Store.dcache.readSize";
+	private static final String EVENT_NAME_RESPONSE_SIZE = "Squirrel.dcache.readSize";
 
 	public DCacheTranscoder() {
 		this(CachedData.MAX_SIZE);

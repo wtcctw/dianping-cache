@@ -85,7 +85,7 @@ public class CacheCuratorClient {
 	    try {
             init();
         } catch (Exception e) {
-            logger.error("failed to init cache curator client", e);
+            logger.error("failed to init curator client", e);
         }
 	}
 	
@@ -105,7 +105,7 @@ public class CacheCuratorClient {
 			String path = PathUtils.getServicePath(service);
 			String content = getData(path, true);
 			if (StringUtils.isBlank(content)) {
-				logger.warn("cache service config [" + service + "] is empty");
+				logger.warn("store service config [" + service + "] is empty");
 				return null;
 			}
 			CacheConfigurationDTO serviceConfig = JsonUtils.fromStr(content, CacheConfigurationDTO.class);
@@ -158,7 +158,7 @@ public class CacheCuratorClient {
 		String path = PathUtils.getCategoryPath(category);
 		String content = getData(path, true);
 		if (StringUtils.isBlank(content)) {
-			logger.warn("cache category config [" + category + "] is empty");
+			logger.warn("store category config [" + category + "] is empty");
 			return null;
 		}
 		CacheKeyConfigurationDTO config = JsonUtils.fromStr(content, CacheKeyConfigurationDTO.class);
@@ -169,7 +169,7 @@ public class CacheCuratorClient {
 		String path = PathUtils.getVersionPath(category);
 		String content = getData(path, true);
 		if (StringUtils.isBlank(content)) {
-			logger.warn("cache category version [" + category + "] is empty");
+			logger.warn("store category version [" + category + "] is empty");
 			return null;
 		}
 		CacheKeyTypeVersionUpdateDTO versionChange = JsonUtils.fromStr(content, CacheKeyTypeVersionUpdateDTO.class);
@@ -236,7 +236,7 @@ public class CacheCuratorClient {
 				} catch (InterruptedException e) {
 					Thread.currentThread().interrupt();
 				} catch (Exception e) {
-					logger.error("failed to sync cache events", e);
+					logger.error("failed to sync store events", e);
 				} finally {
 					lastSyncTime = System.currentTimeMillis();
 					syncCount++;
@@ -248,7 +248,7 @@ public class CacheCuratorClient {
 
 	private void _syncAll() throws Exception {
 		if (PathUtils.isZookeeperEnabled() && isZookeeperConnected()) {
-			Transaction t = Cat.getProducer().newTransaction("Store.sync", "syncAll");
+			Transaction t = Cat.getProducer().newTransaction(CacheMessageListener.CAT_EVENT_TYPE, "sync.config");
 			try {
 				syncAllServices();
 				syncAllCategories();

@@ -69,7 +69,7 @@ public class TimeMonitor {
 	public void logTime(String cacheType, String category, String eventName, long time, String desc) {
 		if (enableMonitor && time >= timeMin && cacheType != null && !"web".equalsIgnoreCase(cacheType)) {
 			try {
-				doLogTime(time, timeRangeArray, "Store." + cacheType + "." + eventName + ".time", desc);
+				doLogTime(time, timeRangeArray, "Squirrel." + cacheType + "." + eventName + ".time", desc);
 			} catch (Throwable t) {
 				logger.warn("error while logging time:" + t.getMessage());
 			}
@@ -79,7 +79,7 @@ public class TimeMonitor {
 	public void logTime(String cacheType, String category, String eventName, long time, long timeMinimum) {
 		if (enableMonitor && time >= timeMinimum && cacheType != null && !"web".equalsIgnoreCase(cacheType)) {
 			try {
-				doLogTime(time, timeRangeArray, "Store." + cacheType + "." + eventName + ".time", null);
+				doLogTime(time, timeRangeArray, "Squirrel." + cacheType + "." + eventName + ".time", null);
 			} catch (Throwable t) {
 				logger.warn("error while logging time:" + t.getMessage());
 			}

@@ -336,7 +336,7 @@ public class MemcachedStoreClientImpl extends AbstractStoreClient implements Mem
             try {
                 client.set(CacheKeyUtils.reformKey(key, true), expiration + hotKeyExpiration, value);
             } catch (RuntimeException e) {
-                Cat.logEvent("Store." + this.getStoreType(), category + ":setBackupFail", "-1", "key=" + key
+                Cat.logEvent("Squirrel." + this.getStoreType(), category + ":setBackupFail", "-1", "key=" + key
                         + "&error=" + e.getMessage());
             }
         }
@@ -347,7 +347,7 @@ public class MemcachedStoreClientImpl extends AbstractStoreClient implements Mem
             try {
                 getWriteClient().delete(CacheKeyUtils.reformKey(key, true));
             } catch (RuntimeException e) {
-                Cat.logEvent("Store." + this.getStoreType(), category + ":removeBackupFail", "-1", "key=" + key
+                Cat.logEvent("Squirrel." + this.getStoreType(), category + ":removeBackupFail", "-1", "key=" + key
                         + "&error=" + e.getMessage());
             }
         }
@@ -391,17 +391,17 @@ public class MemcachedStoreClientImpl extends AbstractStoreClient implements Mem
             try {
                 result = doGet(lastVersionCacheKey, category);
                 if (result != null) {
-                    Cat.logEvent("Store." + this.getStoreType(), category + ":getLast", "0", lastVersionCacheKey);
+                    Cat.logEvent("Squirrel." + this.getStoreType(), category + ":getLast", "0", lastVersionCacheKey);
                 } else {
-                    Cat.logEvent("Store." + this.getStoreType(), category + ":getLastMissed", "-1", lastVersionCacheKey);
+                    Cat.logEvent("Squirrel." + this.getStoreType(), category + ":getLastMissed", "-1", lastVersionCacheKey);
                 }
             } catch (TimeoutException e) {
-                Cat.logEvent("Store." + this.getStoreType(), category + ":getLastTimeout", "-1", lastVersionCacheKey);
+                Cat.logEvent("Squirrel." + this.getStoreType(), category + ":getLastTimeout", "-1", lastVersionCacheKey);
                 logger.error("memcached get last key {} timeout", lastVersionCacheKey);
                 throw e;
             }
         } else {
-            Cat.logEvent("Store." + this.getStoreType(), category + ":lockAfterClear", "0", key);
+            Cat.logEvent("Squirrel." + this.getStoreType(), category + ":lockAfterClear", "0", key);
             logger.info("memcached locked {} after clear category", lockKey);
             result = null;
         }
@@ -423,17 +423,17 @@ public class MemcachedStoreClientImpl extends AbstractStoreClient implements Mem
             try {
                 result = doGet(hotKey, category);
                 if (result != null) {
-                    Cat.logEvent("Store." + this.getStoreType(), category + ":getHot", "0", hotKey);
+                    Cat.logEvent("Squirrel." + this.getStoreType(), category + ":getHot", "0", hotKey);
                 } else {
-                    Cat.logEvent("Store." + this.getStoreType(), category + ":getHotMissed", "-1", hotKey);
+                    Cat.logEvent("Squirrel." + this.getStoreType(), category + ":getHotMissed", "-1", hotKey);
                 }
             } catch (TimeoutException e) {
-                Cat.logEvent("Store." + this.getStoreType(), category + ":getHotTimeout", "-1", hotKey);
+                Cat.logEvent("Squirrel." + this.getStoreType(), category + ":getHotTimeout", "-1", hotKey);
                 logger.error("memcached get hot key {} timeout", hotKey);
                 throw e;
             }
         } else {
-            Cat.logEvent("Store." + this.getStoreType(), category + ":lockAfterExp", "0", key);
+            Cat.logEvent("Squirrel." + this.getStoreType(), category + ":lockAfterExp", "0", key);
             logger.info("memcached locked {} after expiration", lockKey);
             result = null;
         }

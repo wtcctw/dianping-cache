@@ -25,9 +25,9 @@ public class NodeMonitor {
 
 	private static Logger logger = LoggerFactory.getLogger(NodeMonitor.class);
 
-	private static final String EVENT_TYPE_NODES = "Store.memcached.nodes";
+	private static final String EVENT_TYPE_NODES = "Squirrel.memcached.nodes";
 
-	private static final String EVENT_TYPE_SERVER = "Store.memcached.server";
+	private static final String EVENT_TYPE_SERVER = "Squirrel.memcached.server";
 
 	private static final int NODE_MONITOR_PERIOD = ConfigManagerLoader.getConfigManager().getIntValue(
 			"avatar-cache.monitor.memcached.nodes.period", 60);

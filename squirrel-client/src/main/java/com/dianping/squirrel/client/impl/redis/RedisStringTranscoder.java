@@ -68,13 +68,13 @@ public class RedisStringTranscoder implements Transcoder<String> {
                 throw new StoreTranscodeException(e);
             }
         }
-        SizeMonitor.getInstance().logRequestSize("Store.redis.writeSize", serialized.length());
+        SizeMonitor.getInstance().logRequestSize("Squirrel.redis.writeSize", serialized.length());
         return serialized;
     }
 
     @Override
     public <T> T decode(String data) {
-        SizeMonitor.getInstance().logResponseSize("Store.redis.readSize", data.length());
+        SizeMonitor.getInstance().logResponseSize("Squirrel.redis.readSize", data.length());
         if(data.startsWith(TRANSCODE_PREFIX)) {
             byte compressType = (byte) data.charAt(2);
             if(compressType != 0) {

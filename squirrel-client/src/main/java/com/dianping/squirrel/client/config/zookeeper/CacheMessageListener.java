@@ -33,7 +33,7 @@ public class CacheMessageListener implements CuratorListener {
 
     private static Logger logger = LoggerFactory.getLogger(CacheMessageListener.class);
 
-    public static final String CAT_EVENT_TYPE = "Store.notifications";
+    public static final String CAT_EVENT_TYPE = "Squirrel.client";
     public static final String CACHE_SERVICE_PATH = "/dp/cache/service/";
     public static final String CACHE_CATEGORY_PATH = "/dp/cache/category/";
     public static final String VERSION_SUFFIX = "/version";
@@ -126,13 +126,13 @@ public class CacheMessageListener implements CuratorListener {
 
     private void processDataChanged(CuratorFramework client, String path) throws Exception {
         String content = getData(client, path, true);
-        logger.info(String.format("received cache notification, path: %s, content: %s", path, content));
+        logger.info(String.format("received store notification, path: %s, content: %s", path, content));
         if(content == null) {
             return;
         }
         CacheEvent ce = parseEvent(path, content);
         if (ce == null) {
-            logger.error(String.format("failed to parse cache event, path: %s, content: %s", path, content));
+            logger.error(String.format("failed to parse store event, path: %s, content: %s", path, content));
             return;
         }
         if(ce.getContent() instanceof CacheKeyConfigurationDTO) {
@@ -213,7 +213,7 @@ public class CacheMessageListener implements CuratorListener {
             }
             return false;
         default:
-            logger.error("invalid cache event");
+            logger.error("invalid store event");
             return false;
         }
     }

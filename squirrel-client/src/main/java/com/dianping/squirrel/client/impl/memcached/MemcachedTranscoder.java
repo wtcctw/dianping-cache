@@ -51,9 +51,9 @@ public class MemcachedTranscoder extends BaseSerializingTranscoder implements Tr
 
 	private Serializer hessianSerializer = SerializerFactory.getSerializer("hessian");
 
-	private String EVENT_NAME_REQUEST_SIZE = "Store.memcached.writeSize";
+	private String EVENT_NAME_REQUEST_SIZE = "Squirrel.memcached.writeSize";
 
-	private String EVENT_NAME_RESPONSE_SIZE = "Store.memcached.readSize";
+	private String EVENT_NAME_RESPONSE_SIZE = "Squirrel.memcached.readSize";
 
 	private static final String EVENT_NAME_ENCODE_TIME = "encode";
 
@@ -74,8 +74,8 @@ public class MemcachedTranscoder extends BaseSerializingTranscoder implements Tr
 
 	public void setCacheType(String cacheType) {
 		CACHE_TYPE = cacheType;
-		EVENT_NAME_RESPONSE_SIZE = "Store." + cacheType + ".readSize";
-		EVENT_NAME_REQUEST_SIZE = "Store." + cacheType + ".writeSize";
+		EVENT_NAME_RESPONSE_SIZE = "Squirrel." + cacheType + ".readSize";
+		EVENT_NAME_REQUEST_SIZE = "Squirrel." + cacheType + ".writeSize";
 	}
 
 	public MemcachedTranscoder(String cacheType, int max) {
