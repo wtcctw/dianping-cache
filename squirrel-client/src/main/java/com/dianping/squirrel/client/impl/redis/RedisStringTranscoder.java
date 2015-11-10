@@ -46,6 +46,10 @@ public class RedisStringTranscoder implements Transcoder<String> {
     private Serializer serializer;
     private Compressor compressor;
 
+    public RedisStringTranscoder() {
+        this("redis");
+    }
+    
     public RedisStringTranscoder(String storeType) {
         setStoreType(storeType);
         this.serializer = SerializerFactory.getSerializer(DEFAULT_SERIALIZE_TYPE);
