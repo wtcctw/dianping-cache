@@ -41,12 +41,22 @@ public class RedisStringTranscoder implements Transcoder<String> {
     private static final byte COMPRESS_GZIP = 1;
     private static final byte COMPRESS_SNAPPY = 2;
     
+    private String readSizeEvent;
+    private String writeSizeEvent;
     private Serializer serializer;
     private Compressor compressor;
 
-    public RedisStringTranscoder() {
+    public RedisStringTranscoder(String storeType) {
+        setStoreType(storeType);
         this.serializer = SerializerFactory.getSerializer(DEFAULT_SERIALIZE_TYPE);
         this.compressor = null;
+    }
+
+    private void setStoreType(String storeType) {
+        if(storeType == null)
+            storeType = "redis";
+        readSizeEvent = "Squirrel." + storeType + ".readSize";
+        writeSizeEvent = "Squirrel." + storeType + ".writeSize";
     }
 
     @Override
@@ -68,13 +78,13 @@ public class RedisStringTranscoder implements Transcoder<String> {
                 throw new StoreTranscodeException(e);
             }
         }
-        SizeMonitor.getInstance().logRequestSize("Squirrel.redis.writeSize", serialized.length());
+        SizeMonitor.getInstance().logRequestSize(writeSizeEvent, serialized.length());
         return serialized;
     }
 
     @Override
     public <T> T decode(String data) {
-        SizeMonitor.getInstance().logResponseSize("Squirrel.redis.readSize", data.length());
+        SizeMonitor.getInstance().logResponseSize(readSizeEvent, data.length());
         if(data.startsWith(TRANSCODE_PREFIX)) {
             byte compressType = (byte) data.charAt(2);
             if(compressType != 0) {

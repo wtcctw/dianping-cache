@@ -36,7 +36,7 @@ public class RedisStoreClientImpl extends AbstractStoreClient implements RedisSt
 
     private volatile JedisCluster client;
 
-    private Transcoder<String> transcoder = new RedisStringTranscoder();
+    private Transcoder<String> transcoder;
 
     @Override
     public void configure(StoreClientConfig config) {
@@ -55,6 +55,7 @@ public class RedisStoreClientImpl extends AbstractStoreClient implements RedisSt
     
     @Override
     public void start() {
+        transcoder = new RedisStringTranscoder(storeType);
         client = RedisClientFactory.createClient(config);
     }
 

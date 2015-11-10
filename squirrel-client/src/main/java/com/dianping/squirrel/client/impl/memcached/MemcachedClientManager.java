@@ -94,14 +94,7 @@ public class MemcachedClientManager {
         try {
             ExtendedConnectionFactory connectionFactory = new ExtendedKetamaConnectionFactory(opQueueLen, readBufSize,
                     opQueueMaxBlockTime);
-            if (config.getTranscoder() != null) {
-                if (config.getTranscoder() instanceof MemcachedTranscoder) {
-                    ((MemcachedTranscoder) config.getTranscoder()).setCacheType(storeType);
-                }
-                connectionFactory.setTranscoder(config.getTranscoder());
-            } else {
-                connectionFactory.setTranscoder(new MemcachedTranscoder(storeType));
-            }
+            connectionFactory.setTranscoder(new MemcachedTranscoder(storeType));
 
             String[] serverSplits = config.getServers().split("\\|");
             String mainServer = serverSplits[0].trim();

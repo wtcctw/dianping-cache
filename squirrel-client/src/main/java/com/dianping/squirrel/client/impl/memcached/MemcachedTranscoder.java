@@ -23,7 +23,6 @@ import com.dianping.squirrel.client.monitor.SizeMonitor;
 import com.dianping.squirrel.client.monitor.TimeMonitor;
 import com.dianping.squirrel.common.config.ConfigManagerLoader;
 import com.dianping.squirrel.common.exception.StoreTranscodeException;
-import com.dianping.squirrel.common.serialize.HessianSerializer;
 import com.dianping.squirrel.common.serialize.SerializeException;
 import com.dianping.squirrel.common.serialize.Serializer;
 import com.dianping.squirrel.common.serialize.SerializerFactory;
@@ -72,8 +71,10 @@ public class MemcachedTranscoder extends BaseSerializingTranscoder implements Tr
 		this(cacheType, CachedData.MAX_SIZE);
 	}
 
-	public void setCacheType(String cacheType) {
+	private void setCacheType(String cacheType) {
 		CACHE_TYPE = cacheType;
+		if(CACHE_TYPE == null) 
+		    CACHE_TYPE = "memcached";
 		EVENT_NAME_RESPONSE_SIZE = "Squirrel." + cacheType + ".readSize";
 		EVENT_NAME_REQUEST_SIZE = "Squirrel." + cacheType + ".writeSize";
 	}
