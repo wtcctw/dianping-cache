@@ -21,7 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.dianping.remote.cache.dto.CacheKeyTypeVersionUpdateDTO;
-import com.dianping.squirrel.client.config.CacheKeyType;
+import com.dianping.squirrel.client.config.StoreCategoryConfig;
 import com.dianping.squirrel.client.config.StoreCategoryConfigManager;
 import com.dianping.squirrel.client.util.IPUtils;
 
@@ -54,7 +54,7 @@ public class CacheKeyTypeVersionUpdateListener {
 					logger.error(String.format("cache category %s invalid version %s", category, version));
 					return;
 				}
-				CacheKeyType keyType = StoreCategoryConfigManager.getInstance().getCacheKeyType(category);
+				StoreCategoryConfig keyType = StoreCategoryConfigManager.getInstance().getCacheKeyType(category);
 				if (keyType != null) {
 					keyType.setVersion(versionInt);
 					logger.info(String.format("cache category %s version changed to %s", category, version));

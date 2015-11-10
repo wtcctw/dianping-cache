@@ -17,7 +17,7 @@ import org.slf4j.LoggerFactory;
 import redis.clients.jedis.JedisCluster;
 
 import com.dianping.squirrel.client.StoreKey;
-import com.dianping.squirrel.client.config.CacheKeyType;
+import com.dianping.squirrel.client.config.StoreCategoryConfig;
 import com.dianping.squirrel.client.config.StoreClientConfig;
 import com.dianping.squirrel.client.core.Configurable;
 import com.dianping.squirrel.client.core.Lifecycle;
@@ -64,7 +64,7 @@ public class RedisStoreClientImpl extends AbstractStoreClient implements RedisSt
     }
 
     @Override
-    protected <T> T doGet(CacheKeyType categoryConfig, String finalKey) {
+    protected <T> T doGet(StoreCategoryConfig categoryConfig, String finalKey) {
         String value = client.get(finalKey);
         if(value != null) {
             T object = transcoder.decode(value);
@@ -75,7 +75,7 @@ public class RedisStoreClientImpl extends AbstractStoreClient implements RedisSt
     }
 
     @Override
-    protected Boolean doSet(CacheKeyType categoryConfig, String finalKey, Object value) {
+    protected Boolean doSet(StoreCategoryConfig categoryConfig, String finalKey, Object value) {
         String result = null;
         String str = transcoder.encode(value);
         if (categoryConfig.getDurationSeconds() > 0)
@@ -86,7 +86,7 @@ public class RedisStoreClientImpl extends AbstractStoreClient implements RedisSt
     }
 
     @Override
-    protected Boolean doAdd(CacheKeyType categoryConfig, String finalKey, Object value) {
+    protected Boolean doAdd(StoreCategoryConfig categoryConfig, String finalKey, Object value) {
         String str = transcoder.encode(value);
         if (categoryConfig.getDurationSeconds() > 0) {
             String result = client.set(finalKey, str, "NX", "EX", categoryConfig.getDurationSeconds());
@@ -98,95 +98,95 @@ public class RedisStoreClientImpl extends AbstractStoreClient implements RedisSt
     }
 
     @Override
-    protected Boolean doDelete(CacheKeyType categoryConfig, String finalKey) {
+    protected Boolean doDelete(StoreCategoryConfig categoryConfig, String finalKey) {
          long result = client.del(finalKey);
          return 1 == result;
     }
 
     @Override
-    public Long doIncrease(CacheKeyType categoryConfig, String finalKey, int amount) {
+    public Long doIncrease(StoreCategoryConfig categoryConfig, String finalKey, int amount) {
         long result = client.incrBy(finalKey, amount);
         return result;
     }
 
     @Override
-    public Long doDecrease(CacheKeyType categoryConfig, String finalKey, int amount) {
+    public Long doDecrease(StoreCategoryConfig categoryConfig, String finalKey, int amount) {
         long result = client.decrBy(finalKey, amount);
         return result;
     }
 
     @Override
-    protected <T> Future<T> doAsyncGet(CacheKeyType categoryConfig, String finalKey) {
+    protected <T> Future<T> doAsyncGet(StoreCategoryConfig categoryConfig, String finalKey) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    protected Future<Boolean> doAsyncSet(CacheKeyType categoryConfig, String finalKey, Object value) {
+    protected Future<Boolean> doAsyncSet(StoreCategoryConfig categoryConfig, String finalKey, Object value) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    protected Future<Boolean> doAsyncAdd(CacheKeyType categoryConfig, String finalKey, Object value) {
+    protected Future<Boolean> doAsyncAdd(StoreCategoryConfig categoryConfig, String finalKey, Object value) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    protected Future<Boolean> doAsyncDelete(CacheKeyType categoryConfig, String finalKey) {
+    protected Future<Boolean> doAsyncDelete(StoreCategoryConfig categoryConfig, String finalKey) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    protected <T> Void doAsyncGet(CacheKeyType categoryConfig, String finalKey, StoreCallback<T> callback) {
+    protected <T> Void doAsyncGet(StoreCategoryConfig categoryConfig, String finalKey, StoreCallback<T> callback) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    protected Void doAsyncSet(CacheKeyType categoryConfig, String finalKey, Object value, StoreCallback<Boolean> callback) {
+    protected Void doAsyncSet(StoreCategoryConfig categoryConfig, String finalKey, Object value, StoreCallback<Boolean> callback) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    protected Void doAsyncAdd(CacheKeyType categoryConfig, String finalKey, Object value,
+    protected Void doAsyncAdd(StoreCategoryConfig categoryConfig, String finalKey, Object value,
                               StoreCallback<Boolean> callback) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    protected Void doAsyncDelete(CacheKeyType categoryConfig, String finalKey, StoreCallback<Boolean> callback) {
+    protected Void doAsyncDelete(StoreCategoryConfig categoryConfig, String finalKey, StoreCallback<Boolean> callback) {
         // TODO Auto-generated method stub
         return null;
     }
     
 
     @Override
-    protected <T> Map<String, T> doMultiGet(CacheKeyType categoryConfig, List<String> finalKeyList) throws Exception {
+    protected <T> Map<String, T> doMultiGet(StoreCategoryConfig categoryConfig, List<String> finalKeyList) throws Exception {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    protected <T> Void doAsyncMultiGet(CacheKeyType categoryConfig, List<String> finalKeyList,
+    protected <T> Void doAsyncMultiGet(StoreCategoryConfig categoryConfig, List<String> finalKeyList,
                                        StoreCallback<Map<String, T>> callback) throws Exception {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    protected <T> Boolean doMultiSet(CacheKeyType categoryConfig, List<String> finalKeyList, 
+    protected <T> Boolean doMultiSet(StoreCategoryConfig categoryConfig, List<String> finalKeyList, 
                                      List<T> values) throws Exception {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public <T> Void doAsyncMultiSet(CacheKeyType categoryConfig, List<String> keys, List<T> values,
+    public <T> Void doAsyncMultiSet(StoreCategoryConfig categoryConfig, List<String> keys, List<T> values,
                                     StoreCallback<Boolean> callback) {
         // TODO Auto-generated method stub
         return null;
@@ -197,7 +197,7 @@ public class RedisStoreClientImpl extends AbstractStoreClient implements RedisSt
         if (key == null) {
             throw new IllegalArgumentException("store key is null");
         }
-        final CacheKeyType categoryConfig = configManager.findCacheKeyType(key.getCategory());
+        final StoreCategoryConfig categoryConfig = configManager.findCacheKeyType(key.getCategory());
         checkNotNull(categoryConfig, "%s's category config is null", key.getCategory());
         final String finalKey = categoryConfig.getKey(key.getParams());
         
@@ -214,7 +214,7 @@ public class RedisStoreClientImpl extends AbstractStoreClient implements RedisSt
     @Override
     public String type(StoreKey key) {
         checkNotNull(key, "store key is null");
-        final CacheKeyType categoryConfig = configManager.findCacheKeyType(key.getCategory());
+        final StoreCategoryConfig categoryConfig = configManager.findCacheKeyType(key.getCategory());
         checkNotNull(categoryConfig, "%s's category config is null", key.getCategory());
         final String finalKey = categoryConfig.getKey(key.getParams());
         
@@ -231,7 +231,7 @@ public class RedisStoreClientImpl extends AbstractStoreClient implements RedisSt
     @Override
     public Boolean expire(StoreKey key, final int seconds) {
         checkNotNull(key, "store key is null");
-        final CacheKeyType categoryConfig = configManager.findCacheKeyType(key.getCategory());
+        final StoreCategoryConfig categoryConfig = configManager.findCacheKeyType(key.getCategory());
         checkNotNull(categoryConfig, "%s's category config is null", key.getCategory());
         final String finalKey = categoryConfig.getKey(key.getParams());
         
@@ -249,7 +249,7 @@ public class RedisStoreClientImpl extends AbstractStoreClient implements RedisSt
     @Override
     public Long ttl(StoreKey key) {
         checkNotNull(key, "store key is null");
-        final CacheKeyType categoryConfig = configManager.findCacheKeyType(key.getCategory());
+        final StoreCategoryConfig categoryConfig = configManager.findCacheKeyType(key.getCategory());
         checkNotNull(categoryConfig, "%s's category config is null", key.getCategory());
         final String finalKey = categoryConfig.getKey(key.getParams());
         
@@ -267,7 +267,7 @@ public class RedisStoreClientImpl extends AbstractStoreClient implements RedisSt
     @Override
     public Boolean persist(StoreKey key) {
         checkNotNull(key, "store key is null");
-        final CacheKeyType categoryConfig = configManager.findCacheKeyType(key.getCategory());
+        final StoreCategoryConfig categoryConfig = configManager.findCacheKeyType(key.getCategory());
         checkNotNull(categoryConfig, "%s's category config is null", key.getCategory());
         final String finalKey = categoryConfig.getKey(key.getParams());
         
@@ -286,7 +286,7 @@ public class RedisStoreClientImpl extends AbstractStoreClient implements RedisSt
     public Long hset(StoreKey key, final String field, final Object value) {
         checkNotNull(key, "store key is null");
         checkNotNull(field, "hash field is null");
-        final CacheKeyType categoryConfig = configManager.findCacheKeyType(key.getCategory());
+        final StoreCategoryConfig categoryConfig = configManager.findCacheKeyType(key.getCategory());
         checkNotNull(categoryConfig, "%s's category config is null", key.getCategory());
         final String finalKey = categoryConfig.getKey(key.getParams());
         
@@ -306,7 +306,7 @@ public class RedisStoreClientImpl extends AbstractStoreClient implements RedisSt
     public <T> T hget(StoreKey key, final String field) {
         checkNotNull(key, "store key is null");
         checkNotNull(field, "hash field is null");
-        final CacheKeyType categoryConfig = configManager.findCacheKeyType(key.getCategory());
+        final StoreCategoryConfig categoryConfig = configManager.findCacheKeyType(key.getCategory());
         checkNotNull(categoryConfig, "%s's category config is null", key.getCategory());
         final String finalKey = categoryConfig.getKey(key.getParams());
         
@@ -332,7 +332,7 @@ public class RedisStoreClientImpl extends AbstractStoreClient implements RedisSt
         if(fields == null || fields.length == 0) {
             return null;
         }
-        final CacheKeyType categoryConfig = configManager.findCacheKeyType(key.getCategory());
+        final StoreCategoryConfig categoryConfig = configManager.findCacheKeyType(key.getCategory());
         checkNotNull(categoryConfig, "%s's category config is null", key.getCategory());
         final String finalKey = categoryConfig.getKey(key.getParams());
         
@@ -367,7 +367,7 @@ public class RedisStoreClientImpl extends AbstractStoreClient implements RedisSt
         if(objMap.size() == 0) {
             return true;
         }
-        final CacheKeyType categoryConfig = configManager.findCacheKeyType(key.getCategory());
+        final StoreCategoryConfig categoryConfig = configManager.findCacheKeyType(key.getCategory());
         checkNotNull(categoryConfig, "%s's category config is null", key.getCategory());
         final String finalKey = categoryConfig.getKey(key.getParams());
         
@@ -395,7 +395,7 @@ public class RedisStoreClientImpl extends AbstractStoreClient implements RedisSt
         if(fields == null || fields.length == 0) {
             return 0L;
         }
-        final CacheKeyType categoryConfig = configManager.findCacheKeyType(key.getCategory());
+        final StoreCategoryConfig categoryConfig = configManager.findCacheKeyType(key.getCategory());
         checkNotNull(categoryConfig, "%s's category config is null", key.getCategory());
         final String finalKey = categoryConfig.getKey(key.getParams());
         
@@ -412,7 +412,7 @@ public class RedisStoreClientImpl extends AbstractStoreClient implements RedisSt
     @Override
     public Set<String> hkeys(StoreKey key) {
         checkNotNull(key, "store key is null");
-        final CacheKeyType categoryConfig = configManager.findCacheKeyType(key.getCategory());
+        final StoreCategoryConfig categoryConfig = configManager.findCacheKeyType(key.getCategory());
         checkNotNull(categoryConfig, "%s's category config is null", key.getCategory());
         final String finalKey = categoryConfig.getKey(key.getParams());
         
@@ -429,7 +429,7 @@ public class RedisStoreClientImpl extends AbstractStoreClient implements RedisSt
     @Override
     public List<Object> hvals(StoreKey key) {
         checkNotNull(key, "store key is null");
-        final CacheKeyType categoryConfig = configManager.findCacheKeyType(key.getCategory());
+        final StoreCategoryConfig categoryConfig = configManager.findCacheKeyType(key.getCategory());
         checkNotNull(categoryConfig, "%s's category config is null", key.getCategory());
         final String finalKey = categoryConfig.getKey(key.getParams());
         
@@ -456,7 +456,7 @@ public class RedisStoreClientImpl extends AbstractStoreClient implements RedisSt
     @Override
     public Map<String, Object> hgetAll(StoreKey key) {
         checkNotNull(key, "store key is null");
-        final CacheKeyType categoryConfig = configManager.findCacheKeyType(key.getCategory());
+        final StoreCategoryConfig categoryConfig = configManager.findCacheKeyType(key.getCategory());
         checkNotNull(categoryConfig, "%s's category config is null", key.getCategory());
         final String finalKey = categoryConfig.getKey(key.getParams());
         
@@ -484,7 +484,7 @@ public class RedisStoreClientImpl extends AbstractStoreClient implements RedisSt
     public Long hincrBy(StoreKey key, final String field, final int amount) {
         checkNotNull(key, "store key is null");
         checkNotNull(field, "hash field is null");
-        final CacheKeyType categoryConfig = configManager.findCacheKeyType(key.getCategory());
+        final StoreCategoryConfig categoryConfig = configManager.findCacheKeyType(key.getCategory());
         checkNotNull(categoryConfig, "%s's category config is null", key.getCategory());
         final String finalKey = categoryConfig.getKey(key.getParams());
         
@@ -504,7 +504,7 @@ public class RedisStoreClientImpl extends AbstractStoreClient implements RedisSt
         if(objects == null || objects.length == 0) {
             return -1L;
         }
-        final CacheKeyType categoryConfig = configManager.findCacheKeyType(key.getCategory());
+        final StoreCategoryConfig categoryConfig = configManager.findCacheKeyType(key.getCategory());
         checkNotNull(categoryConfig, "%s's category config is null", key.getCategory());
         final String finalKey = categoryConfig.getKey(key.getParams());
         
@@ -532,7 +532,7 @@ public class RedisStoreClientImpl extends AbstractStoreClient implements RedisSt
         if(objects == null || objects.length == 0) {
             return -1L;
         }
-        final CacheKeyType categoryConfig = configManager.findCacheKeyType(key.getCategory());
+        final StoreCategoryConfig categoryConfig = configManager.findCacheKeyType(key.getCategory());
         checkNotNull(categoryConfig, "%s's category config is null", key.getCategory());
         final String finalKey = categoryConfig.getKey(key.getParams());
         
@@ -557,7 +557,7 @@ public class RedisStoreClientImpl extends AbstractStoreClient implements RedisSt
     @Override
     public <T> T lpop(StoreKey key) {
         checkNotNull(key, "store key is null");
-        final CacheKeyType categoryConfig = configManager.findCacheKeyType(key.getCategory());
+        final StoreCategoryConfig categoryConfig = configManager.findCacheKeyType(key.getCategory());
         checkNotNull(categoryConfig, "%s's category config is null", key.getCategory());
         final String finalKey = categoryConfig.getKey(key.getParams());
         
@@ -579,7 +579,7 @@ public class RedisStoreClientImpl extends AbstractStoreClient implements RedisSt
     @Override
     public <T> T rpop(StoreKey key) {
         checkNotNull(key, "store key is null");
-        final CacheKeyType categoryConfig = configManager.findCacheKeyType(key.getCategory());
+        final StoreCategoryConfig categoryConfig = configManager.findCacheKeyType(key.getCategory());
         checkNotNull(categoryConfig, "%s's category config is null", key.getCategory());
         final String finalKey = categoryConfig.getKey(key.getParams());
         
@@ -601,7 +601,7 @@ public class RedisStoreClientImpl extends AbstractStoreClient implements RedisSt
     @Override
     public <T> T lindex(StoreKey key, final long index) {
         checkNotNull(key, "store key is null");
-        final CacheKeyType categoryConfig = configManager.findCacheKeyType(key.getCategory());
+        final StoreCategoryConfig categoryConfig = configManager.findCacheKeyType(key.getCategory());
         checkNotNull(categoryConfig, "%s's category config is null", key.getCategory());
         final String finalKey = categoryConfig.getKey(key.getParams());
         
@@ -624,7 +624,7 @@ public class RedisStoreClientImpl extends AbstractStoreClient implements RedisSt
     public Boolean lset(StoreKey key, final long index, final Object object) {
         checkNotNull(key, "store key is null");
         checkNotNull(key, "value is null");
-        final CacheKeyType categoryConfig = configManager.findCacheKeyType(key.getCategory());
+        final StoreCategoryConfig categoryConfig = configManager.findCacheKeyType(key.getCategory());
         checkNotNull(categoryConfig, "%s's category config is null", key.getCategory());
         final String finalKey = categoryConfig.getKey(key.getParams());
         
@@ -646,7 +646,7 @@ public class RedisStoreClientImpl extends AbstractStoreClient implements RedisSt
     @Override
     public Long llen(StoreKey key) {
         checkNotNull(key, "store key is null");
-        final CacheKeyType categoryConfig = configManager.findCacheKeyType(key.getCategory());
+        final StoreCategoryConfig categoryConfig = configManager.findCacheKeyType(key.getCategory());
         checkNotNull(categoryConfig, "%s's category config is null", key.getCategory());
         final String finalKey = categoryConfig.getKey(key.getParams());
         
@@ -663,7 +663,7 @@ public class RedisStoreClientImpl extends AbstractStoreClient implements RedisSt
     @Override
     public List<Object> lrange(StoreKey key, final long start, final long end) {
         checkNotNull(key, "store key is null");
-        final CacheKeyType categoryConfig = configManager.findCacheKeyType(key.getCategory());
+        final StoreCategoryConfig categoryConfig = configManager.findCacheKeyType(key.getCategory());
         checkNotNull(categoryConfig, "%s's category config is null", key.getCategory());
         final String finalKey = categoryConfig.getKey(key.getParams());
         
@@ -690,7 +690,7 @@ public class RedisStoreClientImpl extends AbstractStoreClient implements RedisSt
     @Override
     public Boolean ltrim(StoreKey key, final long start, final long end) {
         checkNotNull(key, "store key is null");
-        final CacheKeyType categoryConfig = configManager.findCacheKeyType(key.getCategory());
+        final StoreCategoryConfig categoryConfig = configManager.findCacheKeyType(key.getCategory());
         checkNotNull(categoryConfig, "%s's category config is null", key.getCategory());
         final String finalKey = categoryConfig.getKey(key.getParams());
         
@@ -711,7 +711,7 @@ public class RedisStoreClientImpl extends AbstractStoreClient implements RedisSt
         if(objects == null || objects.length == 0) {
             return 0L;
         }
-        final CacheKeyType categoryConfig = configManager.findCacheKeyType(key.getCategory());
+        final StoreCategoryConfig categoryConfig = configManager.findCacheKeyType(key.getCategory());
         checkNotNull(categoryConfig, "%s's category config is null", key.getCategory());
         final String finalKey = categoryConfig.getKey(key.getParams());
         
@@ -743,7 +743,7 @@ public class RedisStoreClientImpl extends AbstractStoreClient implements RedisSt
         if(objects == null || objects.length == 0) {
             return 0L;
         }
-        final CacheKeyType categoryConfig = configManager.findCacheKeyType(key.getCategory());
+        final StoreCategoryConfig categoryConfig = configManager.findCacheKeyType(key.getCategory());
         checkNotNull(categoryConfig, "%s's category config is null", key.getCategory());
         final String finalKey = categoryConfig.getKey(key.getParams());
         
@@ -768,7 +768,7 @@ public class RedisStoreClientImpl extends AbstractStoreClient implements RedisSt
     @Override
     public Set<Object> smembers(StoreKey key) {
         checkNotNull(key, "store key is null");
-        final CacheKeyType categoryConfig = configManager.findCacheKeyType(key.getCategory());
+        final StoreCategoryConfig categoryConfig = configManager.findCacheKeyType(key.getCategory());
         checkNotNull(categoryConfig, "%s's category config is null", key.getCategory());
         final String finalKey = categoryConfig.getKey(key.getParams());
         
@@ -795,7 +795,7 @@ public class RedisStoreClientImpl extends AbstractStoreClient implements RedisSt
     @Override
     public Long scard(StoreKey key) {
         checkNotNull(key, "store key is null");
-        final CacheKeyType categoryConfig = configManager.findCacheKeyType(key.getCategory());
+        final StoreCategoryConfig categoryConfig = configManager.findCacheKeyType(key.getCategory());
         checkNotNull(categoryConfig, "%s's category config is null", key.getCategory());
         final String finalKey = categoryConfig.getKey(key.getParams());
         
@@ -813,7 +813,7 @@ public class RedisStoreClientImpl extends AbstractStoreClient implements RedisSt
     public Boolean sismember(StoreKey key, final Object member) {
         checkNotNull(key, "store key is null");
         checkNotNull(member, "set member is null");
-        final CacheKeyType categoryConfig = configManager.findCacheKeyType(key.getCategory());
+        final StoreCategoryConfig categoryConfig = configManager.findCacheKeyType(key.getCategory());
         checkNotNull(categoryConfig, "%s's category config is null", key.getCategory());
         final String finalKey = categoryConfig.getKey(key.getParams());
         
@@ -826,6 +826,11 @@ public class RedisStoreClientImpl extends AbstractStoreClient implements RedisSt
             }
             
         }, categoryConfig, finalKey, "sismember");
+    }
+
+    @Override
+    public String getScheme() {
+        return "redis-cluster";
     }
 
 }

@@ -26,7 +26,7 @@ import net.sf.ehcache.Element;
 import net.sf.ehcache.constructs.blocking.BlockingCache;
 import net.sf.ehcache.management.ManagementService;
 
-import com.dianping.squirrel.client.config.CacheKeyType;
+import com.dianping.squirrel.client.config.StoreCategoryConfig;
 import com.dianping.squirrel.client.config.StoreClientConfig;
 import com.dianping.squirrel.client.core.Configurable;
 import com.dianping.squirrel.client.core.Lifecycle;
@@ -75,7 +75,7 @@ public class EhcacheStoreClientImpl extends AbstractStoreClient implements Confi
 		}
 	}
 
-	public <T> T get(CacheKeyType categoryConfig, String key) {
+	public <T> T get(StoreCategoryConfig categoryConfig, String key) {
 		Element element = findCache(categoryConfig.getCategory()).get(key);
 		return (T) (element == null ? null : element.getObjectValue());
 	}
@@ -176,7 +176,7 @@ public class EhcacheStoreClientImpl extends AbstractStoreClient implements Confi
 	}
 
     @Override
-    protected <T> T doGet(CacheKeyType categoryConfig, String key) throws Exception {
+    protected <T> T doGet(StoreCategoryConfig categoryConfig, String key) throws Exception {
         String category = categoryConfig.getCategory();
         T result = get(categoryConfig, key);
 
@@ -206,7 +206,7 @@ public class EhcacheStoreClientImpl extends AbstractStoreClient implements Confi
     }
 
     @Override
-    protected Boolean doSet(CacheKeyType categoryConfig, String key, Object value) throws Exception {
+    protected Boolean doSet(StoreCategoryConfig categoryConfig, String key, Object value) throws Exception {
         String category = categoryConfig.getCategory();
         findCache(category).put(new Element(key, value, false, 0, categoryConfig.getDurationSeconds()));
         if (categoryConfig.isHot()) {
@@ -221,7 +221,7 @@ public class EhcacheStoreClientImpl extends AbstractStoreClient implements Confi
     }
 
     @Override
-    protected Boolean doAdd(CacheKeyType categoryConfig, String key, Object value) throws Exception {
+    protected Boolean doAdd(StoreCategoryConfig categoryConfig, String key, Object value) throws Exception {
         String category = categoryConfig.getCategory();
         Element element = findCache(category).
                         putIfAbsent(new Element(key, value, false, 0, categoryConfig.getDurationSeconds()));
@@ -241,12 +241,12 @@ public class EhcacheStoreClientImpl extends AbstractStoreClient implements Confi
     }
 
     @Override
-    protected Boolean doDelete(CacheKeyType categoryConfig, String finalKey) throws Exception {
+    protected Boolean doDelete(StoreCategoryConfig categoryConfig, String finalKey) throws Exception {
         return findCache(categoryConfig.getCategory()).remove(finalKey);
     }
 
     @Override
-    protected <T> Future<T> doAsyncGet(CacheKeyType categoryConfig, String key) throws Exception {
+    protected <T> Future<T> doAsyncGet(StoreCategoryConfig categoryConfig, String key) throws Exception {
         T result = doGet(categoryConfig, key);
         StoreFuture<T> future = new StoreFuture<T>(key);
         future.onSuccess(result);
@@ -254,7 +254,7 @@ public class EhcacheStoreClientImpl extends AbstractStoreClient implements Confi
     }
 
     @Override
-    protected Future<Boolean> doAsyncSet(CacheKeyType categoryConfig, String key, Object value) throws Exception {
+    protected Future<Boolean> doAsyncSet(StoreCategoryConfig categoryConfig, String key, Object value) throws Exception {
         boolean result = doSet(categoryConfig, key, value);
         StoreFuture<Boolean> future = new StoreFuture<Boolean>(key);
         future.onSuccess(result);
@@ -262,7 +262,7 @@ public class EhcacheStoreClientImpl extends AbstractStoreClient implements Confi
     }
 
     @Override
-    protected Future<Boolean> doAsyncAdd(CacheKeyType categoryConfig, String key, Object value) throws Exception {
+    protected Future<Boolean> doAsyncAdd(StoreCategoryConfig categoryConfig, String key, Object value) throws Exception {
         boolean result = doAdd(categoryConfig, key, value);
         StoreFuture<Boolean> future = new StoreFuture<Boolean>(key);
         future.onSuccess(result);
@@ -270,7 +270,7 @@ public class EhcacheStoreClientImpl extends AbstractStoreClient implements Confi
     }
 
     @Override
-    protected Future<Boolean> doAsyncDelete(CacheKeyType categoryConfig, String key) throws Exception {
+    protected Future<Boolean> doAsyncDelete(StoreCategoryConfig categoryConfig, String key) throws Exception {
         boolean result = doDelete(categoryConfig, key);
         StoreFuture<Boolean> future = new StoreFuture<Boolean>(key);
         future.onSuccess(result);
@@ -278,7 +278,7 @@ public class EhcacheStoreClientImpl extends AbstractStoreClient implements Confi
     }
 
     @Override
-    protected <T> Void doAsyncGet(CacheKeyType categoryConfig, String finalKey, 
+    protected <T> Void doAsyncGet(StoreCategoryConfig categoryConfig, String finalKey, 
                                   StoreCallback<T> callback) throws Exception {
         T result = doGet(categoryConfig, finalKey);
         callback.onSuccess(result);
@@ -286,7 +286,7 @@ public class EhcacheStoreClientImpl extends AbstractStoreClient implements Confi
     }
 
     @Override
-    protected Void doAsyncSet(CacheKeyType categoryConfig, String finalKey, Object value,
+    protected Void doAsyncSet(StoreCategoryConfig categoryConfig, String finalKey, Object value,
                               StoreCallback<Boolean> callback) throws Exception {
         boolean result = doSet(categoryConfig, finalKey, value);
         callback.onSuccess(result);
@@ -294,7 +294,7 @@ public class EhcacheStoreClientImpl extends AbstractStoreClient implements Confi
     }
 
     @Override
-    protected Void doAsyncAdd(CacheKeyType categoryConfig, String finalKey, Object value,
+    protected Void doAsyncAdd(StoreCategoryConfig categoryConfig, String finalKey, Object value,
                               StoreCallback<Boolean> callback) throws Exception {
         boolean result = doAdd(categoryConfig, finalKey, value);
         callback.onSuccess(result);
@@ -302,7 +302,7 @@ public class EhcacheStoreClientImpl extends AbstractStoreClient implements Confi
     }
 
     @Override
-    protected Void doAsyncDelete(CacheKeyType categoryConfig, String finalKey, 
+    protected Void doAsyncDelete(StoreCategoryConfig categoryConfig, String finalKey, 
                                  StoreCallback<Boolean> callback) throws Exception {
         boolean result = doDelete(categoryConfig, finalKey);
         callback.onSuccess(result);
@@ -310,12 +310,12 @@ public class EhcacheStoreClientImpl extends AbstractStoreClient implements Confi
     }
 
     @Override
-    protected Long doIncrease(CacheKeyType categoryConfig, String finalKey, int amount) throws Exception {
+    protected Long doIncrease(StoreCategoryConfig categoryConfig, String finalKey, int amount) throws Exception {
         throw new UnsupportedOperationException("ehcache does not support increase operation");
     }
 
     @Override
-    protected Long doDecrease(CacheKeyType categoryConfig, String key, int amount) throws Exception {
+    protected Long doDecrease(StoreCategoryConfig categoryConfig, String key, int amount) throws Exception {
         throw new UnsupportedOperationException("ehcache does not support decrease operation");
     }
     
@@ -324,7 +324,7 @@ public class EhcacheStoreClientImpl extends AbstractStoreClient implements Confi
     }
 
     @Override
-    protected <T> Map<String, T> doMultiGet(CacheKeyType categoryConfig, List<String> finalKeyList) throws Exception {
+    protected <T> Map<String, T> doMultiGet(StoreCategoryConfig categoryConfig, List<String> finalKeyList) throws Exception {
         Map<String, T> map = new HashMap<String, T>();
         for (String key : finalKeyList) {
             T result = doGet(categoryConfig, key);
@@ -336,7 +336,7 @@ public class EhcacheStoreClientImpl extends AbstractStoreClient implements Confi
     }
 
     @Override
-    protected <T> Void doAsyncMultiGet(CacheKeyType categoryConfig, List<String> finalKeyList,
+    protected <T> Void doAsyncMultiGet(StoreCategoryConfig categoryConfig, List<String> finalKeyList,
                                        StoreCallback<Map<String, T>> callback) throws Exception {
         Map<String, T> result = doMultiGet(categoryConfig, finalKeyList);
         callback.onSuccess(result);
@@ -344,7 +344,7 @@ public class EhcacheStoreClientImpl extends AbstractStoreClient implements Confi
     }
 
     @Override
-    protected <T> Boolean doMultiSet(CacheKeyType categoryConfig, List<String> keys, List<T> values) throws Exception {
+    protected <T> Boolean doMultiSet(StoreCategoryConfig categoryConfig, List<String> keys, List<T> values) throws Exception {
         for (int i = 0; i < keys.size(); i++) {
             String key = keys.get(i);
             T value = values.get(i);
@@ -354,7 +354,7 @@ public class EhcacheStoreClientImpl extends AbstractStoreClient implements Confi
     }
 
     @Override
-    public <T> Void doAsyncMultiSet(CacheKeyType categoryConfig, List<String> keys, List<T> values,
+    public <T> Void doAsyncMultiSet(StoreCategoryConfig categoryConfig, List<String> keys, List<T> values,
                                     StoreCallback<Boolean> callback) throws Exception {
         doMultiSet(categoryConfig, keys, values);
         callback.onSuccess(true);
@@ -364,6 +364,11 @@ public class EhcacheStoreClientImpl extends AbstractStoreClient implements Confi
     @Override
     public void configChanged(StoreClientConfig config) {
         // TODO: can trigger ehcache config reload etc.
+    }
+
+    @Override
+    public String getScheme() {
+        return "ehcache";
     }
     
 }

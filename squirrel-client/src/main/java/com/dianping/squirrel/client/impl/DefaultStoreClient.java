@@ -14,10 +14,9 @@ import org.slf4j.LoggerFactory;
 import com.dianping.squirrel.client.StoreClient;
 import com.dianping.squirrel.client.StoreClientFactory;
 import com.dianping.squirrel.client.StoreKey;
-import com.dianping.squirrel.client.config.CacheKeyType;
+import com.dianping.squirrel.client.config.StoreCategoryConfig;
 import com.dianping.squirrel.client.config.StoreCategoryConfigManager;
 import com.dianping.squirrel.client.core.StoreCallback;
-import com.dianping.squirrel.client.log.LoggerLoader;
 import com.dianping.squirrel.client.monitor.SizeMonitor;
 import com.dianping.squirrel.client.monitor.StatusHolder;
 import com.dianping.squirrel.client.monitor.TimeMonitor;
@@ -27,10 +26,6 @@ import com.dianping.squirrel.common.exception.StoreException;
 import com.dianping.squirrel.common.util.PathUtils;
 
 public class DefaultStoreClient implements StoreClient {
-
-    static {
-        LoggerLoader.init();
-    }
     
 	private static final Logger logger = LoggerFactory.getLogger(DefaultStoreClient.class);
 
@@ -358,7 +353,7 @@ public class DefaultStoreClient implements StoreClient {
     @Override
     public String getFinalKey(StoreKey storeKey) {
         checkNotNull(storeKey, "store key is null");
-        CacheKeyType categoryConfig = StoreCategoryConfigManager.getInstance().findCacheKeyType(storeKey.getCategory());
+        StoreCategoryConfig categoryConfig = StoreCategoryConfigManager.getInstance().findCacheKeyType(storeKey.getCategory());
         checkNotNull(categoryConfig, "%s's category config is null", storeKey.getCategory());
         return categoryConfig.getKey(storeKey.getParams());
     }
@@ -366,6 +361,11 @@ public class DefaultStoreClient implements StoreClient {
     @Override
     public boolean isDistributed() {
         return false;
+    }
+
+    @Override
+    public String getScheme() {
+        return "default";
     }
 
 }

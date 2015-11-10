@@ -200,13 +200,15 @@ public interface StoreClient {
      *         如果发生异常，会调用 callback 的 onFailure 方法，参数为异常
      */
 	<T> Void asyncMultiSet(List<StoreKey> keys, List<T> values, StoreCallback<Boolean> callback);
-
-	public String getFinalKey(StoreKey storeKey);
 	
 	public <T> T get(String finalKey) throws StoreException;
 	
-    public Boolean delete(String finalKey) throws StoreException;
-    
+	public Boolean delete(String finalKey) throws StoreException;
+	
+	public String getFinalKey(StoreKey storeKey);
+
     public boolean isDistributed();
+    
+    public String getScheme();
 
 }

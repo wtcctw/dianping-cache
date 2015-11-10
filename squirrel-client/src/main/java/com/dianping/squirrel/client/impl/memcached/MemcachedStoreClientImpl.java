@@ -41,7 +41,7 @@ import org.slf4j.LoggerFactory;
 import com.dianping.cat.Cat;
 import com.dianping.cat.message.Message;
 import com.dianping.squirrel.client.StoreKey;
-import com.dianping.squirrel.client.config.CacheKeyType;
+import com.dianping.squirrel.client.config.StoreCategoryConfig;
 import com.dianping.squirrel.client.config.StoreClientConfig;
 import com.dianping.squirrel.client.core.Configurable;
 import com.dianping.squirrel.client.core.Lifecycle;
@@ -221,7 +221,7 @@ public class MemcachedStoreClientImpl extends AbstractStoreClient implements Mem
     @Override
     public <T> CASValue<T> gets(StoreKey key) throws StoreException {
         checkNotNull(key, "store key is null");
-        final CacheKeyType categoryConfig = super.configManager.findCacheKeyType(key.getCategory());
+        final StoreCategoryConfig categoryConfig = super.configManager.findCacheKeyType(key.getCategory());
         checkNotNull(categoryConfig, "%s's category config is null", key.getCategory());
         final String finalKey = categoryConfig.getKey(key.getParams());
 
@@ -239,7 +239,7 @@ public class MemcachedStoreClientImpl extends AbstractStoreClient implements Mem
     public CASResponse cas(StoreKey key, final long casId, final Object value) throws StoreException {
         checkNotNull(key, "store key is null");
         checkNotNull(value, "value is null");
-        final CacheKeyType categoryConfig = super.configManager.findCacheKeyType(key.getCategory());
+        final StoreCategoryConfig categoryConfig = super.configManager.findCacheKeyType(key.getCategory());
         checkNotNull(categoryConfig, "%s's category config is null", key.getCategory());
         final String finalKey = categoryConfig.getKey(key.getParams());
 
@@ -253,7 +253,7 @@ public class MemcachedStoreClientImpl extends AbstractStoreClient implements Mem
         }, categoryConfig, finalKey, "cas");
     }
 
-    public <T> CASValue<T> doGets(CacheKeyType categoryConfig, String key) throws StoreException {
+    public <T> CASValue<T> doGets(StoreCategoryConfig categoryConfig, String key) throws StoreException {
         String reformedKey = CacheKeyUtils.reformKey(key);
         MemcachedClient client = getReadClient();
         try {
@@ -273,7 +273,7 @@ public class MemcachedStoreClientImpl extends AbstractStoreClient implements Mem
         }
     }
 
-    public CASResponse doCas(CacheKeyType categoryConfig, String key, long casId, Object value) throws StoreException {
+    public CASResponse doCas(StoreCategoryConfig categoryConfig, String key, long casId, Object value) throws StoreException {
         String reformedKey = CacheKeyUtils.reformKey(key);
         MemcachedClient client = getWriteClient();
         try {
@@ -467,7 +467,7 @@ public class MemcachedStoreClientImpl extends AbstractStoreClient implements Mem
     }
 
     @Override
-    protected <T> T doGet(CacheKeyType categoryConfig, String key) throws Exception {
+    protected <T> T doGet(StoreCategoryConfig categoryConfig, String key) throws Exception {
         boolean isHot = categoryConfig.isHot();
         String category = categoryConfig.getCategory();
         TimeoutException timeoutException = null;
@@ -516,7 +516,7 @@ public class MemcachedStoreClientImpl extends AbstractStoreClient implements Mem
     }
 
     @Override
-    protected Boolean doSet(CacheKeyType categoryConfig, String key, Object value) throws Exception {
+    protected Boolean doSet(StoreCategoryConfig categoryConfig, String key, Object value) throws Exception {
         boolean isHot = categoryConfig.isHot();
         String category = categoryConfig.getCategory();
         int expiration = categoryConfig.getDurationSeconds();
@@ -545,7 +545,7 @@ public class MemcachedStoreClientImpl extends AbstractStoreClient implements Mem
     }
 
     @Override
-    protected Boolean doAdd(CacheKeyType categoryConfig, String finalKey, Object value) throws Exception {
+    protected Boolean doAdd(StoreCategoryConfig categoryConfig, String finalKey, Object value) throws Exception {
         boolean isHot = categoryConfig.isHot();
         int expiration = categoryConfig.getDurationSeconds();
         String category = categoryConfig.getCategory();
@@ -575,7 +575,7 @@ public class MemcachedStoreClientImpl extends AbstractStoreClient implements Mem
     }
 
     @Override
-    protected Boolean doDelete(CacheKeyType categoryConfig, String finalKey) throws Exception {
+    protected Boolean doDelete(StoreCategoryConfig categoryConfig, String finalKey) throws Exception {
         boolean isHot = categoryConfig.isHot();
         String category = categoryConfig.getCategory();
         MemcachedClient client = getWriteClient();
@@ -601,7 +601,7 @@ public class MemcachedStoreClientImpl extends AbstractStoreClient implements Mem
     }
 
     @Override
-    protected <T> GetFuture<T> doAsyncGet(CacheKeyType categoryConfig, String key) throws Exception {
+    protected <T> GetFuture<T> doAsyncGet(StoreCategoryConfig categoryConfig, String key) throws Exception {
         String finalKey = CacheKeyUtils.nextCacheKey(key, categoryConfig.isHot(), hotKeyHitRange);
         MemcachedClient client = getReadClient();
         try {
@@ -614,7 +614,7 @@ public class MemcachedStoreClientImpl extends AbstractStoreClient implements Mem
     }
 
     @Override
-    protected OperationFuture<Boolean> doAsyncSet(CacheKeyType categoryConfig, String key, Object value)
+    protected OperationFuture<Boolean> doAsyncSet(StoreCategoryConfig categoryConfig, String key, Object value)
             throws Exception {
         boolean isHot = categoryConfig.isHot();
         String category = categoryConfig.getCategory();
@@ -634,7 +634,7 @@ public class MemcachedStoreClientImpl extends AbstractStoreClient implements Mem
     }
 
     @Override
-    protected OperationFuture<Boolean> doAsyncAdd(CacheKeyType categoryConfig, String key, Object value)
+    protected OperationFuture<Boolean> doAsyncAdd(StoreCategoryConfig categoryConfig, String key, Object value)
             throws Exception {
         boolean isHot = categoryConfig.isHot();
         String category = categoryConfig.getCategory();
@@ -653,7 +653,7 @@ public class MemcachedStoreClientImpl extends AbstractStoreClient implements Mem
     }
 
     @Override
-    protected OperationFuture<Boolean> doAsyncDelete(CacheKeyType categoryConfig, String key) throws Exception {
+    protected OperationFuture<Boolean> doAsyncDelete(StoreCategoryConfig categoryConfig, String key) throws Exception {
         String reformedKey = getCacheKey(key, categoryConfig.isHot());
         OperationFuture<Boolean> future = getWriteClient().delete(reformedKey);
         asyncRemoveBackupKey(key, categoryConfig.isHot(), categoryConfig.getCategory());
@@ -661,7 +661,7 @@ public class MemcachedStoreClientImpl extends AbstractStoreClient implements Mem
     }
 
     @Override
-    protected <T> Void doAsyncGet(final CacheKeyType categoryConfig, final String key, final StoreCallback<T> callback)
+    protected <T> Void doAsyncGet(final StoreCategoryConfig categoryConfig, final String key, final StoreCallback<T> callback)
             throws Exception {
         GetFuture<T> future = doAsyncGet(categoryConfig, key);
         final MemcachedClient client = getReadClient();
@@ -691,7 +691,7 @@ public class MemcachedStoreClientImpl extends AbstractStoreClient implements Mem
     }
 
     @Override
-    protected Void doAsyncSet(final CacheKeyType categoryConfig, final String key, Object value,
+    protected Void doAsyncSet(final StoreCategoryConfig categoryConfig, final String key, Object value,
             final StoreCallback<Boolean> callback) throws Exception {
         OperationFuture<Boolean> future = doAsyncSet(categoryConfig, key, value);
         final MemcachedClient client = getReadClient();
@@ -721,7 +721,7 @@ public class MemcachedStoreClientImpl extends AbstractStoreClient implements Mem
     }
 
     @Override
-    protected Void doAsyncAdd(final CacheKeyType categoryConfig, final String key, Object value,
+    protected Void doAsyncAdd(final StoreCategoryConfig categoryConfig, final String key, Object value,
             final StoreCallback<Boolean> callback) throws Exception {
         OperationFuture<Boolean> future = doAsyncAdd(categoryConfig, key, value);
         final MemcachedClient client = getReadClient();
@@ -751,7 +751,7 @@ public class MemcachedStoreClientImpl extends AbstractStoreClient implements Mem
     }
 
     @Override
-    protected Void doAsyncDelete(final CacheKeyType categoryConfig, final String key,
+    protected Void doAsyncDelete(final StoreCategoryConfig categoryConfig, final String key,
             final StoreCallback<Boolean> callback) throws Exception {
         OperationFuture<Boolean> future = doAsyncDelete(categoryConfig, key);
         final MemcachedClient client = getReadClient();
@@ -781,7 +781,7 @@ public class MemcachedStoreClientImpl extends AbstractStoreClient implements Mem
     }
 
     @Override
-    protected Long doIncrease(CacheKeyType categoryConfig, String finalKey, int amount) throws Exception {
+    protected Long doIncrease(StoreCategoryConfig categoryConfig, String finalKey, int amount) throws Exception {
         MemcachedClient client = getWriteClient();
         try {
             long value = client.incr(finalKey, amount, (long) amount);
@@ -797,7 +797,7 @@ public class MemcachedStoreClientImpl extends AbstractStoreClient implements Mem
     }
 
     @Override
-    protected Long doDecrease(CacheKeyType categoryConfig, String finalKey, int amount) throws Exception {
+    protected Long doDecrease(StoreCategoryConfig categoryConfig, String finalKey, int amount) throws Exception {
         MemcachedClient client = getWriteClient();
         try {
             long value = client.decr(finalKey, amount, (long) (0 - amount));
@@ -813,7 +813,7 @@ public class MemcachedStoreClientImpl extends AbstractStoreClient implements Mem
     }
 
     @Override
-    protected <T> Map<String, T> doMultiGet(CacheKeyType categoryConfig, List<String> keys) throws Exception {
+    protected <T> Map<String, T> doMultiGet(StoreCategoryConfig categoryConfig, List<String> keys) throws Exception {
         MemcachedClient client = getReadClient();
         try {
             // use timeout to eliminate memcached servers' crash
@@ -830,7 +830,7 @@ public class MemcachedStoreClientImpl extends AbstractStoreClient implements Mem
     }
 
     @Override
-    protected <T> Void doAsyncMultiGet(CacheKeyType categoryConfig, final List<String> keys,
+    protected <T> Void doAsyncMultiGet(StoreCategoryConfig categoryConfig, final List<String> keys,
             final StoreCallback<Map<String, T>> callback) throws Exception {
         MemcachedClient client = getReadClient();
 
@@ -856,13 +856,13 @@ public class MemcachedStoreClientImpl extends AbstractStoreClient implements Mem
     }
 
     @Override
-    protected <T> Boolean doMultiSet(CacheKeyType categoryConfig, List<String> finalKeyList, List<T> values)
+    protected <T> Boolean doMultiSet(StoreCategoryConfig categoryConfig, List<String> finalKeyList, List<T> values)
             throws Exception {
         throw new UnsupportedOperationException("memcached does not support multi set");
     }
 
     @Override
-    public <T> Void doAsyncMultiSet(CacheKeyType categoryConfig, List<String> keys, List<T> values,
+    public <T> Void doAsyncMultiSet(StoreCategoryConfig categoryConfig, List<String> keys, List<T> values,
             StoreCallback<Boolean> callback) throws Exception {
         throw new UnsupportedOperationException("memcached does not support async multi set");
     }
@@ -870,7 +870,7 @@ public class MemcachedStoreClientImpl extends AbstractStoreClient implements Mem
     @Override
     public String locate(StoreKey key) {
         checkNotNull(key, "store key is null");
-        final CacheKeyType categoryConfig = super.configManager.findCacheKeyType(key.getCategory());
+        final StoreCategoryConfig categoryConfig = super.configManager.findCacheKeyType(key.getCategory());
         checkNotNull(categoryConfig, "%s's category config is null", key.getCategory());
         final String finalKey = categoryConfig.getKey(key.getParams());
         
@@ -885,6 +885,11 @@ public class MemcachedStoreClientImpl extends AbstractStoreClient implements Mem
         MemcachedClient client = getReadClient();
         MemcachedNode node = client.getNodeLocator().getPrimary(finalKey);
         return node == null ? null : node.getSocketAddress().toString();
+    }
+
+    @Override
+    public String getScheme() {
+        return "memcached";
     }
 
 }

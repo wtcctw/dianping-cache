@@ -40,37 +40,37 @@ public class StoreCategoryConfigManagerTest {
     
     @Test
     public void testGetCacheKeyType() {
-        CacheKeyType categoryConfig = StoreCategoryConfigManager.getInstance().findCacheKeyType("non-exist");
+        StoreCategoryConfig categoryConfig = StoreCategoryConfigManager.getInstance().findCacheKeyType("non-exist");
         assertNotNull(categoryConfig);
-        assertTrue(categoryConfig instanceof DefaultCacheKeyType);
+        assertTrue(categoryConfig instanceof DefaultStoreCategoryConfig);
         System.out.println(categoryConfig);
         categoryConfig = StoreCategoryConfigManager.getInstance().findCacheKeyType("mymemcache");
         assertNotNull(categoryConfig);
-        assertFalse(categoryConfig instanceof DefaultCacheKeyType);
+        assertFalse(categoryConfig instanceof DefaultStoreCategoryConfig);
         System.out.println(categoryConfig);
     }
     
     @Test
     public void testCategoryConfigListener() {
         final CountDownLatch latch = new CountDownLatch(1);
-        final ResultHolder<CacheKeyType> holder = new ResultHolder<CacheKeyType>();
+        final ResultHolder<StoreCategoryConfig> holder = new ResultHolder<StoreCategoryConfig>();
         
         StoreCategoryConfigManager.getInstance().addConfigListener(new StoreCategoryConfigListener() {
             
             @Override
-            public void configRemoved(CacheKeyType categoryConfig) {
+            public void configRemoved(StoreCategoryConfig categoryConfig) {
                 holder.result = categoryConfig;
                 latch.countDown();
             }
             
             @Override
-            public void configChanged(CacheKeyType categoryConfig) {
+            public void configChanged(StoreCategoryConfig categoryConfig) {
                 holder.result = categoryConfig;
                 latch.countDown();
             }
         });
         
-        CacheKeyType categoryConfig = StoreCategoryConfigManager.getInstance().findCacheKeyType("mymemcache");
+        StoreCategoryConfig categoryConfig = StoreCategoryConfigManager.getInstance().findCacheKeyType("mymemcache");
         CacheKeyConfigurationDTO configDto = storeConfigService.getKeyConfiguration("mymemcache");
         configDto.setIndexDesc("hahaha");
         configDto.setAddTime(System.currentTimeMillis());

@@ -2,8 +2,8 @@ package com.dianping.squirrel.client.config;
 
 public interface StoreCategoryConfigListener {
 
-    public void configChanged(CacheKeyType categoryConfig);
+    public void configChanged(StoreCategoryConfig categoryConfig);
     
-    public void configRemoved(CacheKeyType categoryConfig);
+    public void configRemoved(StoreCategoryConfig categoryConfig);
     
 }

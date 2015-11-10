@@ -51,7 +51,7 @@ public class StoreCategoryConfigManager {
 
 	private CacheCuratorClient cacheCuratorClient = CacheCuratorClient.getInstance();
 
-	private ConcurrentMap<String, CacheKeyType> cacheKeyTypes = new ConcurrentHashMap<String, CacheKeyType>();
+	private ConcurrentMap<String, StoreCategoryConfig> cacheKeyTypes = new ConcurrentHashMap<String, StoreCategoryConfig>();
 
 	private Set<String> usedCategories = new ConcurrentSkipListSet<String>();
 
@@ -88,7 +88,7 @@ public class StoreCategoryConfigManager {
         configListeners.add(listener);
     }
     
-    private void fireConfigChanged(CacheKeyType categoryConfig) {
+    private void fireConfigChanged(StoreCategoryConfig categoryConfig) {
         if(configListeners != null) {
             for(StoreCategoryConfigListener listener : configListeners) {
                 try {
@@ -100,7 +100,7 @@ public class StoreCategoryConfigManager {
         }
     }
     
-    private void fireConfigRemoved(CacheKeyType categoryConfig) {
+    private void fireConfigRemoved(StoreCategoryConfig categoryConfig) {
         if(configListeners != null) {
             for(StoreCategoryConfigListener listener : configListeners) {
                 try {
@@ -112,12 +112,12 @@ public class StoreCategoryConfigManager {
         }
     }
     
-	public CacheKeyType getCacheKeyType(String category) {
+	public StoreCategoryConfig getCacheKeyType(String category) {
 		return cacheKeyTypes.get(category);
 	}
 
-	public CacheKeyType init(String category) {
-		CacheKeyType cacheKeyType = cacheKeyTypes.get(category);
+	public StoreCategoryConfig init(String category) {
+		StoreCategoryConfig cacheKeyType = cacheKeyTypes.get(category);
 		if (cacheKeyType == null) {
 			synchronized (this) {
 				cacheKeyType = cacheKeyTypes.get(category);
@@ -131,7 +131,7 @@ public class StoreCategoryConfigManager {
 					if (categoryConfig == null) {
 						logger.error("category config is null: " + category);
 						Cat.logError(new CacheException("category config is null: " + category));
-						CacheKeyType defaultType = new DefaultCacheKeyType(category);
+						StoreCategoryConfig defaultType = new DefaultStoreCategoryConfig(category);
 						cacheKeyTypes.put(category, defaultType);
 						return defaultType;
 					}
@@ -143,7 +143,7 @@ public class StoreCategoryConfigManager {
 		return cacheKeyType;
 	}
 
-	public CacheKeyType findCacheKeyType(String category) {
+	public StoreCategoryConfig findCacheKeyType(String category) {
 	    if(StringUtils.isBlank(category)) {
 	        throw new NullPointerException("store category is empty");
 	    }
@@ -163,15 +163,15 @@ public class StoreCategoryConfigManager {
 	 * @param configurationDTO
 	 */
 	public void updateConfig(CacheKeyConfigurationDTO configurationDTO) {
-	    CacheKeyType categoryConfig = registerCacheKey(configurationDTO);
+	    StoreCategoryConfig categoryConfig = registerCacheKey(configurationDTO);
 		fireConfigChanged(categoryConfig);
 	}
 
 	/**
 	 * @param configurationDTO
 	 */
-	private CacheKeyType registerCacheKey(CacheKeyConfigurationDTO configurationDTO) {
-		CacheKeyType cacheKeyType = new CacheKeyType();
+	private StoreCategoryConfig registerCacheKey(CacheKeyConfigurationDTO configurationDTO) {
+		StoreCategoryConfig cacheKeyType = new StoreCategoryConfig();
 		DTOUtils.copyProperties(cacheKeyType, configurationDTO);
 		cacheKeyTypes.put(cacheKeyType.getCategory(), cacheKeyType);
 		return cacheKeyType;
@@ -182,7 +182,7 @@ public class StoreCategoryConfigManager {
 	}
 
 	public void removeCacheKeyType(String category) {
-	    CacheKeyType categoryConfig = cacheKeyTypes.remove(category);
+	    StoreCategoryConfig categoryConfig = cacheKeyTypes.remove(category);
 	    if(categoryConfig != null) {
 	        fireConfigRemoved(categoryConfig);
 	    }

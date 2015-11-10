@@ -19,12 +19,12 @@ package com.dianping.squirrel.client.config;
  * @author liujian
  *
  */
-public class DefaultCacheKeyType extends CacheKeyType {
+public class DefaultStoreCategoryConfig extends StoreCategoryConfig {
 
 	/**
 	 * @param category
 	 */
-	public DefaultCacheKeyType(String category) {
+	public DefaultStoreCategoryConfig(String category) {
 		setCategory(category);
 		setDuration("2");
 		setIndexTemplate("{0}");

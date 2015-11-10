@@ -14,7 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.dianping.squirrel.client.StoreKey;
-import com.dianping.squirrel.client.config.CacheKeyType;
+import com.dianping.squirrel.client.config.StoreCategoryConfig;
 import com.dianping.squirrel.client.config.StoreClientConfig;
 import com.dianping.squirrel.client.core.Configurable;
 import com.dianping.squirrel.client.core.StoreCallback;
@@ -136,7 +136,7 @@ public class DCacheStoreClientImpl extends AbstractStoreClient implements DCache
     }
 
     @Override
-    protected <T> T doGet(CacheKeyType categoryConfig, String finalKey) throws Exception {
+    protected <T> T doGet(StoreCategoryConfig categoryConfig, String finalKey) throws Exception {
         KVCacheResult result = getKVClient().get(finalKey);
         if (result != null) {
             if (result.getCode() == DCacheConst.ET_SUCC) {
@@ -149,7 +149,7 @@ public class DCacheStoreClientImpl extends AbstractStoreClient implements DCache
     }
 
     @Override
-    protected Boolean doSet(CacheKeyType categoryConfig, String finalKey, Object value) throws Exception {
+    protected Boolean doSet(StoreCategoryConfig categoryConfig, String finalKey, Object value) throws Exception {
         KVCacheResult result = null;
         int expiration = categoryConfig.getDurationSeconds();
         if (expiration <= 0) {
@@ -166,7 +166,7 @@ public class DCacheStoreClientImpl extends AbstractStoreClient implements DCache
     }
 
     @Override
-    protected Boolean doAdd(CacheKeyType categoryConfig, String finalKey, Object value) throws Exception {
+    protected Boolean doAdd(StoreCategoryConfig categoryConfig, String finalKey, Object value) throws Exception {
         KVCacheResult result = null;
         int expiration = categoryConfig.getDurationSeconds();
         if (expiration <= 0) {
@@ -189,7 +189,7 @@ public class DCacheStoreClientImpl extends AbstractStoreClient implements DCache
     }
 
     @Override
-    protected Boolean doDelete(CacheKeyType categoryConfig, String finalKey) throws Exception {
+    protected Boolean doDelete(StoreCategoryConfig categoryConfig, String finalKey) throws Exception {
         KVCacheResult result = getKVClient().delete(finalKey);
         if (result != null) {
             if (result.getCode() == DCacheConst.ET_SUCC) {
@@ -205,7 +205,7 @@ public class DCacheStoreClientImpl extends AbstractStoreClient implements DCache
     }
 
     @Override
-    protected <T> Future<T> doAsyncGet(CacheKeyType categoryConfig, String finalKey) throws Exception {
+    protected <T> Future<T> doAsyncGet(StoreCategoryConfig categoryConfig, String finalKey) throws Exception {
         final StoreFuture<T> future = new StoreFuture<T>(finalKey);
         ClientCallback<KVCacheResult> dcacheCallback = new ClientCallback<KVCacheResult>() {
 
@@ -234,7 +234,7 @@ public class DCacheStoreClientImpl extends AbstractStoreClient implements DCache
     }
 
     @Override
-    protected Future<Boolean> doAsyncSet(CacheKeyType categoryConfig, String finalKey, Object value) throws Exception {
+    protected Future<Boolean> doAsyncSet(StoreCategoryConfig categoryConfig, String finalKey, Object value) throws Exception {
         final StoreFuture<Boolean> future = new StoreFuture<Boolean>(finalKey);
         ClientCallback<KVCacheResult> callback = new ClientCallback<KVCacheResult>() {
 
@@ -268,7 +268,7 @@ public class DCacheStoreClientImpl extends AbstractStoreClient implements DCache
     }
 
     @Override
-    protected Future<Boolean> doAsyncAdd(CacheKeyType categoryConfig, String finalKey, Object value) throws Exception {
+    protected Future<Boolean> doAsyncAdd(StoreCategoryConfig categoryConfig, String finalKey, Object value) throws Exception {
         final StoreFuture<Boolean> future = new StoreFuture<Boolean>(finalKey);
         ClientCallback<KVCacheResult> callback = new ClientCallback<KVCacheResult>() {
 
@@ -299,7 +299,7 @@ public class DCacheStoreClientImpl extends AbstractStoreClient implements DCache
     }
 
     @Override
-    protected Future<Boolean> doAsyncDelete(CacheKeyType categoryConfig, String finalKey) throws Exception {
+    protected Future<Boolean> doAsyncDelete(StoreCategoryConfig categoryConfig, String finalKey) throws Exception {
         final StoreFuture<Boolean> future = new StoreFuture<Boolean>(finalKey);
         ClientCallback<KVCacheResult> callback = new ClientCallback<KVCacheResult>() {
 
@@ -333,7 +333,7 @@ public class DCacheStoreClientImpl extends AbstractStoreClient implements DCache
     }
 
     @Override
-    protected <T> Void doAsyncGet(CacheKeyType categoryConfig, String finalKey, final StoreCallback<T> callback) throws Exception {
+    protected <T> Void doAsyncGet(StoreCategoryConfig categoryConfig, String finalKey, final StoreCallback<T> callback) throws Exception {
         ClientCallback<KVCacheResult> dcacheCallback = new ClientCallback<KVCacheResult>() {
 
             @Override
@@ -363,7 +363,7 @@ public class DCacheStoreClientImpl extends AbstractStoreClient implements DCache
     }
 
     @Override
-    protected Void doAsyncSet(CacheKeyType categoryConfig, String finalKey, Object value, final StoreCallback<Boolean> callback) throws Exception {
+    protected Void doAsyncSet(StoreCategoryConfig categoryConfig, String finalKey, Object value, final StoreCallback<Boolean> callback) throws Exception {
         ClientCallback<KVCacheResult> dcacheCallback = new ClientCallback<KVCacheResult>() {
 
             @Override
@@ -396,7 +396,7 @@ public class DCacheStoreClientImpl extends AbstractStoreClient implements DCache
     }
 
     @Override
-    protected Void doAsyncAdd(CacheKeyType categoryConfig, String finalKey, Object value,
+    protected Void doAsyncAdd(StoreCategoryConfig categoryConfig, String finalKey, Object value,
                               final StoreCallback<Boolean> callback) throws Exception {
         ClientCallback<KVCacheResult> dcacheCallback = new ClientCallback<KVCacheResult>() {
 
@@ -425,7 +425,7 @@ public class DCacheStoreClientImpl extends AbstractStoreClient implements DCache
     }
 
     @Override
-    protected Void doAsyncDelete(CacheKeyType categoryConfig, String finalKey, final StoreCallback<Boolean> callback) throws Exception {
+    protected Void doAsyncDelete(StoreCategoryConfig categoryConfig, String finalKey, final StoreCallback<Boolean> callback) throws Exception {
         final ClientCallback<KVCacheResult> dcacheCallback = new ClientCallback<KVCacheResult>() {
 
             @Override
@@ -458,17 +458,17 @@ public class DCacheStoreClientImpl extends AbstractStoreClient implements DCache
     }
 
     @Override
-    protected Long doIncrease(CacheKeyType categoryConfig, String finalKey, int amount) {
+    protected Long doIncrease(StoreCategoryConfig categoryConfig, String finalKey, int amount) {
         throw new UnsupportedOperationException("dcache does not support increase operation");
     }
 
     @Override
-    protected Long doDecrease(CacheKeyType categoryConfig, String finalKey, int amount) {
+    protected Long doDecrease(StoreCategoryConfig categoryConfig, String finalKey, int amount) {
         throw new UnsupportedOperationException("dcache does not support decrease operation");
     }
 
     @Override
-    protected <T> Map<String, T> doMultiGet(CacheKeyType categoryConfig, List<String> keys) throws Exception {
+    protected <T> Map<String, T> doMultiGet(StoreCategoryConfig categoryConfig, List<String> keys) throws Exception {
         Map<String, T> result = null;
         List<Object> list = new ArrayList<Object>(keys);
         
@@ -493,7 +493,7 @@ public class DCacheStoreClientImpl extends AbstractStoreClient implements DCache
     }
 
     @Override
-    protected <T> Void doAsyncMultiGet(CacheKeyType categoryConfig, List<String> finalKeyList,
+    protected <T> Void doAsyncMultiGet(StoreCategoryConfig categoryConfig, List<String> finalKeyList,
                                        final StoreCallback<Map<String, T>> callback) throws Exception {
         ClientCallback<BatchKVCacheResult> dcacheCallback = new ClientCallback<BatchKVCacheResult>() {
 
@@ -529,7 +529,7 @@ public class DCacheStoreClientImpl extends AbstractStoreClient implements DCache
     }
 
     @Override
-    protected <T> Boolean doMultiSet(CacheKeyType categoryConfig, List<String> keys, List<T> values) throws Exception {
+    protected <T> Boolean doMultiSet(StoreCategoryConfig categoryConfig, List<String> keys, List<T> values) throws Exception {
         BatchKVCacheResult result = null;
         Map<Object, InputValue> kvs = new HashMap<Object, InputValue>();
         for (int i = 0; i < keys.size(); i++) {
@@ -546,7 +546,7 @@ public class DCacheStoreClientImpl extends AbstractStoreClient implements DCache
     }
 
     @Override
-    public <T> Void doAsyncMultiSet(CacheKeyType categoryConfig, List<String> keys, List<T> values,
+    public <T> Void doAsyncMultiSet(StoreCategoryConfig categoryConfig, List<String> keys, List<T> values,
                                     final StoreCallback<Boolean> callback) throws Exception {
         ClientCallback<BatchKVCacheResult> dcacheCallback = null;
         if (callback != null) {
@@ -589,6 +589,11 @@ public class DCacheStoreClientImpl extends AbstractStoreClient implements DCache
     public void configChanged(StoreClientConfig config) {
         logger.info("dcache store client config changed: " + config);
         initClient();
+    }
+
+    @Override
+    public String getScheme() {
+        return "dcache";
     }
 
 }

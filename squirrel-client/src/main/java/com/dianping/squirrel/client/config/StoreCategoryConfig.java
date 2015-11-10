@@ -30,9 +30,9 @@ import org.slf4j.LoggerFactory;
  * @author danson.liu
  * 
  */
-public class CacheKeyType {
+public class StoreCategoryConfig {
 
-    private static final Logger logger = LoggerFactory.getLogger(CacheKeyType.class);
+    private static final Logger logger = LoggerFactory.getLogger(StoreCategoryConfig.class);
     
 	public final static String DEFAULT_STORE_TYPE = "memcached";
 

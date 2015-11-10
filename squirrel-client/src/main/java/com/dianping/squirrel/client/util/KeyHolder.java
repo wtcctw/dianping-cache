@@ -8,18 +8,17 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 
 import com.dianping.squirrel.client.StoreKey;
-import com.dianping.squirrel.client.config.CacheKeyType;
+import com.dianping.squirrel.client.config.StoreCategoryConfig;
 
 public class KeyHolder {
 
-    private CacheKeyType categoryConfig;
+    private StoreCategoryConfig categoryConfig;
     
     private Map<String, StoreKey> keyMap;
     
-    public KeyHolder(CacheKeyType categoryConfig, List<StoreKey> storeKeys) {
+    public KeyHolder(StoreCategoryConfig categoryConfig, List<StoreKey> storeKeys) {
         checkNotNull(categoryConfig, "category config is null");
         this.categoryConfig = categoryConfig;
         checkNotNull(storeKeys, "store key list is null");
