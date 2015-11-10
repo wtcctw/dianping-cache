@@ -30,15 +30,12 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.dianping.pigeon.remoting.ServiceFactory;
-import com.dianping.remote.cache.CacheConfigurationWebService;
 import com.dianping.remote.cache.dto.CacheConfigurationDTO;
 import com.dianping.squirrel.client.StoreClient;
 import com.dianping.squirrel.client.config.zookeeper.CacheCuratorClient;
 import com.dianping.squirrel.client.core.CacheConfiguration;
 import com.dianping.squirrel.client.core.StoreClientBuilder;
 import com.dianping.squirrel.client.impl.dcache.DCacheStoreClientImpl;
-import com.dianping.squirrel.client.impl.dcache.DCacheTranscoder;
 import com.dianping.squirrel.client.impl.ehcache.EhcacheStoreClientImpl;
 import com.dianping.squirrel.client.impl.memcached.MemcachedStoreClientImpl;
 import com.dianping.squirrel.client.impl.redis.RedisStoreClientImpl;
@@ -186,7 +183,6 @@ public class StoreClientConfigManager {
             configDto.setClientClazz(MemcachedStoreClientImpl.class.getName());
         } else if (storeType.startsWith("dcache")) {
             configDto.setClientClazz(DCacheStoreClientImpl.class.getName());
-            configDto.setTranscoderClazz(DCacheTranscoder.class.getName());
         } else if (storeType.startsWith("redis")) {
             configDto.setClientClazz(RedisStoreClientImpl.class.getName());
         } else if(storeType.startsWith("web") || storeType.startsWith("ehcache")) {
@@ -210,7 +206,6 @@ public class StoreClientConfigManager {
 		    configuration.setClientClazz(MemcachedStoreClientImpl.class.getName());
 		} else if (cacheKey.startsWith("dcache")) {
 		    configuration.setClientClazz(DCacheStoreClientImpl.class.getName());
-		    configuration.setTranscoderClazz(DCacheTranscoder.class.getName());
 		} else if (cacheKey.startsWith("redis")) {
             configuration.setClientClazz(RedisStoreClientImpl.class.getName());
         } else if(cacheKey.startsWith("web") || cacheKey.startsWith("ehcache")) {
