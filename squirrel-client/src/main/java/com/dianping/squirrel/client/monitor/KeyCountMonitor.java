@@ -57,7 +57,7 @@ public class KeyCountMonitor {
 	public void logKeyCount(String cacheType, String category, String eventName, int count) {
 		if (enableMonitor && cacheType != null && !"web".equalsIgnoreCase(cacheType)) {
 			try {
-				log(count, keyCountRangeArray, "Store." + eventName + ".keyCount."
+				log(count, keyCountRangeArray, "Squirrel." + eventName + ".keyCount."
 						+ (category == null ? cacheType : category));
 			} catch (Throwable t) {
 				logger.warn("error while logging key count:" + t.getMessage());

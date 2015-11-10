@@ -57,7 +57,7 @@ public class HitRateMonitor {
 	public void logHitRate(String cacheType, String category, String eventName, int hitRate, int hits) {
 		if (enableMonitor && cacheType != null && !"web".equalsIgnoreCase(cacheType)) {
 			try {
-				log(hitRate, keyMissedRangeArray, "Store." + eventName + ".hitRate."
+				log(hitRate, keyMissedRangeArray, "Squirrel." + eventName + ".hitRate."
 						+ (category == null ? cacheType : category), hits);
 			} catch (Throwable t) {
 				logger.warn("error while logging key hit rate:" + t.getMessage());

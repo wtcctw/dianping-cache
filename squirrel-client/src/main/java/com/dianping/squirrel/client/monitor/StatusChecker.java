@@ -28,9 +28,9 @@ public class StatusChecker implements Runnable {
 						CapacityBucket bucket = StatusHolder.getCapacityBuckets().get(key);
 						int qps = bucket.getRequestsInLastSecond();
 						if (qps >= logMinQps) {
-							QpsMonitor.getInstance().logQps("Store." + key + ".qps", qps);
+							QpsMonitor.getInstance().logQps("Squirrel." + key + ".qps", qps);
 							if(logLocal) {
-							    logger.info("Store." + key + ".qps" + " : " + qps);
+							    logger.info("Squirrel." + key + ".qps" + " : " + qps);
 							}
 						}
 						bucket.resetRequestsInSecondCounter();
