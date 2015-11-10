@@ -54,7 +54,10 @@ import com.dianping.cache.service.condition.OperationLogSearchCondition;
 import com.dianping.cache.util.NetUtil;
 import com.dianping.cache.util.RequestUtil;
 import com.dianping.core.type.PageModel;
-import com.dianping.squirrel.client.core.CacheClient;
+import com.dianping.squirrel.client.StoreClient;
+import com.dianping.squirrel.client.StoreClientFactory;
+import com.dianping.squirrel.client.core.Locatable;
+import com.dianping.squirrel.client.impl.memcached.MemcachedStoreClient;
 import com.dianping.squirrel.client.impl.memcached.MemcachedStoreClientImpl;
 
 @Controller
@@ -385,9 +388,9 @@ public class CacheManagerController extends AbstractCacheController {
 		p.put("impl", impl);
 		p.put("coder", coder);
 
-		ServiceLoader<CacheClient> loader = ServiceLoader
-				.load(CacheClient.class);
-		for (CacheClient implClass : loader) {
+		ServiceLoader<StoreClient> loader = ServiceLoader
+				.load(StoreClient.class);
+		for (StoreClient implClass : loader) {
 			System.out.println(implClass.getClass().toString());
 		}
 		// 转换成json格式
@@ -842,11 +845,10 @@ public class CacheManagerController extends AbstractCacheController {
 		Map<String, Object> paras = super.createViewMap();
 		Object o = cacheService.get(finalKey);
 		paras.put("result", o);
-		CacheClient cc = cacheService.getCacheClient(key.getCacheType());
-		if(cc instanceof MemcachedStoreClientImpl){
-			MemcachedClient mcc = ((MemcachedStoreClientImpl) cc).getReadClient();
-			MemcachedNode mn = mcc.getNodeLocator().getPrimary(finalKey);
-			paras.put("address", mn.getSocketAddress());
+		StoreClient cc = StoreClientFactory.getStoreClient(key.getCacheType());
+		if(cc instanceof Locatable){
+			String location = ((Locatable)cc).locate(finalKey);
+			paras.put("address", location);
 		}
 		return paras;
 	}

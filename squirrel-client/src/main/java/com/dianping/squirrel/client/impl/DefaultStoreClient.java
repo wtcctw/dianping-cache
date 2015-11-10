@@ -328,6 +328,19 @@ public class DefaultStoreClient implements StoreClient {
             return null;
         }
 	}
+	
+	@Override
+    public <T> T get(String finalKey) throws StoreException {
+        checkNotNull(finalKey, "final key is null");
+        String category = PathUtils.getCategoryFromKey(finalKey);
+        StoreClient storeClient = StoreClientFactory.getStoreClientByCategory(category);
+        checkNotNull(storeClient, "no store client for category %s", category);
+        if(enable) {
+            return storeClient.get(finalKey);
+        } else {
+            return null;
+        }
+    }
 
     @Override
     public Boolean delete(String finalKey) throws StoreException {

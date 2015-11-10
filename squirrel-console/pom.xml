@@ -252,6 +252,11 @@
 			<version>0.7.1</version>
 		</dependency>
 		<dependency>
+		    <groupId>com.dianping.swallow</groupId>
+		    <artifactId>swallow-consumerclient</artifactId>
+		    <version>0.7.1</version>
+		</dependency>
+		<dependency>
 			<groupId>com.dianping.lion</groupId>
 			<artifactId>lion-client</artifactId>
 			<scope>compile</scope>

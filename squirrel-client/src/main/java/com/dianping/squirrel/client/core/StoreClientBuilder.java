@@ -105,13 +105,16 @@ public class StoreClientBuilder {
 			((StoreTypeAware) storeClient).setStoreType(storeType);
 		}
 		
+		if(storeClient instanceof Configurable) {
+		    ((Configurable)storeClient).configure(config);
+		}
+		
 		if(storeClient instanceof StoreClientConfigListener) {
 		    StoreClientConfigManager.getInstance().addConfigListener(storeType, 
 		            ((StoreClientConfigListener)storeClient));
 		}
 
 		if (storeClient instanceof Lifecycle) {
-		    ((Lifecycle) storeClient).initialize(config);
 			((Lifecycle) storeClient).start();
 		}
 

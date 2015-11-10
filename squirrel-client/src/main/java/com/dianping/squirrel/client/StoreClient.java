@@ -203,6 +203,8 @@ public interface StoreClient {
 
 	public String getFinalKey(StoreKey storeKey);
 	
+	public <T> T get(String finalKey) throws StoreException;
+	
     public Boolean delete(String finalKey) throws StoreException;
     
     public boolean isDistributed();

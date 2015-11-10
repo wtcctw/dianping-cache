@@ -15,30 +15,14 @@
  */
 package com.dianping.squirrel.client.core;
 
-import com.dianping.squirrel.client.config.StoreClientConfig;
 
 /**
  * Life cycle interface for representing Object that can be managed. Generally,
- * it will be extended by CacheClient implementation for destroy.
+ * it will be extended by StoreClient implementation for destroy.
  * 
  * @author guoqing.chen
- * 
+ * @author enlight.chen
  */
-public interface Lifecycle {
+public interface Lifecycle extends Startable, Stopable {
 
-    /**
-     * Initialize the cache client
-     */
-    void initialize(StoreClientConfig config);
-    
-	/**
-	 * Start the Object
-	 */
-	void start();
-
-	/**
-	 * Stop the object
-	 */
-	void stop();
-	
 }

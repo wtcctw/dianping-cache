@@ -22,6 +22,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import net.spy.memcached.MemcachedClient;
+import net.spy.memcached.MemcachedNode;
 import net.spy.memcached.OperationTimeoutException;
 import net.spy.memcached.internal.BulkFuture;
 import net.spy.memcached.internal.BulkGetCompletionListener;
@@ -42,7 +43,9 @@ import com.dianping.cat.message.Message;
 import com.dianping.squirrel.client.StoreKey;
 import com.dianping.squirrel.client.config.CacheKeyType;
 import com.dianping.squirrel.client.config.StoreClientConfig;
+import com.dianping.squirrel.client.core.Configurable;
 import com.dianping.squirrel.client.core.Lifecycle;
+import com.dianping.squirrel.client.core.Locatable;
 import com.dianping.squirrel.client.core.StoreCallback;
 import com.dianping.squirrel.client.core.StoreTypeAware;
 import com.dianping.squirrel.client.impl.AbstractStoreClient;
@@ -64,7 +67,7 @@ import com.dianping.squirrel.common.util.RetryLoop.RetryResponse;
  * @author xiang.wu
  * 
  */
-public class MemcachedStoreClientImpl extends AbstractStoreClient implements MemcachedStoreClient, Lifecycle,
+public class MemcachedStoreClientImpl extends AbstractStoreClient implements MemcachedStoreClient, Configurable, Lifecycle,
         StoreTypeAware {
 
     private static Logger logger = LoggerFactory.getLogger(MemcachedStoreClientImpl.class);
@@ -144,7 +147,7 @@ public class MemcachedStoreClientImpl extends AbstractStoreClient implements Mem
     }
 
     @Override
-    public void initialize(StoreClientConfig config) {
+    public void configure(StoreClientConfig config) {
         this.config = (MemcachedClientConfig) config;
         NodeMonitor.getInstance().clear(storeType);
     }
@@ -178,11 +181,11 @@ public class MemcachedStoreClientImpl extends AbstractStoreClient implements Mem
         oldClientManager.stop();
     }
 
-    public MemcachedClient getReadClient() {
+    private MemcachedClient getReadClient() {
         return clientManager.getReadClient();
     }
 
-    public MemcachedClient getWriteClient() {
+    private MemcachedClient getWriteClient() {
         return clientManager.getWriteClient();
     }
 
@@ -862,6 +865,26 @@ public class MemcachedStoreClientImpl extends AbstractStoreClient implements Mem
     public <T> Void doAsyncMultiSet(CacheKeyType categoryConfig, List<String> keys, List<T> values,
             StoreCallback<Boolean> callback) throws Exception {
         throw new UnsupportedOperationException("memcached does not support async multi set");
+    }
+
+    @Override
+    public String locate(StoreKey key) {
+        checkNotNull(key, "store key is null");
+        final CacheKeyType categoryConfig = super.configManager.findCacheKeyType(key.getCategory());
+        checkNotNull(categoryConfig, "%s's category config is null", key.getCategory());
+        final String finalKey = categoryConfig.getKey(key.getParams());
+        
+        MemcachedClient client = getReadClient();
+        MemcachedNode node = client.getNodeLocator().getPrimary(finalKey);
+        return node == null ? null : node.getSocketAddress().toString();
+    }
+    
+    public String locate(String finalKey) {
+        checkNotNull(finalKey, "final key is null");
+        
+        MemcachedClient client = getReadClient();
+        MemcachedNode node = client.getNodeLocator().getPrimary(finalKey);
+        return node == null ? null : node.getSocketAddress().toString();
     }
 
 }

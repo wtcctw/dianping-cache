@@ -2,9 +2,10 @@ package com.dianping.squirrel.client.impl.memcached;
 
 import com.dianping.squirrel.client.StoreClient;
 import com.dianping.squirrel.client.StoreKey;
+import com.dianping.squirrel.client.core.Locatable;
 import com.dianping.squirrel.common.exception.StoreException;
 
-public interface MemcachedStoreClient extends StoreClient {
+public interface MemcachedStoreClient extends StoreClient, Locatable {
 
     public <T> CASValue<T> gets(StoreKey key) throws StoreException;
     

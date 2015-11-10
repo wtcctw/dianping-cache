@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import com.dianping.squirrel.client.StoreKey;
 import com.dianping.squirrel.client.config.CacheKeyType;
 import com.dianping.squirrel.client.config.StoreClientConfig;
+import com.dianping.squirrel.client.core.Configurable;
 import com.dianping.squirrel.client.core.StoreCallback;
 import com.dianping.squirrel.client.core.StoreFuture;
 import com.dianping.squirrel.client.core.StoreTypeAware;
@@ -41,7 +42,7 @@ import com.qq.cloud.component.dcache.client.kv.DCacheKVClientAPI;
 import com.qq.cloud.component.dcache.client.kv.InputValue;
 import com.qq.cloud.component.dcache.client.kv.KVCacheResult;
 
-public class DCacheStoreClientImpl extends AbstractStoreClient implements DCacheStoreClient, Lifecycle, StoreTypeAware {
+public class DCacheStoreClientImpl extends AbstractStoreClient implements DCacheStoreClient, Configurable, Lifecycle, StoreTypeAware {
 
     private static Logger logger = LoggerFactory.getLogger(DCacheStoreClientImpl.class);
 
@@ -65,7 +66,7 @@ public class DCacheStoreClientImpl extends AbstractStoreClient implements DCache
 	private volatile DCacheKVClientAPI kvClient;
 
 	@Override
-	public void initialize(StoreClientConfig config) {
+	public void configure(StoreClientConfig config) {
 		this.config = (DCacheClientConfig) config;
 	}
 

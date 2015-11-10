@@ -19,13 +19,14 @@ import redis.clients.jedis.JedisCluster;
 import com.dianping.squirrel.client.StoreKey;
 import com.dianping.squirrel.client.config.CacheKeyType;
 import com.dianping.squirrel.client.config.StoreClientConfig;
+import com.dianping.squirrel.client.core.Configurable;
 import com.dianping.squirrel.client.core.Lifecycle;
 import com.dianping.squirrel.client.core.StoreCallback;
 import com.dianping.squirrel.client.core.StoreTypeAware;
 import com.dianping.squirrel.client.core.Transcoder;
 import com.dianping.squirrel.client.impl.AbstractStoreClient;
 
-public class RedisStoreClientImpl extends AbstractStoreClient implements RedisStoreClient, Lifecycle, StoreTypeAware {
+public class RedisStoreClientImpl extends AbstractStoreClient implements RedisStoreClient, Configurable, Lifecycle, StoreTypeAware {
 
     private static Logger logger = LoggerFactory.getLogger(RedisStoreClientImpl.class);
 
@@ -38,7 +39,7 @@ public class RedisStoreClientImpl extends AbstractStoreClient implements RedisSt
     private Transcoder<String> transcoder = new RedisStringTranscoder();
 
     @Override
-    public void initialize(StoreClientConfig config) {
+    public void configure(StoreClientConfig config) {
         this.config = (RedisClientConfig) config;
     }
 

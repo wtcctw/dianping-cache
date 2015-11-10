@@ -44,6 +44,23 @@ public abstract class AbstractStoreClient implements StoreClient, StoreTypeAware
 	}
 	
 	@Override
+	public <T> T get(final String finalKey) throws StoreException {
+	    checkNotNull(finalKey, "final key is null");
+        String category = PathUtils.getCategoryFromKey(finalKey);
+        final CacheKeyType categoryConfig = configManager.findCacheKeyType(category);
+        checkNotNull(categoryConfig, "%s' category config is null", category);
+        
+        return executeWithMonitor(new Command() {
+
+            @Override
+            public Object execute() throws Exception {
+                return doGet(categoryConfig, finalKey);
+            }
+            
+        }, categoryConfig, finalKey, "get");
+	}
+	
+	@Override
     public Boolean delete(final String finalKey) throws StoreException {
 	    checkNotNull(finalKey, "final key is null");
 	    String category = PathUtils.getCategoryFromKey(finalKey);

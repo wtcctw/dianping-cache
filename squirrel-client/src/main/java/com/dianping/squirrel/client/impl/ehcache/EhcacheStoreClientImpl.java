@@ -28,6 +28,7 @@ import net.sf.ehcache.management.ManagementService;
 
 import com.dianping.squirrel.client.config.CacheKeyType;
 import com.dianping.squirrel.client.config.StoreClientConfig;
+import com.dianping.squirrel.client.core.Configurable;
 import com.dianping.squirrel.client.core.Lifecycle;
 import com.dianping.squirrel.client.core.StoreCallback;
 import com.dianping.squirrel.client.core.StoreFuture;
@@ -44,7 +45,7 @@ import com.google.common.eventbus.EventBus;
  * @author enlight.chen
  * 
  */
-public class EhcacheStoreClientImpl extends AbstractStoreClient implements Lifecycle {
+public class EhcacheStoreClientImpl extends AbstractStoreClient implements Configurable, Lifecycle {
 
 	public static final EventBus eventBus = new EventBus();
 
@@ -105,7 +106,7 @@ public class EhcacheStoreClientImpl extends AbstractStoreClient implements Lifec
 	 * @see com.dianping.squirrel.client.core.InitialConfiguration#initialize(com.dianping.squirrel.client.config.StoreClientConfig)
 	 */
 	@Override
-	public void initialize(StoreClientConfig config) {
+	public void configure(StoreClientConfig config) {
 		if (config instanceof EhcacheClientConfig) {
 			manager = ((EhcacheClientConfig) config).buildEhcacheManager();
 		}

@@ -57,7 +57,7 @@ import com.dianping.queue.message.TextMessage;
 import com.dianping.remote.cache.dto.CacheConfigurationDTO;
 import com.dianping.remote.cache.dto.CacheKeyTypeVersionUpdateDTO;
 import com.dianping.remote.cache.dto.SingleCacheRemoveDTO;
-import com.dianping.squirrel.client.core.CacheClient;
+import com.dianping.squirrel.client.StoreClient;
 import com.dianping.squirrel.client.core.StoreClientBuilder;
 import com.dianping.squirrel.client.impl.memcached.MemcachedClientConfig;
 import com.dianping.squirrel.common.config.ConfigChangeListener;
@@ -260,11 +260,11 @@ public class CacheConfigurationServiceImpl implements CacheConfigurationService,
 						config.setServerList(configuration.getServerList());
 						Class<?> transcoderClazz = Class.forName(configuration.getTranscoderClazz());
 						config.setTranscoderClass(transcoderClazz);
-						CacheClient cacheClient = StoreClientBuilder.buildStoreClient(cacheType, config);
+						StoreClient cacheClient = StoreClientBuilder.buildStoreClient(cacheType, config);
 						String[] keyList = StringUtils.splitByWholeSeparator(key, CACHE_FINAL_KEY_SEP);
 						if (keyList != null) {
 							for (String singleKey : keyList) {
-								cacheClient.asyncDelete(singleKey, true, null);
+								cacheClient.delete(singleKey);
 							}
 						}
 					}
