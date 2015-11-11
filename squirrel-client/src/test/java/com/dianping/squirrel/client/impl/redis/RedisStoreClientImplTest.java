@@ -16,7 +16,7 @@ import com.dianping.squirrel.client.impl.User;
 
 public class RedisStoreClientImplTest {
     
-    private static final String STORE_TYPE = "redis-hua";
+    private static final String STORE_TYPE = "redis-default";
     
     private static final String CATEGORY = "myredis";
     

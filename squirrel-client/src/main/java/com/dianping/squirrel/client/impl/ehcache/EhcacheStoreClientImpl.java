@@ -28,8 +28,6 @@ import net.sf.ehcache.management.ManagementService;
 
 import com.dianping.squirrel.client.config.StoreCategoryConfig;
 import com.dianping.squirrel.client.config.StoreClientConfig;
-import com.dianping.squirrel.client.core.Configurable;
-import com.dianping.squirrel.client.core.Lifecycle;
 import com.dianping.squirrel.client.core.StoreCallback;
 import com.dianping.squirrel.client.core.StoreFuture;
 import com.dianping.squirrel.client.impl.AbstractStoreClient;
@@ -45,7 +43,7 @@ import com.google.common.eventbus.EventBus;
  * @author enlight.chen
  * 
  */
-public class EhcacheStoreClientImpl extends AbstractStoreClient implements Configurable, Lifecycle {
+public class EhcacheStoreClientImpl extends AbstractStoreClient {
 
 	public static final EventBus eventBus = new EventBus();
 
@@ -354,7 +352,7 @@ public class EhcacheStoreClientImpl extends AbstractStoreClient implements Confi
     }
 
     @Override
-    public <T> Void doAsyncMultiSet(StoreCategoryConfig categoryConfig, List<String> keys, List<T> values,
+    protected <T> Void doAsyncMultiSet(StoreCategoryConfig categoryConfig, List<String> keys, List<T> values,
                                     StoreCallback<Boolean> callback) throws Exception {
         doMultiSet(categoryConfig, keys, values);
         callback.onSuccess(true);

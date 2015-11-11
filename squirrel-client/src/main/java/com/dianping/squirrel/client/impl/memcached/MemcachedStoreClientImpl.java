@@ -43,11 +43,7 @@ import com.dianping.cat.message.Message;
 import com.dianping.squirrel.client.StoreKey;
 import com.dianping.squirrel.client.config.StoreCategoryConfig;
 import com.dianping.squirrel.client.config.StoreClientConfig;
-import com.dianping.squirrel.client.core.Configurable;
-import com.dianping.squirrel.client.core.Lifecycle;
-import com.dianping.squirrel.client.core.Locatable;
 import com.dianping.squirrel.client.core.StoreCallback;
-import com.dianping.squirrel.client.core.StoreTypeAware;
 import com.dianping.squirrel.client.impl.AbstractStoreClient;
 import com.dianping.squirrel.common.config.ConfigChangeListener;
 import com.dianping.squirrel.common.config.ConfigManager;
@@ -67,8 +63,7 @@ import com.dianping.squirrel.common.util.RetryLoop.RetryResponse;
  * @author xiang.wu
  * 
  */
-public class MemcachedStoreClientImpl extends AbstractStoreClient implements MemcachedStoreClient, Configurable, Lifecycle,
-        StoreTypeAware {
+public class MemcachedStoreClientImpl extends AbstractStoreClient implements MemcachedStoreClient {
 
     private static Logger logger = LoggerFactory.getLogger(MemcachedStoreClientImpl.class);
 
@@ -253,7 +248,7 @@ public class MemcachedStoreClientImpl extends AbstractStoreClient implements Mem
         }, categoryConfig, finalKey, "cas");
     }
 
-    public <T> CASValue<T> doGets(StoreCategoryConfig categoryConfig, String key) throws StoreException {
+    protected <T> CASValue<T> doGets(StoreCategoryConfig categoryConfig, String key) throws StoreException {
         String reformedKey = CacheKeyUtils.reformKey(key);
         MemcachedClient client = getReadClient();
         try {
@@ -273,7 +268,7 @@ public class MemcachedStoreClientImpl extends AbstractStoreClient implements Mem
         }
     }
 
-    public CASResponse doCas(StoreCategoryConfig categoryConfig, String key, long casId, Object value) throws StoreException {
+    protected CASResponse doCas(StoreCategoryConfig categoryConfig, String key, long casId, Object value) throws StoreException {
         String reformedKey = CacheKeyUtils.reformKey(key);
         MemcachedClient client = getWriteClient();
         try {
@@ -329,7 +324,7 @@ public class MemcachedStoreClientImpl extends AbstractStoreClient implements Mem
         return value;
     }
 
-    public void asyncSetBackupKey(String key, Object value, int expiration, boolean isHot, String category)
+    private void asyncSetBackupKey(String key, Object value, int expiration, boolean isHot, String category)
             throws StoreException {
         if (isHot) {
             MemcachedClient client = getWriteClient();
@@ -342,7 +337,7 @@ public class MemcachedStoreClientImpl extends AbstractStoreClient implements Mem
         }
     }
 
-    public void asyncRemoveBackupKey(String key, boolean isHot, String category) throws StoreException {
+    private void asyncRemoveBackupKey(String key, boolean isHot, String category) throws StoreException {
         if (isHot && removeBackup) {
             try {
                 getWriteClient().delete(CacheKeyUtils.reformKey(key, true));
@@ -408,7 +403,7 @@ public class MemcachedStoreClientImpl extends AbstractStoreClient implements Mem
         return result;
     }
 
-    public Object getBackupValue(String key, boolean isHot, String category) throws Exception {
+    private Object getBackupValue(String key, boolean isHot, String category) throws Exception {
         Object result = null;
         String lockKey = CacheKeyUtils.getLockKey(key);
         Future<Boolean> future = getWriteClient().add(lockKey, hotkeyLockTime, true);
@@ -862,7 +857,7 @@ public class MemcachedStoreClientImpl extends AbstractStoreClient implements Mem
     }
 
     @Override
-    public <T> Void doAsyncMultiSet(StoreCategoryConfig categoryConfig, List<String> keys, List<T> values,
+    protected <T> Void doAsyncMultiSet(StoreCategoryConfig categoryConfig, List<String> keys, List<T> values,
             StoreCallback<Boolean> callback) throws Exception {
         throw new UnsupportedOperationException("memcached does not support async multi set");
     }

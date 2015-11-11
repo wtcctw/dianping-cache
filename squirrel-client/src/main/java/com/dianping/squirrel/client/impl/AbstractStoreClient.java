@@ -1,6 +1,7 @@
 package com.dianping.squirrel.client.impl;
 
-import static com.google.common.base.Preconditions.*;
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -17,6 +18,8 @@ import com.dianping.squirrel.client.StoreKey;
 import com.dianping.squirrel.client.config.StoreCategoryConfig;
 import com.dianping.squirrel.client.config.StoreCategoryConfigManager;
 import com.dianping.squirrel.client.config.StoreClientConfigListener;
+import com.dianping.squirrel.client.core.Configurable;
+import com.dianping.squirrel.client.core.Lifecycle;
 import com.dianping.squirrel.client.core.StoreCallback;
 import com.dianping.squirrel.client.core.StoreTypeAware;
 import com.dianping.squirrel.client.log.LoggerLoader;
@@ -29,7 +32,7 @@ import com.dianping.squirrel.common.exception.StoreException;
 import com.dianping.squirrel.common.exception.StoreTimeoutException;
 import com.dianping.squirrel.common.util.PathUtils;
 
-public abstract class AbstractStoreClient implements StoreClient, StoreTypeAware, StoreClientConfigListener {
+public abstract class AbstractStoreClient implements StoreClient, StoreTypeAware, Configurable, Lifecycle, StoreClientConfigListener {
 
     static {
         LoggerLoader.init();
@@ -42,7 +45,17 @@ public abstract class AbstractStoreClient implements StoreClient, StoreTypeAware
 	public AbstractStoreClient() {
 		configManager = StoreCategoryConfigManager.getInstance();
 	}
-	
+
+    @Override
+    public void setStoreType(String storeType) {
+        this.storeType = storeType;
+    }
+
+    @Override
+    public String getStoreType() {
+        return storeType;
+    }
+    
 	@Override
 	public <T> T get(final String finalKey) throws StoreException {
 	    checkNotNull(finalKey, "final key is null");
@@ -505,7 +518,7 @@ public abstract class AbstractStoreClient implements StoreClient, StoreTypeAware
         }, categoryConfig, finalKeyList, "asyncMultiSet");
 	}
 
-	public abstract <T> Void doAsyncMultiSet(StoreCategoryConfig categoryConfig, List<String> keys, List<T> values, 
+	protected abstract <T> Void doAsyncMultiSet(StoreCategoryConfig categoryConfig, List<String> keys, List<T> values, 
 	                                         StoreCallback<Boolean> callback) throws Exception;
 
     @Override
@@ -618,16 +631,6 @@ public abstract class AbstractStoreClient implements StoreClient, StoreTypeAware
 	protected boolean needMonitor(String cacheType) {
 		return true;
 	}
-
-    @Override
-    public void setStoreType(String storeType) {
-        this.storeType = storeType;
-    }
-
-    @Override
-    public String getStoreType() {
-        return storeType;
-    }
     
 	public static interface Command {
 

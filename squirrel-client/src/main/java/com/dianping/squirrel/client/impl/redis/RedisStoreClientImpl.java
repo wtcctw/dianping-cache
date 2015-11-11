@@ -19,14 +19,11 @@ import redis.clients.jedis.JedisCluster;
 import com.dianping.squirrel.client.StoreKey;
 import com.dianping.squirrel.client.config.StoreCategoryConfig;
 import com.dianping.squirrel.client.config.StoreClientConfig;
-import com.dianping.squirrel.client.core.Configurable;
-import com.dianping.squirrel.client.core.Lifecycle;
 import com.dianping.squirrel.client.core.StoreCallback;
-import com.dianping.squirrel.client.core.StoreTypeAware;
 import com.dianping.squirrel.client.core.Transcoder;
 import com.dianping.squirrel.client.impl.AbstractStoreClient;
 
-public class RedisStoreClientImpl extends AbstractStoreClient implements RedisStoreClient, Configurable, Lifecycle, StoreTypeAware {
+public class RedisStoreClientImpl extends AbstractStoreClient implements RedisStoreClient {
 
     private static Logger logger = LoggerFactory.getLogger(RedisStoreClientImpl.class);
 
@@ -105,13 +102,13 @@ public class RedisStoreClientImpl extends AbstractStoreClient implements RedisSt
     }
 
     @Override
-    public Long doIncrease(StoreCategoryConfig categoryConfig, String finalKey, int amount) {
+    protected Long doIncrease(StoreCategoryConfig categoryConfig, String finalKey, int amount) {
         long result = client.incrBy(finalKey, amount);
         return result;
     }
 
     @Override
-    public Long doDecrease(StoreCategoryConfig categoryConfig, String finalKey, int amount) {
+    protected Long doDecrease(StoreCategoryConfig categoryConfig, String finalKey, int amount) {
         long result = client.decrBy(finalKey, amount);
         return result;
     }
@@ -187,7 +184,7 @@ public class RedisStoreClientImpl extends AbstractStoreClient implements RedisSt
     }
 
     @Override
-    public <T> Void doAsyncMultiSet(StoreCategoryConfig categoryConfig, List<String> keys, List<T> values,
+    protected <T> Void doAsyncMultiSet(StoreCategoryConfig categoryConfig, List<String> keys, List<T> values,
                                     StoreCallback<Boolean> callback) {
         // TODO Auto-generated method stub
         return null;

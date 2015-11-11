@@ -1,7 +1,6 @@
 package com.dianping.squirrel.client.impl.dcache;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -13,28 +12,20 @@ import java.util.concurrent.TimeoutException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.dianping.squirrel.client.StoreKey;
 import com.dianping.squirrel.client.config.StoreCategoryConfig;
 import com.dianping.squirrel.client.config.StoreClientConfig;
-import com.dianping.squirrel.client.core.Configurable;
 import com.dianping.squirrel.client.core.StoreCallback;
 import com.dianping.squirrel.client.core.StoreFuture;
-import com.dianping.squirrel.client.core.StoreTypeAware;
-import com.dianping.squirrel.client.core.Lifecycle;
 import com.dianping.squirrel.client.impl.AbstractStoreClient;
-import com.dianping.squirrel.client.impl.memcached.CASResponse;
-import com.dianping.squirrel.client.impl.memcached.CASValue;
 import com.dianping.squirrel.common.config.ConfigChangeListener;
 import com.dianping.squirrel.common.config.ConfigManager;
 import com.dianping.squirrel.common.config.ConfigManagerLoader;
 import com.dianping.squirrel.common.exception.StoreException;
 import com.dianping.squirrel.common.exception.StoreInitializeException;
 import com.dianping.squirrel.common.exception.StoreTimeoutException;
-import com.dianping.squirrel.common.util.CacheKeyUtils;
 import com.qq.cloud.component.dcache.client.api.ClientCallback;
 import com.qq.cloud.component.dcache.client.api.ClientFactory;
 import com.qq.cloud.component.dcache.client.api.ConnectionConf;
-import com.qq.cloud.component.dcache.client.api.DCacheClientAPI;
 import com.qq.cloud.component.dcache.client.dcache.DCacheConst;
 import com.qq.cloud.component.dcache.client.kv.BatchKVCacheResult;
 import com.qq.cloud.component.dcache.client.kv.CacheValue;
@@ -42,7 +33,7 @@ import com.qq.cloud.component.dcache.client.kv.DCacheKVClientAPI;
 import com.qq.cloud.component.dcache.client.kv.InputValue;
 import com.qq.cloud.component.dcache.client.kv.KVCacheResult;
 
-public class DCacheStoreClientImpl extends AbstractStoreClient implements DCacheStoreClient, Configurable, Lifecycle, StoreTypeAware {
+public class DCacheStoreClientImpl extends AbstractStoreClient implements DCacheStoreClient {
 
     private static Logger logger = LoggerFactory.getLogger(DCacheStoreClientImpl.class);
 
@@ -546,7 +537,7 @@ public class DCacheStoreClientImpl extends AbstractStoreClient implements DCache
     }
 
     @Override
-    public <T> Void doAsyncMultiSet(StoreCategoryConfig categoryConfig, List<String> keys, List<T> values,
+    protected <T> Void doAsyncMultiSet(StoreCategoryConfig categoryConfig, List<String> keys, List<T> values,
                                     final StoreCallback<Boolean> callback) throws Exception {
         ClientCallback<BatchKVCacheResult> dcacheCallback = null;
         if (callback != null) {
