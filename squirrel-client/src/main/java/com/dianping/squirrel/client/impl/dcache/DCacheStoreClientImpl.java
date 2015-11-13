@@ -72,8 +72,8 @@ public class DCacheStoreClientImpl extends AbstractStoreClient implements DCache
 	}
 
 	private void initClient() {
-		if (this.config == null || this.config.getLocator() == null || this.config.getTranscoder() == null
-				|| this.config.getModule() == null || this.config.getProxy() == null) {
+		if (this.config == null || this.config.getLocator() == null ||
+				this.config.getModule() == null || this.config.getProxy() == null) {
 			throw new StoreInitializeException("invalid dcache config");
 		}
 		System.setProperty("com.qq.nami.client.selectorPoolSize", "1");

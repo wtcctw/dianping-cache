@@ -1,6 +1,5 @@
 package com.dianping.squirrel.client.impl.dcache;
 
-import org.apache.commons.lang.ClassUtils;
 import org.codehaus.plexus.util.StringUtils;
 
 import com.dianping.remote.cache.dto.CacheConfigurationDTO;
@@ -61,15 +60,6 @@ public class DCacheClientConfigParser implements StoreClientConfigParser {
 		config.setModule(module);
 		config.setProxy(proxy);
 		config.setPersistent(persistent);
-		String transcoderClass = detail.getTranscoderClazz();
-		if (transcoderClass != null && !transcoderClass.trim().isEmpty()) {
-			try {
-				Class<?> cz = ClassUtils.getClass(transcoderClass.trim());
-				config.setTranscoderClass(cz);
-			} catch (Exception ex) {
-				throw new RuntimeException("Failed to set dcached's transcoder.", ex);
-			}
-		}
 		config.setClientClazz(detail.getClientClazz());
 
 		return config;
