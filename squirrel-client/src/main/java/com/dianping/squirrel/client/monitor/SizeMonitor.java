@@ -12,20 +12,20 @@ public class SizeMonitor {
 	private static Logger logger = LoggerFactory.getLogger(SizeMonitor.class);
 
 	private static final String requestSizeRangeConfig = ConfigManagerLoader.getConfigManager().getStringValue(
-			"avatar-cache.monitor.size.requestrange", "1,2,4,8,16,32,64,128,256,512,1024");
+			"squirrel-client.monitor.size.requestrange", "1,2,4,8,16,32,64,128,256,512,1024");
 
 	private static final String responseSizeRangeConfig = ConfigManagerLoader.getConfigManager().getStringValue(
-			"avatar-cache.monitor.size.responserange", "1,2,4,8,16,32,64,128,256,512,1024");
+			"squirrel-client.monitor.size.responserange", "1,2,4,8,16,32,64,128,256,512,1024");
 
 	private static int[] requestSizeRangeArray;
 
 	private static int[] responseSizeRangeArray;
 
 	private static final boolean enableMonitor = ConfigManagerLoader.getConfigManager().getBooleanValue(
-			"avatar-cache.monitor.size.enable", true);
+			"squirrel-client.monitor.size.enable", true);
 
 	private static final long sizeMin = ConfigManagerLoader.getConfigManager().getLongValue(
-			"avatar-cache.monitor.size.min", 65536);
+			"squirrel-client.monitor.size.min", 65536);
 
 	private static class CacheSizeHolder {
 		public static final SizeMonitor INSTANCE = new SizeMonitor();

@@ -550,10 +550,10 @@ public abstract class AbstractStoreClient implements StoreClient, StoreTypeAware
 		try {
 		    Cat.getProducer().logEvent("Squirrel." + storeType + ".qps", "S"+second);
 			Object result = command.execute();
-			TimeMonitor.getInstance().logTime(storeType, category, action, System.nanoTime() - begin);
+//			TimeMonitor.getInstance().logTime(storeType, category, action, System.nanoTime() - begin);
 			return (T) result;
 		} catch (TimeoutException e) {
-			TimeMonitor.getInstance().logTime(storeType, category, action, System.nanoTime() - begin, "timeout");
+//			TimeMonitor.getInstance().logTime(storeType, category, action, System.nanoTime() - begin, "timeout");
 			Cat.getProducer().logEvent("Squirrel." + storeType, category + ":timeout");
 			StoreTimeoutException ste = new StoreTimeoutException(e);
 			if (t != null) {
@@ -597,10 +597,10 @@ public abstract class AbstractStoreClient implements StoreClient, StoreTypeAware
         try {
             Cat.getProducer().logEvent("Squirrel." + storeType + ".qps", "S"+second);
             Object result = command.execute();
-            TimeMonitor.getInstance().logTime(storeType, category, action, System.nanoTime() - begin);
+//            TimeMonitor.getInstance().logTime(storeType, category, action, System.nanoTime() - begin);
             return (T) result;
         } catch (TimeoutException e) {
-            TimeMonitor.getInstance().logTime(storeType, category, action, System.nanoTime() - begin, "timeout");
+//            TimeMonitor.getInstance().logTime(storeType, category, action, System.nanoTime() - begin, "timeout");
             Cat.getProducer().logEvent("Squirrel." + storeType, category + ":timeout", Message.SUCCESS, "");
             StoreTimeoutException ste = new StoreTimeoutException(e);
             if (t != null) {

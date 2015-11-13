@@ -13,15 +13,15 @@ public class TimeMonitor {
 	private static Logger logger = LoggerFactory.getLogger(TimeMonitor.class);
 
 	private static final String timeRangeConfig = ConfigManagerLoader.getConfigManager().getStringValue(
-			"avatar-cache.monitor.time.range", "2,4,8,16,32,50");
+			"squirrel-client.monitor.time.range", "2,4,8,16,32,50");
 
 	private static int[] timeRangeArray;
 
 	private static final boolean enableMonitor = ConfigManagerLoader.getConfigManager().getBooleanValue(
-			"avatar-cache.monitor.time.enable", true);
+			"squirrel-client.monitor.time.enable", true);
 
 	private static final long timeMin = ConfigManagerLoader.getConfigManager().getIntValue(
-			"avatar-cache.monitor.time.min", 50) * 1000000;
+			"squirrel-client.monitor.time.min", 5) * 1000000;
 
 	private static class CacheTimeHolder {
 		public static final TimeMonitor INSTANCE = new TimeMonitor();

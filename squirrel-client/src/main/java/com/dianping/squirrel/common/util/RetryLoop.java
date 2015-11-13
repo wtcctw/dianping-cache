@@ -8,14 +8,18 @@ import java.util.concurrent.TimeoutException;
 
 import net.spy.memcached.MemcachedClient;
 import net.spy.memcached.internal.CheckedOperationTimeoutException;
+import net.spy.memcached.internal.GetFuture;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.dianping.squirrel.client.impl.memcached.NodeMonitor;
+
 public class RetryLoop {
 
 	private static Logger logger = LoggerFactory.getLogger(RetryLoop.class);
+	
 	private static int retryLimit = 0;
 	private static Integer[] timeoutMillis;
 	private boolean done = false;
@@ -98,7 +102,7 @@ public class RetryLoop {
 
 	public static RetryResponse hedgedGet(MemcachedClient client, String key) throws Exception {
 		Object result = null;
-		Future<Object> future = null;
+		GetFuture<Object> future = null;
 		RetryLoop retryLoop = new RetryLoop();
 
 		RetryResponse resp = new RetryResponse();
@@ -107,6 +111,7 @@ public class RetryLoop {
 			try {
 				future = client.asyncGet(key);
 				if (future != null) {
+				    NodeMonitor.getInstance().logNode(future);
 					result = future.get(timeoutMillis[i++], TimeUnit.MILLISECONDS);
 					retryLoop.markComplete();
 				}

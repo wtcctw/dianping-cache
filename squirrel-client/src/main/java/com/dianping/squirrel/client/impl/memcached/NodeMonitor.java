@@ -1,10 +1,13 @@
 package com.dianping.squirrel.client.impl.memcached;
 
+import java.lang.reflect.Field;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Timer;
@@ -12,6 +15,11 @@ import java.util.TimerTask;
 
 import net.spy.memcached.MemcachedClient;
 import net.spy.memcached.MemcachedNode;
+import net.spy.memcached.internal.BulkFuture;
+import net.spy.memcached.internal.BulkGetFuture;
+import net.spy.memcached.internal.GetFuture;
+import net.spy.memcached.internal.OperationFuture;
+import net.spy.memcached.ops.Operation;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,19 +38,19 @@ public class NodeMonitor {
 	private static final String EVENT_TYPE_SERVER = "Squirrel.memcached.server";
 
 	private static final int NODE_MONITOR_PERIOD = ConfigManagerLoader.getConfigManager().getIntValue(
-			"avatar-cache.monitor.memcached.nodes.period", 60);
+			"squirrel-client.monitor.memcached.nodes.period", 60);
 
 	private static final boolean enableMonitorNodes = ConfigManagerLoader.getConfigManager().getBooleanValue(
-			"avatar-cache.monitor.memcached.nodes.enable", true);
+			"squirrel-client.monitor.memcached.nodes.enable", true);
 
 	private static boolean enableMonitorServer = ConfigManagerLoader.getConfigManager().getBooleanValue(
-			"avatar-cache.monitor.memcached.server.enable", true);
+			"squirrel-client.monitor.memcached.server.enable", true);
 
 	private static boolean enableMonitorServerForMget = ConfigManagerLoader.getConfigManager().getBooleanValue(
-			"avatar-cache.monitor.memcached.server.mget.enable", false);
+			"squirrel-client.monitor.memcached.server.mget.enable", true);
 
 	private static int serverMonitorPercent = ConfigManagerLoader.getConfigManager().getIntValue(
-			"avatar-cache.monitor.memcached.server.percent", 100);
+			"squirrel-client.monitor.memcached.server.percent", 100);
 
 	private Timer timer;
 
@@ -53,31 +61,54 @@ public class NodeMonitor {
 	private Map<String, Collection<SocketAddress>> clusterNodes = new HashMap<String, Collection<SocketAddress>>();
 
 	private static Random random = new Random();
-
+	
+    private static Field rvField = null;
+    private static Field opField = null;
+    private static Field opsField = null;
+    
 	static {
 		try {
-			ConfigManagerLoader.getConfigManager().registerConfigChangeListener(new ConfigChangeHandler());
-		} catch (Exception e) {
-		}
+            rvField = GetFuture.class.getDeclaredField("rv");
+            rvField.setAccessible(true);
+        } catch (Throwable t) {
+            logger.error("failed to get 'GetFuture.rv' field", t);
+        }
+        try {
+            opField = OperationFuture.class.getDeclaredField("op");
+            opField.setAccessible(true);
+        } catch (Throwable t) {
+            logger.error("failed to get 'OperationFuture.op' field", t);
+        }
+        try {
+            opsField = BulkGetFuture.class.getDeclaredField("ops");
+            opsField.setAccessible(true);
+        } catch (Throwable t) {
+            logger.error("failed to get 'BulkGetFuture.ops' field", t);
+        }
+        try {
+            ConfigManagerLoader.getConfigManager().registerConfigChangeListener(new ConfigChangeHandler());
+        } catch (Exception e) {
+            logger.error("faield to register config change listener", e);
+        }
 	}
 
 	private static class ConfigChangeHandler implements ConfigChangeListener {
 
 		@Override
 		public void onChange(String key, String value) {
-			if (key.endsWith("avatar-cache.monitor.memcached.server.enable")) {
+			if (key.endsWith("squirrel-client.monitor.memcached.server.enable")) {
 				try {
 					enableMonitorServer = Boolean.valueOf(value);
 				} catch (RuntimeException e) {
 					logger.warn("error while loading config:" + key + "=" + value + ", caused by " + e.toString());
 				}
-			} else if (key.endsWith("avatar-cache.monitor.memcached.server.mget.enable")) {
+			} else if (key.endsWith("squirrel-client.monitor.memcached.server.mget.enable")) {
 				try {
 					enableMonitorServerForMget = Boolean.valueOf(value);
 				} catch (RuntimeException e) {
 					logger.warn("error while loading config:" + key + "=" + value + ", caused by " + e.toString());
 				}
-			} else if (key.endsWith("avatar-cache.monitor.memcached.server.percent")) {
+			} else if (key.endsWith("squirrel-client.monitor.memcached.server.percent")) {
 				try {
 					serverMonitorPercent = Integer.valueOf(value);
 				} catch (RuntimeException e) {
@@ -321,4 +352,104 @@ public class NodeMonitor {
 					+ ")";
 		}
 	}
+
+    public void logNode(OperationFuture future) {
+        boolean enableMonitor = enableMonitorServer;
+        if (enableMonitor) {
+            boolean isHit = random.nextInt(serverMonitorPercent) < 1;
+            if (!isHit) {
+                enableMonitor = false;
+            }
+        }
+        if (enableMonitor) {
+            try {
+                MemcachedNode node = getNode(future);
+                if(node != null) {
+                    Cat.logEvent(EVENT_TYPE_SERVER, getNodeAddress(node));
+                }
+            } catch (Throwable t) {
+                logger.warn("error while logging node: " + t.getMessage());
+            }
+        }
+    }
+    
+    private MemcachedNode getNode(OperationFuture future) throws Exception {
+        if(opField != null && future != null) {
+            Operation op = (Operation) opField.get(future);
+            if(op != null) {
+                return op.getHandlingNode();
+            }
+        }
+        return null;
+    }
+
+    public void logNode(GetFuture future) {
+        boolean enableMonitor = enableMonitorServer;
+        if (enableMonitor) {
+            boolean isHit = random.nextInt(serverMonitorPercent) < 1;
+            if (!isHit) {
+                enableMonitor = false;
+            }
+        }
+        if (enableMonitor) {
+            try {
+                MemcachedNode node = getNode(future);
+                if(node != null) {
+                    Cat.logEvent(EVENT_TYPE_SERVER, getNodeAddress(node));
+                }
+            } catch (Throwable t) {
+                logger.warn("error while logging node: " + t.getMessage());
+            }
+        }
+    }
+
+    private MemcachedNode getNode(GetFuture future) throws Exception {
+        if(rvField != null && future != null) {
+            OperationFuture rv = (OperationFuture) rvField.get(future);
+            if(opField != null && rv != null) {
+                Operation op = (Operation) opField.get(rv);
+                if(op != null) {
+                    return op.getHandlingNode();
+                }
+            }
+        }
+        return null;
+    }
+
+    public void logNode(BulkFuture future) {
+        boolean enableMonitor = enableMonitorServerForMget;
+        if (enableMonitor) {
+            boolean isHit = random.nextInt(serverMonitorPercent) < 1;
+            if (!isHit) {
+                enableMonitor = false;
+            }
+        }
+        if (enableMonitor) {
+            try {
+                List<MemcachedNode> nodes = getNodes(future);
+                if(nodes != null) {
+                    for (MemcachedNode node : nodes) {
+                        Cat.logEvent(EVENT_TYPE_SERVER, getNodeAddress(node));
+                    }
+                }
+            } catch (Throwable t) {
+                logger.warn("error while logging node:" + t.getMessage());
+            }
+        }
+    }
+
+    private List<MemcachedNode> getNodes(BulkFuture future) throws Exception {
+        if(opsField != null && future != null) {
+            Collection<Operation> ops = (Collection<Operation>) opsField.get(future);
+            if(ops != null) {
+                List<MemcachedNode> nodes = new ArrayList<MemcachedNode>(ops.size());
+                for(Operation op : ops) {
+                    nodes.add(op.getHandlingNode());
+                }
+                return nodes;
+            }
+        }
+        return null;
+    }
+    
 }

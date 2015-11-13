@@ -288,33 +288,33 @@ public class MemcachedStoreClientImpl extends AbstractStoreClient implements Mem
         }
     }
 
-    public boolean delete(String key, boolean isHot, String category) throws StoreException, TimeoutException {
-        return this.delete(key, isHot, category, timeoutSet);
-    }
-
-    public boolean delete(String key, boolean isHot, String category, long timeout) throws StoreException,
-            TimeoutException {
-        MemcachedClient client = getWriteClient();
-        try {
-            String reformedKey = getCacheKey(key, isHot);
-            Future<Boolean> future = client.delete(reformedKey);
-            if (future != null) {
-                boolean result = future.get(timeout, TimeUnit.MILLISECONDS);
-                if (result) {
-                    asyncRemoveBackupKey(key, isHot, category);
-                }
-                NodeMonitor.getInstance().logNode(client, key, MSG_SUCCESS, category);
-                return result;
-            }
-            return false;
-        } catch (CheckedOperationTimeoutException e) {
-            NodeMonitor.getInstance().logNode(client, key, MSG_TIMEOUT, category);
-            throw new StoreTimeoutException(e.getMessage());
-        } catch (Exception e) {
-            NodeMonitor.getInstance().logNode(client, key, MSG_EXCEPTION, category);
-            throw new StoreException(e);
-        }
-    }
+//    public boolean delete(String key, boolean isHot, String category) throws StoreException, TimeoutException {
+//        return this.delete(key, isHot, category, timeoutSet);
+//    }
+//
+//    public boolean delete(String key, boolean isHot, String category, long timeout) throws StoreException,
+//            TimeoutException {
+//        MemcachedClient client = getWriteClient();
+//        try {
+//            String reformedKey = getCacheKey(key, isHot);
+//            Future<Boolean> future = client.delete(reformedKey);
+//            if (future != null) {
+//                boolean result = future.get(timeout, TimeUnit.MILLISECONDS);
+//                if (result) {
+//                    asyncRemoveBackupKey(key, isHot, category);
+//                }
+//                NodeMonitor.getInstance().logNode(client, key, MSG_SUCCESS, category);
+//                return result;
+//            }
+//            return false;
+//        } catch (CheckedOperationTimeoutException e) {
+//            NodeMonitor.getInstance().logNode(client, key, MSG_TIMEOUT, category);
+//            throw new StoreTimeoutException(e.getMessage());
+//        } catch (Exception e) {
+//            NodeMonitor.getInstance().logNode(client, key, MSG_EXCEPTION, category);
+//            throw new StoreException(e);
+//        }
+//    }
 
     private String getCacheKey(String key, boolean isHot) {
         return CacheKeyUtils.reformKey(key);
@@ -329,7 +329,10 @@ public class MemcachedStoreClientImpl extends AbstractStoreClient implements Mem
         if (isHot) {
             MemcachedClient client = getWriteClient();
             try {
-                client.set(CacheKeyUtils.reformKey(key, true), expiration + hotKeyExpiration, value);
+                OperationFuture<Boolean> future = client.set(CacheKeyUtils.reformKey(key, true), expiration + hotKeyExpiration, value);
+                if(future != null) {
+                    NodeMonitor.getInstance().logNode(future);
+                }
             } catch (RuntimeException e) {
                 Cat.logEvent("Squirrel." + this.getStoreType(), category + ":setBackupFail", "-1", "key=" + key
                         + "&error=" + e.getMessage());
@@ -340,7 +343,10 @@ public class MemcachedStoreClientImpl extends AbstractStoreClient implements Mem
     private void asyncRemoveBackupKey(String key, boolean isHot, String category) throws StoreException {
         if (isHot && removeBackup) {
             try {
-                getWriteClient().delete(CacheKeyUtils.reformKey(key, true));
+                OperationFuture<Boolean> future = getWriteClient().delete(CacheKeyUtils.reformKey(key, true));
+                if(future != null) {
+                    NodeMonitor.getInstance().logNode(future);
+                }
             } catch (RuntimeException e) {
                 Cat.logEvent("Squirrel." + this.getStoreType(), category + ":removeBackupFail", "-1", "key=" + key
                         + "&error=" + e.getMessage());
@@ -356,13 +362,13 @@ public class MemcachedStoreClientImpl extends AbstractStoreClient implements Mem
         try {
             retryResponse = RetryLoop.hedgedGet(client, key);
             result = retryResponse.getResult();
-            NodeMonitor.getInstance().logNode(client, key, MSG_SUCCESS, category);
+//            NodeMonitor.getInstance().logNode(client, key, MSG_SUCCESS, category);
         } catch (TimeoutException e) {
             timeoutException = e;
             result = null;
-            NodeMonitor.getInstance().logNode(client, key, MSG_TIMEOUT, category);
+//            NodeMonitor.getInstance().logNode(client, key, MSG_TIMEOUT, category);
         } catch (Exception e) {
-            NodeMonitor.getInstance().logNode(client, key, MSG_EXCEPTION, category);
+//            NodeMonitor.getInstance().logNode(client, key, MSG_EXCEPTION, category);
             throw e;
         }
         if (timeoutException != null && result == null) {
@@ -438,10 +444,11 @@ public class MemcachedStoreClientImpl extends AbstractStoreClient implements Mem
     private <T> Map<String, Object> doGetBulk(MemcachedClient client, Collection<String> key, long timeout)
             throws Exception {
         Map<String, Object> result = null;
-        Future<Map<String, Object>> future = null;
+        BulkFuture<Map<String, Object>> future = null;
         try {
             future = client.asyncGetBulk(key);
             if (future != null) {
+                NodeMonitor.getInstance().logNode(future);
                 result = future.get(timeout, TimeUnit.MILLISECONDS);
             }
         } catch (Exception e) {
@@ -521,21 +528,22 @@ public class MemcachedStoreClientImpl extends AbstractStoreClient implements Mem
         try {
             OperationFuture<Boolean> future = client.set(k, expiration, v);
             if (future != null) {
+                NodeMonitor.getInstance().logNode(future);
                 boolean success = future.get(timeoutSet, TimeUnit.MILLISECONDS);
                 if (success) {
                     asyncSetBackupKey(k, value, expiration, isHot, category);
                 }
-                NodeMonitor.getInstance().logNode(client, k, MSG_SUCCESS, category);
+//                NodeMonitor.getInstance().logNode(client, k, MSG_SUCCESS, category);
                 return success;
             }
         } catch (CheckedOperationTimeoutException e) {
-            NodeMonitor.getInstance().logNode(client, k, MSG_TIMEOUT, category);
+//            NodeMonitor.getInstance().logNode(client, k, MSG_TIMEOUT, category);
             throw new TimeoutException(e.getMessage());
         } catch (Exception e) {
-            NodeMonitor.getInstance().logNode(client, k, MSG_EXCEPTION, category);
+//            NodeMonitor.getInstance().logNode(client, k, MSG_EXCEPTION, category);
             throw new StoreException(e);
         }
-        NodeMonitor.getInstance().logNode(client, k, MSG_EXCEPTION, category);
+//        NodeMonitor.getInstance().logNode(client, k, MSG_EXCEPTION, category);
         return false;
     }
 
@@ -551,21 +559,22 @@ public class MemcachedStoreClientImpl extends AbstractStoreClient implements Mem
         try {
             OperationFuture<Boolean> future = client.add(k, expiration, v);
             if (future != null) {
+                NodeMonitor.getInstance().logNode(future);
                 boolean result = future.get(timeoutAdd, TimeUnit.MILLISECONDS);
                 if (result) {
                     asyncSetBackupKey(finalKey, value, expiration, isHot, category);
                 }
-                NodeMonitor.getInstance().logNode(client, k, MSG_SUCCESS, category);
+//                NodeMonitor.getInstance().logNode(client, k, MSG_SUCCESS, category);
                 return result;
             }
         } catch (CheckedOperationTimeoutException e) {
-            NodeMonitor.getInstance().logNode(client, k, MSG_TIMEOUT, category);
+//            NodeMonitor.getInstance().logNode(client, k, MSG_TIMEOUT, category);
             throw new TimeoutException(e.getMessage());
         } catch (Exception e) {
-            NodeMonitor.getInstance().logNode(client, k, MSG_EXCEPTION, category);
+//            NodeMonitor.getInstance().logNode(client, k, MSG_EXCEPTION, category);
             throw new StoreException(e);
         }
-        NodeMonitor.getInstance().logNode(client, k, MSG_EXCEPTION, category);
+//        NodeMonitor.getInstance().logNode(client, k, MSG_EXCEPTION, category);
         return false;
     }
 
@@ -576,21 +585,22 @@ public class MemcachedStoreClientImpl extends AbstractStoreClient implements Mem
         MemcachedClient client = getWriteClient();
         try {
             String reformedKey = getCacheKey(finalKey, isHot);
-            Future<Boolean> future = client.delete(reformedKey);
+            OperationFuture<Boolean> future = client.delete(reformedKey);
             if (future != null) {
+                NodeMonitor.getInstance().logNode(future);
                 boolean result = future.get(timeoutSet, TimeUnit.MILLISECONDS);
                 if (result) {
                     asyncRemoveBackupKey(finalKey, isHot, category);
                 }
-                NodeMonitor.getInstance().logNode(client, finalKey, MSG_SUCCESS, category);
+//                NodeMonitor.getInstance().logNode(client, finalKey, MSG_SUCCESS, category);
                 return result;
             }
             return false;
         } catch (CheckedOperationTimeoutException e) {
-            NodeMonitor.getInstance().logNode(client, finalKey, MSG_TIMEOUT, category);
+//            NodeMonitor.getInstance().logNode(client, finalKey, MSG_TIMEOUT, category);
             throw new TimeoutException(e.getMessage());
         } catch (Exception e) {
-            NodeMonitor.getInstance().logNode(client, finalKey, MSG_EXCEPTION, category);
+//            NodeMonitor.getInstance().logNode(client, finalKey, MSG_EXCEPTION, category);
             throw new StoreException(e);
         }
     }
@@ -601,9 +611,12 @@ public class MemcachedStoreClientImpl extends AbstractStoreClient implements Mem
         MemcachedClient client = getReadClient();
         try {
             GetFuture<T> future = (GetFuture<T>) client.asyncGet(finalKey);
+            if(future != null) {
+                NodeMonitor.getInstance().logNode(future);
+            }
             return future;
         } catch (Exception e) {
-            NodeMonitor.getInstance().logNode(client, key, MSG_EXCEPTION, categoryConfig.getCategory());
+//            NodeMonitor.getInstance().logNode(client, key, MSG_EXCEPTION, categoryConfig.getCategory());
             throw new StoreException(e);
         }
     }
@@ -619,11 +632,14 @@ public class MemcachedStoreClientImpl extends AbstractStoreClient implements Mem
         MemcachedClient client = getWriteClient();
         try {
             OperationFuture<Boolean> future = client.set(k, expiration, v);
+            if(future != null) {
+                NodeMonitor.getInstance().logNode(future);
+            }
             asyncSetBackupKey(k, value, expiration, isHot, category);
-            NodeMonitor.getInstance().logNode(client, k, MSG_SUCCESS, category);
+//            NodeMonitor.getInstance().logNode(client, k, MSG_SUCCESS, category);
             return future;
         } catch (RuntimeException e) {
-            NodeMonitor.getInstance().logNode(client, k, MSG_EXCEPTION, category);
+//            NodeMonitor.getInstance().logNode(client, k, MSG_EXCEPTION, category);
             throw new StoreException(e);
         }
     }
@@ -639,10 +655,13 @@ public class MemcachedStoreClientImpl extends AbstractStoreClient implements Mem
         MemcachedClient client = getWriteClient();
         try {
             OperationFuture<Boolean> future = client.add(k, expiration, v);
-            NodeMonitor.getInstance().logNode(client, k, MSG_SUCCESS, category);
+            if(future != null) {
+                NodeMonitor.getInstance().logNode(future);
+            }
+//            NodeMonitor.getInstance().logNode(client, k, MSG_SUCCESS, category);
             return future;
         } catch (Exception e) {
-            NodeMonitor.getInstance().logNode(client, k, MSG_EXCEPTION, category);
+//            NodeMonitor.getInstance().logNode(client, k, MSG_EXCEPTION, category);
             throw new StoreException(e);
         }
     }
@@ -664,17 +683,18 @@ public class MemcachedStoreClientImpl extends AbstractStoreClient implements Mem
 
             @Override
             public void onComplete(GetFuture<?> future) throws Exception {
+                NodeMonitor.getInstance().logNode(future);
                 OperationStatus status = future.getStatus();
                 if (status.isSuccess() || status.getStatusCode() == StatusCode.ERR_NOT_FOUND) {
                     T result = (T) future.get();
-                    NodeMonitor.getInstance().logNode(client, key, MSG_SUCCESS, categoryConfig.getCategory());
+//                    NodeMonitor.getInstance().logNode(client, key, MSG_SUCCESS, categoryConfig.getCategory());
                     callback.onSuccess(result);
                 } else {
                     if (status.getStatusCode() == StatusCode.TIMEDOUT) {
-                        NodeMonitor.getInstance().logNode(client, key, MSG_TIMEOUT, categoryConfig.getCategory());
+//                        NodeMonitor.getInstance().logNode(client, key, MSG_TIMEOUT, categoryConfig.getCategory());
                         callback.onFailure(new StoreTimeoutException("memcached async get key " + key + " timeout"));
                     } else {
-                        NodeMonitor.getInstance().logNode(client, key, MSG_EXCEPTION, categoryConfig.getCategory());
+//                        NodeMonitor.getInstance().logNode(client, key, MSG_EXCEPTION, categoryConfig.getCategory());
                         callback.onFailure(new StoreException("memcached async get key " + key + " failed, error: "
                                 + status.getMessage()));
                     }
@@ -694,17 +714,18 @@ public class MemcachedStoreClientImpl extends AbstractStoreClient implements Mem
 
             @Override
             public void onComplete(OperationFuture<?> future) throws Exception {
+                NodeMonitor.getInstance().logNode(future);
                 OperationStatus status = future.getStatus();
                 if (status.isSuccess()) {
                     Boolean result = (Boolean) future.get();
-                    NodeMonitor.getInstance().logNode(client, key, MSG_SUCCESS, categoryConfig.getCategory());
+//                    NodeMonitor.getInstance().logNode(client, key, MSG_SUCCESS, categoryConfig.getCategory());
                     callback.onSuccess(result);
                 } else {
                     if (status.getStatusCode() == StatusCode.TIMEDOUT) {
-                        NodeMonitor.getInstance().logNode(client, key, MSG_TIMEOUT, categoryConfig.getCategory());
+//                        NodeMonitor.getInstance().logNode(client, key, MSG_TIMEOUT, categoryConfig.getCategory());
                         callback.onFailure(new StoreTimeoutException("memcached async set key " + key + " timeout"));
                     } else {
-                        NodeMonitor.getInstance().logNode(client, key, MSG_EXCEPTION, categoryConfig.getCategory());
+//                        NodeMonitor.getInstance().logNode(client, key, MSG_EXCEPTION, categoryConfig.getCategory());
                         callback.onFailure(new StoreException("memcached async set key " + key + " failed, error: "
                                 + status.getMessage()));
                     }
@@ -724,17 +745,18 @@ public class MemcachedStoreClientImpl extends AbstractStoreClient implements Mem
 
             @Override
             public void onComplete(OperationFuture<?> future) throws Exception {
+                NodeMonitor.getInstance().logNode(future);
                 OperationStatus status = future.getStatus();
                 if (status.isSuccess() || status.getStatusCode() == StatusCode.ERR_EXISTS) {
                     Boolean result = (Boolean) future.get();
-                    NodeMonitor.getInstance().logNode(client, key, MSG_SUCCESS, categoryConfig.getCategory());
+//                    NodeMonitor.getInstance().logNode(client, key, MSG_SUCCESS, categoryConfig.getCategory());
                     callback.onSuccess(result);
                 } else {
                     if (status.getStatusCode() == StatusCode.TIMEDOUT) {
-                        NodeMonitor.getInstance().logNode(client, key, MSG_TIMEOUT, categoryConfig.getCategory());
+//                        NodeMonitor.getInstance().logNode(client, key, MSG_TIMEOUT, categoryConfig.getCategory());
                         callback.onFailure(new StoreTimeoutException("memcached async add key " + key + " timeout"));
                     } else {
-                        NodeMonitor.getInstance().logNode(client, key, MSG_EXCEPTION, categoryConfig.getCategory());
+//                        NodeMonitor.getInstance().logNode(client, key, MSG_EXCEPTION, categoryConfig.getCategory());
                         callback.onFailure(new StoreException("memcached async add key " + key + " failed, error: "
                                 + status.getMessage()));
                     }
@@ -754,17 +776,18 @@ public class MemcachedStoreClientImpl extends AbstractStoreClient implements Mem
 
             @Override
             public void onComplete(OperationFuture<?> future) throws Exception {
+                NodeMonitor.getInstance().logNode(future);
                 OperationStatus status = future.getStatus();
                 if (status.isSuccess() || status.getStatusCode() == StatusCode.ERR_NOT_FOUND) {
                     Boolean result = (Boolean) future.get();
-                    NodeMonitor.getInstance().logNode(client, key, MSG_SUCCESS, categoryConfig.getCategory());
+//                    NodeMonitor.getInstance().logNode(client, key, MSG_SUCCESS, categoryConfig.getCategory());
                     callback.onSuccess(result);
                 } else {
                     if (status.getStatusCode() == StatusCode.TIMEDOUT) {
-                        NodeMonitor.getInstance().logNode(client, key, MSG_TIMEOUT, categoryConfig.getCategory());
+//                        NodeMonitor.getInstance().logNode(client, key, MSG_TIMEOUT, categoryConfig.getCategory());
                         callback.onFailure(new StoreTimeoutException("memcached async delete key " + key + " timeout"));
                     } else {
-                        NodeMonitor.getInstance().logNode(client, key, MSG_EXCEPTION, categoryConfig.getCategory());
+//                        NodeMonitor.getInstance().logNode(client, key, MSG_EXCEPTION, categoryConfig.getCategory());
                         callback.onFailure(new StoreException("memcached async delete key " + key + " failed, error: "
                                 + status.getMessage()));
                     }
@@ -813,13 +836,13 @@ public class MemcachedStoreClientImpl extends AbstractStoreClient implements Mem
         try {
             // use timeout to eliminate memcached servers' crash
             Map<String, T> result = (Map<String, T>) doGetBulk(client, keys, timeoutMGet);
-            NodeMonitor.getInstance().logNode(client, keys, MSG_SUCCESS, "");
+//            NodeMonitor.getInstance().logNode(client, keys, MSG_SUCCESS, "");
             return result;
         } catch (TimeoutException e) {
-            NodeMonitor.getInstance().logNode(client, keys, MSG_TIMEOUT, "");
+//            NodeMonitor.getInstance().logNode(client, keys, MSG_TIMEOUT, "");
             throw new StoreTimeoutException(e);
         } catch (Exception e) {
-            NodeMonitor.getInstance().logNode(client, keys, MSG_EXCEPTION, "");
+//            NodeMonitor.getInstance().logNode(client, keys, MSG_EXCEPTION, "");
             throw new StoreException(e);
         }
     }
@@ -834,6 +857,7 @@ public class MemcachedStoreClientImpl extends AbstractStoreClient implements Mem
 
             @Override
             public void onComplete(BulkGetFuture<?> future) throws Exception {
+                NodeMonitor.getInstance().logNode(future);
                 OperationStatus status = future.getStatus();
                 if (status.isSuccess() || status.getStatusCode() == StatusCode.ERR_NOT_FOUND) {
                     Map<String, T> result = (Map<String, T>) future.get();

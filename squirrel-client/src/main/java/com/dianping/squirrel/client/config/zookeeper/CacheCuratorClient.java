@@ -22,17 +22,17 @@ import org.springframework.util.CollectionUtils;
 import com.dianping.cat.Cat;
 import com.dianping.cat.message.Message;
 import com.dianping.cat.message.Transaction;
-import com.dianping.pigeon.threadpool.NamedThreadFactory;
 import com.dianping.remote.cache.dto.CacheConfigurationDTO;
 import com.dianping.remote.cache.dto.CacheKeyConfigurationDTO;
 import com.dianping.remote.cache.dto.CacheKeyTypeVersionUpdateDTO;
-import com.dianping.squirrel.client.config.StoreClientConfigManager;
 import com.dianping.squirrel.client.config.StoreCategoryConfigManager;
+import com.dianping.squirrel.client.config.StoreClientConfigManager;
 import com.dianping.squirrel.client.config.zookeeper.CacheEvent.CacheEventType;
 import com.dianping.squirrel.common.config.ConfigChangeListener;
 import com.dianping.squirrel.common.config.ConfigManager;
 import com.dianping.squirrel.common.config.ConfigManagerLoader;
 import com.dianping.squirrel.common.util.JsonUtils;
+import com.dianping.squirrel.common.util.NamedThreadFactory;
 import com.dianping.squirrel.common.util.PathUtils;
 
 public class CacheCuratorClient {

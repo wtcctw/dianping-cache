@@ -12,12 +12,12 @@ public class KeyCountMonitor {
 	private static Logger logger = LoggerFactory.getLogger(KeyCountMonitor.class);
 
 	private static final String keyCountRangeConfig = ConfigManagerLoader.getConfigManager().getStringValue(
-			"avatar-cache.monitor.keycount.range", "4,8,16,32,64,128");
+			"squirrel-client.monitor.keycount.range", "4,8,16,32,64,128,256");
 
 	private static int[] keyCountRangeArray;
 
 	private static final boolean enableMonitor = ConfigManagerLoader.getConfigManager().getBooleanValue(
-			"avatar-cache.monitor.keycount.enable", true);
+			"squirrel-client.monitor.keycount.enable", true);
 
 	private static class KeyCountHolder {
 		public static final KeyCountMonitor INSTANCE = new KeyCountMonitor();
@@ -57,8 +57,7 @@ public class KeyCountMonitor {
 	public void logKeyCount(String cacheType, String category, String eventName, int count) {
 		if (enableMonitor && cacheType != null && !"web".equalsIgnoreCase(cacheType)) {
 			try {
-				log(count, keyCountRangeArray, "Squirrel." + eventName + ".keyCount."
-						+ (category == null ? cacheType : category));
+				log(count, keyCountRangeArray, "Squirrel." + cacheType + ".multi.keyCount");
 			} catch (Throwable t) {
 				logger.warn("error while logging key count:" + t.getMessage());
 			}

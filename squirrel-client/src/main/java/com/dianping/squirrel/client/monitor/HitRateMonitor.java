@@ -11,20 +11,20 @@ public class HitRateMonitor {
 
 	private static Logger logger = LoggerFactory.getLogger(HitRateMonitor.class);
 
-	private static final String keyMissedRangeConfig = ConfigManagerLoader.getConfigManager().getStringValue(
-			"avatar-cache.monitor.keymissed.range", "1,5,10,20,30,40,50,60,70,80,90,100");
+	private static final String hitRateRangeConfig = ConfigManagerLoader.getConfigManager().getStringValue(
+			"squirrel-client.monitor.hitrate.range", "1,5,10,20,30,40,50,60,70,80,90,100");
 
-	private static int[] keyMissedRangeArray;
+	private static int[] hitRateRangeArray;
 
 	private static final boolean enableMonitor = ConfigManagerLoader.getConfigManager().getBooleanValue(
-			"avatar-cache.monitor.keymissed.enable", true);
+			"squirrel-client.monitor.hitrate.enable", true);
 
-	private static class KeyMissedHolder {
+	private static class HitRateHolder {
 		public static final HitRateMonitor INSTANCE = new HitRateMonitor();
 	}
 
 	public static HitRateMonitor getInstance() {
-		return KeyMissedHolder.INSTANCE;
+		return HitRateHolder.INSTANCE;
 	}
 
 	private HitRateMonitor() {
@@ -34,7 +34,7 @@ public class HitRateMonitor {
 	}
 
 	private void init() {
-		keyMissedRangeArray = initRangeArray(keyMissedRangeConfig);
+		hitRateRangeArray = initRangeArray(hitRateRangeConfig);
 	}
 
 	private int[] initRangeArray(String rangeConfig) {
@@ -57,8 +57,7 @@ public class HitRateMonitor {
 	public void logHitRate(String cacheType, String category, String eventName, int hitRate, int hits) {
 		if (enableMonitor && cacheType != null && !"web".equalsIgnoreCase(cacheType)) {
 			try {
-				log(hitRate, keyMissedRangeArray, "Squirrel." + eventName + ".hitRate."
-						+ (category == null ? cacheType : category), hits);
+				log(hitRate, hitRateRangeArray, "Squirrel." + cacheType + ".multi.hitRate", hits);
 			} catch (Throwable t) {
 				logger.warn("error while logging key hit rate:" + t.getMessage());
 			}

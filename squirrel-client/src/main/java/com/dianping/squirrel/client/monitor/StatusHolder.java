@@ -15,7 +15,7 @@ public final class StatusHolder {
     private static ConcurrentHashMap<String, CapacityBucket> capacityBuckets = new ConcurrentHashMap<String, CapacityBucket>();
 
     public static final boolean statEnable = ConfigManagerLoader.getConfigManager().getBooleanValue(
-            "avatar-cache.stat.enable", false);
+            "squirrel-client.stat.enable", false);
 
     private static volatile boolean inited = false;
 

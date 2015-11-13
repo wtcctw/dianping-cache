@@ -13,13 +13,13 @@ public class QpsMonitor {
 
 	private static final String rangeConfig = ConfigManagerLoader
 			.getConfigManager()
-			.getStringValue("avatar-cache.monitor.qps.range",
+			.getStringValue("squirrel-client.monitor.qps.range",
 					"10,50,100,300,500,1000,2000,3000,4000,5000,6000,7000,8000,9000,10000,12000,14000,16000,18000,20000,25000,30000");
 
 	private static int[] rangeArray;
 
 	private static final boolean enableMonitor = ConfigManagerLoader.getConfigManager().getBooleanValue(
-			"avatar-cache.monitor.qps.enable", true);
+			"squirrel-client.monitor.qps.enable", false);
 
 	private static class KeyCountHolder {
 		public static final QpsMonitor INSTANCE = new QpsMonitor();

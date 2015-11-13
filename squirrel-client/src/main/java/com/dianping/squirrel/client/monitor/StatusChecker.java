@@ -9,11 +9,11 @@ public class StatusChecker implements Runnable {
 
 	private static final Logger logger = LoggerFactory.getLogger(StatusChecker.class);
 	public static final int logPeriod = ConfigManagerLoader.getConfigManager().getIntValue(
-			"avatar-cache.stat.log.period", 5000);
+			"squirrel-client.stat.log.period", 5000);
 	public static final int logMinQps = ConfigManagerLoader.getConfigManager().getIntValue(
-			"avatar-cache.stat.log.minqps", 0);
+			"squirrel-client.stat.log.minqps", 0);
 	public static final boolean logLocal = ConfigManagerLoader.getConfigManager().getBooleanValue(
-	        "avatar-cache.stat.log.local", false);
+	        "squirrel-client.stat.log.local", false);
 
 	@Override
 	public void run() {
