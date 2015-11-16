@@ -1,22 +1,42 @@
 # Squirrel 用户文档
 ---
 ## 概述
-Squirrel 是点评的 Key-Value 存储框架，继承自 Avatar-Cache 缓存框架。主要包括管理端（squirrel-console）、客户端（squirrel-client）和存储节点（memcached、redis、dcache等）组成：
+Squirrel 是点评的 Key-Value 存储框架，继承自 Avatar-Cache 缓存框架。主要包括管理端（squirrel-console）、客户端（squirrel-client）和存储节点（memcached、redis、dcache等）组成。
 
+### 基本概念
+
+* key：存储的键，用于唯一定位一个 value
+* value：存储的值，经序列化后存储在后端存储中
+* cluster：存储集群，用于指定后端的存储节点，主要类型有 memcached，redis，dcache，ehcache 等
+* category：存储类别，用于指定某一类存储数据，可以类比的理解为数据库中的一张表，或者一个 namespace，存储类别被用于这个类别的 key 的前缀
+
+### 存储 key 的组成
+
+存储 key 的组成包括3部分：category、template、version，最终存储的 key 字符串是由 **${category}.${template}_${version}** 组合而成：
+1)、category 是某一类存储的名称，它不是存储 key，它是存储 key 的前缀，可以理解它是数据库里的一张表
+2)、template 是存储 key 的模板，由参数组成，如c{0}d{1}这个模板，{0}代表第1个参数比如userId，{1}代表第2个参数比如cityId，如果最终把2个参数值填充进去，最后的字符串类似：c1000d2
+3)、version 是 squirrel 内部管理的一个数字，如果这个 category 清一次缓存，那么 version 会自动加1，这样最后的key字符串会变成全新的字符串，应用使用新的key之后需要重新从数据源加载数据到缓存
+比如申请一个category：test，template为c{0}d{1}，最后的key字符串可能是：test.c1000d2_0
+
+### 基本架构
 ![Squirrel 架构](http://code.dianpingoa.com/arch/squirrel/raw/master/squirrel-arch.png)
+
+* squirrel-console 是管理端，主要负责
+	* 配置存储集群和存储类别的属性
+	* 查询某个 key 对应的 value
+	* 查询所有变更的操作日志，如什么时候修改了集群的属性等
+	* 存储节点监控，实时监控所有后端存储节点的健康状况并报警
+	* 存储节点的扩容，缩容，支持一键扩容缩容
+	* 存储节点数据迁移
+* zookeeper 用作配置中心，所有配置保存在 zookeeper 上，同时保存一份到数据库中，所有配置变更通过 zookeeper 实时推送到相应客户端。同时 zookeeper 也作为分布式清缓存的消息中心，本地缓存的清除消息通过 zookeeper 通知到相应客户端进行本地清除。
+* squirrel-client 是客户端，启动时从 zookeeper 读取缓存集群和缓存类别的配置，然后基于配置，直接连接相应的后端存储节点，同时响应存储集群和存储类别的配置变更事件，实时应用变更到本地。
+* 存储节点，视不同的存储类别，分为好几种，当前支持的有：memcached, redis, ehcache, dcache
 
 ## 主要改变
 1. API 接口较 Avatar-Cache 更加合理。
 2. 支持基于 redis-cluster 的 KV 存储。
 3. 后续版本会增加多备份，自动扩容等功能。
 
-## 存储 Key 的组成
-
-存储包括 key 和 value 两部分，key 的组成包括3部分：category、template、version，最终存储的 key 字符串是由 **${category}.${template}_${version}** 组合而成：
-1)、category 是某一类存储的名称，它不是存储 key，它是存储 key 的前缀，可以理解它是数据库里的一张表
-2)、template 是存储 key 的模板，由参数组成，如c{0}d{1}这个模板，{0}代表第1个参数比如userId，{1}代表第2个参数比如cityId，如果最终把2个参数值填充进去，最后的字符串类似：c1000d2
-3)、version 是 squirrel 内部管理的一个数字，如果这个 category 清一次缓存，那么 version 会自动加1，这样最后的key字符串会变成全新的字符串，应用使用新的key之后需要重新从数据源加载数据到缓存
-比如申请一个category：test，template为c{0}d{1}，最后的key字符串可能是：test.c1000d2_0
 
 ## 存储管理平台
 
@@ -96,8 +116,6 @@ b) Spring 配置使用方式
     http://www.dianping.com/schema/squirrel http://www.dianping.com/schema/squirrel/squirrel-1.0.xsd">  
 
     <!-- squirrel store annotation -->
-    <!-- <squirrel:store store-type="redis-default"/> -->
-    <!-- store-type 是可选参数，用于指定存储类型，用于拿到指定存储的客户端 -->
     <squirrel:store />
 
     <!-- spring annotation -->
@@ -328,145 +346,21 @@ public interface StoreClient {
 
 ```
 
-## RedisStoreClient 接口
-Redis cluster 专用接口支持一些 redis 特有的命令，支持 Hash，List 和 Set 的相关操作。
-Redis 相关操作暂时只支持同步接口，multi 和 async 相关操作由于 jedis 驱动不支持，我们现在也不支持，将在后续版本增加。
-一般情况下，不建议直接获取特定存储相关的实例，因为当你使用的 category 更换了后端存储类型，存储特定实例将得不到通知。
+## 特定存储相关接口
+各种后端存储都支持一些自身特有的命令。如 dcache 支持二级表，memcached 支持 cas 操作，redis支持 Hash，List 和 Set 的操作等。
+如果要使用和后端存储相关的特定接口时，可以使用一下方式获得特定存储相关的接口：
 
-a) 获取 RedisStoreClient 实例
+**请注意：**Redis 相关操作暂时只支持同步接口，multi 和 async 相关操作由于 jedis 驱动不支持，我们现在也不支持，将在后续版本增加。
+
+**请注意：**一般情况下，不建议直接获取特定存储相关的实例，因为当你使用的 category 更换了后端存储类型，存储特定实例将得不到通知。
+
+获取特定存储相关接口的实例
 
 ```
 使用工厂方法
-RedisStoreClient storeClient = (RedisStoreClient)StoreClientFactory.getStoreClient("redis-default");
-redis-default 是申请存储时选择的 redis 集群的名字
+RedisStoreClient storeClient = (RedisStoreClient)StoreClientFactory.getStoreClientByCategory("myredis");
+// myredis 是申请存储时指定的存储类别 category，如果这个 category 的存储集群是 redis 类型的，那么返回的就是 RedisStoreClient 接口，同样的，如果这个 category 的存储集群是 memcached 的，那么返回的就是 MemcachedStoreClient 接口。
  
-```
-
-b) RedisStoreClient 接口
-
-```
-public interface RedisStoreClient extends StoreClient {
-
-	// expire related
-	Boolean exists(StoreKey key);
-
-	String type(StoreKey key);
-
-	Boolean expire(StoreKey key, int seconds);
-
-	/**
-	 * @return TTL in seconds<br>
-	 *         -2 if key does not exist<br>
-	 *         -1 if key exists but has no associated expire
-	 */
-	Long ttl(StoreKey key);
-
-	/**
-	 * Remove the existing timeout on key
-	 * @param key
-	 * @return 
-	 * 		true if the timeout was removed<br>
-	 * 		false if key does not exist or does not have an associated timeout.
-	 */
-	Boolean persist(StoreKey key);
-
-	// hash related
-	/**
-	 * @return
-	 *		1 if field is a new field in the hash and value was set<br>
-  	 *      0 if field already exists in the hash and the value was updated
-	 */
-	Long hset(StoreKey key, String field, Object value);
-
-	<T> T hget(StoreKey key, String field);
-
-	/**
-	 * @return the number of fields that were removed
-	 */
-	Long hdel(StoreKey key, String... field);
-
-	Set<String> hkeys(StoreKey key);
-
-	List<Object> hvals(StoreKey key);
-
-	Map<String, Object> hgetAll(StoreKey key);
-
-	/**
-	 * @return list of values for the fields, if some field
-	 *         does not exist, a null value is in the returned list<br>
-	 *         null if the key does not exist or fields are not specified
-	 */
-	List<Object> hmget(StoreKey key, final String... fields);
-	
-	Boolean hmset(StoreKey key, final Map<String, Object> valueMap);
-	
-	// list related
-	/**
-	 * Insert the values at the tail of the list stored at key
-	 * 
-	 * @return length of the list after the push operation
-	 */
-	Long rpush(StoreKey key, Object... value);
-
-	/**
-	 * Insert the values at the head of the list stored at key<br>
-	 * Value are inserted one after the other to the head of the list
-	 * 
-	 * @return the length of the list after the push operations
-	 */
-	Long lpush(StoreKey key, Object... value);
-
-	<T> T lpop(StoreKey key);
-
-	<T> T rpop(StoreKey key);
-
-	<T> T lindex(StoreKey key, long index);
-
-	Boolean lset(StoreKey key, long index, Object value);
-
-	/**
-	 * Returns the length of the list stored at key
-
-	 * @return the length of the list stored at key<br>
-	 *         0 if the key does not exist
-	 */
-	Long llen(StoreKey key);
-
-	/**
-	 * Returns the specified elements of the list stored at key
-	 *
-	 * @return list of elements in the specified range
-	 */
-	List<Object> lrange(StoreKey key, long start, long end);
-
-	/**
-	 * Trim an existing list so that it will contain only the specified range of elements
-	 * 
-	 * @return
-	 */
-	Boolean ltrim(StoreKey key, long start, long end);
-
-	// set related
-	/**
-	 * @return number of elements that were added to the set
-	 */
-	Long sadd(StoreKey key, Object... member);
-	
-	/**
-	 * @return number of members that were removed from the set
-	 */
-	Long srem(StoreKey key, Object... member);
-
-	Set<Object> smembers(StoreKey key);
-
-	Long scard(StoreKey key);
-
-	Boolean sismember(StoreKey key, Object member);
-	
-	// sorted set related
-	
-}
-
 ```
 
 
