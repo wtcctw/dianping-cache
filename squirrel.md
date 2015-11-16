@@ -22,15 +22,15 @@ Squirrel 是点评的 Key-Value 存储框架，继承自 Avatar-Cache 缓存框�
 ![Squirrel 架构](http://code.dianpingoa.com/arch/squirrel/raw/master/squirrel-arch.png)
 
 * squirrel-console 是管理端，主要负责
-	* 配置存储集群和存储类别的属性
+	* 配置存储集群(cluster)和存储类别(category)的属性
 	* 查询某个 key 对应的 value
-	* 查询所有变更的操作日志，如什么时候修改了集群的属性等
+	* 查询变更操作日志，如什么时候修改了集群的属性等
 	* 存储节点监控，实时监控所有后端存储节点的健康状况并报警
 	* 存储节点的扩容，缩容，支持一键扩容缩容
 	* 存储节点数据迁移
 * zookeeper 用作配置中心，所有配置保存在 zookeeper 上，同时保存一份到数据库中，所有配置变更通过 zookeeper 实时推送到相应客户端。同时 zookeeper 也作为分布式清缓存的消息中心，本地缓存的清除消息通过 zookeeper 通知到相应客户端进行本地清除。
-* squirrel-client 是客户端，启动时从 zookeeper 读取缓存集群和缓存类别的配置，然后基于配置，直接连接相应的后端存储节点，同时响应存储集群和存储类别的配置变更事件，实时应用变更到本地。
-* 存储节点，视不同的存储类别，分为好几种，当前支持的有：memcached, redis, ehcache, dcache
+* squirrel-client 是客户端，启动时从 zookeeper 读取缓存集群和缓存类别的配置，然后基于配置，直接连接相应的后端存储节点，同时响应存储集群和存储类别的配置变更事件.
+* 存储节点，视不同的存储类别，分为好几种，当前线上部署的有：memcached, redis, ehcache, dcache
 
 ## 主要改变
 1. API 接口较 Avatar-Cache 更加合理。
@@ -38,13 +38,13 @@ Squirrel 是点评的 Key-Value 存储框架，继承自 Avatar-Cache 缓存框�
 3. 后续版本会增加多备份，自动扩容等功能。
 
 
-## 存储管理平台
+## 用户接入
 
-存储的管理包括以下几个方面：
+用户接入主要在 DBA 的存储管理平台完成：
 
 a、存储申请和变更
 为了统一管理存储，需要申请存储，申请存储需要指定以下：
-1)、存储类别定义，包括存储类别（category）、key模板、失效时间、是否热点key
+1)、存储类别定义，包括存储类别（category）、key 的模板、失效时间、是否热点key等
 2)、存储集群，包括memcached集群、web（web cache是本地ehcache）、dcache集群，比如memcached在线上有多套集群，需要根据自己业务申请相应的集群
 3)、存储访问大概qps、数据平均大小、数量等
 
@@ -83,7 +83,7 @@ avatar-cache针对dcache接口进行了封装，只需要在申请缓存时指�
 
 d、redis-cluster
 
-redis 既可以作为缓存也可以作为 KV 来使用。作为缓存，相较于 memcached，redis 的接口更加丰富，支持 list，hash，set 等数据结构，同时具有很高的性能。作为 KV，redis-cluster 提供了主备，数据迁移，数据持久化等的支持。但由于 redis 是全内存的，存储成本比较高，而且一般都有主备，更加剧了内存消耗，所以一般 redis-cluster 的使用场景是：数据量不太大的存储，或者数据量大的缓存。
+redis 既可以作为缓存也可以作为 KV 来使用。作为缓存，相较于 memcached，redis 的接口更加丰富，支持 list，hash，set 等数据结构，同时具有很高的性能。作为 KV，redis-cluster 提供了主备，数据迁移，数据持久化等的支持。但由于 redis 是全内存的，存储成本比较高，而且一般都有主备，更加剧了内存消耗，所以一般 redis-cluster 的使用场景是：**数据量不太大的存储，或者数据量大的缓存**。
 
 
 ## 客户端使用说明
@@ -348,7 +348,7 @@ public interface StoreClient {
 
 ## 特定存储相关接口
 各种后端存储都支持一些自身特有的命令。如 dcache 支持二级表，memcached 支持 cas 操作，redis支持 Hash，List 和 Set 的操作等。
-如果要使用和后端存储相关的特定接口时，可以使用一下方式获得特定存储相关的接口：
+如果要使用和后端存储相关的特定接口时，可以使用以下方式获得特定存储相关的接口：
 
 **请注意：**Redis 相关操作暂时只支持同步接口，multi 和 async 相关操作由于 jedis 驱动不支持，我们现在也不支持，将在后续版本增加。
 
