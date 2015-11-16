@@ -3,7 +3,7 @@
 ## 概述
 Squirrel 是点评的 Key-Value 存储框架，继承自 Avatar-Cache 缓存框架。主要包括管理端（squirrel-console）、客户端（squirrel-client）和存储节点（memcached、redis、dcache等）组成：
 
-TODO：arch-picture
+![Squirrel 架构](http://code.dianpingoa.com/arch/squirrel/raw/master/squirrel-arch.png)
 
 ## 主要改变
 1. API 接口较 Avatar-Cache 更加合理。
