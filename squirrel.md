@@ -363,4 +363,33 @@ RedisStoreClient storeClient = (RedisStoreClient)StoreClientFactory.getStoreClie
  
 ```
 
+## 缓存 API 使用约定
+![缓存 API 使用约定](http://code.dianpingoa.com/arch/squirrel/raw/master/cache-pattern.png)
 
+1. 应用从缓存取值，如果取到，返回
+2. 如果没取到，应用从数据库 load 数据
+3. 把 load 到的数据放到缓存中
+
+相应的，缓存 api 的接口遵循这一模式：
+1. 如果缓存中有值，返回值
+2. 如果缓存中没有值，返回 null，应用需要从数据库 load
+3. 如果发生异常，抛出相应的异常，包括超时异常，连接异常等
+
+
+## 缓存清理
+申请存储时，会要求指定 category 的过期时间，如果过期时间为负值，则认为 category 需要持久存储，不做过期处理。如果是正值，那么 key 会在指定时间后过期，无法再取到。再次去取过期的 key 会返回 null，这时需要应用方从数据源再次 load 数据并放入缓存中。如果在缓存数据过期前就需要清楚缓存，那么就要用到缓存清理。
+
+squirrel 支持两种缓存清理：
+
+* 清理单个 key
+* 清理整个 category，category 下所有 key 都清除
+
+#### 清理单个 key
+* 对于 memcached，redis，dcache 等远程存储，可以直接通过客户端清除对应的 key。
+* 对于 ehcache 这样的本地存储，需要通过消息中间件通知到所有使用这个 category 的客户端，进行相应的清除操作。在 squirrel 中，如上面的架构图所示，使用了 zookeeper 作为消息中间件，来通知对应的客户端进行清除操作。
+
+#### 清理整个 category
+清理整个 category，用到了上面 key 组成中的 version 字段，清理整个 cagetory 的实现，就是把这个 category 的属性中的 version 字段 +1。然后通过 zookeeper 通知到所有使用了这个 category 的客户端。这样客户端再次从缓存中取值时，因为 version 变了，所以最后的 final key 也变了，不再能取到原来的值，变相地清除了 category 下的所有 key。原有的 key 通过过期时间让其自动淘汰。
+
+## 热点 key
+所谓热点 key，就是这个 key 的访问 qps 极高，如果这个 key 一旦过期或者被清除，可能导致很多客户端同时取到 null，而同时去从数据库 load 数据，瞬间的高流量可能导致数据库顶不住压力而崩溃。
