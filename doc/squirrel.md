@@ -21,7 +21,7 @@ Squirrel 是点评的 Key-Value 存储框架，继承自 Avatar-Cache 缓存框�
 > String finalKey = storeClient.getFinalKey(key); // finalKey = shopDetail.s123456_0
 
 ### 基本架构
-![Squirrel 架构](http://code.dianpingoa.com/arch/squirrel/blob/master/doc/squirrel-arch.png)
+![Squirrel 架构](http://code.dianpingoa.com/arch/squirrel/raw/master/doc/squirrel-arch.png)
 
 * squirrel-console 是管理端，主要负责
 	* 配置存储集群(cluster)和存储类别(category)的属性
@@ -357,7 +357,7 @@ RedisStoreClient storeClient = (RedisStoreClient)StoreClientFactory.getStoreClie
 ```
 
 ## 缓存 API 使用约定
-![缓存 API 使用约定](http://code.dianpingoa.com/arch/squirrel/blob/master/doc/cache-pattern.png)
+![缓存 API 使用约定](http://code.dianpingoa.com/arch/squirrel/raw/master/doc/cache-pattern.png)
 
 1. 应用从缓存取值，如果取到，返回
 2. 如果没取到，应用从数据库 load 数据
