@@ -73,7 +73,7 @@ public class RedisServer extends Server {
     }
     
     public boolean isFail() {
-        return flags.contains("fail");
+        return flags.contains("fail") && !flags.contains("fail?");
     }
     
     public boolean isHandShake() {
