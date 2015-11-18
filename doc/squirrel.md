@@ -14,9 +14,11 @@ Squirrel 是点评的 Key-Value 存储框架，继承自 Avatar-Cache 缓存框�
 
 存储 key 的组成包括3部分：category、template、version，最终存储的 key 字符串是由 **${category}.${template}_${version}** 组合而成：
 1)、category 是某一类存储的名称，它不是存储 key，它是存储 key 的前缀，可以理解它是数据库里的一张表
-2)、template 是存储 key 的模板，由参数组成，如c{0}d{1}这个模板，{0}代表第1个参数比如userId，{1}代表第2个参数比如cityId，如果最终把2个参数值填充进去，最后的字符串类似：c1000d2
-3)、version 是 squirrel 内部管理的一个数字，如果这个 category 清一次缓存，那么 version 会自动加1，这样最后的key字符串会变成全新的字符串，应用使用新的key之后需要重新从数据源加载数据到缓存
-比如申请一个category：test，template为c{0}d{1}，最后的key字符串可能是：test.c1000d2_0
+2)、template 是存储 key 的模板，由参数组成，如c{0}d{1}这个模板，{0}代表第1个参数比如userId，{1}代表第2个参数比如cityId，template 会被 StoreKey 构造函数里的params参数列表填充，最后的字符串类似：c1000d2
+3)、version 是 squirrel 内部管理的一个数字，如果这个 category 清一次缓存，那么 version 会加1，这样最后的key字符串会变成全新的字符串，应用使用新的key之后需要重新从数据源加载数据到缓存
+比如申请一个category：shopDetail，template为s{0}，最终落到存储上的key字符串就是：
+> StoreKey key = new StoreKey("shopDetail", shopId); // shopId = 123456
+> String finalKey = storeClient.getFinalKey(key); // finalKey = shopDetail.s123456_0
 
 ### 基本架构
 ![Squirrel 架构](http://code.dianpingoa.com/arch/squirrel/raw/master/squirrel-arch.png)
@@ -31,11 +33,6 @@ Squirrel 是点评的 Key-Value 存储框架，继承自 Avatar-Cache 缓存框�
 * zookeeper 用作配置中心，所有配置保存在 zookeeper 上，同时保存一份到数据库中，所有配置变更通过 zookeeper 实时推送到相应客户端。同时 zookeeper 也作为分布式清缓存的消息中心，本地缓存的清除消息通过 zookeeper 通知到相应客户端进行本地清除。
 * squirrel-client 是客户端，启动时从 zookeeper 读取缓存集群和缓存类别的配置，然后基于配置，直接连接相应的后端存储节点，同时响应存储集群和存储类别的配置变更事件.
 * 存储节点，视不同的存储类别，分为好几种，当前线上部署的有：memcached, redis, ehcache, dcache
-
-## 主要改变
-1. API 接口较 Avatar-Cache 更加合理。
-2. 支持基于 redis-cluster 的 KV 存储。
-3. 后续版本会增加多备份，自动扩容等功能。
 
 
 ## 用户接入
@@ -62,7 +59,7 @@ http://tools.dba.dp/cache_admin/info_get_value.php
 
 存储的申请和变更等操作均由DBA负责，如有问题请联系DBA戴骁雄
 
-##	存储节点
+##	支持的存储类型
 
 a、memcached
 
@@ -71,15 +68,11 @@ memcached集群由DBA维护，线上一般按业务划分为不同的集群，�
 
 b、ehcache
 
-ehcache其实是应用本地缓存，它的优势是性能高，相比memcached没有网络开销，但除非对性能要求极高的业务，建议还是使用memcached
+ehcache 是应用本地缓存，它的优势是性能高，相比memcached没有网络开销，但除非对性能要求极高的业务，建议还是使用memcached
 
 c、dcache
 
-dcache是由腾讯MIG开发的一套KV系统，相比memcached，它提供了数据持久化的功能
-在很多业务场景下，使用dcache并不是用来取代memcached，而是取代mysql，数据的写和读都直接操作dcache
-avatar-cache针对dcache接口进行了封装，只需要在申请缓存时指定缓存集群为dcache
-目前dcache在beta环境、线上环境有部署，由DBA负责维护，其他环境暂时没有部署
-对于数据量较大或访问较多的业务，可以申请独立的集群，如果需要申请独立的dcache集群，请联系DBA戴骁雄
+dcache 是由腾讯MIG开发的一套KV系统，相比memcached，它提供了数据持久化的功能。在很多业务场景下，使用 dcache 并不是用来取代 memcached，而是取代 mysql，数据的写和读都直接操作 dcache。squirrel-client 针对 dcache 接口进行了封装，只需要在申请缓存时指定缓存集群为 dcache。目前 dcache 在 beta 环境、PPE环境，线上环境有部署，由 DBA 负责维护，其他环境暂时没有部署。对于数据量较大或访问较多的业务，可以申请独立的集群，如果需要申请独立的 dcache 集群，请联系 DBA 戴骁雄
 
 d、redis-cluster
 
@@ -392,4 +385,45 @@ squirrel 支持两种缓存清理：
 清理整个 category，用到了上面 key 组成中的 version 字段，清理整个 cagetory 的实现，就是把这个 category 的属性中的 version 字段 +1。然后通过 zookeeper 通知到所有使用了这个 category 的客户端。这样客户端再次从缓存中取值时，因为 version 变了，所以最后的 final key 也变了，不再能取到原来的值，变相地清除了 category 下的所有 key。原有的 key 通过过期时间让其自动淘汰。
 
 ## 热点 key
-所谓热点 key，就是这个 key 的访问 qps 极高，如果这个 key 一旦过期或者被清除，可能导致很多客户端同时取到 null，而同时去从数据库 load 数据，瞬间的高流量可能导致数据库顶不住压力而崩溃。
+所谓热点 key，就是这个 key 的访问 qps 极高，如果这个 key 一旦过期或者被清除，可能导致很多客户端同时取到 null，而同时去从数据库 load 数据，瞬间的高流量可能导致数据库顶不住压力而崩溃。针对热点 key，memcahed 对于热点 key 的处理如下：
+
+* 热点 key 的写入
+	1. 保存热点 key，value 到 memcached
+	2. 保存热点 key 的备份 key，value 到 memcached，备份 key 的名字为 key + "_h"，value 不变，过期时间为热点 key 的过期时间 + 缓冲时间，缓冲时间一般是10s，设置为10s的原因是一般情况下10s足够从数据库 load 数据了
+* 热点 key 的读取
+	1. 读取热点 key 对应的值，如果读到，直接返回。如果发生异常，抛出异常
+	2. 如果读取到的值为 null，那么分情况，一种是热点 key 被清除了，一种是热点 key 过期了：
+		* 热点 key 被清除了：尝试对热点 key 加锁，如果加锁成功，返回 null，由客户端去数据库 load 数据并放入缓存中；如果加锁失败，尝试去取热点 key 上一个版本的数据，上一个版本的 key 由当前热点 key 的version-1得到，并返回取到的数据
+		* 热点 key 过期了：尝试对热点 key 加锁，如果加锁成功，返回 null，由客户端去数据库 load 数据并放入缓存中；如果加锁失败，尝试去取热点 key 的备份 key 的数据，并返回取到的数据
+		* 对热点 key 加锁的过程是这样的：加锁也是在 memcached 上新增一个 key，key 的名字是热点 key 的名字加上 "_lock"，因为 memcached 的 add 操作是原子的，而且仅当不存在这个 key 时才能添加成功，所以可以利用这一特性做一个互斥锁，这个加锁的 key 的超时时间设置为30s，避免长期占用锁。
+* 热点 key 的删除
+	1. 清除热点 key
+	2. 清除热点 key 的备份 key
+
+## 存储监控
+### 客户端
+### 服务端
+
+## 扩容缩容
+### memcached
+新建的 memcached 集群都由 docker 来负责创建和销毁实例。memcached 作为缓存，在扩容，缩容时不需要做数据迁移。
+
+* 扩容：首先申请一个 memcached 的 docker 实例，待实例启动后，验证 memcached 端口开启，把实例 ip 加到 memcached 集群中，通过 zookeeper 通知客户端集群配置已更新，客户端基于最新的集群配置重建连接
+* 缩容：把 memcached 实例 ip 从集群中移除，通过 zookeeper 通知客户端集群配置已更新，客户端基于最新的集群配置重建连接，最后销毁 docker 实例
+
+### redis-cluster
+redis 集群也是部署在 docker 上，redis 实例通过 docker 来创建和销毁。redis 我们部署的是 redis cluster。每个 redis cluster 至少有3个 master，每个 master 都有一个 slave。redis 实例默认都启用了 aof，每秒会把 aof 刷到磁盘，保证数据是持久化的，而且即使丢数据，也仅丢失最近1秒的数据。redis 定位为 KV，所以默认数据不会过期，过期清理策略是 noeviction，也就是说如果内存满了，不会淘汰旧的数据，而是返回错误。
+
+redis 的扩容缩容涉及到数据的迁移，比 memcached 要复杂的多。但整个迁移过程并不会阻塞客户端，客户端的读写照常进行，是无缝的。
+
+* 扩容：redis 的扩容都是成对的扩，也就是说最小扩容单位是1主1从，也可以一下子扩多主多从。扩容步骤如下：首先申请两个 redis 实例，一个作为 master，一个作为 slave，把 master 和 slave 加入现有 redis 集群中，设置好主备关系。然后计算需要从集群现有节点迁移的数据量，接着从集群现有节点一个 key 一个 key 的迁移数据。等到所有 key 都迁移完成，redis cluster 会更新路由表，然后通知客户端
+* 缩容：redis 缩容之前，需要先迁移已有实例上的数据，等到所有 key 都从已有实例上迁移后，把 master 和 slave 从集群移除，然后通过 docker 销毁这两个实例
+
+### dcache
+dcache 的扩容和缩容由 dba 操作 dcache 的管理端进行，不在 squirrel 的管理范围之内。
+
+## 后续展望
+### redis-cluster
+#### 客户端
+#### 管理端
+### 冷热分离
