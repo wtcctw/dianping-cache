@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<script>
+	window.contextPath = "${rc.contextPath}";
+</script>
+<head>#parse("common/header0.htm")
+</head>
+
+<body class="navbar-fixed">
+	#parse("common/navbar.htm")
+	<div class="main-container-inner">
+		$screen_content</div>
+	#parse("common/simplefooter.htm")
+
+	<script type="text/javascript">
+		$('#datetimepicker').datetimepicker({
+			dateFormat : 'yy-mm-dd',
+			autoclose : true
+		});
+
+		$('#starttime').datetimepicker({
+			showSecond : true,
+			timeFormat : 'HH:mm:ss',
+			dateFormat : 'yy-mm-dd',
+			autoclose : true
+		});
+		$('#stoptime').datetimepicker({
+			showSecond : true,
+			//showMillisec: true, 
+			timeFormat : 'HH:mm:ss',
+			dateFormat : 'yy-mm-dd',
+			autoclose : true
+		});
+		$("#datetimepicker").datepicker('setDate', new Date());
+		$("#starttime").datepicker('setDate', new Date());
+		$("#stoptime").datepicker('setDate', new Date());
+	</script>
+</body>
+</html>

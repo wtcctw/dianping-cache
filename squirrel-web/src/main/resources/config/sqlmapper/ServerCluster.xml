@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.dianping.cache.dao.ServerClusterDao">
+	
+	<resultMap id="ServerClusterResult" type="ServerCluster">
+		<result column="id" property="id"/>
+		<result column="serverId" property="serverId"/>
+		<result column="cluster" property="cluster"/>
+	</resultMap>
+	<resultMap id="ServerResult" type="Server">
+		<result column="id" property="id"/>
+		<result column="address" property="address"/>
+		<result column="appId" property="appId"/>
+		<result column="instanceId" property="instanceId"/>
+	</resultMap>
+	<insert id="insert" parameterType="ServerCluster">
+		INSERT INTO server_cluster(serverId,cluster)
+		VALUES(#{serverId},#{cluster})
+	</insert>
+	
+	
+	<select id="findByServer" resultMap="ServerClusterResult" parameterType="String">
+   		SELECT server_cluster.id,serverId,cluster
+   		FROM server_cluster left join servers on server_cluster.serverId=servers.id
+   		WHERE servers.address = #{address}
+	</select>
+	
+	<select id="findByCluster" resultMap="ServerResult" parameterType="String">
+   		SELECT servers.id,servers.address,appId,instanceId
+   		FROM server_cluster LEFT JOIN servers ON server_cluster.serverId = servers.id
+   		WHERE cluster = #{cluster}
+	</select>
+	
+	<delete id="delete" parameterType="ServerCluster">
+		DELETE 
+		FROM server_cluster
+		WHERE cluster = #{cluster} AND serverId = #{serverId}
+	</delete>
+	
+</mapper>

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.dianping.cache.dao.ServerGroupDao">
+	
+	<resultMap id="ServerGroupResult" type="ServerGroup">
+		<result column="Group" property="group"/>
+		<result column="Servers" property="servers"/>
+		<result column="CreatedTime" property="createdTime"/>
+		<result column="UpdatedTime" property="updatedTime"/>
+	</resultMap>
+	
+    <select id="findAll" resultMap="ServerGroupResult">
+    		SELECT `Group`, Servers, CreatedTime, UpdatedTime
+    		FROM CacheServerGroup
+    </select>
+    
+    <select id="find" resultMap="ServerGroupResult" parameterType="String">
+    		SELECT `Group`, Servers, CreatedTime, UpdatedTime
+    		FROM CacheServerGroup
+    		WHERE `Group`=#{group}
+    </select>
+    
+    <insert id="create" parameterType="ServerGroup">
+    		INSERT INTO CacheServerGroup(`Group`, Servers, CreatedTime, UpdatedTime)
+    		VALUES(#{group}, #{servers}, #{createdTime}, #{updatedTime})
+    </insert>
+    
+    <update id="update" parameterType="ServerGroup">
+    		UPDATE CacheServerGroup 
+    		SET Servers = #{servers}, UpdatedTime = #{updatedTime}
+    		WHERE `Group` = #{group}
+    </update>
+    
+    <delete id="delete" parameterType="map">
+    		DELETE FROM CacheServerGroup
+    		WHERE `Group` = #{group}
+    </delete>
+	
+
+</mapper>

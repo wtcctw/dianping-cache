@@ -1,0 +1,275 @@
+<div class="main-content" style="opacity: 1.0;"
+	ng-controller="ConfigController">
+	<div class="main-content-inner">
+		<script type="text/javascript"
+			src="${rc.contextPath}/static/js/avatar-cacheconfig.js"></script>
+		<!-- page-content -->
+		<div class="page-content">
+
+
+			<!--row  -->
+			<div class="row">
+				<div class="col-xs-12">
+					<table class="table table-hover progress-panel table-striped"
+						style="table-layout: fixed;">
+						<tr>
+							<th style="width: 15%; text-align: left">服务名称</th>
+							<th style="width: 20%; text-align: center">客户端实现类</th>
+							<th style="width: 30%; text-align: left">服务地址</th>
+							<th style="width: 20%; text-align: center">transcoder</th>
+							<th
+								style="width: 15%; text-align: left;#if(${isadmin})display: table-cell;#else display: none;#end;">操作
+								<a href="${rc.contextPath}/cache/config/new"
+								style="float: right">
+									<button type="button" class="btn btn-success btn-xs ">
+										<i class="icon-plus"></i> New
+									</button>
+							</a>
+							</th>
+						</tr>
+						<tr ng-repeat="info in searchPaginator.currentPageItems">
+							<td
+								style="text-align: left; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">
+								{{info.cacheKey}}</td>
+							<td
+								style="text-align: center; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">
+								{{info.clientClazz | getClient}}</td>
+							<td
+								style="text-align: left; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">
+								{{info.servers}}</td>
+							<td
+								style="text-align: center; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">
+								   {{info.transcoderClazz | getLastDotStr}}
+								<!-- <p
+									ng-show="{{info.transcoderClazz== 'com.dianping.cache.memcached.HessianTranscoder'}} ">memcached.Hessian</p>
+								<p
+									ng-show="{{info.transcoderClazz== 'com.dianping.cache.memcached.KvdbTranscoder'}}">memcached.Kvdb</p> -->
+							</td>
+
+
+							<td
+								style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis;#if(${isadmin})display: table-cell;#else display: none;#end;">
+								<a href="${rc.contextPath}/cache/config/edit" title="修改"
+								id="modify" data-toggle="tooltip"
+								ng-click="transportToEdit(info.cacheKey, info.clientClazz, info.servers, info.transcoderClazz );"><i
+									class="action-buttons ace-icon fa fa-pencil bigger-120 grey" style="float: left"></i></a> <a
+								href="" ng-click="dialog(info.cacheKey)" title="删除"><i
+									class="ace-icon fa fa-trash-o bigger-120 red"></i></a> <a href="#configModal3"
+								title="清除缓存" data-toggle="modal"
+								ng-click="setModalInput(info.cacheKey);"><i
+									class="ace-icon fa fa-leaf bigger-120 green" style="float: right"></i></a>
+							</td>
+						</tr>
+					</table>
+
+				</div>
+				<!-- end col-xs-12 -->
+			</div>
+
+			<!--end row  -->
+		</div>
+
+		<!-- 模态框（Modal） -->
+		<div class="modal fade" id="myModal" tabindex="-1" role="dialog"
+			aria-labelledby="myModalLabel" aria-hidden="true">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal"
+							aria-hidden="true">&times;</button>
+						<h4 class="modal-title" id="myModalLabel">修改配置</h4>
+					</div>
+					<div class="modal-body">
+						<form method="post" class="form-horizontal" name="myForm"
+							ng-submit="refreshpage(myForm)">
+							<div class="control-group">
+								<label class="control-label">cacheKey</label>
+								<div class="controls">
+									<input type="text" name="name" class="input-xlarge"
+										ng-model="mCacheKey" readonly="readonly">
+								</div>
+							</div>
+							<div class="control-group">
+								<label class="control-label">客户端实现类</label>
+								<div class="controls">
+									<select ng-model="mClientClazz"
+										ng-options="p for p in implItems" id="mClientClazz">
+
+									</select>
+								</div>
+							</div>
+							<div class="control-group">
+								<label class="control-label">服务地址 (以;~;分割) </label>
+								<div class="controls">
+									<textarea name="prop" class="input-xlarge" type="text"
+										data-provide="typeahead" ng-model="mServers" id="mServers"
+										autocomplete="off" style="width: 800px">
+									</textarea>
+								</div>
+							</div>
+							<div class="control-group">
+								<label class="control-label">Transcoder</label>
+								<div class="controls">
+									<select ng-model="mTranscoderClazz"
+										ng-options="p for p in coderItems" id="mTranscoderClazz">
+
+									</select>
+								</div>
+							</div>
+							<div class="control-group" style="margin-top: 40px">
+								<div class="controls">
+									<button type="button" class="btn btn-default"
+										data-dismiss="modal">关闭</button>
+									<button type="submit" style="float: right"
+										class="btn btn-success">提交更改</button>
+								</div>
+							</div>
+
+						</form>
+					</div>
+
+				</div>
+			</div>
+			<!-- /.modal-content -->
+		</div>
+		<!-- /.modal -->
+
+		<!-- 模态框（Modal） -->
+		<div class="modal fade" id="myModal2" tabindex="-1" role="dialog"
+			aria-labelledby="myModalLabel" aria-hidden="true">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal"
+							aria-hidden="true">&times;</button>
+						<h4 class="modal-title" id="myModalLabel">新增配置</h4>
+					</div>
+					<div class="modal-body">
+						<form method="post" class="form-horizontal" name="myForm2"
+							ng-submit="creatNew(myForm2)">
+							<div class="control-group">
+								<label class="control-label">cacheKey</label>
+								<div class="controls">
+									<input type="text" name="name" class="input-xlarge"
+										id="mCacheKey2" ng-model="mCacheKey" required>
+								</div>
+							</div>
+							<div class="control-group">
+								<label class="control-label">客户端实现类</label>
+								<div class="controls">
+									<select ng-model="mClientClazz"
+										ng-options="p for p in implItems" id="mClientClazz2" required>
+
+									</select>
+								</div>
+
+							</div>
+							<div class="control-group">
+								<label class="control-label">服务地址 (以;~;分割) </label>
+								<div class="controls">
+									<textarea name="prop" class="input-xlarge " type="text"
+										data-provide="typeahead" ng-model="mServers" id="mServers2"
+										autocomplete="off" style="width: 800px"></textarea>
+
+								</div>
+							</div>
+							<div class="control-group">
+								<label class="control-label">Transcoder</label>
+								<div class="controls">
+									<select ng-model="mTranscoderClazz"
+										ng-options="p for p in coderItems" id="mTranscoderClazz2"
+										required>
+
+									</select>
+								</div>
+							</div>
+							<div class="control-group" style="margin-top: 40px">
+								<div class="controls">
+									<button type="button" class="btn btn-default"
+										data-dismiss="modal">关闭</button>
+									<button type="submit" style="float: right"
+										class="btn btn-success">确认增加</button>
+								</div>
+							</div>
+
+						</form>
+					</div>
+
+				</div>
+			</div>
+			<!-- /.modal-content -->
+		</div>
+
+
+		<!-- 模态框（Modal） -->
+		<div class="modal fade" id="configModal3" tabindex="-1" role="dialog"
+			aria-labelledby="myModalLabel" aria-hidden="true">
+			<div class="modal-dialog" style="width: 400px;">
+				<div class="modal-content" style="border: none">
+					<div class="modal-header">
+						<h4 class="modal-title" id="myModalLabel">清除<{{mCacheKey}}>缓存</h4>
+					</div>
+					<form method="post" class="form-horizontal" name="myForm3"
+						ng-submit="clearConfig(m)">
+						<div class="modal-body">
+							<div class="col-sm-12">
+								<label class="col-sm-3 control-label">缓存key</label>
+								<div class="col-sm-9">
+									 <input data-role="tagsinput" id="ipKey" 
+										placeholder='Enter'>
+									<!-- <select class="col-sm-3" multiple data-role="tagsinput"  id="cleankey"/> -->
+								</div>
+							</div>
+						</div>
+
+							<div class="col-sm-12" style="margin-top: 10px">
+								<div class="col-sm-12">
+									<button type="button" class="btn btn-default btn-sm"
+										data-dismiss="modal">关闭</button>
+									<button type="submit" style="float: right"
+										class="btn btn-sm btn-success">确认清除</button>
+								</div>
+							</div>
+					</form>
+
+				</div>
+			</div>
+			<!-- /.modal-content -->
+		</div>
+		<!-- end page-content -->
+		
+		
+		
+						<div id="modal3" class="modal" aria-hidden="true"
+							style="display: none;">
+							<div class="modal-dialog">
+								<div class="modal-content">
+									<div class="modal-header red">
+										<h3>警告</h3>
+									</div>
+
+									<div class="modal-body step-content">
+										<div class="active">
+											<div class="col-sm-12">
+								<label class="col-sm-3 control-label">缓存key</label>
+								<div class="col-sm-9">
+									 <input data-role="tagsinput" id="ipKey" 
+										placeholder='Enter'>
+									<!-- <select class="col-sm-3" multiple data-role="tagsinput"  id="cleankey"/> -->
+								</div>
+							</div>
+										</div>
+									</div>
+									<div class="modal-footer wizard-actions">
+										<button class="btn btn-danger btn-sm pull-left"
+											data-dismiss="modal">取消</button>
+										<button class="btn btn-success btn-sm pull-right" ng-click="deleteServer()"
+											data-dismiss="modal">确定</button>
+									</div>
+								</div>
+							</div>
+						</div>
+		
+		
+	</div>
+</div>

@@ -1,0 +1,649 @@
+<div class="main-content" style="opacity: 1.0;"
+	ng-controller="ConfigEditController">
+	<div class=" main-content-inner">
+		<div id="breadcrumbs">
+			<script type="text/javascript"
+				src="${rc.contextPath}/static/js/avatar-configedit.js"></script>
+			<script type="text/javascript">
+				try {
+					ace.settings.check('breadcrumbs', 'fixed')
+				} catch (e) {
+				}
+			</script>
+			<!-- end  breadcrumbs-->
+		</div>
+
+
+		<div class="page-content">
+			<div class="page-content-area">
+
+				<div class="page-header">
+					<h1>集群配置编辑</h1>
+				</div>
+
+				<div class="row">
+					<div class="col-xs-12">
+						<form class="form-horizontal" role="form" name="configform">
+							<!-- #section:elements.form -->
+							<div class="form-group">
+								<label class="col-sm-3 control-label no-padding-right"
+									for="form-field-1"> 集群名 </label>
+
+								<div class="col-sm-9">
+									<input disabled type="text" id="mCacheKey"
+										class="col-xs-10 col-sm-5" ng-model="mCacheKey">
+								</div>
+							</div>
+
+							<!-- /section:elements.form -->
+							<div class="space-4"></div>
+
+							<div class="form-group">
+								<label class="col-sm-3 control-label no-padding-right"
+									for="form-field-2"> 集群实现类 </label>
+
+								<div class="col-sm-9">
+									<select class="col-xs-10 col-sm-5" ng-model="mClientClazz"
+										ng-options="p for p in implItems" id="mClientClazz">
+
+									</select>
+								</div>
+							</div>
+
+							<div class="space-4"></div>
+
+							<div class="form-group">
+								<label class="col-sm-3 control-label no-padding-right"
+									for="form-field-2">Transcoder</label>
+
+								<div class="col-sm-9">
+									<select class=" col-xs-10 col-sm-5" ng-model="mTranscoderClazz"
+										ng-options="p for p in coderItems" id="mTranscoderClazz">
+
+									</select>
+								</div>
+							</div>
+
+							<div class="space-4"></div>
+							<div class="col-md-offset-3 col-md-9">
+								<button class="btn btn-info btn-sm" type="button"
+									ng-click="updateConfig()">
+									<i class="icon-check bigger-110"></i> Submit <i
+										class="icon-spinner icon-spin orange bigger-110"
+										ng-show="submiticon"></i>
+								</button>
+								&nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp;
+								&nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp;
+
+								<button class="btn btn-sm" type="button" ng-click="initpage()">
+									<i class="icon-undo bigger-110"></i> Reset
+								</button>
+							</div>
+							<div class="hr hr-24"></div>
+
+
+
+							<h4 class="header green">集群服务器</h4>
+
+
+						</form>
+
+
+
+						<!-- /section:pages/faq -->
+						<div id="faq-tab-1" ng-show="showMemcached">
+							<div class="space-8"></div>
+							<form class="form-horizontal" role="form">
+
+
+
+								<!-- 								<div class="form-group">
+									<label class="col-sm-3 control-label no-padding-right"
+										for="form-field-2">自动扩容</label>
+
+									<div class="col-sm-2">
+										<select class=" col-xs-12 col-sm-12" ng-model="capacity">
+											<option value="memcached8">内存 8 G</option>
+										</select>
+
+									</div>
+									<div class="col-sm-2">
+										<select ng-model="num" readonly>
+											<option value="1">1</option>
+										</select>
+										<button type="button" class="btn btn-white  btn-sm pull-right"
+											ng-disabled="true" ng-click="autoAddNode()">确认添加</button>
+									</div>
+
+								</div> -->
+
+
+
+								<div class="space-4"></div>
+
+
+								<div class="form-group">
+									<label class="col-sm-3 control-label no-padding-right"
+										for="form-field-2">手动扩容</label>
+
+									<div class="col-sm-3">
+										<input type="text" placeholder="ip" id="ip" name="ip"
+											class="col-sm-7" ng-model="ip"
+											ng-pattern="/((2[0-4]\d|25[0-5]|[01]?\d\d?)\.){3}(2[0-4]\d|25[0-5]|[01]?\d\d?)/"
+											required> <input type="text" class="col-sm-4"
+											ng-model="port">
+									</div>
+									<div>
+										<button type="button"
+											class=" btn btn-white btn-yellow btn-sm pull-left"
+											style="margin-left: 0px" ng-disabled="btndisable2"
+											ng-click="manualAddNode()">确认添加</button>
+									</div>
+
+								</div>
+
+							</form>
+
+
+							<table class="table">
+								<thead>
+									<tr>
+										<th>#</th>
+										<th>IP</th>
+										<th>State</th>
+										<th>Operation</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr ng-repeat="info in servers track by $index ">
+										<td>{{$index+1}}</td>
+										<td>{{info}}</td>
+										<td>已加入配置</td>
+										<td>
+											<button class="btn btn-xs btn-danger"
+												ng-click="preDeleteServer($index)">删除</button> &nbsp; &nbsp;
+											&nbsp;&nbsp;
+											<button class="btn btn-xs btn-danger"
+												ng-click="dropServer($index)">临时禁用</button>
+										</td>
+									</tr>
+									<tr ng-repeat="info in dropservers track by $index">
+										<td>-</td>
+										<td>{{info}}</td>
+										<td>临时禁用(刷新后丢失)</td>
+										<td>
+											<!-- <a href=""title="删除" ng-click="deleteServer($index)"data-toggle="tooltip" data-placement="left" ><i
+															class="icon-trash bigger-130 red"></i></a>
+														&nbsp; &nbsp; &nbsp;&nbsp; -->
+											<button class="btn btn-xs btn-success"
+												ng-click="resetServer($index)">重新部署</button>
+										</td>
+									</tr>
+								</tbody>
+							</table>
+
+						</div>
+
+						<div id="faq-tab-2" class=" " ng-show="showDcache">
+							<form class="form-horizontal" id="sample-form" role="form">
+								<div class="form-group">
+									<label class="col-sm-3 control-label no-padding-right"
+										for="form-field-1"> module </label>
+
+									<div class="col-sm-9">
+										<input type="text" class="col-xs-10 col-sm-5"
+											ng-model="module">
+									</div>
+								</div>
+
+
+								<div class="form-group">
+									<label class="col-sm-3 control-label no-padding-right"
+										for="form-field-1"> proxy </label>
+
+									<div class="col-sm-9">
+										<input type="text" class="col-xs-10 col-sm-5" ng-model="proxy">
+									</div>
+								</div>
+
+								<div class="form-group">
+									<label class="col-sm-3 control-label no-padding-right"
+										for="form-field-1"> locator </label>
+
+									<div class="col-sm-9">
+										<textarea type="text" class="col-xs-10 col-sm-5" rows="3"
+											ng-model="locator"></textarea>
+									</div>
+								</div>
+
+
+								<div class="space-4"></div>
+								<div class="col-md-offset-3 col-md-9">
+									<button class="btn btn-info btn-sm" type="button"
+										ng-click="updateDcacheConfig()">
+										<i class="icon-check bigger-110"></i> Submit <i
+											class="icon-spinner icon-spin orange bigger-110"
+											ng-show="submiticon"></i>
+									</button>
+									&nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp;
+									&nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp;
+
+									<button class="btn btn-sm" type="button" ng-click="initpage()">
+										<i class="icon-undo bigger-110"></i> Reset
+									</button>
+								</div>
+
+
+							</form>
+
+
+
+						</div>
+
+						 <div id="faq-tab-3" ng-show="showRedis">
+							<form class="form-horizontal"  role="form">
+								<div class="form-group">
+									<label class="col-sm-3 control-label no-padding-right"
+										for="form-field-1"> servers </label>
+
+									<div class="col-sm-9">
+										<textarea type="text" class="col-xs-10 col-sm-5" rows="8"
+											ng-model="mServers">
+										</textarea>
+									</div>
+								</div>
+								<div class="col-md-offset-3 col-md-9">
+									<button class="btn btn-info btn-sm" type="button"
+										ng-click="updateConfig()">
+										<i class="icon-check bigger-110"></i> Submit <i
+											class="icon-spinner icon-spin orange bigger-110"
+											ng-show="submiticon"></i>
+									</button>
+									&nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp;
+									&nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp;
+
+									<button class="btn btn-sm" type="button" ng-click="initpage()">
+										<i class="icon-undo bigger-110"></i> Reset
+									</button>
+								</div>
+							</form>
+						</div>
+
+
+						<div id="faq-tab-4" ng-show="showWeb">Ehcache</div>
+
+<!-- 						<div id="faq-tab-5" ng-show="showRedis">
+						<form class="form-horizontal" role="form">
+								<div class="form-group">
+									<label class="col-sm-3 control-label no-padding-right"
+										for="form-field-2">添加master</label>
+
+									<div class="col-sm-3">
+										<input type="text" placeholder="ip" id="ip" name="ip"
+											class="col-sm-7" ng-model="ip"
+											ng-pattern="/((2[0-4]\d|25[0-5]|[01]?\d\d?)\.){3}(2[0-4]\d|25[0-5]|[01]?\d\d?)/"
+											required> <input type="text" class="col-sm-4"
+											ng-model="port">
+									</div>
+									<div>
+										<button type="button"
+											class=" btn btn-white btn-sm pull-left"
+											style="margin-left: 0px" ng-disabled=""
+											ng-click="redisAddMasterNode()">确认添加</button>
+									</div>
+
+								</div>
+								
+								<div class="form-group">
+									<label class="col-sm-3 control-label no-padding-right">自动扩容</label>
+									<div class="col-sm-3">
+										<select ng-model="appid">
+										<option value="redis10">redis10</option>
+										<option value="redis5">redis5</option>
+										</select>
+									</div>
+									<div>
+									<button type="button"
+											class=" btn btn-white btn-sm pull-left"
+											style="margin-left: 0px" ng-disabled=""
+											ng-click="redisAutoScaleNode()">确认添加</button>
+									</div>
+								</div>
+						</form>
+						
+						
+							<div class="row">
+								<div class="col-xs-12">
+									<table class="table table-striped table-bordered table-hover">
+										<thead>
+											<tr>
+												<th>ID</th>
+												<th>Master</th>
+												<th>Slave</th>
+											</tr>
+										</thead>
+
+										<tbody>
+											<tr ng-repeat="node in redisnodes">
+												<td>{{$index+1}}</td>
+												<td class="col-sm-7">
+													<div class="row col-sm-12">
+														<div class="col-xs-6">{{node.master.address}} | {{node.master.slotString}}</div>
+														<div class="col-xs-6">
+															<div class="hidden-sm hidden-xs btn-group">
+															<button class="btn btn-xs btn-success">
+																<a href="#modal-wizard5" data-toggle="modal">
+																<i class="ace-icon fa fa-arrow-down bigger-120"></i>
+																</a>
+															</button>
+															<button class="btn btn-xs btn-success">
+															<a href="#modal-wizard5" data-toggle="modal">
+																<i class="ace-icon fa fa-arrow-up bigger-120"></i>
+																</a>
+															</button>
+
+															<button class="btn btn-xs btn-info">
+																<i class="ace-icon fa fa-pencil bigger-120"></i>
+															</button>
+
+															<button class="btn btn-xs btn-danger"
+																 ng-click="delRedisMasterNode(node.master.address)">
+																<i class="ace-icon fa fa-trash-o bigger-120"></i>
+															</button>
+
+															
+															</div>
+														</div>
+													</div>
+												</td>
+												<td class="col-sm-4">
+													<div class="row col-sm-12">
+														<div class="col-xs-6">{{node.slave.address}}
+														
+														</div>
+														<div class="col-xs-6">
+															<div class="hidden-sm hidden-xs btn-group">
+															
+															<button class="btn btn-xs btn-success" ng-disabled="!{{node.slave.address==null}}"
+																ng-click="addRedisSlaveNode()">
+																<i class="ace-icon fa fa-plus bigger-120"></i>
+															</button>
+															
+															<button class="btn btn-xs btn-info">
+																<i class="ace-icon fa fa-pencil bigger-120"></i>
+															</button>
+
+															<button class="btn btn-xs btn-danger">
+																<i class="ace-icon fa fa-trash-o bigger-120"></i>
+															</button>
+
+															
+															</div>
+														</div>
+													</div>
+												</td>
+											</tr>
+										</tbody>
+									</table>
+								</div>
+							</div>
+						</div> -->
+
+
+						<!-- PAGE CONTENT ENDS -->
+					</div>
+
+
+
+
+
+					<!-- -------------------------modal area ------------------------------------------------>
+					<div id="modal-wizard1" class="modal" aria-hidden="true"
+						style="display: none;">
+						<div class="modal-dialog">
+							<div class="modal-content">
+								<div class="modal-header" data-target="#modal-step-contents">
+									<ul class="wizard-steps">
+										<li data-target="#modal-step1" ng-class="{'active':isStep1}">
+											<span class="step">1</span> <span class="title">申请扩容 </span>
+										</li>
+
+										<li data-target="#modal-step2" ng-class="{'active':isStep2}">
+											<span class="step">2</span> <span class="title">申请成功</span>
+										</li>
+
+										<li data-target="#modal-step3" ng-class="{'active':isStep3}">
+											<span class="step">3</span> <span class="title">paas新建实例
+										</span>
+										</li>
+
+										<li data-target="#modal-step4" ng-class="{'active':isStep4}">
+											<span class="step">4</span> <span class="title"> 扩容成功</span>
+										</li>
+									</ul>
+								</div>
+
+								<div class="modal-body step-content" id="modal-step-contents">
+									<div class="step-pane active" id="modal-step1">
+										<div class="center">
+											<h4>自动扩容</h4>
+											<h4 class="blue">{{message1}}</h4>
+											<h4>
+												<i ng-show="process"
+													class="icon-spinner icon-spin orange bigger-300"></i> <i
+													ng-show="success" class="icon-check green bigger-300"></i>
+												<i ng-show="fail" class="icon-remove red bigger-300"></i>
+											</h4>
+										</div>
+									</div>
+
+								</div>
+
+								<div class="modal-footer wizard-actions">
+									<button class="btn btn-danger btn-sm pull-left"
+										data-dismiss="modal">取消</button>
+									<button class="btn btn-success btn-sm pull-right"
+										data-dismiss="modal">确定</button>
+								</div>
+							</div>
+						</div>
+					</div>
+					<!--end of modal-wizard -->
+
+
+
+					<div id="modal-wizard2" class="modal" aria-hidden="true"
+						style="display: none;">
+						<div class="modal-dialog">
+							<div class="modal-content">
+								<div class="modal-header" data-target="#modal-step-contents">
+									<ul class="wizard-steps">
+										<li data-target="#modal-step1" ng-class="{'active':isStep21}">
+											<span class="step">1</span> <span class="title">验证服务开启
+										</span>
+										</li>
+
+										<li data-target="#modal-step2" ng-class="{'active':isStep22}">
+											<span class="step">2</span> <span class="title">更新配置</span>
+										</li>
+
+										<li data-target="#modal-step3" ng-class="{'active':isStep23}">
+											<span class="step">3</span> <span class="title">操作成功 </span>
+										</li>
+
+									</ul>
+								</div>
+
+								<div class="modal-body step-content" id="modal-step-contents">
+									<div class="step-pane active" id="modal-step1">
+										<div class="center">
+											<h4>扩容</h4>
+											<h4 class="blue">{{message2}}</h4>
+											<h4>
+												<i ng-show="process"
+													class="icon-spinner icon-spin orange bigger-300"></i> <i
+													ng-show="success" class="icon-check green bigger-300"></i>
+												<i ng-show="fail" class="icon-remove red bigger-300"></i>
+											</h4>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<!--end of modal-wizard -->
+
+
+
+
+					<div id="modal-wizard3" class="modal" aria-hidden="true"
+						style="display: none;">
+						<div class="modal-dialog">
+							<div class="modal-content">
+								<div class="modal-header red">
+									<h3>警告</h3>
+								</div>
+
+								<div class="modal-body step-content">
+									<div class="active">
+										<div class="center">
+											<h4>确认删除</h4>
+											<h4 class="blue">{{serverToDelete}}</h4>
+										</div>
+									</div>
+								</div>
+								<div class="modal-footer wizard-actions">
+									<button class="btn btn-danger btn-sm pull-left"
+										data-dismiss="modal">取消</button>
+									<button class="btn btn-success btn-sm pull-right"
+										ng-click="reduceServer()" data-dismiss="modal">确定</button>
+								</div>
+							</div>
+						</div>
+					</div>
+
+
+					<div id="modal-wizard4" class="modal" aria-hidden="true"
+						style="display: none;">
+						<div class="modal-dialog">
+							<div class="modal-content">
+
+								<div class="modal-body step-content" id="modal-step-contents">
+									<div class="step-pane active" id="modal-step1">
+										<div class="center">
+											<h4>缩容</h4>
+											<h4 class="blue">{{message4}}</h4>
+											<h4>
+												<i ng-show="process"
+													class="icon-spinner icon-spin orange bigger-300"></i> <i
+													ng-show="success" class="icon-check green bigger-300"></i>
+												<i ng-show="fail" class="icon-remove red bigger-300"></i>
+											</h4>
+										</div>
+									</div>
+
+								</div>
+
+								<div class="modal-footer wizard-actions">
+									<button class="btn btn-danger btn-sm pull-left"
+										data-dismiss="modal">取消</button>
+									<button class="btn btn-success btn-sm pull-right"
+										data-dismiss="modal">确定</button>
+								</div>
+							</div>
+						</div>
+					</div>
+					
+					
+					
+					<div id="modal-wizard5" class="modal" aria-hidden="true"
+						style="display: none;">
+						<div class="modal-dialog">
+							<div class="modal-content">
+								<div class="modal-header">
+									<h3>slot 迁入 </h3>
+								</div>
+								<div class="modal-body">
+									<div id="slotsFrom">
+										<span>源 ：</span>
+										<select multiple="" class="chosen-select" style="width: 320px;"id="form-field-select-4" data-placeholder="Choose Nodes"
+										 ng-options="item.master.address for item in redisnodes">
+											<option value=""></option>
+										</select>
+									</div>
+									<div id="slotsTo">
+										10.1.1.2
+									</div>
+								</div>
+
+								<div class="modal-footer wizard-actions">
+									<button class="btn btn-danger btn-sm pull-left"
+										data-dismiss="modal">取消</button>
+									<button class="btn btn-success btn-sm pull-right"
+										data-dismiss="modal">确定</button>
+								</div>
+							</div>
+						</div>
+					</div>
+
+
+				</div>
+			</div>
+
+		</div>
+		<!-- page-content-area -->
+
+	</div>
+	<!-- page-content -->
+ 
+</div>
+
+<script type="text/javascript">
+			jQuery(function($) {
+			
+				$('.chosen-select').chosen({allow_single_deselect:true}); 
+				//resize the chosen on window resize
+			
+	
+			
+			
+				$('#chosen-multiple-style').on('click', function(e){
+					var target = $(e.target).find('input[type=radio]');
+					var which = parseInt(target.val());
+					if(which == 2) $('#form-field-select-4').addClass('tag-input-style');
+					 else $('#form-field-select-4').removeClass('tag-input-style');
+				});
+			
+			
+				$('[data-rel=tooltip]').tooltip({container:'body'});
+				$('[data-rel=popover]').popover({container:'body'});
+				
+				$('textarea[class*=autosize]').autosize({append: "\n"});
+				$('textarea.limited').inputlimiter({
+					remText: '%n character%s remaining...',
+					limitText: 'max allowed : %n.'
+				});
+	
+			
+				
+				//chosen plugin inside a modal will have a zero width because the select element is originally hidden
+				//and its width cannot be determined.
+				//so we set the width after modal is show
+				$('#modal-wizard5').on('shown.bs.modal', function () {
+					$(this).find('.chosen-container').each(function(){
+						$(this).find('a:first-child').css('width' , '320px');
+						$(this).find('.chosen-choices').css('width' , '320px');
+						$(this).find('.chosen-drop').css('width' , '320px');
+						$(this).find('.chosen-search input').css('width' , '200px');
+					});
+				})
+				/**
+				//or you can activate the chosen plugin after modal is shown
+				//this way select element becomes visible with dimensions and chosen works as expected
+				$('#modal-form').on('shown', function () {
+					$(this).find('.modal-chosen').chosen();
+				})
+				*/
+			
+			});
+		</script>

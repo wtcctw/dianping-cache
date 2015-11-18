@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.dianping.cache.dao.RedisStatsDao">
+	
+	<resultMap id="RedisStatsResult" type="RedisStats">
+		<result column="id" property="id"/>
+		<result column="serverId" property="serverId"/>
+		<result column="memory_used" property="memory_used"/>
+		<result column="curr_time" property="curr_time"/>
+		<result column="total_commands" property="total_commands"/>
+		<result column="total_connections" property="total_connections"/>
+	</resultMap>
+
+	<insert id="insert" parameterType="RedisStats">
+		INSERT INTO redis_stats(serverId,curr_time, memory_used,total_commands,total_connections)
+		VALUES(#{serverId},#{curr_time}, #{memory_used},#{total_commands},#{total_connections})
+	</insert>
+	
+	
+	<select id="findByServer" resultMap="RedisStatsResult" parameterType="String">
+   		SELECT id, serverId, curr_time,memory_used,total_commands,total_connections
+   		FROM redis_stats
+   		WHERE serverId = select id from servers where address = #{server}
+   		ORDER BY id DESC
+	</select>
+	
+	<select id="findAll" resultMap="RedisStatsResult">
+		SELECT id, serverId, curr_time,memory_used, total_commands, total_connections
+   		FROM redis_stats
+   		ORDER BY id DESC
+	</select>
+
+	<select id="findLast" resultMap="RedisStatsResult" >
+		SELECT id, serverId,curr_time, memory_used, total_commands, total_connections
+   		FROM redis_stats
+   		WHERE serverId = select id from servers where address = #{server}
+   		ORDER BY id DESC
+   		limit 1
+	</select>	
+	
+	<select id="findByServerWithInterval" resultMap="RedisStatsResult" parameterType="map">
+		<![CDATA[
+		SELECT id,serverId,curr_time, memory_used, total_commands, total_connections
+   		FROM redis_stats 
+   		WHERE curr_time >= #{start} AND curr_time <= #{end} AND serverId = (select id from servers  where address = #{address}) 
+   		ORDER BY curr_time ASC 
+		 ]]>
+	</select>
+	
+	<delete id="delete" parameterType="map">
+		DELETE FROM redis_stats 
+   		WHERE curr_time &lt;= #{timeBefore}
+	</delete>
+	
+</mapper>

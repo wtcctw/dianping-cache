@@ -1,0 +1,210 @@
+<div class="main-content" ng-controller="RedisServerController"
+	id="ClusterQpsController">
+	<script type="text/javascript"
+		src="${rc.contextPath}/static/js/highcharts/highcharts.js"></script>
+	<script type="text/javascript"
+		src="${rc.contextPath}/static/js/highcharts/exporting.js"></script>
+	<script type="text/javascript"
+		src="${rc.contextPath}/static/js/avatar-cachemonitor.js"></script>
+	<div class="page-header">
+		<div class="rows">
+			<div>
+				<h1>
+					<a href="${rc.contextPath}/redis/dashboard">Cluster</a> <small>
+						<i class="ace-icon fa fa-angle-double-right"></i>{{address}}
+					</small>
+				</h1>
+			</div>
+		</div>
+	</div>
+	<div class="page-content">
+		<div class="rows">
+			<div class="col-lg-3 col-sm-4 ">
+				<div class="table-header"># Server</div>
+				<table class="table">
+					<thead>
+						<tr>
+							<th>属性</th>
+							<th>值</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td>redis_version</td>
+							<td>{{infodata.redis_version}}</td>
+						</tr>
+						<tr>
+							<td>process_id</td>
+							<td>{{infodata.process_id}}</td>
+						</tr><tr>
+							<td>lru_clock</td>
+							<td>{{infodata.lru_clock}}</td>
+						</tr><tr>
+							<td>uptime_in_days</td>
+							<td>{{infodata.uptime_in_days}}</td>
+						</tr>
+
+					</tbody>
+				</table>
+				<div class="table-header"># Clients</div>
+				<table class="table">
+					<thead>
+						<tr>
+							<th>属性</th>
+							<th>值</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td>connected_clients</td>
+							<td>{{infodata.connected_clients}}</td>
+						</tr>
+						<tr>
+							<td>client_longest_output_list</td>
+							<td>{{infodata.client_longest_output_list}}</td>
+						</tr>
+
+						<tr>
+							<td>client_biggest_input_buf</td>
+							<td>{{infodata.client_biggest_input_buf}}</td>
+						</tr>
+						<tr>
+							<td>blocked_clients</td>
+							<td>{{infodata.blocked_clients}}</td>
+						</tr>
+					</tbody>
+				</table>
+				<div class="table-header"># Memory</div>
+				<table class="table">
+					<thead>
+						<tr>
+							<th>属性</th>
+							<th>值</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td>used_memory_human</td>
+							<td>{{infodata.used_memory_human}}</td>
+						</tr>
+						<tr>
+							<td>used_memory_peak_human</td>
+							<td>{{infodata.used_memory_peak_human}}</td>
+						</tr>
+						<tr>
+							<td>mem_allocator</td>
+							<td>{{infodata.mem_allocator}}</td>
+						</tr>
+
+					</tbody>
+				</table>
+				<div class="table-header"># Persistence</div>
+				<table class="table">
+					<thead>
+						<tr>
+							<th>属性</th>
+							<th>值</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td>loading</td>
+							<td>{{infodata.loading}}</td>
+						</tr>
+						<tr>
+							<td>rdb_last_bgsave_status</td>
+							<td>{{infodata.rdb_last_bgsave_status}}</td>
+						</tr>
+
+						<tr>
+							<td>aof_enabled</td>
+							<td>{{infodata.aof_enabled}}</td>
+						</tr>
+						<tr>
+							<td>aof_rewrite_in_progress</td>
+							<td>{{infodata.aof_rewrite_in_progress}}</td>
+						</tr>
+						<tr>
+							<td>aof_rewrite_scheduled</td>
+							<td>{{infodata.aof_rewrite_scheduled}}</td>
+						</tr>
+					</tbody>
+				</table>
+				<div class="table-header"># Stats</div>
+				<table class="table">
+					<thead>
+						<tr>
+							<th>属性</th>
+							<th>值</th>
+						</tr>
+					</thead>
+					<tbody>
+
+						<tr>
+							<td>total_connections_received</td>
+							<td>{{infodata.total_connections_received}}</td>
+						</tr>
+						<tr>
+							<td>total_commands_processed</td>
+							<td>{{infodata.total_commands_processed}}</td>
+						</tr>
+						<tr>
+							<td>instantaneous_ops_per_sec</td>
+							<td>{{infodata.instantaneous_ops_per_sec}}</td>
+						</tr>
+						<tr>
+							<td>total_net_input_bytes</td>
+							<td>{{infodata.total_net_input_bytes}}</td>
+						</tr>
+						<tr>
+							<td>total_net_output_bytes</td>
+							<td>{{infodata.total_net_output_bytes}}</td>
+						</tr>
+						<tr>
+							<td>expired_keys</td>
+							<td>{{infodata.expired_keys}}</td>
+						</tr>
+						<tr>
+							<td>evicted_keys</td>
+							<td>{{infodata.evicted_keys}}</td>
+						</tr>
+
+					</tbody>
+				</table>
+				<div class="table-header"># CPU</div>
+				<table class="table">
+					<thead>
+						<tr>
+							<th>属性</th>
+							<th>值</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td>used_cpu_sys</td>
+							<td>{{infodata.used_cpu_sys}}</td>
+						</tr>
+						<tr>
+							<td>used_cpu_user</td>
+							<td>{{infodata.used_cpu_user}}</td>
+						</tr>
+
+						<tr>
+							<td>used_cpu_sys_children</td>
+							<td>{{infodata.used_cpu_sys_children}}</td>
+						</tr>
+						<tr>
+							<td>used_cpu_user_children</td>
+							<td>{{infodata.used_cpu_user_children}}</td>
+						</tr>
+
+					</tbody>
+				</table>
+			</div>
+			<div class="col-lg-9 col-sm-8" id="container"></div>
+		</div>
+
+
+	</div>
+
+</div>
