@@ -177,7 +177,7 @@
 	</dependencies>
 
 	<modules>
-		<module>squirrel-console</module>
+		<module>squirrel-web</module>
 		<module>squirrel-client</module>
 		<module>squirrel-test</module>
 	</modules>
