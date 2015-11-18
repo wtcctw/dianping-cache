@@ -402,7 +402,12 @@ squirrel 支持两种缓存清理：
 
 ## 存储监控
 ### 客户端
+客户端监控可以在 cat 上看到
+TODO：补充
+
 ### 服务端
+服务端的监控可以在 squirrel-console 上看到
+TODO：补充
 
 ## 扩容缩容
 ### memcached
