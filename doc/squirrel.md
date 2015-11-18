@@ -410,6 +410,7 @@ TODO：补充
 TODO：补充
 
 ## 扩容缩容
+
 ### memcached
 新建的 memcached 集群都由 docker 来负责创建和销毁实例。memcached 作为缓存，在扩容，缩容时不需要做数据迁移。
 
