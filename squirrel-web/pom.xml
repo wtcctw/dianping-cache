@@ -18,6 +18,11 @@
 	<name>squirrel-web</name>
 
 	<dependencies>
+	<dependency>
+            <groupId>org.objenesis</groupId>
+            <artifactId>objenesis</artifactId>
+            <scope>compile</scope>
+        </dependency>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>squirrel-client</artifactId>
