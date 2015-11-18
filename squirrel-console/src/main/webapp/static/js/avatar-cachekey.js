@@ -272,6 +272,21 @@ module.controller('KeyController', [
 				$scope.categoryForClear = category;
 			}
 			
+			$scope.applist=[];
+			$scope.getAppList = function(category){
+				$http.post(window.contextPath + '/cache/key/applist',
+	        			{"category":category}
+				).success(function(response) {
+					if(response != null){
+						$scope.applist = [];
+						response.forEach(function(item) {
+							$scope.applist.push(item.application);
+						});
+					}
+	        	});
+			}
+			
+			
 			$scope.clearCache = function(myForm){
 				$('#keyModal3').modal('hide');
 				$http.post(window.contextPath + '/cache/key/clear',

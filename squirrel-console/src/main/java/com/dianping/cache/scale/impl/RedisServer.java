@@ -2,11 +2,18 @@ package com.dianping.cache.scale.impl;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import redis.clients.jedis.Jedis;
+import redis.clients.jedis.exceptions.JedisDataException;
 
 import com.dianping.cache.scale.Server;
 
@@ -18,9 +25,13 @@ public class RedisServer extends Server {
     
     private String slotString;
     
-    private List<Integer> slotList;
+    private List<Integer> slotList = new ArrayList<Integer>();
 
     private String masterId;
+    
+    private RedisInfo info = new RedisInfo();
+    
+    private Logger logger = LoggerFactory.getLogger(getClass());
 
     public RedisServer(String address) {
         super(address);
@@ -115,6 +126,8 @@ public class RedisServer extends Server {
     }
     
     List<Integer> updateSlotList(String slotString) {
+    	if(slotString == null)
+    		return null;
         String[] segments = slotString.split(",");
         List<Integer> slotList = new ArrayList<Integer>();
         for(String segment : segments) {
@@ -124,15 +137,18 @@ public class RedisServer extends Server {
             int idx = segment.indexOf('-');
             if(idx == -1) {
                 slotList.add(Integer.parseInt(segment));
-            } else {
-                int end = Integer.parseInt(segment.substring(idx + 1).trim());
-                int start = Integer.parseInt(segment.substring(0, idx).trim());
-                if(end < start) {
-                    start = start ^ end; end = start ^ end; start = start ^ end;
-                }
-                for(int i=start; i<=end; i++) {
-                    slotList.add(i);
-                }
+            } else if(segment.startsWith("[")){ //正在传输
+            	//TODO
+            } else{
+            	int end = Integer.parseInt(segment.substring(idx + 1).trim());
+            	int start = Integer.parseInt(segment.substring(0, idx).trim());
+            	if(end < start) {
+            		start = start ^ end; end = start ^ end; start = start ^ end;
+            	}
+            	for(int i=start; i<=end; i++) {
+            		slotList.add(i);
+            	}
+            	
             }
         }
         // deduplicate
@@ -170,4 +186,56 @@ public class RedisServer extends Server {
         return ss.length() > 0 ? ss.substring(0, ss.length()-1) : "";
     }
     
+    public void loadRedisInfo(){
+		Jedis jedis = new Jedis(getIp(), getPort());
+		try {
+			List<String> redisConfig = jedis.configGet("*");
+			String redisInfo = jedis.info();
+			Map<String,String> redisConfigMap = parseServerConfig(redisConfig);
+			Map<String,String> redisInfoMap = parseServerInfo(redisInfo);
+			
+			info.setMaxMemory(Long.parseLong(redisConfigMap.get("maxmemory"))/1024/1024);
+			info.setUsedMemory(Long.parseLong(redisInfoMap.get("used_memory"))/1024/1024);
+		} catch (NumberFormatException e) {
+			logger.error(e.toString());
+		} catch (Exception e1){
+			logger.error("CONFIG alias error :" + e1);
+		} finally{
+			jedis.close();
+		}
+    } 
+    
+    private Map<String,String> parseServerConfig(List<String> config){
+    	String quota = "\"";
+    	String quotaStr = "&quot;";
+    	Map<String,String> result = new HashMap<String,String>();
+    	if(config == null)
+    		return result;
+    	for(int i = 0; i < config.size(); i += 2 ){
+    		config.set(i+1,config.get(i+1).replaceAll(quota, ""));
+    		config.set(i+1,config.get(i+1).replaceAll(quotaStr,""));
+    		result.put(config.get(i), config.get(i+1));
+    	}
+    	return result;
+    }
+    
+	private Map<String,String> parseServerInfo(String infoString){
+		Map<String,String> data = new HashMap<String,String>();
+		String[] infoArray = infoString.split("\r\n");
+		for(String info : infoArray){
+			info.trim();
+			String[] each = info.split(":");
+			if(each.length > 1)
+				data.put(each[0], each[1]);
+		}
+		return data;
+	}
+
+	public RedisInfo getInfo() {
+		return info;
+	}
+
+	public void setInfo(RedisInfo info) {
+		this.info = info;
+	}
 }

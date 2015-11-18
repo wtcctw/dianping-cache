@@ -12,7 +12,9 @@ import com.dianping.ba.es.qyweixin.adapter.api.dto.MessageDto;
 import com.dianping.ba.es.qyweixin.adapter.api.dto.media.TextDto;
 import com.dianping.ba.es.qyweixin.adapter.api.exception.QyWeixinAdaperException;
 import com.dianping.ba.es.qyweixin.adapter.api.service.MessageService;
+
 import com.dianping.cache.util.CollectionUtils;
+import com.dianping.cache.util.RequestUtil;
 import com.dianping.lion.Environment;
 import com.dianping.mailremote.remote.MailService;
 import com.dianping.pigeon.remoting.ServiceFactory;
@@ -20,7 +22,6 @@ import com.dianping.sms.biz.SMSService;
 import com.dianping.squirrel.common.config.ConfigChangeListener;
 import com.dianping.squirrel.common.config.ConfigManager;
 import com.dianping.squirrel.common.config.ConfigManagerLoader;
-
 public class NotifyManager {
 
     private static Logger logger = LoggerFactory.getLogger(NotifyManager.class);
@@ -45,13 +46,13 @@ public class NotifyManager {
     
     private MailService mailService;
     
-    private SMSService smsService;
+    //private SMSService smsService;
     
     private MessageService weixinService;
     
     private NotifyManager() {
         mailService = ServiceFactory.getService("http://service.dianping.com/mailService/mailService_1.0.0", MailService.class);
-        smsService = ServiceFactory.getService("http://service.dianping.com/smsService/smsRemoteService_1.0.0", SMSService.class);
+        //smsService = ServiceFactory.getService("http://service.dianping.com/smsService/smsRemoteService_1.0.0", SMSService.class);
         weixinService = ServiceFactory.getService("http://service.dianping.com/ba/es/qyweixin/adapter/MessageService_1.0.0", MessageService.class);
         enableNotify = configManager.getBooleanValue(Constants.KEY_NOTIFY_ENABLE, Constants.DEFAULT_NOTIFY_ENABLE);
         emailType = configManager.getIntValue(Constants.KEY_NOTIFY_EMAIL_TYPE, Constants.DEFAULT_NOTIFY_EMAIL_TYPE);
@@ -109,8 +110,10 @@ public class NotifyManager {
         String[] mobiles = smsList.split(",");
         boolean success = true;
         for(String mobile : mobiles) {
-            int result = smsService.send(smsType, mobile, subPair);
-            if(result != 200) {
+        	String smsparam = "mobile=" + mobile + "&body=" + message;
+        	String result = RequestUtil.sendGet("http://web.paas.dp/sms/send", smsparam);
+            //int result = smsService.send(smsType, mobile, subPair);
+            if(!result.contains("200")) {
                 success = false;
                 logger.warn("failed to send sms, content: " + message + ", error code: " + result);
             }
@@ -134,5 +137,23 @@ public class NotifyManager {
             logger.error("failed to send weixin, content: " + message, e);
         }
     }
+
+	public boolean notifySms2(String message) {
+	       Map<String,String> subPair = new HashMap<String, String>();
+	        subPair.put("body", message);
+	        String smsList = "18721794573";
+	        String[] mobiles = smsList.split(",");
+	        boolean success = true;
+	        for(String mobile : mobiles) {
+	        	String smsparam = "mobile=" + mobile + "&body=" + message;
+	        	String result = RequestUtil.sendGet("http://web.paas.dp/sms/send", smsparam);
+	            //int result = smsService.send(smsType, mobile, subPair);
+	            if(!result.contains("200")) {
+	                success = false;
+	                logger.warn("failed to send sms, content: " + message + ", error code: " + result);
+	            }
+	        }
+	        return success;
+	}
 
 }

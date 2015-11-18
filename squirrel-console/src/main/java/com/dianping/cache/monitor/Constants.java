@@ -40,15 +40,15 @@ public interface Constants {
     String KEY_NOTIFY_EMAIL_TYPE = "avatar-cache.notify.email.type";
     int DEFAULT_NOTIFY_EMAIL_TYPE = 15;// 架构中间件异常告警邮件
     String KEY_NOTIFY_EMAIL_LIST = "avatar-cache.notify.email.list";
-    String DEFAULT_NOTIFY_EMAIL_LIST = "faping.miao@dianping.com,xiaoxiong.dai@dianping.com," +
+    String DEFAULT_NOTIFY_EMAIL_LIST = "dp.wang@dianping.com,faping.miao@dianping.com,xiaoxiong.dai@dianping.com," +
     		"xiang.wu@dianping.com,enlight.chen@dianping.com";
     String KEY_NOTIFY_SMS_TYPE = "avatar-cache.notify.sms.type";
     int DEFAULT_NOTIFY_SMS_TYPE = 801;// 架构监控通知短信$$body#$
     String KEY_NOTIFY_SMS_LIST = "avatar-cache.notify.sms.list";
-    String DEFAULT_NOTIFY_SMS_LIST = "13501702948,18918371840,18616210562,18917002059";
+    String DEFAULT_NOTIFY_SMS_LIST = "18721794573,13501702948,18918371840,18616210562,18917002059";
     String KEY_NOTIFY_WEIXIN_TYPE = "avatar-cache.notify.weixin.type";
     int DEFAULT_NOTIFY_WEIXIN_TYPE = 54;// 运维平台
     String KEY_NOTIFY_WEIXIN_LIST = "avatar-cache.notify.weixin.list";
-    String DEFAULT_NOTIFY_WEIXIN_LIST = "0000558,0014852,0005503,0003769";
+    String DEFAULT_NOTIFY_WEIXIN_LIST = "0023415,0000558,0014852,0005503,0003769";
 
 }

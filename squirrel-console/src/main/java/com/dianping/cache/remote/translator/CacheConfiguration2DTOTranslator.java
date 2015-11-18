@@ -35,11 +35,14 @@ public class CacheConfiguration2DTOTranslator implements Translator<CacheConfigu
 	@Override
 	public CacheConfigurationDTO translate(CacheConfiguration source) {
 		assert source != null;
-		CacheConfigurationDTO configuration = new CacheConfigurationDTO();
-        DTOUtils.copyProperties(configuration, source);
-        configuration.setKey(source.getCacheKey());
-        configuration.setDetail(translate2detail(source));
-        return configuration;
+		if(source != null){
+			CacheConfigurationDTO configuration = new CacheConfigurationDTO();
+			DTOUtils.copyProperties(configuration, source);
+			configuration.setKey(source.getCacheKey());
+			configuration.setDetail(translate2detail(source));
+			return configuration;
+		}
+		return null;
 	}
 
 	/**

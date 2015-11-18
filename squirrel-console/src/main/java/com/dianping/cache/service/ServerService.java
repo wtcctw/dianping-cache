@@ -13,9 +13,15 @@ public interface ServerService {
 	
 	public List<Server> findAllRedisServers();
 
-	public void insert(String address, String appId,String instanceId, int type) throws DuplicateKeyException;
+	public void insert(String address, String appId,String instanceId, int type, String hostIp) throws DuplicateKeyException;
 	
 	public Server findByAddress(String address);
 	
 	public void delete(String address);
+	
+	public void update(Server server);
+
+	public void setDeleteType(String instanceId);
+
+	public void deleteByInstanceId(String instanceId);
 }

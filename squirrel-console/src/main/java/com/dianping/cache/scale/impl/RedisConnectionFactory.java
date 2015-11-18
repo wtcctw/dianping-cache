@@ -29,5 +29,11 @@ public class RedisConnectionFactory {
         Server server = new Server(address);
         return new Jedis(server.getIp(), server.getPort());
     }
+    
+    public static void removeConnection(String address){
+    	connPool.remove(address);
+    }
+    
+   
 
 }

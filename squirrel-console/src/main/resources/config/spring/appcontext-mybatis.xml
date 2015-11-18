@@ -85,4 +85,9 @@
 		<property name="mapperInterface" value="com.dianping.cache.dao.CategoryToAppDao" />   
 		<property name="sqlSessionFactory" ref="sqlSessionFactory" /> 
 	</bean>
+	<bean id="redisStatsDao" class="org.mybatis.spring.mapper.MapperFactoryBean">
+		<property name="mapperInterface" value="com.dianping.cache.dao.RedisStatsDao" />   
+		<property name="sqlSessionFactory" ref="sqlSessionFactory" /> 
+	</bean>
+	
 </beans>

@@ -70,6 +70,20 @@ public class CacheMonitorController  extends AbstractSidebarController {
 		return new ModelAndView("monitor/dashboard",createViewMap());
 	}
 	
+	
+	@RequestMapping(value = "/monitor/nodedashboard", method = RequestMethod.GET)
+	public ModelAndView viewServers() {
+
+		subside = "node";
+		return new ModelAndView("monitor/nodedashboard", createViewMap());
+	}
+	
+	@RequestMapping(value = "/monitor/servers", method = RequestMethod.GET)
+	@ResponseBody
+	public List<Server> getServers(){
+		return serverService.findAll();
+	}
+	
 	@RequestMapping(value = "/monitor/dashboardinfo", method = RequestMethod.GET)
 	@ResponseBody
 	public List<HashMap<String, Object>> dashBoard(HttpServletRequest request, HttpServletResponse response){
@@ -135,11 +149,17 @@ public class CacheMonitorController  extends AbstractSidebarController {
 					alarm = 2;
 				if(hitmin < 0.97)
 					alarm = 1;
-				
-				qpsavg = qpsavg/alive;
-				hitavg = hitavg/alive;
-				connavg = connavg/alive;
-				evictavg = evictavg/alive;
+				if(alive > 0){
+					qpsavg = qpsavg/alive;
+					hitavg = hitavg/alive;
+					connavg = connavg/alive;
+					evictavg = evictavg/alive;
+				}else{
+					qpsavg = 0;
+					hitavg = 0;
+					connavg = 0;
+					evictavg = 0;
+				}
 				info.put("numbers", serverList.size() - alive +"/"+serverList.size());
 				info.put("memory", (float)(Math.round(usage*100)) +"%/" + mem+"M");
 				info.put("QPS", qpsmax+"/"+qpsmin+"/"+qpsavg);
@@ -156,7 +176,7 @@ public class CacheMonitorController  extends AbstractSidebarController {
 	}
 	
 	
-	@RequestMapping(value = "/monitor/cluster/{cluster}", method = RequestMethod.POST)
+	@RequestMapping(value = "/monitor/cluster/{cluster}", method = RequestMethod.GET)
 	@ResponseBody
 	public List<HighChartsWrapper> getClusterStats(@PathVariable("cluster") String cluster,@RequestParam("endTime") long endTime){
 		

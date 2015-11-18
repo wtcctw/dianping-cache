@@ -11,11 +11,12 @@
 		<result column="appId" property="appId"/>
 		<result column="instanceId" property="instanceId"/>
 		<result column="type" property="type"/>
+		<result column="hostIP" property="hostIp"/>
 	</resultMap>
 	
 	<insert id="insert" parameterType="Server">
-		INSERT INTO servers(address,appId,instanceId,type)
-		VALUES(#{address},#{appId},#{instanceId},#{type})
+		INSERT INTO servers(address,appId,instanceId,type,hostIp)
+		VALUES(#{address},#{appId},#{instanceId},#{type},#{hostIp})
 	</insert>
 
 	<delete id="delete" parameterType="String">
@@ -23,18 +24,33 @@
 		WHERE #{address} = address
 	</delete>
 	
+	<delete id="deleteByInstanceId" parameterType="String">
+		DELETE FROM servers
+		WHERE #{instanceId} = instanceId 
+	</delete>
+	
 	<select id="findByAddress" resultMap="ServerResult" parameterType="String">
-		SELECT id,address,appId,instanceId,type
+		SELECT id,address,appId,instanceId,type,hostIp
    		FROM servers
    		WHERE #{address} = address
 	</select>
 	
 	<select id="findAll" resultMap="ServerResult" parameterType="int">
-   		SELECT id,address,appId,instanceId,type
+   		SELECT id,address,appId,instanceId,type,hostIp
    		FROM servers
    		WHERE #{type} = type
 	</select>
-
-
+	
+	<update id="update" parameterType="Server">
+		UPDATE servers
+		SET type = #{type},address = #{address},appId=#{appId},instanceId=#{instanceId},hostIp=#{hostIp}
+		WHERE #{id} = id 
+	</update>
+	
+	<update id="setDeleteType" parameterType="String">
+		UPDATE servers
+		SET type = -1
+		WHERE #{instanceId} = instanceId 
+	</update>
 
 </mapper>

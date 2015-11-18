@@ -8,6 +8,8 @@ import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.dianping.cache.config.ConfigManager;
+import com.dianping.cache.config.ConfigManagerLoader;
 import com.dianping.cache.service.MemcacheStatsService;
 import com.dianping.cache.service.OperationLogService;
 import com.dianping.cache.service.ServerStatsService;
@@ -15,6 +17,16 @@ import com.dianping.combiz.spring.context.SpringLocator;
 
 public class TimedCleanData {
 	private Logger logger = LoggerFactory.getLogger(TimedCleanData.class);
+	private static final ConfigManager configManager = ConfigManagerLoader.getConfigManager();
+	
+	private static final String OPERATIONLOG_CLEAN_TIME = "avatar-cache.timeclean.operationlog";
+	private static final int DEFAULT_OPERATIONLOG_CLEAN_TIME = 365;
+	
+	private static final String STATS_CLEAN_TIME = "avatar-cache.timeclean.stats";
+	private static final int DEFAULT_STATS_CLEAN_TIMER = 15;
+	
+	private static int logtime = configManager.getIntValue(OPERATIONLOG_CLEAN_TIME,DEFAULT_OPERATIONLOG_CLEAN_TIME);
+	private static int statstime = configManager.getIntValue(STATS_CLEAN_TIME,DEFAULT_STATS_CLEAN_TIMER);
 	
 	private ScheduledExecutorService scheduled  = Executors.newSingleThreadScheduledExecutor();
 	
@@ -47,14 +59,14 @@ public class TimedCleanData {
 	 */
 	private void cleanServerStats(){
 		logger.info("start to clean ServerStats !");
-		long timeBefore = (System.currentTimeMillis() - TimeUnit.MILLISECONDS.convert(30 * 24 * 60, TimeUnit.MINUTES))/1000;
+		long timeBefore = (System.currentTimeMillis() - TimeUnit.MILLISECONDS.convert(statstime * 24 * 60, TimeUnit.MINUTES))/1000;
 		serverStatsService.delete(timeBefore);
 		logger.info("ServerStats clear !");
 	}
 	
 	private void cleanMemcachedStats(){
 		logger.info("start to clean MemcachedStats !");
-		long timeBefore = (System.currentTimeMillis() - TimeUnit.MILLISECONDS.convert(30 * 24 * 60, TimeUnit.MINUTES))/1000;
+		long timeBefore = (System.currentTimeMillis() - TimeUnit.MILLISECONDS.convert(statstime * 24 * 60, TimeUnit.MINUTES))/1000;
 		memcacheStatsService.delete(timeBefore);
 		logger.info("MemcachedStats clear!");
 	}
@@ -62,7 +74,7 @@ public class TimedCleanData {
 	private void cleanOperationLog(){
 		logger.info("start to clean OperationLog !");
 		Date date =  new Date();
-		date.setTime(System.currentTimeMillis() - TimeUnit.MILLISECONDS.convert(30 * 24 * 60, TimeUnit.MINUTES));
+		date.setTime(System.currentTimeMillis() - TimeUnit.MILLISECONDS.convert(logtime * 24 * 60, TimeUnit.MINUTES));
 		operationLogService.delete(date);
 		logger.info("OperationLog clear!");
 	}

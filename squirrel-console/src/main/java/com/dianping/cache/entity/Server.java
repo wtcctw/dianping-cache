@@ -18,6 +18,8 @@ public class Server implements Serializable{
 	private String instanceId;
 	
 	private int type;
+	
+	private String hostIp;
 
 	public int getId() {
 		return id;
@@ -57,6 +59,14 @@ public class Server implements Serializable{
 
 	public void setType(int type) {
 		this.type = type;
+	}
+
+	public String getHostIp() {
+		return hostIp;
+	}
+
+	public void setHostIp(String hostIp) {
+		this.hostIp = hostIp;
 	}
 	
 }

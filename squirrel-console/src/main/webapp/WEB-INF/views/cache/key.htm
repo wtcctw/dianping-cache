@@ -10,42 +10,51 @@
 				} catch (e) {
 				}
 			</script>
+			<style type="text/css">
+				.dropdown-menu
+				{
+					 width: 200px;
+				}
+			</style>
+			<div class="nav-search col-sm-8" id="nav-search" style="margin:0px auto">
+				<form class="form-search">
+					<input type="text"
+						placeholder="Category ..." class="nav-search-input col-sm-6"
+						 id="category" ng-model="category"autocomplete="off" style="width:200px" >
+					
+					<input type="text"
+						placeholder="CacheType ..." class="nav-search-input col-sm-6"
+						 id="cacheType" ng-model="cacheType" autocomplete="off" style="width:200px" >
+					<button type="submit" class="btn btn-xs btn-round"
+								ng-click="query()" >查询
+					</button>
+				</form>
+			</div>
 
-			<form class="form-horizontal">
-				<div class="col-lg-2"></div>
-				<div class="col-lg-3">
-					<div class="row">
-						<div class="col-xs-3">
+
+
+
+			<!-- 			<form>
+						<div class="col-sm-2">
 							<label style="color: grey"> Category </label>
 						</div>
-						<div class="col-xs-7">
+						<div class="col-sm-3">
  							<input type="text" placeholder="" id="category"
 								ng-model="category">
 						</div>
-
-					</div>
-				</div>
-				<div class="col-lg-4">
-
-					<div class="row">
-						<div class="col-xs-3">
+						<div class="col-sm-2">
 							<label style="color: grey"> CacheType </label>
 						</div>
-						<div class="col-xs-6">
+						<div class="col-sm-3">
 							<input type="text" placeholder="" id="cacheType"
 								ng-model="cacheType" >
 						</div>
-						<div class="col-xs-2">
-							<button type="button" class="btn btn-sm btn-success"
+						<div class="col-sm-2">
+							<button type="submit" class="btn btn-sm btn-success"
 								ng-click="query()" style="margin-bottom: 5px">查询</button>
 						</div>
-
-					</div>
-				</div>
-
-
-
-			</form>
+				
+				</form> -->
 		</div>
 
 
@@ -65,7 +74,7 @@
 							<th style="width: 14%; text-align: center">CacheType</th>
 							<th style="width: 7%; text-align: center">Version</th>
 							<th style="width: 7%; text-align: center">Hot</th>
-							<th style="width: 7%; text-align: left">Extension</th>
+							<th style="width: 7%; text-align: left">AppList</th>
 							<th
 								style="width: 14%; text-align: left;#if(${isadmin})display: table-cell;#else display: none;#end;">操作
 								<a href="#keyModal" data-toggle="modal" style="float: right"
@@ -103,24 +112,26 @@
 							</td>
 							<td
 								style="text-align: center; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">
-								<i class="icon-ok green" ng-show="{{info.hot}}"></i> <i
-								class="icon-remove red" ng-show="!{{info.hot}}"></i>
+								<i class="ace-icon glyphicon glyphicon-ok green" ng-show="{{info.hot}}"></i> <i
+								class="ace-icon glyphicon glyphicon-remove red" ng-show="!{{info.hot}}"></i>
 							</td>
 							<td
 								style="text-align: left; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">
-								{{info.extension}}
+								<a href="#myModal" class="badge" data-toggle="modal"
+									ng-click="getAppList(info.category)">
+										查看应用 </a>
 							</td>
 							<td
 								style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis;#if(${isadmin})display: table-cell;#else display: none;#end;">
 								<a href="#keyModal2" title="修改"
 								ng-click="setModalInput(info.category , info.duration, info.indexTemplate, info.cacheType, info.indexDesc,info.version,info.hot,info.sync2Dnet,info.extension);"
 								data-toggle="modal" class="edit-config-btn blue"><i
-									class="icon-edit bigger-130 grey" style="float: left"></i></a> <a
+									class="ace-icon fa fa-pencil bigger-120 grey" style="float: left"></i></a> <a
 								href="" ng-click="dialog(info.category)" title="删除"><i
-									class="icon-trash bigger-130 red"></i></a> <a href="#keyModal3"
+									class="ace-icon fa fa-trash-o bigger-120 red"></i></a> <a href="#keyModal3"
 								title="清除缓存" data-toggle="modal"
 								ng-click="setClearCategory(info.category);"><i
-									class="icon-leaf bigger-130 green" style="float: right"></i></a>
+									class="ace-icon fa fa-leaf bigger-120 green" style="float: right"></i></a>
 							</td>
 
 						</tr>
@@ -144,7 +155,26 @@
 			</div>
 			<!--end row  -->
 		</div>
+			<!-- 模态框（Modal） -->
+		<div class="modal fade" id="myModal" tabindex="-1" role="dialog"
+				aria-labelledby="myModalLabel" aria-hidden="true">
+				<div class="modal-dialog">
+					<div class="modal-content">
+						<div class="modal-header">
+							<button type="button" class="close" data-dismiss="modal"
+								aria-hidden="true">&times;</button>
+							<h4 class="modal-title" id="myModalLabel">使用该category的相关</h4>
+						</div>
+						<div class="modal-body">
+							<div ng-repeat="item in applist">
+								{{item}}
+							</div>
+						</div>
 
+					</div>
+				</div>
+				<!-- /.modal-content -->
+			</div>
 
 		<div class="modal fade" id="keyModal" tabindex="-1"
 			role="dialog">

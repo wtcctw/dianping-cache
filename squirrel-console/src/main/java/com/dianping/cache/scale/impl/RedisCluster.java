@@ -30,9 +30,20 @@ public class RedisCluster implements Cluster<RedisNode> {
         if(serverList == null || serverList.size() == 0) {
             throw new ScaleException("server list is empty");
         }
-        Jedis jedis = RedisConnectionFactory.getConnection(serverList.get(0));
-        String clusterInfo = jedis.clusterNodes();
-        nodes = parseClusterInfo(clusterInfo);
+        //目前没有考虑集群割裂的情况   仅仅是考虑有一个节点可能链接不上
+        for(String address : serverList){
+        	Jedis jedis;
+			try {
+				jedis = RedisConnectionFactory.getConnection(address);
+				String clusterInfo = jedis.clusterNodes();
+				nodes = parseClusterInfo(clusterInfo);
+				break;
+			} catch (Exception e) {
+				RedisConnectionFactory.removeConnection(address);
+				nodes = new ArrayList<RedisNode>();
+				continue;
+			}
+        }
     }
     
     private List<RedisNode> parseClusterInfo(String clusterInfo) {
@@ -51,7 +62,7 @@ public class RedisCluster implements Cluster<RedisNode> {
             }
         }
         for(RedisServer server : servers) {
-            if(server.isSlave()) {
+            if(server.isSlave()  && !server.isFail()) {
                 RedisNode node = nodeMap.get(server.getMasterId());
                 if(node != null) {
                     node.setSlave(server);
@@ -112,7 +123,7 @@ public class RedisCluster implements Cluster<RedisNode> {
         List<Integer> allSlots = new ArrayList<Integer>();
         for(RedisNode node : nodes) {
             RedisServer master = node.getMaster();
-            if(master != null && master.isAlive()) {
+            if(master != null && master.isAlive() && master.getSlotList()!=null) {
                 allSlots.addAll(master.getSlotList());
             }
         }

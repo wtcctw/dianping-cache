@@ -10,8 +10,70 @@
 				} catch (e) {
 				}
 			</script>
+			<div class="row col-lg-12 col-sm-12">
+				<div class="row col-sm-6" style="margin-top:5px">
+					<div class="col-xs-6">
+						<div class="input-group input-group-sm">
+							<input type="text" class="form-control"
+						placeholder=""  id="operator"
+						ng-model='operator' required> 
+							<span
+								class="input-group-addon"> 操作者
+							</span>
+						</div>
+					</div>
 
-			<form class="bs-example bs-example-form" role="form">
+					<div class="col-xs-6">
+						<div class="input-group input-group-sm">
+							<input type="text" 
+								class="form-control " id="content" ng-model='content' required> 
+							<span
+								class="input-group-addon">操作内容
+
+							</span>
+						</div>
+					</div>
+				
+				</div>
+
+				<div class="row col-sm-5"  style="margin-top:5px">
+					<div class="col-xs-6">
+						<div class="input-group input-group-sm">
+							<input type="text" placeholder="开始时间..." ng-model="startTime"
+								id="starttime"
+								class="form-control "> 
+							<span
+								class="input-group-addon"> <i
+								class="ace-icon fa fa-calendar"></i>
+							</span>
+						</div>
+					</div>
+
+					<div class="col-xs-6">
+						<div class="input-group input-group-sm">
+							<input type="text"  placeholder="结束时间..."
+								ng-model="endTime" id="stoptime"
+								class="form-control"> 
+							<span
+								class="input-group-addon"> <i
+								class="ace-icon fa fa-calendar"></i>
+
+							</span>
+						</div>
+					</div>
+					
+				</div>
+				
+				<div class="col-sm-1" >
+					<button type="submit" class="btn btn-sm form-control"
+						style="height: 30px;
+    margin-bottom: 3px;"
+						id="summittime" ng-click="query()">查询</button>
+					
+				</div>
+
+			</div>
+<!-- 			<form class="bs-example bs-example-form" role="form">
 				<div class="input-group" style="margin-left: 20px">
 					操作者 <input type="text" class="form-control"
 						placeholder="cacheOperator" style="width: 200px" id="operator"
@@ -22,16 +84,14 @@
 						style="top: 28px; left: 0px; display: none;">
 					</ul>
 
-					<span class="input-group-addon" style="opacity: 0;"></span> 时间 <input
+					<span class="" style="opacity: 0;"></span> 时间 <input
 						type="text" placeholder="开始时间..." ng-model="startTime"
 						id="starttime"> <input type="text" placeholder="结束时间..."
 						ng-model="endTime" id="stoptime">
-					<button type="button" class="btn btn-success btn-swallow-ok"
+					<button type="submit" class="btn btn-success btn-swallow-ok"
 						id="summittime" ng-click="query()">查询</button>
 				</div>
-			</form>
-
-			<!-- end  breadcrumbs-->
+			</form> -->
 		</div>
 
 
@@ -73,8 +133,8 @@
 								</td>
 								<td
 									style="text-align: center; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">
-									<i class="icon-ok green" ng-show="{{info.succeed}}"></i> <i
-									class="icon-remove red" ng-show="!{{info.succeed}}"></i>
+									<i class="ace-icon glyphicon glyphicon-ok green" ng-show="{{info.succeed}}"></i> <i
+									class="ace-icon glyphicon glyphicon-remove red" ng-show="!{{info.succeed}}"></i>
 								</td>
 							</tr>
 						</table>

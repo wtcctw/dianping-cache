@@ -1,6 +1,7 @@
 package com.dianping.cache.monitor.highcharts;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -8,6 +9,7 @@ import com.dianping.cache.monitor.highcharts.HighChartsWrapper.PlotOption;
 import com.dianping.cache.monitor.highcharts.HighChartsWrapper.PlotOptionSeries;
 import com.dianping.cache.monitor.highcharts.HighChartsWrapper.Series;
 import com.dianping.cache.monitor.statsdata.MemcachedStatsData;
+import com.dianping.cache.monitor.statsdata.RedisStatsData;
 import com.dianping.cache.monitor.statsdata.ServerStatsData;
 
 public class ChartsBuilder {
@@ -119,6 +121,15 @@ public class ChartsBuilder {
 		return result;
 	}
 	
+	public static List<HighChartsWrapper> buildRedisStatsCharts(RedisStatsData data){
+		List<HighChartsWrapper> result = new ArrayList<HighChartsWrapper>();
+		long startTime = data.getStartTime();
+		result.add(build1("Used_Memory",startTime,data.getUsed_memory()));
+		result.add(build1("total_connections_received",startTime,data.getTotal_connections()));
+		result.add(build1("total_commands_processed",startTime,data.getTotal_commands()));
+		return result;
+	}
+	
 	private static HighChartsWrapper build0(String title, long startTime, Map<String, Number[]> data) {
 		HighChartsWrapper charts = new HighChartsWrapper();
 		charts.setTitle(title);
@@ -138,6 +149,28 @@ public class ChartsBuilder {
 		plotOption.setSeries(pos);
 		
 		charts.setTitle(title);
+		charts.setPlotOption(plotOption);
+		charts.setSeries(series);
+		
+		return charts;
+	}
+	
+	private static HighChartsWrapper build1(String title, long startTime, Number[] data) {
+		HighChartsWrapper charts = new HighChartsWrapper();
+		charts.setTitle(title);
+		Series[] series = new Series[1];
+		series[0] = new Series();
+		series[0].setData(data);
+		series[0].setName("RedisServer");
+		PlotOption plotOption = new PlotOption();
+		PlotOptionSeries pos = new PlotOptionSeries();
+
+		pos.setPointStart(startTime*1000);
+		pos.setPointInterval(30000L);
+		plotOption.setSeries(pos);
+		
+		charts.setTitle(title);
+		charts.setyAxisTitle("");
 		charts.setPlotOption(plotOption);
 		charts.setSeries(series);
 		

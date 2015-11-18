@@ -20,12 +20,13 @@ public class ServerServiceImpl implements ServerService{
 	}
 
 	@Override
-	public void insert(String address, String appId, String instanceId,int type) {
+	public void insert(String address, String appId, String instanceId,int type,String hostIp) {
 		Server server = new Server();
 		server.setAddress(address);
 		server.setInstanceId(instanceId);
 		server.setAppId(appId);
 		server.setType(type);
+		server.setHostIp(hostIp);
 		serverDao.insert(server);
 	}
 	
@@ -55,6 +56,21 @@ public class ServerServiceImpl implements ServerService{
 	@Override
 	public List<Server> findAllRedisServers() {
 		return serverDao.findAll(1);
+	}
+
+	@Override
+	public void update(Server server) {
+		serverDao.update(server);
+	}
+
+	@Override
+	public void setDeleteType(String instanceId) {
+		serverDao.setDeleteType(instanceId);
+	}
+
+	@Override
+	public void deleteByInstanceId(String instanceId) {
+		serverDao.deleteByInstanceId(instanceId);
 	}
 
 

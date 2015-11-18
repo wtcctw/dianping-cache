@@ -9,7 +9,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
+
+import com.dianping.cache.autoscale.dockerscale.DockerScale;
+import com.dianping.cache.monitor.NotifyManager;
 
 
 @Controller
@@ -22,6 +26,19 @@ public class IndexController extends AbstractMenuController{
 	public ModelAndView allApps(HttpServletRequest request,
 			HttpServletResponse response) { 
 		return new ModelAndView("cache/config",createViewMap());
+	}
+	
+	@RequestMapping(value = "/send")
+	public void sendsms(HttpServletRequest request,
+			HttpServletResponse response) { 
+		NotifyManager.getInstance().notifySms2("Justtest");
+	}
+	
+	@RequestMapping(value="/dockerinfo")
+	@ResponseBody
+	public Object dockerInfo(){
+		DockerScale ds = new DockerScale();
+		return ds.info();
 	}
 	
 	

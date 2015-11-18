@@ -22,7 +22,6 @@ import javax.servlet.http.HttpServletResponse;
 import jodd.util.StringUtil;
 import net.spy.memcached.AddrUtil;
 import net.spy.memcached.MemcachedClient;
-import net.spy.memcached.MemcachedNode;
 import net.spy.memcached.internal.OperationFuture;
 
 import org.codehaus.plexus.util.StringUtils;
@@ -41,11 +40,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.dianping.avatar.cache.CacheKey;
-import com.dianping.avatar.cache.CacheService;
 import com.dianping.avatar.exception.DuplicatedIdentityException;
 import com.dianping.cache.entity.*;
-import com.dianping.cache.exception.CacheException;
 import com.dianping.cache.monitor.storage.MemcacheStatsDataStorage;
 import com.dianping.cache.monitor.storage.ServerStatsDataStorage;
 import com.dianping.cache.service.*;
@@ -56,9 +52,8 @@ import com.dianping.cache.util.RequestUtil;
 import com.dianping.core.type.PageModel;
 import com.dianping.squirrel.client.StoreClient;
 import com.dianping.squirrel.client.StoreClientFactory;
+import com.dianping.squirrel.client.StoreKey;
 import com.dianping.squirrel.client.core.Locatable;
-import com.dianping.squirrel.client.impl.memcached.MemcachedStoreClient;
-import com.dianping.squirrel.client.impl.memcached.MemcachedStoreClientImpl;
 
 @Controller
 public class CacheManagerController extends AbstractCacheController {
@@ -74,14 +69,17 @@ public class CacheManagerController extends AbstractCacheController {
 	@Resource(name = "cacheKeyConfigurationService")
 	private CacheKeyConfigurationService cacheKeyConfigurationService;
 
-	@Resource(name = "cacheService")
-	private CacheService cacheService;
+	@Resource(name = "storeClient")
+	private StoreClient storeClient;
 
 	@Resource(name = "serverService")
 	private ServerService serverService;
 
 	@Resource(name = "serverClusterService")
 	private ServerClusterService serverClusterService;
+	
+	@Resource(name = "categoryToAppService")
+	private CategoryToAppService categoryToAppService;
 
 	@RequestMapping(value = "/cache/config", method = RequestMethod.GET)
 	public ModelAndView viewCacheConfig(HttpServletRequest request,
@@ -241,7 +239,7 @@ public class CacheManagerController extends AbstractCacheController {
 			oldConfig.setAddTime(System.currentTimeMillis());
 			cacheConfigurationService.update(oldConfig);
 			try {
-				serverService.insert(server, null, null,0);
+				serverService.insert(server, null, null,0,null);
 				serverClusterService.insert(server, cacheKey);
 				ServerStatsDataStorage.REFRESH = true;
 			} catch (DuplicateKeyException e) {
@@ -339,7 +337,7 @@ public class CacheManagerController extends AbstractCacheController {
 			if(flag && cacheKey.contains("memcached") && servers!=null){
 				for(String server : newConfig.getServerList()){
 					try{
-						serverService.insert(server, null, null,0);
+						serverService.insert(server, null, null,0,null);
 						serverClusterService.insert(server, cacheKey);
 					} catch (DuplicateKeyException e) {
 					}
@@ -557,7 +555,7 @@ public class CacheManagerController extends AbstractCacheController {
 
 								try {
 									serverService.insert(ipvalue + ":11211",
-											appId, instanceId,0);
+											appId, instanceId,0,null);
 								} catch (DuplicateKeyException e) {
 									// do nothing
 								}
@@ -776,6 +774,14 @@ public class CacheManagerController extends AbstractCacheController {
 
 	}
 
+	@RequestMapping(value = "/cache/key/applist", method = RequestMethod.POST)
+	@ResponseBody
+	public List<CategoryToApp> getAppList(@RequestParam("category")String category) {
+		subside = "key";
+		List<CategoryToApp> applist = categoryToAppService.findByCategory(category);
+		return applist;
+	}
+	
 	@RequestMapping(value = "/cache/operator", method = RequestMethod.GET)
 	public ModelAndView viewCacheOperator(HttpServletRequest request) {
 
@@ -843,7 +849,7 @@ public class CacheManagerController extends AbstractCacheController {
 
 		CacheKeyConfiguration key = cacheKeyConfigurationService.find(finalKey.substring(0, finalKey.indexOf(".")));
 		Map<String, Object> paras = super.createViewMap();
-		Object o = cacheService.get(finalKey);
+		Object o = storeClient.get(finalKey);
 		paras.put("result", o);
 		StoreClient cc = StoreClientFactory.getStoreClient(key.getCacheType());
 		if(cc instanceof Locatable){
@@ -859,17 +865,9 @@ public class CacheManagerController extends AbstractCacheController {
 			@RequestParam("value") String value,
 			@RequestParam("params") Object... params) {
 
-		CacheKey cacheKey = new CacheKey(category, params);
+		StoreKey storeKey = new StoreKey(category, params);
 		boolean o = false;
-		try {
-			o = cacheService.set(cacheKey, value);
-		} catch (CacheException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (TimeoutException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		o = storeClient.set(storeKey, value);
 		return o;
 	}
 	
@@ -882,7 +880,7 @@ public class CacheManagerController extends AbstractCacheController {
 				List<String> serverList = item.getServerList();
 				for (String server : serverList) {
 					try {
-						serverService.insert(server, null, null,0);
+						serverService.insert(server, null, null,0,null);
 
 					} catch (DuplicateKeyException e) {
 						// do nothing
@@ -891,7 +889,11 @@ public class CacheManagerController extends AbstractCacheController {
 				}
 			}
 		}
-		
+	}
+	
+	@RequestMapping(value = "/insertServerCluster", method = RequestMethod.GET)
+	public void serverCluster(String server,String cluster) {
+		serverClusterService.insert(server, cluster);
 	}
 	
 	@RequestMapping(value = "/start", method = RequestMethod.GET)

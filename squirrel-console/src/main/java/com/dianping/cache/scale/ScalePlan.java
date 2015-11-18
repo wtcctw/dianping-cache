@@ -8,4 +8,6 @@ public interface ScalePlan<T extends Node> {
     
     public void addNodes(List<T> nodes) throws ScaleException;
     
+    public void removeNode(T node) throws ScaleException;
+    
 }

@@ -30,5 +30,6 @@
      <bean id="dataStorage" class="com.dianping.cache.monitor.storage.MemcacheStatsDataStorage"></bean>
      <bean id="store" class="com.dianping.cache.monitor.storage.ServerStatsDataStorage"></bean>
      <bean id="cleanData" class="com.dianping.cache.timedtask.TimedCleanData"></bean>
-
+     <bean id="applist" class="com.dianping.cache.timedtask.TimedRetriCategoryToApp"></bean>
+	<bean id="redisDataStorage" class="com.dianping.cache.monitor.storage.RedisStatsDataStorage"></bean>	
 </beans>

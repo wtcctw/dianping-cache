@@ -19,6 +19,7 @@ import org.springframework.beans.factory.InitializingBean;
 
 import com.dianping.cat.Cat;
 import com.dianping.remote.cache.dto.CacheConfigurationDTO;
+import com.dianping.remote.cache.dto.CacheConfigurationRemoveDTO;
 import com.dianping.remote.cache.dto.CacheKeyConfigurationDTO;
 import com.dianping.remote.cache.dto.CacheKeyTypeVersionUpdateDTO;
 import com.dianping.remote.cache.dto.SingleCacheRemoveDTO;
@@ -111,6 +112,8 @@ public class CacheMessageNotifier implements Serializable, InitializingBean, MQS
                 notifyServiceConfigChange((CacheConfigurationDTO)msg);
             } else if(msg instanceof CacheKeyConfigurationDTO) {
                 notifyCategoryConfigChange((CacheKeyConfigurationDTO)msg);
+            } else if(msg instanceof CacheConfigurationRemoveDTO){
+            	notifyServiceConfigRemove((CacheConfigurationRemoveDTO)msg);
             } else {
                 logger.warn("unknown message");
             }
@@ -135,6 +138,19 @@ public class CacheMessageNotifier implements Serializable, InitializingBean, MQS
         }
     }
     
+    public void notifyServiceConfigRemove(CacheConfigurationRemoveDTO serviceConfig){
+    	String path = PathUtils.getServicePath(serviceConfig.getCacheKey());
+    	 try {
+             //remove Node
+    		 curatorClient.delete().forPath(path);
+             Cat.logEvent(CAT_EVENT_TYPE, "service.remove:" + serviceConfig.getCacheKey(),
+                     "0", serviceConfig.toString());
+         } catch (Exception e) {
+             Cat.logEvent(CAT_EVENT_TYPE, "service.change:" + serviceConfig.getCacheKey(),
+                     "-1", e.getMessage());
+             logger.error("failed to notify service config change: " + serviceConfig, e);
+         }
+    }
     public void notifyCategoryConfigChange(CacheKeyConfigurationDTO categoryConfig) {
         String path = PathUtils.getCategoryPath(categoryConfig.getCategory());
         String versionPath = PathUtils.getVersionPath(categoryConfig.getCategory());

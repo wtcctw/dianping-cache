@@ -15,4 +15,10 @@ public interface ServerDao {
 	public void insert(Server server) throws DuplicateKeyException;
 	
 	public void delete(String address);
+	
+	public void update(Server server);
+
+	void setDeleteType(String instanceId);
+
+	void deleteByInstanceId(String instanceId);
 }

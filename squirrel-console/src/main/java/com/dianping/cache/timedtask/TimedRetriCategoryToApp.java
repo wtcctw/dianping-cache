@@ -50,6 +50,7 @@ public class TimedRetriCategoryToApp {
 				  String result = new String(catenodes, "GB2312");
 				  String[] categorys = result.split(",");
 				  for(String category : categorys){
+					  category = category.trim();
 					  if(category.length() >= 50){
 						  int end = 0;
 						  while(!Character.isDigit(category.charAt(end))){

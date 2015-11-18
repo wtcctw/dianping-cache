@@ -10,6 +10,7 @@ module.controller('ConfigEditController', [
 			$scope.mServers = "";
 			$scope.servers = [];
 			$scope.dropservers = [];
+			$scope.redisnodes = [];
 			$scope.tempServers = "";
 			$scope.mTranscoderClazz = "";
 			$scope.locator = "";
@@ -18,8 +19,8 @@ module.controller('ConfigEditController', [
 			
 			$scope.capacity = "memcached8";
 			$scope.num = 1;
-			$scope.ip = "";
-			$scope.port = "11211";//默认11211端口
+			$scope.ip = "ip";
+			$scope.port = "port";//默认11211端口
 			
 			$scope.message1 = ""; //自动模态框信息显示
 			$scope.message2 = ""; //手动模态框信息显示
@@ -82,13 +83,22 @@ module.controller('ConfigEditController', [
 							}
 						}
 						
-					}else if($scope.mCacheKey.indexOf("redis") != -1 
-							||  $scope.mCacheKey.indexOf("memcached-leo") != -1
-							||  $scope.mCacheKey.indexOf("kvdb") != -1){
+					}else if($scope.mCacheKey.indexOf("redis") != -1){
 						$scope.showMemcached = false;
 						$scope.showDcache = false;
 						$scope.showRedis = true;
 						$scope.showWeb = false;
+						$http.get(window.contextPath + '/redis/clusterinfo',{
+							params : {
+					        	"cacheKey":$scope.mCacheKey,
+					        	}
+						}).success(function(response){
+							if(response != null){
+								$scope.redisnodes = response;
+							}
+						});
+						
+						
 					}else if($scope.mCacheKey.indexOf("web") != -1 ){
 						$scope.showMemcached = false;
 						$scope.showDcache = false;
@@ -563,8 +573,32 @@ module.controller('ConfigEditController', [
 		        		});
 				
 			}
+/*****************************    Redis	  **************************************************/
+			$scope.instances = 1;
+			$scope.appid = "redis10";
 			
+			$scope.redisAddMasterNode = function(){
+				$http.post(window.contextPath + '/redis/addmaster',
+		        	{"cluster":$scope.mCacheKey,
+						"ip":$scope.ip,
+	        			"port":$scope.port
+	        		}).success();
+			}
 			
+			$scope.redisAutoScaleNode = function(){
+				$http.post(window.contextPath + '/redis/autoscaleup',
+		        	{"cluster":$scope.mCacheKey,
+					"instances":$scope.instances,
+	        			"appid":$scope.appid
+	        		}).success();
+			}
+			
+			$scope.delRedisMasterNode = function(address){
+				$http.post(window.contextPath + '/redis/delmaster',
+			        	{"cluster":$scope.mCacheKey,
+						"address":address
+		        		}).success();
+			}
 			
 			//重新上线机器
 			$scope.resetServer = function(index){
