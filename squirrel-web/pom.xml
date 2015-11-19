@@ -18,11 +18,34 @@
 	<name>squirrel-web</name>
 
 	<dependencies>
-	<dependency>
-            <groupId>org.objenesis</groupId>
-            <artifactId>objenesis</artifactId>
-            <scope>compile</scope>
-        </dependency>
+		<dependency>
+			<groupId>com.dianping.dpsf</groupId>
+			<artifactId>dpsf-net</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>de.ruedigermoeller</groupId>
+			<artifactId>fst</artifactId>
+			<version>1.63</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>io.protostuff</groupId>
+			<artifactId>protostuff-runtime</artifactId>
+			<version>1.1.0</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<artifactId>protostuff-core</artifactId>
+			<groupId>io.protostuff</groupId>
+			<version>1.1.0</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.objenesis</groupId>
+			<artifactId>objenesis</artifactId>
+			<version>2.1</version>
+			<scope>compile</scope>
+		</dependency>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>squirrel-client</artifactId>
@@ -70,11 +93,7 @@
 			<version>2.1.7</version>
 			<type>jar</type>
 		</dependency>
-		<dependency>
-			<groupId>com.dianping.dpsf</groupId>
-			<artifactId>dpsf-net</artifactId>
-			<scope>compile</scope>
-		</dependency>
+
 		<dependency>
 			<groupId>com.dianping</groupId>
 			<artifactId>simple-queue</artifactId>
@@ -141,30 +160,30 @@
 			<artifactId>spring-tx</artifactId>
 			<version>${spring.version}</version>   <!-- 8.5 add -->
 		</dependency>
-         <dependency> <!-- 8.5 add -->
-              <groupId>org.mybatis</groupId>
-              <artifactId>mybatis</artifactId>
-              <version>3.3.0</version>
-          </dependency>
+		<dependency> <!-- 8.5 add -->
+			<groupId>org.mybatis</groupId>
+			<artifactId>mybatis</artifactId>
+			<version>3.3.0</version>
+		</dependency>
 		<dependency><!-- 8.5 add -->
 			<groupId>org.mybatis</groupId>
-              <artifactId>mybatis-spring</artifactId>
-              <version>1.2.3</version>
+			<artifactId>mybatis-spring</artifactId>
+			<version>1.2.3</version>
 		</dependency>
 		<dependency>
-		  	<groupId>org.codehaus.jackson</groupId>
-  			<artifactId>jackson-core-asl</artifactId>
-  			<version>1.9.13</version>
+			<groupId>org.codehaus.jackson</groupId>
+			<artifactId>jackson-core-asl</artifactId>
+			<version>1.9.13</version>
 		</dependency>
 		<dependency>
-		  	<groupId>org.codehaus.jackson</groupId>
-  			<artifactId>jackson-mapper-asl</artifactId>
-  			<version>1.9.4</version>
+			<groupId>org.codehaus.jackson</groupId>
+			<artifactId>jackson-mapper-asl</artifactId>
+			<version>1.9.4</version>
 		</dependency>
 		<dependency>
-		 	 <groupId>com.fasterxml.jackson.core</groupId>
- 			 <artifactId>jackson-databind</artifactId>
- 			 <version>2.1.4</version>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+			<version>2.1.4</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.security</groupId>
@@ -256,15 +275,15 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
-        <dependency>
+		<dependency>
 			<groupId>com.dianping.swallow</groupId>
 			<artifactId>swallow-producerclient</artifactId>
 			<version>0.7.1</version>
 		</dependency>
 		<dependency>
-		    <groupId>com.dianping.swallow</groupId>
-		    <artifactId>swallow-consumerclient</artifactId>
-		    <version>0.7.1</version>
+			<groupId>com.dianping.swallow</groupId>
+			<artifactId>swallow-consumerclient</artifactId>
+			<version>0.7.1</version>
 		</dependency>
 		<dependency>
 			<groupId>com.dianping.lion</groupId>
@@ -286,36 +305,36 @@
 			<artifactId>hawk-client</artifactId>
 			<version>0.7.1</version>
 		</dependency>
-        <dependency>
-            <groupId>com.dianping</groupId>
-            <artifactId>mail-api</artifactId>
-            <version>1.0.1</version>
-        </dependency>
-        <dependency>
-            <groupId>com.dianping</groupId>
-            <artifactId>sms-api</artifactId>
-            <version>1.0.5</version>
-        </dependency>
-        <dependency>
-            <groupId>com.dianping</groupId>
-            <artifactId>qyweixin-adapter-api</artifactId>
-            <version>0.0.8</version>
-        </dependency>
-        <dependency>
-            <groupId>com.dianping</groupId>
-            <artifactId>ops-cmdb-client</artifactId>
-            <version>1.2.0</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpclient</artifactId>
-            <version>4.3.6</version>
-        </dependency>
-        <dependency>
-            <groupId>com.googlecode.xmemcached</groupId>
-            <artifactId>xmemcached</artifactId>
-            <scope>compile</scope>
-        </dependency>
+		<dependency>
+			<groupId>com.dianping</groupId>
+			<artifactId>mail-api</artifactId>
+			<version>1.0.1</version>
+		</dependency>
+		<dependency>
+			<groupId>com.dianping</groupId>
+			<artifactId>sms-api</artifactId>
+			<version>1.0.5</version>
+		</dependency>
+		<dependency>
+			<groupId>com.dianping</groupId>
+			<artifactId>qyweixin-adapter-api</artifactId>
+			<version>0.0.8</version>
+		</dependency>
+		<dependency>
+			<groupId>com.dianping</groupId>
+			<artifactId>ops-cmdb-client</artifactId>
+			<version>1.2.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+			<version>4.3.6</version>
+		</dependency>
+		<dependency>
+			<groupId>com.googlecode.xmemcached</groupId>
+			<artifactId>xmemcached</artifactId>
+			<scope>compile</scope>
+		</dependency>
 		<dependency>
 			<groupId>org.apache.velocity</groupId>
 			<artifactId>velocity</artifactId>
