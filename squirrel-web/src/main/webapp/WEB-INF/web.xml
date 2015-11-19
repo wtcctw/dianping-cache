@@ -26,7 +26,7 @@
 	
 	<context-param>
 	    <param-name>webAppRootKey</param-name>
-	    <param-value>cache-server.root</param-value>
+	    <param-value>squirrel-web.root</param-value>
 	</context-param>
 
 
@@ -48,7 +48,7 @@
 		</init-param>
 		<init-param>
 			<param-name>serverNameLionKey</param-name>
-			<param-value>cache-server.sso.url</param-value>
+			<param-value>squirrel-web.sso.url</param-value>
 		</init-param>
 		<init-param>
 			<param-name>safe</param-name>
@@ -70,7 +70,7 @@
 		</init-param>
 		<init-param>
 			<param-name>serverNameLionKey</param-name>
-			<param-value>cache-server.sso.url</param-value>
+			<param-value>squirrel-web.sso.url</param-value>
 		</init-param>
 		<init-param>
 			<param-name>redirectAfterValidation</param-name>
