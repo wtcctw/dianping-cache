@@ -401,6 +401,7 @@ squirrel 支持两种缓存清理：
 	2. 清除热点 key 的备份 key
 
 ## 存储监控
+
 ### 客户端
 
 客户端监控可以在 cat 上看到
@@ -425,8 +426,6 @@ squirrel 支持两种缓存清理：
 
 ![客户端 transaction2](http://code.dianpingoa.com/arch/squirrel/raw/master/doc/redis-overview.png)
 
-![客户端 transaction2](http://code.dianpingoa.com/arch/squirrel/raw/master/doc/redis-detail.png)
-
 ## 扩容缩容
 
 ### memcached
@@ -448,8 +447,21 @@ redis 的扩容缩容涉及到数据的迁移，比 memcached 要复杂的多。
 ### dcache
 dcache 的扩容和缩容由 dba 操作 dcache 的管理端进行，不在 squirrel 的管理范围之内。
 
+## 常见问题诊断
+
 ## 后续展望
+
 ### redis-cluster
+
 #### 客户端
+
+* support async operations, including future & callback
+* support multi keys operations
+
 #### 管理端
-### 冷热分离
+
+* 完善 redis cluster 监控
+* 支持 redis cluster 数据迁移
+* 支持 redis cluster 一键扩容
+
+### 冷热数据分离
