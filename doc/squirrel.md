@@ -402,8 +402,18 @@ squirrel 支持两种缓存清理：
 
 ## 存储监控
 ### 客户端
+
 客户端监控可以在 cat 上看到
-TODO：补充
+
+* 查看 QPS，99线，999线
+
+在 cat 上，进入自己的项目，点击"Transaction"，查找名为 "Squirrel." +  redis 集群名的类型
+
+![客户端 transaction](http://code.dianpingoa.com/arch/squirrel/raw/master/doc/client-transaction.png)
+
+点击这个类型，可以看到进一步细分的各类操作的 QPS 等
+
+![客户端 transaction2](http://code.dianpingoa.com/arch/squirrel/raw/master/doc/client-transaction2.png)
 
 ### 服务端
 服务端的监控可以在 squirrel-console 上看到
@@ -423,7 +433,7 @@ redis 集群也是部署在 docker 上，redis 实例通过 docker 来创建和�
 redis 的扩容缩容涉及到数据的迁移，比 memcached 要复杂的多。但整个迁移过程并不会阻塞客户端，客户端的读写照常进行，是无缝的。
 
 * 扩容：redis 的扩容都是成对的扩，也就是说最小扩容单位是1主1从，也可以一下子扩多主多从。扩容步骤如下：首先申请两个 redis 实例，一个作为 master，一个作为 slave，把 master 和 slave 加入现有 redis 集群中，设置好主备关系。然后计算需要从集群现有节点迁移的数据量，接着从集群现有节点一个 key 一个 key 的迁移数据。等到所有 key 都迁移完成，redis cluster 会更新路由表，然后通知客户端
-* 缩容：redis 缩容之前，需要先迁移已有实例上的数据，等到所有 key 都从已有实例上迁移后，把 master 和 slave 从集群移除，然后通过 docker 销毁这两个实例
+* 缩容：redis 缩容之前，需要先迁移已有实例上的数据，等到所有 key 都从已有实例上迁移后，把 master 和 slave 从集群移除，通知客户端，然后通过 docker 销毁这两个实例
 
 ### dcache
 dcache 的扩容和缩容由 dba 操作 dcache 的管理端进行，不在 squirrel 的管理范围之内。
