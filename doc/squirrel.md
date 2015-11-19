@@ -141,7 +141,7 @@ StoreClient storeClient = StoreClientFactory.getStoreClient();
 
 ## StoreClient 接口
 
-```
+```java
 public interface StoreClient {
     
     /**
