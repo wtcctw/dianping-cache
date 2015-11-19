@@ -26,7 +26,21 @@
 		</property>
 	</bean>
 	<context:component-scan base-package="com.dianping.cache.controller"></context:component-scan>
-	
+	<mvc:annotation-driven/>
+
+
+	<mvc:interceptors>
+		<mvc:interceptor>
+			<mvc:mapping path="/"/>
+			<mvc:mapping path="/cache/*"/>
+			<mvc:mapping path="/cache/config/edit"/>
+			<mvc:mapping path="/cache/config/new"/>
+			<mvc:mapping path="/monitor/cluster"/>
+			<mvc:mapping path="/monitor/dashboard"/>
+			<bean class="com.dianping.cache.interceptor.ModelAndViewInterceptor">
+			</bean>
+		</mvc:interceptor>
+	</mvc:interceptors>
 	<bean id="velocityConfig"
 		class="org.springframework.web.servlet.view.velocity.VelocityConfigurer">
 		<property name="resourceLoaderPath" value="/WEB-INF/views/" />

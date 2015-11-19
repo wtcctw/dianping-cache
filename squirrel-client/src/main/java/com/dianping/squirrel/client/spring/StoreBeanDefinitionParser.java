@@ -116,6 +116,7 @@ public class StoreBeanDefinitionParser implements BeanDefinitionParser {
 		// register advisor
 		registerStoreAdvisorDefinition(element, parserContext);
 
+
 		return null;
 	}
 
