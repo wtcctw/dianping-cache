@@ -430,12 +430,14 @@ squirrel 支持两种缓存清理：
 ## 扩容缩容
 
 ### memcached
+
 新建的 memcached 集群都由 docker 来负责创建和销毁实例。memcached 作为缓存，在扩容，缩容时不需要做数据迁移。
 
 * 扩容：首先申请一个 memcached 的 docker 实例，待实例启动后，验证 memcached 端口开启，把实例 ip 加到 memcached 集群中，通过 zookeeper 通知客户端集群配置已更新，客户端基于最新的集群配置重建连接
 * 缩容：把 memcached 实例 ip 从集群中移除，通过 zookeeper 通知客户端集群配置已更新，客户端基于最新的集群配置重建连接，最后销毁 docker 实例
 
 ### redis-cluster
+
 redis 集群也是部署在 docker 上，redis 实例通过 docker 来创建和销毁。redis 我们部署的是 redis cluster。每个 redis cluster 至少有3个 master，每个 master 都有一个 slave。redis 实例默认都启用了 aof，每秒会把 aof 刷到磁盘，保证数据是持久化的，而且即使丢数据，也仅丢失最近1秒的数据。redis 定位为 KV，所以默认数据不会过期，过期清理策略是 noeviction，也就是说如果内存满了，不会淘汰旧的数据，而是返回错误。
 
 redis 的扩容缩容涉及到数据的迁移，比 memcached 要复杂的多。但整个迁移过程并不会阻塞客户端，客户端的读写照常进行，是无缝的。
