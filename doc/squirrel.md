@@ -416,8 +416,16 @@ squirrel 支持两种缓存清理：
 ![客户端 transaction2](http://code.dianpingoa.com/arch/squirrel/raw/master/doc/client-transaction2.png)
 
 ### 服务端
+
 服务端的监控可以在 squirrel-console 上看到
-TODO：补充
+
+![客户端 transaction2](http://code.dianpingoa.com/arch/squirrel/raw/master/doc/memcached-overview.png)
+
+![客户端 transaction2](http://code.dianpingoa.com/arch/squirrel/raw/master/doc/memcached-detail.png)
+
+![客户端 transaction2](http://code.dianpingoa.com/arch/squirrel/raw/master/doc/redis-overview.png)
+
+![客户端 transaction2](http://code.dianpingoa.com/arch/squirrel/raw/master/doc/redis-detail.png)
 
 ## 扩容缩容
 
