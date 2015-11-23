@@ -47,7 +47,7 @@ public class RedisDashBoardUtil {
 				
 				tmp.setClusterName(item.getCacheKey());
 				tmp.setNodes(nodes);
-				tmp.setMaxMemory(maxmemory / 1024);
+				tmp.setMaxMemory(maxmemory/1024);
 				tmp.setUsedMemory(usedmemory/1024);
 				float used = (float)usedmemory/maxmemory;
 				used = convert(used);

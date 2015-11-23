@@ -892,8 +892,18 @@ public class CacheManagerController extends AbstractCacheController {
 	}
 	
 	@RequestMapping(value = "/insertServerCluster", method = RequestMethod.GET)
-	public void serverCluster(String server,String cluster) {
+	public void serverCluster_(String server,String cluster) {
 		serverClusterService.insert(server, cluster);
+	}
+	
+	@RequestMapping(value = "/deleteServer", method = RequestMethod.GET)
+	public void deleteServer_(String server) {
+		serverService.delete(server);
+	}
+	
+	@RequestMapping(value = "/deleteServerCluster", method = RequestMethod.GET)
+	public void deleteServerCluster_(String server,String cluster) {
+		serverClusterService.delete(server, cluster);
 	}
 	
 	@RequestMapping(value = "/start", method = RequestMethod.GET)
@@ -985,29 +995,6 @@ public class CacheManagerController extends AbstractCacheController {
 			ServerStatsDataStorage.REFRESH = true;
 		}
 	}
-	public static void main(String[] ars) {
-		String str = RequestUtil.sendGet(
-				"http://10.101.0.12:8080/api/v1/operations/" + "2362", null);
-		Map json = (Map) JSON.parse(str);
-		long operationStatus = (Long) json.get("operationStatus");
-		if (operationStatus == 200) {
 
-			String log = (String) json.get("log");
-			try {
-				Document document = DocumentHelper.parseText(log);
-				Element root = document.getRootElement();
-				Element detail = root.element("host-operation");
-				Attribute attribute = detail.attribute("instance-ip");
-				String value = attribute.getText();
-
-			} catch (DocumentException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-
-		}
-	}
-	
-	
 
 }
