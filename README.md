@@ -2,7 +2,7 @@
 ------
 
 ### Documentation
-[Squirrel 用户文档](http://code.dianpingoa.com/arch/squirrel/blob/master/squirrel.md)
+[Squirrel 用户文档](http://code.dianpingoa.com/arch/squirrel/blob/master/doc/squirrel.md)
 
 ### Release Notes
 

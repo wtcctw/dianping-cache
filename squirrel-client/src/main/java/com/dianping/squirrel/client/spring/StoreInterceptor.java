@@ -64,8 +64,10 @@ public class StoreInterceptor implements MethodInterceptor, InitializingBean {
                 }
 
                 Object item = invocation.proceed();
-                // consider create an null object instead of null
-                storeClient.add(storeKey, item);
+                // TODO: consider create an null object instead of null
+                if(item != null) {
+                    storeClient.add(storeKey, item);
+                }
 
                 return item;
             } else if (operation == StoreOperation.Update || operation == StoreOperation.Remove) {
