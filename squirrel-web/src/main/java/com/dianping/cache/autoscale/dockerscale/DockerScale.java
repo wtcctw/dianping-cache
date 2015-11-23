@@ -1,13 +1,10 @@
 package com.dianping.cache.autoscale.dockerscale;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.codehaus.jackson.JsonParseException;
-import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,7 +19,6 @@ import com.dianping.cache.service.ServerService;
 import com.dianping.cache.support.spring.SpringLocator;
 import com.dianping.cache.util.RequestUtil;
 
-import edu.emory.mathcs.backport.java.util.Arrays;
 
 public class DockerScale implements AutoScale{
 	
@@ -58,7 +54,7 @@ public class DockerScale implements AutoScale{
 		destroy(server.getAppId(),new String[]{server.getInstanceId()});
 		return true;
 	}
-	
+
 	private void operate(final Result value,final int operationId){
 		Runnable runnable = new Runnable() {
 			@Override
@@ -203,7 +199,12 @@ public class DockerScale implements AutoScale{
 		DockerResultParse.parse(value,resultstr);
 		return value;
 	}
-	
+
+	@Override
+	public void destroyByInstanceId(String instanceId) {
+
+	}
+
 	public static void main(String[] arges){
 		List<String> des = new ArrayList<String>();
 		String[] arr = new String[]{

@@ -148,7 +148,15 @@ public class RedisController extends AbstractCacheController{
 	public void destroy(String address){
 		RedisUtil.destroy(address);
 	}
-	
+
+
+	@RequestMapping(value = "/redis/des", method = RequestMethod.GET)
+	public void des(String instanceId){
+		RedisUtil.des(instanceId);
+	}
+
+
+
 	private String getClusterAppId(String cluster) {
 		CacheConfiguration config = cacheConfigurationService.find(cluster);
 		String url = config.getServers();

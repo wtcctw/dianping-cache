@@ -44,6 +44,14 @@
 					href="${rc.contextPath}/redis/dashboard"> <i
 						class="icon-globe"></i> Redis集群监控
 				</a></li>
+				<li class="#if($subside == 'paascat') active #end"><a
+					href="http://cat.dp/cat/r/system?type=paasSystem"> <i
+						class="icon-globe"></i> PAAS监控
+				</a></li>
+				<li class="#if($subside == 'paasweb') active #end"><a
+					href="http://10.1.139.138"> <i
+						class="icon-globe"></i> PAAS管理
+				</a></li>
 				<!-- <li class="#if($subside == 'node') active #end"><a
 					href="${rc.contextPath}/monitor/node"> <i
 						class="icon-globe"></i> 节点监控

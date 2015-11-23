@@ -4,13 +4,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import redis.clients.jedis.HostAndPort;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.exceptions.JedisClusterException;
 
@@ -51,13 +49,7 @@ public class RedisUtil {
 	private static Map<Integer,Integer> scaleStatus = new HashMap<Integer,Integer>();
 	
 	
-	/**
-	 * @param cluster
-	 * @param nodeNum
-	 * @param appId
-	 * @return operationId 
-	 * @throws ScaleException
-	 */
+
 	public static int applyNodes(String appId,int number){
 		return autoScale.scaleUp(AppId.valueOf(appId), number);
 	}
@@ -79,7 +71,7 @@ public class RedisUtil {
 		int scaleOperationId = operateId++;
 		scaleStatus.put(scaleOperationId, 100);
 		//TODO
-		autoScaleSlave(scaleOperationId,masterAddress);
+		autoScaleSlave(scaleOperationId, masterAddress);
 		return scaleOperationId;
 	}
 
@@ -107,7 +99,7 @@ public class RedisUtil {
 		Runnable run = new Runnable() {
 			@Override
 			public void run() {
-//				int operateid = autoScale.scaleUp(appId, totalNum);
+//				int operateid = .scaleUp(appId, totalNum);
 //				Result result = autoScale.getValue(operateid);
 //				while(result.getStatus() == 100){
 //					try {
@@ -266,5 +258,9 @@ public class RedisUtil {
 
 	public static void destroy(String address) {
 		autoScale.scaleDown(address);
+	}
+
+	public static void des(String instanceId) {
+		autoScale.destroyByInstanceId(instanceId);
 	}
 }

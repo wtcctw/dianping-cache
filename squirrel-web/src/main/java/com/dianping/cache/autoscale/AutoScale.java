@@ -14,4 +14,6 @@ public interface AutoScale {
 	void destroy(Result value);
 
 	Result getValue(int operateid);
+
+	void destroyByInstanceId(String instanceId);
 }

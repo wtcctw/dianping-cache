@@ -1,24 +1,18 @@
 package com.dianping.cache.test;
 
+import com.dianping.avatar.cache.CacheService;
+import com.dianping.pigeon.remoting.provider.config.annotation.Service;
+import com.dianping.squirrel.client.impl.dcache.DCacheStoreClient;
+import com.qq.cloud.component.dcache.client.api.*;
+import com.qq.cloud.component.dcache.client.dcache.DCacheConst;
+import com.qq.cloud.component.dcache.client.dcache.Op;
+
+import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-
-import javax.annotation.Resource;
-
-import com.dianping.avatar.cache.CacheService;
-import com.dianping.pigeon.remoting.provider.config.annotation.Service;
-import com.dianping.squirrel.client.impl.dcache.DCacheStoreClient;
-import com.qq.cloud.component.dcache.client.api.BatchCacheResult;
-import com.qq.cloud.component.dcache.client.api.CacheResult;
-import com.qq.cloud.component.dcache.client.api.ConditionStatement;
-import com.qq.cloud.component.dcache.client.api.DCacheClientAPI;
-import com.qq.cloud.component.dcache.client.api.Record;
-import com.qq.cloud.component.dcache.client.api.Statement;
-import com.qq.cloud.component.dcache.client.dcache.DCacheConst;
-import com.qq.cloud.component.dcache.client.dcache.Op;
 
 @Service(url = "com.dianping.cache.test.DCacheDemoService")
 public class DCacheDemoServiceImpl implements DCacheDemoService {

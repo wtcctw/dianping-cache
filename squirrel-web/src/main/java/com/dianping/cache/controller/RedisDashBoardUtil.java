@@ -47,11 +47,12 @@ public class RedisDashBoardUtil {
 				
 				tmp.setClusterName(item.getCacheKey());
 				tmp.setNodes(nodes);
-				tmp.setMaxMemory(maxmemory/1024);
+				tmp.setMaxMemory(maxmemory / 1024);
 				tmp.setUsedMemory(usedmemory/1024);
 				float used = (float)usedmemory/maxmemory;
-				used = ((float)Math.round(used*10000))/10000*100;
+				used = convert(used);
 				tmp.setUsed(used);
+				tmp.check();
 				data.add(tmp);
 			}
 		}
@@ -76,7 +77,11 @@ public class RedisDashBoardUtil {
 		}
 		return data;
 	}
-	
+
+	private static float convert(float value){
+		int tmp = Math.round(value*10000);
+		return (float)(tmp/100.0);
+	}
 	
 	public static void main(String[] args){
 		Jedis jedis = RedisConnectionFactory.getConnection("10.3.21.26:");
