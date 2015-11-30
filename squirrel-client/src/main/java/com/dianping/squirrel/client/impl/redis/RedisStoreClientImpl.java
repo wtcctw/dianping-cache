@@ -1071,4 +1071,16 @@ public class RedisStoreClientImpl extends AbstractStoreClient implements RedisSt
         return "redis-cluster";
     }
 
+    @Override
+    public String locate(StoreKey storeKey) {
+        String finalKey = getFinalKey(storeKey);
+        return locate(finalKey);
+    }
+
+    @Override
+    public String locate(String finalKey) {
+        checkNotNull(finalKey, "final key is null");
+        return client.getClusterNode(finalKey);
+    }
+
 }

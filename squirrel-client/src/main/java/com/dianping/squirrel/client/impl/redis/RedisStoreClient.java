@@ -6,8 +6,9 @@ import java.util.Set;
 
 import com.dianping.squirrel.client.StoreClient;
 import com.dianping.squirrel.client.StoreKey;
+import com.dianping.squirrel.client.core.Locatable;
 
-public interface RedisStoreClient extends StoreClient {
+public interface RedisStoreClient extends StoreClient, Locatable {
 
 	// expire related
 	Boolean exists(StoreKey key);
