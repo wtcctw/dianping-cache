@@ -14,7 +14,6 @@ import com.dianping.cache.autoscale.AutoScale;
 import com.dianping.cache.autoscale.Instance;
 import com.dianping.cache.autoscale.Result;
 import com.dianping.cache.autoscale.dockerscale.DockerResultParse.OperateResult;
-import com.dianping.cache.entity.Server;
 import com.dianping.cache.service.ServerService;
 import com.dianping.cache.support.spring.SpringLocator;
 import com.dianping.cache.util.RequestUtil;
@@ -40,18 +39,17 @@ public class DockerScale implements AutoScale{
 	public int scaleUp(AppId appId, int number){
 		int operationid = sendScaleRequest(appId.toString(),number);
 		Result value = new Result();
-		value.setAppid(appId);
+		value.setAppId(appId);
 		value.setNeed(number);
 		operationResultMap.put(operationid, value);
-		operate(value,operationid);
+		operate(value, operationid);
 		return operationid;
 	}
 
 	@Override
-	public boolean scaleDown(String address) {
+	public boolean scaleDown(AppId appId,String address) {
 		// TODO Auto-generated method stub
-		Server server = serverService.findByAddress(address);
-		destroy(server.getAppId(),new String[]{server.getInstanceId()});
+		destroy(appId.toString(), address);
 		return true;
 	}
 
@@ -64,8 +62,8 @@ public class DockerScale implements AutoScale{
 					DockerResultParse.parse(value,resultstr);
 					if(value.getStatus() == 200){
 						for(Instance ins : value.getInstances()){
-							serverService.insert(ins.getIp()+":"+value.getAppid().getPort(), 
-									value.getAppid().toString(), ins.getInstanceid(), 
+							serverService.insert(ins.getIp()+":"+value.getAppId().getPort(),
+									value.getAppId().toString(), ins.getInstanceid(),
 									-2,ins.getAgentip());// -2 未分配
 						}
 						break;
@@ -85,7 +83,7 @@ public class DockerScale implements AutoScale{
 		t.start();
 	}
 	
-	private void destroy(final String appid,final String[] instances) {
+	private void destroy(final String appid,final String... instances) {
 		
 		Runnable runnable = new Runnable(){
 
@@ -95,7 +93,7 @@ public class DockerScale implements AutoScale{
 				for(String instance : instances){
 					serverService.setDeleteType(instance);
 				}
-				
+
 				String requestUrl = DOCKER_SHUTDOWN_URL + appid + "/shutdown";
 				InstanceIdParam instanceIdParam = new InstanceIdParam();
 				instanceIdParam.setInstances(instances);
@@ -170,6 +168,7 @@ public class DockerScale implements AutoScale{
 		Thread t = new Thread(runnable);
 		t.start();
 	}
+
 	@Override
 	public void destroy(Result value){
 		if(value == null || value.getInstances().size() == 0)
@@ -181,7 +180,7 @@ public class DockerScale implements AutoScale{
 			instances[index++] = ins.getInstanceid();
 		}
 		
-		destroy(value.getAppid().toString(),instances);
+		destroy(value.getAppId().toString(),instances);
 	}
 	
 	@Override

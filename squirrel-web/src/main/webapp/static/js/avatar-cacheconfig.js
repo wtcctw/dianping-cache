@@ -36,21 +36,21 @@ module.controller('ConfigController', [
 			$scope.query = function() {
 
 				$scope.searchPaginator = Paginator(fetchFunction);
-			}
+			};
 			
 			$scope.setModalInput = function(key,clientClazz,servers,transcoderClazz){
 				$scope.mCacheKey = key;
 				$scope.mClientClazz = clientClazz;
 				$scope.mServers = servers;
 				$scope.mTranscoderClazz = transcoderClazz;
-			}
+			};
 			
 			$scope.transportToEdit = function(cacheKey, clientClazz, servers, transcoderClazz){
 				window.localStorage.cacheKey = cacheKey;
 				window.localStorage.clientClazz = clientClazz;
 				window.localStorage.servers = servers;
 				window.localStorage.transcoderClazz = transcoderClazz;
-			}
+			};
 			
 			$scope.refreshpage = function(myForm){
 				
@@ -62,7 +62,7 @@ module.controller('ConfigController', [
 						$scope.searchPaginator = Paginator(fetchFunction);
 		        });
 	        	
-	        }
+	        };
 			
 			$scope.configEdit = function(key,clientClazz,servers,transcoderClazz){
 				
@@ -70,7 +70,7 @@ module.controller('ConfigController', [
 		        	{"key":key,"clientClazz":clientClazz,
 	        		"servers":servers,"transcoderClazz":transcoderClazz});
 				
-			}
+			};
 			
 			$scope.creatNew = function(myForm){
 
@@ -81,7 +81,7 @@ module.controller('ConfigController', [
 	        		"servers":$scope.mServers,"transcoderClazz":$scope.mTranscoderClazz}).success(function(response) {
 					$scope.searchPaginator = Paginator(fetchFunction);
 	        	});
-			}
+			};
 			
 			$rootScope.deleteConfig = function(key){
 				$http.post(window.contextPath + '/cache/config/delete',
@@ -89,7 +89,7 @@ module.controller('ConfigController', [
 					$scope.searchPaginator = Paginator(fetchFunction);
 	        	});
 				return true;
-			}
+			};
 			
 			$scope.dialog = function(key) {
 				
@@ -124,7 +124,7 @@ module.controller('ConfigController', [
 					$scope.searchPaginator = Paginator(fetchFunction);
 	        	});
 				return true;
-			}
+			};
 
 			
 			$scope.implItems = ["com.dianping.cache.memcached.MemcachedClientImpl",
@@ -143,7 +143,7 @@ module.controller('ConfigController', [
 					$scope.implItems = response.impl;
 					$scope.coderItems = response.coder;
 				});
-			}
+			};
 			
 			$scope.query();
 		} ]);

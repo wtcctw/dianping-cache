@@ -543,7 +543,7 @@ var LuaHighlightRules = function() {
         
     };
 
-}
+};
 
 oop.inherits(LuaHighlightRules, TextHighlightRules);
 

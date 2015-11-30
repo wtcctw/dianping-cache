@@ -24,8 +24,7 @@ public class JacksonSerializer implements com.dianping.cache.test.json.JsonSeria
         module.addKeySerializer(Object.class, new JsonSerializer<Object>() {
 
             @Override
-            public void serialize(Object value, JsonGenerator jgen, SerializerProvider provider) throws IOException,
-                    JsonProcessingException {
+            public void serialize(Object value, JsonGenerator jgen, SerializerProvider provider) throws IOException {
                 jgen.writeFieldName(mapper.writeValueAsString(value));
             }
             
@@ -34,8 +33,7 @@ public class JacksonSerializer implements com.dianping.cache.test.json.JsonSeria
         module.addKeyDeserializer(Object.class, new KeyDeserializer() {
 
             @Override
-            public Object deserializeKey(String key, DeserializationContext ctxt) throws IOException,
-                    JsonProcessingException {
+            public Object deserializeKey(String key, DeserializationContext ctxt) throws IOException {
                 return mapper.readValue(key, Object.class);
             }
             

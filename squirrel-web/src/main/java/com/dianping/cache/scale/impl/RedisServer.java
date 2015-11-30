@@ -37,6 +37,10 @@ public class RedisServer extends Server {
         super(address);
     }
 
+    public RedisServer(String ip,int port){
+        super(ip,port);
+    }
+
     public String getId() {
         return id;
     }
@@ -203,8 +207,9 @@ public class RedisServer extends Server {
 		} finally{
 			jedis.close();
 		}
-    } 
-    
+    }
+
+
     private Map<String,String> parseServerConfig(List<String> config){
     	String quota = "\"";
     	String quotaStr = "&quot;";

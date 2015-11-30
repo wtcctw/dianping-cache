@@ -100,20 +100,20 @@ difflib = {
 		this.set_seqs = function (a, b) {
 			this.set_seq1(a);
 			this.set_seq2(b);
-		}
+		};
 		
 		this.set_seq1 = function (a) {
 			if (a == this.a) return;
 			this.a = a;
 			this.matching_blocks = this.opcodes = null;
-		}
+		};
 		
 		this.set_seq2 = function (b) {
 			if (b == this.b) return;
 			this.b = b;
 			this.matching_blocks = this.opcodes = this.fullbcount = null;
 			this.__chain_b();
-		}
+		};
 		
 		this.__chain_b = function () {
 			var b = this.b;
@@ -160,7 +160,7 @@ difflib = {
 	
 			this.isbjunk = difflib.__isindict(junkdict);
 			this.isbpopular = difflib.__isindict(populardict);
-		}
+		};
 		
 		this.find_longest_match = function (alo, ahi, blo, bhi) {
 			var a = this.a;
@@ -217,7 +217,7 @@ difflib = {
 			}
 	
 			return [besti, bestj, bestsize];
-		}
+		};
 		
 		this.get_matching_blocks = function () {
 			if (this.matching_blocks != null) return this.matching_blocks;
@@ -273,7 +273,7 @@ difflib = {
 			non_adjacent.push([la, lb, 0]);
 			this.matching_blocks = non_adjacent;
 			return this.matching_blocks;
-		}
+		};
 		
 		this.get_opcodes = function () {
 			if (this.opcodes != null) return this.opcodes;
@@ -306,7 +306,7 @@ difflib = {
 			}
 			
 			return answer;
-		}
+		};
 		
 		// this is a generator function in the python lib, which of course is not supported in javascript
 		// the reimplementation builds up the grouped opcodes into a list in their entirety and returns that.
@@ -357,17 +357,17 @@ difflib = {
 				}
 			}
 			
-			if (group && !(group.length == 1 && group[0][0] == 'equal')) groups.push(group)
+			if (group && !(group.length == 1 && group[0][0] == 'equal')) groups.push(group);
 			
 			return groups;
-		}
+		};
 		
 		this.ratio = function () {
 			matches = difflib.__reduce(
 							function (sum, triple) { return sum + triple[triple.length - 1]; },
 							this.get_matching_blocks(), 0);
 			return difflib.__calculate_ratio(matches, this.a.length + this.b.length);
-		}
+		};
 		
 		this.quick_ratio = function () {
 			var fullbcount, elt;
@@ -395,13 +395,13 @@ difflib = {
 			}
 			
 			return difflib.__calculate_ratio(matches, this.a.length + this.b.length);
-		}
+		};
 		
 		this.real_quick_ratio = function () {
 			var la = this.a.length;
 			var lb = this.b.length;
 			return _calculate_ratio(Math.min(la, lb), la + lb);
-		}
+		};
 		
 		this.isjunk = isjunk ? isjunk : difflib.defaultJunkFunction;
 		this.a = this.b = null;

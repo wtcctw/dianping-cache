@@ -842,7 +842,7 @@ if (Object.defineProperty) {
 
 if (!Object.defineProperty || definePropertyFallback) {
     var ERR_NON_OBJECT_DESCRIPTOR = "Property description must be an object: ";
-    var ERR_NON_OBJECT_TARGET = "Object.defineProperty called on non-object: "
+    var ERR_NON_OBJECT_TARGET = "Object.defineProperty called on non-object: ";
     var ERR_ACCESSORS_NOT_SUPPORTED = "getters & setters can not be defined " +
                                       "on this javascript engine";
 
@@ -1436,7 +1436,7 @@ oop.inherits(JavaScriptWorker, Mirror);
         } catch(e) {
 //            console.log("narcissus")
 //            console.log(e);
-            var chunks = e.message.split(":")
+            var chunks = e.message.split(":");
             var message = chunks.pop().trim();
             var lineNumber = parseInt(chunks.pop().trim()) - 1;
             this.sender.emit("narcissus", {
@@ -1553,7 +1553,7 @@ var Document = function(text) {
     if ("aaa".split(/a/).length == 0)
         this.$split = function(text) {
             return text.replace(/\r\n|\r/g, "\n").split("\n");
-        }
+        };
     else
         this.$split = function(text) {
             return text.split(/\r\n|\r|\n/);
@@ -1953,7 +1953,7 @@ var Range = function(startRow, startColumn, endRow, endColumn) {
                 return 0;
             }
         }
-    }
+    };
 
     /** related to: Range.compare
      * Range.comparePoint(p) -> Number
@@ -1978,7 +1978,7 @@ var Range = function(startRow, startColumn, endRow, endColumn) {
      **/ 
     this.comparePoint = function(p) {
         return this.compare(p.row, p.column);
-    }
+    };
 
     /** related to: Range.comparePoint
      * Range.containsRange(range) -> Boolean
@@ -1989,7 +1989,7 @@ var Range = function(startRow, startColumn, endRow, endColumn) {
      **/ 
     this.containsRange = function(range) {
         return this.comparePoint(range.start) == 0 && this.comparePoint(range.end) == 0;
-    }
+    };
 
     /**
      * Range.intersects(range) -> Boolean
@@ -2001,7 +2001,7 @@ var Range = function(startRow, startColumn, endRow, endColumn) {
     this.intersects = function(range) {
         var cmp = this.compareRange(range);
         return (cmp == -1 || cmp == 0 || cmp == 1);
-    }
+    };
 
     /**
      * Range.isEnd(row, column) -> Boolean
@@ -2013,7 +2013,7 @@ var Range = function(startRow, startColumn, endRow, endColumn) {
      **/
     this.isEnd = function(row, column) {
         return this.end.row == row && this.end.column == column;
-    }
+    };
 
     /**
      * Range.isStart(row, column) -> Boolean
@@ -2025,7 +2025,7 @@ var Range = function(startRow, startColumn, endRow, endColumn) {
      **/ 
     this.isStart = function(row, column) {
         return this.start.row == row && this.start.column == column;
-    }
+    };
 
     /**
      * Range.setStart(row, column)
@@ -2043,7 +2043,7 @@ var Range = function(startRow, startColumn, endRow, endColumn) {
             this.start.row = row;
             this.start.column = column;
         }
-    }
+    };
 
     /**
      * Range.setEnd(row, column)
@@ -2061,7 +2061,7 @@ var Range = function(startRow, startColumn, endRow, endColumn) {
             this.end.row = row;
             this.end.column = column;
         }
-    }
+    };
 
     /** related to: Range.compare
      * Range.inside(row, column) -> Boolean
@@ -2080,7 +2080,7 @@ var Range = function(startRow, startColumn, endRow, endColumn) {
             }
         }
         return false;
-    }
+    };
 
     /** related to: Range.compare
      * Range.insideStart(row, column) -> Boolean
@@ -2099,7 +2099,7 @@ var Range = function(startRow, startColumn, endRow, endColumn) {
             }
         }
         return false;
-    }
+    };
 
     /** related to: Range.compare
      * Range.insideEnd(row, column) -> Boolean
@@ -2118,7 +2118,7 @@ var Range = function(startRow, startColumn, endRow, endColumn) {
             }
         }
         return false;
-    }
+    };
 
     /** 
      * Range.compare(row, column) -> Number
@@ -2145,7 +2145,7 @@ var Range = function(startRow, startColumn, endRow, endColumn) {
         if (!this.isMultiLine()) {
             if (row === this.start.row) {
                 return column < this.start.column ? -1 : (column > this.end.column ? 1 : 0);
-            };
+            }
         }
 
         if (row < this.start.row)
@@ -2168,7 +2168,7 @@ var Range = function(startRow, startColumn, endRow, endColumn) {
         } else {
             return this.compare(row, column);
         }
-    }
+    };
 
     /**
      * Range.compareEnd(row, column) -> Number
@@ -2197,7 +2197,7 @@ var Range = function(startRow, startColumn, endRow, endColumn) {
         } else {
             return this.compare(row, column);
         }
-    }
+    };
 
     /** 
      * Range.compareInside(row, column) -> Number
@@ -2222,7 +2222,7 @@ var Range = function(startRow, startColumn, endRow, endColumn) {
         } else {
             return this.compare(row, column);
         }
-    }
+    };
 
     /** 
      * Range.clipRows(firstRow, lastRow) -> Range
@@ -2286,7 +2286,7 @@ var Range = function(startRow, startColumn, endRow, endColumn) {
     };
     this.collapseRows = function() {
         if (this.end.column == 0)
-            return new Range(this.start.row, 0, Math.max(this.start.row, this.end.row-1), 0)
+            return new Range(this.start.row, 0, Math.max(this.start.row, this.end.row-1), 0);
         else
             return new Range(this.start.row, 0, this.end.row, 0)
     };
@@ -7343,7 +7343,7 @@ Np.push = function (kid) {
             this.end = kid.end;
     }
     return this.children.push(kid);
-}
+};
 
 Node.indentLevel = 0;
 
@@ -7367,7 +7367,7 @@ Np.toString = function () {
     n = --Node.indentLevel;
     s += "\n" + INDENTATION.repeat(n) + "}";
     return s;
-}
+};
 
 Np.synth = function(init) {
     var node = new SyntheticNode(init);
@@ -7423,7 +7423,7 @@ Pp.MaybeLeftParen = function MaybeLeftParen() {
 Pp.MaybeRightParen = function MaybeRightParen(p) {
     if (p === LEFT_PAREN)
         this.mustMatch(RIGHT_PAREN);
-}
+};
 
 /*
  * Statements :: (node[, boolean]) -> void
@@ -7450,7 +7450,7 @@ Pp.Statements = function Statements(n, topLevel) {
         } catch(e) {}
         throw e;
     }
-}
+};
 
 Pp.Block = function Block() {
     this.mustMatch(LEFT_CURLY);
@@ -7461,7 +7461,7 @@ Pp.Block = function Block() {
     });
     this.mustMatch(RIGHT_CURLY);
     return n;
-}
+};
 
 var DECLARED_FORM = 0, EXPRESSED_FORM = 1, STATEMENT_FORM = 2;
 function Export(node, isDefinition) {
@@ -7959,7 +7959,7 @@ Pp.Statement = function Statement() {
     n.blockComments = comments;
     this.MagicalSemicolon();
     return n;
-}
+};
 
 /*
  * isPragmaToken :: (number) -> boolean
@@ -7987,7 +7987,7 @@ Pp.Pragmas = function Pragmas() {
     } while (this.match(COMMA));
     this.MagicalSemicolon();
     return pragmas;
-}
+};
 
 /*
  * Pragmas :: () -> Array[token]
@@ -8000,7 +8000,7 @@ Pp.Pragma = function Pragma() {
         items.push(this.t.token);
     } while (isPragmaToken(this.peek()));
     return items;
-}
+};
 
 /*
  * MagicalSemicolon :: () -> void
@@ -8013,7 +8013,7 @@ Pp.MagicalSemicolon = function MagicalSemicolon() {
             this.fail("missing ; before statement");
     }
     this.match(SEMICOLON);
-}
+};
 
 /*
  * ReturnOrYield :: () -> (RETURN | YIELD) node
@@ -8050,14 +8050,14 @@ Pp.ReturnOrYield = function ReturnOrYield() {
     }
 
     return n;
-}
+};
 
 /*
  * ModuleExpression :: () -> (STRING | IDENTIFIER | DOT) node
  */
 Pp.ModuleExpression = function ModuleExpression() {
     return this.match(STRING) ? this.newNode() : this.QualifiedPath();
-}
+};
 
 /*
  * ImportPathList :: () -> Array[DOT node]
@@ -8068,7 +8068,7 @@ Pp.ImportPathList = function ImportPathList() {
         a.push(this.ImportPath());
     } while (this.match(COMMA));
     return a;
-}
+};
 
 /*
  * ImportPath :: () -> DOT node
@@ -8085,7 +8085,7 @@ Pp.ImportPath = function ImportPath() {
     n2.push(n);
     n2.push(this.ImportSpecifierSet());
     return n2;
-}
+};
 
 /*
  * ExplicitSpecifierSet :: (() -> node) -> OBJECT_INIT node
@@ -8111,7 +8111,7 @@ Pp.ExplicitSpecifierSet = function ExplicitSpecifierSet(SpecifierRHS) {
     }
 
     return n;
-}
+};
 
 /*
  * ImportSpecifierSet :: () -> (IDENTIFIER | OBJECT_INIT) node
@@ -8121,7 +8121,7 @@ Pp.ImportSpecifierSet = function ImportSpecifierSet() {
     return this.match(MUL)
         ? this.newNode({ type: IDENTIFIER, name: "*" })
     : ExplicitSpecifierSet(function() { return self.Identifier() });
-}
+};
 
 /*
  * Identifier :: () -> IDENTIFIER node
@@ -8129,7 +8129,7 @@ Pp.ImportSpecifierSet = function ImportSpecifierSet() {
 Pp.Identifier = function Identifier() {
     this.mustMatch(IDENTIFIER);
     return this.newNode({ type: IDENTIFIER });
-}
+};
 
 /*
  * IdentifierName :: () -> IDENTIFIER node
@@ -8137,7 +8137,7 @@ Pp.Identifier = function Identifier() {
 Pp.IdentifierName = function IdentifierName() {
     this.mustMatch(IDENTIFIER, true);
     return this.newNode({ type: IDENTIFIER });
-}
+};
 
 /*
  * QualifiedPath :: () -> (IDENTIFIER | DOT) node
@@ -8160,7 +8160,7 @@ Pp.QualifiedPath = function QualifiedPath() {
     }
 
     return n;
-}
+};
 
 /*
  * ExportPath :: () -> (IDENTIFIER | DOT | OBJECT_INIT) node
@@ -8170,7 +8170,7 @@ Pp.ExportPath = function ExportPath() {
     if (this.peek() === LEFT_CURLY)
         return this.ExplicitSpecifierSet(function() { return self.QualifiedPath() });
     return this.QualifiedPath();
-}
+};
 
 /*
  * ExportPathList :: () -> Array[(IDENTIFIER | DOT | OBJECT_INIT) node]
@@ -8181,7 +8181,7 @@ Pp.ExportPathList = function ExportPathList() {
         a.push(this.ExportPath());
     } while (this.match(COMMA));
     return a;
-}
+};
 
 /*
  * FunctionDefinition :: (boolean,
@@ -8256,7 +8256,7 @@ Pp.FunctionDefinition = function FunctionDefinition(requireName, functionForm, c
         f.body = this.newNode({ type: GENERATOR, body: f.body });
 
     return f;
-}
+};
 
 /*
  * ModuleVariables :: (MODULE node) -> void
@@ -8278,7 +8278,7 @@ Pp.ModuleVariables = function ModuleVariables(n) {
         }
         n.push(n1);
     } while (this.match(COMMA));
-}
+};
 
 /*
  * Variables :: () -> node
@@ -8357,7 +8357,7 @@ Pp.Variables = function Variables(letBlock) {
     } while (this.match(COMMA));
 
     return n;
-}
+};
 
 /*
  * LetBlock :: (boolean) -> node
@@ -8389,7 +8389,7 @@ Pp.LetBlock = function LetBlock(isStatement) {
         n.expression = this.AssignExpression();
 
     return n;
-}
+};
 
 Pp.checkDestructuring = function checkDestructuring(n, simpleNamesOnly) {
     if (n.type === ARRAY_COMP)
@@ -8428,20 +8428,20 @@ Pp.checkDestructuring = function checkDestructuring(n, simpleNamesOnly) {
     }
 
     return lhss;
-}
+};
 
 Pp.DestructuringExpression = function DestructuringExpression(simpleNamesOnly) {
     var n = this.PrimaryExpression();
     // Keep the list of lefthand sides for varDecls
     n.destructuredNames = this.checkDestructuring(n, simpleNamesOnly);
     return n;
-}
+};
 
 Pp.GeneratorExpression = function GeneratorExpression(e) {
     return this.newNode({ type: GENERATOR,
                           expression: e,
                           tail: this.ComprehensionTail() });
-}
+};
 
 Pp.ComprehensionTail = function ComprehensionTail() {
     var body, n, n2, n3, p;
@@ -8493,7 +8493,7 @@ Pp.ComprehensionTail = function ComprehensionTail() {
         body.guard = this.HeadExpression();
 
     return body;
-}
+};
 
 Pp.HeadExpression = function HeadExpression() {
     var p = this.MaybeLeftParen();
@@ -8505,7 +8505,7 @@ Pp.HeadExpression = function HeadExpression() {
             this.fail("Unparenthesized head followed by unbraced body");
     }
     return n;
-}
+};
 
 Pp.ParenExpression = function ParenExpression() {
     // Always accept the 'in' operator in a parenthesized expression,
@@ -8526,7 +8526,7 @@ Pp.ParenExpression = function ParenExpression() {
     }
 
     return n;
-}
+};
 
 /*
  * Expression :: () -> node
@@ -8550,7 +8550,7 @@ Pp.Expression = function Expression() {
     }
 
     return n;
-}
+};
 
 Pp.AssignExpression = function AssignExpression() {
     var n, lhs;
@@ -8586,7 +8586,7 @@ Pp.AssignExpression = function AssignExpression() {
     n.push(this.AssignExpression());
 
     return n;
-}
+};
 
 Pp.ConditionalExpression = function ConditionalExpression() {
     var n, n2;
@@ -8606,7 +8606,7 @@ Pp.ConditionalExpression = function ConditionalExpression() {
     }
 
     return n;
-}
+};
 
 Pp.OrExpression = function OrExpression() {
     var n, n2;
@@ -8620,7 +8620,7 @@ Pp.OrExpression = function OrExpression() {
     }
 
     return n;
-}
+};
 
 Pp.AndExpression = function AndExpression() {
     var n, n2;
@@ -8634,7 +8634,7 @@ Pp.AndExpression = function AndExpression() {
     }
 
     return n;
-}
+};
 
 Pp.BitwiseOrExpression = function BitwiseOrExpression() {
     var n, n2;
@@ -8648,7 +8648,7 @@ Pp.BitwiseOrExpression = function BitwiseOrExpression() {
     }
 
     return n;
-}
+};
 
 Pp.BitwiseXorExpression = function BitwiseXorExpression() {
     var n, n2;
@@ -8662,7 +8662,7 @@ Pp.BitwiseXorExpression = function BitwiseXorExpression() {
     }
 
     return n;
-}
+};
 
 Pp.BitwiseAndExpression = function BitwiseAndExpression() {
     var n, n2;
@@ -8676,7 +8676,7 @@ Pp.BitwiseAndExpression = function BitwiseAndExpression() {
     }
 
     return n;
-}
+};
 
 Pp.EqualityExpression = function EqualityExpression() {
     var n, n2;
@@ -8691,7 +8691,7 @@ Pp.EqualityExpression = function EqualityExpression() {
     }
 
     return n;
-}
+};
 
 Pp.RelationalExpression = function RelationalExpression() {
     var n, n2;
@@ -8709,7 +8709,7 @@ Pp.RelationalExpression = function RelationalExpression() {
     });
 
     return n;
-}
+};
 
 Pp.ShiftExpression = function ShiftExpression() {
     var n, n2;
@@ -8723,7 +8723,7 @@ Pp.ShiftExpression = function ShiftExpression() {
     }
 
     return n;
-}
+};
 
 Pp.AddExpression = function AddExpression() {
     var n, n2;
@@ -8737,7 +8737,7 @@ Pp.AddExpression = function AddExpression() {
     }
 
     return n;
-}
+};
 
 Pp.MultiplyExpression = function MultiplyExpression() {
     var n, n2;
@@ -8751,7 +8751,7 @@ Pp.MultiplyExpression = function MultiplyExpression() {
     }
 
     return n;
-}
+};
 
 Pp.UnaryExpression = function UnaryExpression() {
     var n, n2, tt;
@@ -8792,7 +8792,7 @@ Pp.UnaryExpression = function UnaryExpression() {
     }
 
     return n;
-}
+};
 
 Pp.MemberExpression = function MemberExpression(allowCallSyntax) {
     var n, n2, name, tt;
@@ -8841,7 +8841,7 @@ Pp.MemberExpression = function MemberExpression(allowCallSyntax) {
     }
 
     return n;
-}
+};
 
 Pp.ArgumentList = function ArgumentList() {
     var n, n2;
@@ -8863,7 +8863,7 @@ Pp.ArgumentList = function ArgumentList() {
     this.mustMatch(RIGHT_PAREN);
 
     return n;
-}
+};
 
 Pp.PrimaryExpression = function PrimaryExpression() {
     var n, n2, tt = this.t.get(true);
@@ -8963,7 +8963,7 @@ Pp.PrimaryExpression = function PrimaryExpression() {
     }
 
     return n;
-}
+};
 
 /*
  * parse :: (source, filename, line number) -> node
@@ -10066,7 +10066,7 @@ function mixinHandler(redirect, catchall) {
         for (name in catchall) {
             if (!hasOwn(redirect, name))
                 result.push(name);
-        };
+        }
         return result;
     }
 
@@ -10145,7 +10145,9 @@ function makePassthruHandler(obj) {
         set: function(receiver, name, val) { obj[name] = val; return true; },
         enumerate: function() {
             var result = [];
-            for (name in obj) { result.push(name); };
+            for (name in obj) {
+                result.push(name);
+            }
             return result;
         },
         keys: function() { return Object.keys(obj); }

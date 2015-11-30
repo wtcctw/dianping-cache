@@ -9,11 +9,11 @@ import java.util.concurrent.TimeUnit;
  */
 public interface FileQueue<T> {
 
-	public T get();
+	T get();
 
-	public T get(long timeout, TimeUnit timeUnit);
+	T get(long timeout, TimeUnit timeUnit);
 
-	public void add(T m) throws FileQueueClosedException;
+	void add(T m) throws FileQueueClosedException;
 
-	public void close();
+	void close();
 }

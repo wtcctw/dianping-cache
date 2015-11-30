@@ -10,13 +10,13 @@ public interface ServerDao {
 
 	List<Server>  findAll(int type);
 	
-	public Server findByAddress(String address);
+	Server findByAddress(String address);
 	
-	public void insert(Server server) throws DuplicateKeyException;
+	void insert(Server server) throws DuplicateKeyException;
 	
-	public void delete(String address);
+	void delete(String address);
 	
-	public void update(Server server);
+	void update(Server server);
 
 	void setDeleteType(String instanceId);
 

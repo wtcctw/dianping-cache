@@ -178,12 +178,12 @@ module.controller('ConsumerDashboardController', function($scope, $http) {
 	$scope.hourchange = false;
 	$scope.whatClassIsIt = function(index) {
 		if (index == $scope.currentRed)
-			return "red-num"
+			return "red-num";
 		else if (index > $scope.currentMin)
 			return "not-active";
 		else
 			return "";
-	}
+	};
 	
 	Date.prototype.Format = function (fmt) { //author: meizz 
 	    var o = {
@@ -199,15 +199,15 @@ module.controller('ConsumerDashboardController', function($scope, $http) {
 	    for (var k in o)
 	    if (new RegExp("(" + k + ")").test(fmt)) fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
 	    return fmt;
-	}
+	};
 	
 	$scope.getEntry = function(delayEntry){
 		defaultSize = 12;
 		var size = delayEntry.size > defaultSize ? defaultSize : delayEntry.size;
 		var emp = delayEntry.Heap;
-		var entrys = delayEntry.Heap.slice(0, size)
+		var entrys = delayEntry.Heap.slice(0, size);
 		return entrys;
-	}
+	};
 	
 	$scope.getDashboardDelay = function(index) {
 		$scope.minuteEntrys = [];

@@ -8,7 +8,7 @@
 ace.sidebar_scrollable = function($ , options) {
 	if( !$.fn.ace_scroll ) return;
 
-	var old_safari = ace.vars['safari'] && navigator.userAgent.match(/version\/[1-5]/i)
+	var old_safari = ace.vars['safari'] && navigator.userAgent.match(/version\/[1-5]/i);
 	//NOTE
 	//Safari on windows has not been updated for a long time.
 	//And it has a problem when sidebar is fixed&scrollable and there is a CSS3 animation inside page content.
@@ -29,7 +29,7 @@ ace.sidebar_scrollable = function($ , options) {
 
 	var submenu_hover = function() {
 		return sidebar.first('li.hover > .submenu').css('position') == 'absolute'
-	}
+	};
 
 	
 	var scroll_div = null,
@@ -51,7 +51,7 @@ ace.sidebar_scrollable = function($ , options) {
 	//sidebar.offsetHeight is used to force redraw and recalculate 'sidebar.style.position' esp for webkit!
 	function() { sidebar.offsetHeight; return window.getComputedStyle(sidebar).position == 'fixed' }
 	:
-	function() { sidebar.offsetHeight; return $sidebar.css('position') == 'fixed' }
+	function() { sidebar.offsetHeight; return $sidebar.css('position') == 'fixed' };
 	//sometimes when navbar is fixed, sidebar automatically becomes fixed without needing ".sidebar-fixed" class
 	//currently when mobile_style == 1
 
@@ -113,12 +113,12 @@ ace.sidebar_scrollable = function($ , options) {
 						//sometimes there's no active item or not 'offsetTop' property
 						var $active;
 
-						var nav_list = $sidebar.find('.nav-list')
+						var nav_list = $sidebar.find('.nav-list');
 						if(ace.vars['minimized'] && !ace.vars['collapsible']) {
 							$active = nav_list.find('> .active')
 						}
 						else {
-							$active = $nav.find('> .active.hover')
+							$active = $nav.find('> .active.hover');
 							if($active.length == 0)	$active = $nav.find('.active:not(.open)')
 						}
 
@@ -190,13 +190,13 @@ ace.sidebar_scrollable = function($ , options) {
 			else if(height_change < 0) {
 				//if content height is decreasing
 				//let's move nav down while a submenu is being hidden
-				var scroll_top = scroll_content.scrollTop() + height_change
+				var scroll_top = scroll_content.scrollTop() + height_change;
 				if(scroll_top < 0) return;
 
 				scroll_content.scrollTop(scroll_top);
 			}
 		}
-	}
+	};
 	scrollbars.initiate(true);//true = on_page_load
 
 	//reset on document and window changes
@@ -207,7 +207,7 @@ ace.sidebar_scrollable = function($ , options) {
 		}
 		else if( event_name === 'sidebar_fixed' || event_name === 'navbar_fixed' ) {
 			//sidebar_fixed = event_val;
-			sidebar_fixed = is_sidebar_fixed()
+			sidebar_fixed = is_sidebar_fixed();
 			
 			if(sidebar_fixed && !is_scrolling) {
 				scrollbars.reset();
@@ -218,9 +218,9 @@ ace.sidebar_scrollable = function($ , options) {
 		}
 	});
 	$window.on('resize.ace.scroll', function(){
-		sidebar_fixed = is_sidebar_fixed()
+		sidebar_fixed = is_sidebar_fixed();
 		scrollbars.reset();
-	})
+	});
 	
 
 	//change scrollbar size after a submenu is hidden/shown
@@ -234,4 +234,4 @@ ace.sidebar_scrollable = function($ , options) {
 			else scrollbars.reset();
 		}
 	});
-}
+};

@@ -1,9 +1,9 @@
 /**
  Required. Ace's Basic File to Initiliaze Different Parts & Some Variables.
 */
-if( !('ace' in window) ) window['ace'] = {}
-if( !('helper' in window['ace']) ) window['ace'].helper = {}
-if( !('options' in window['ace']) ) window['ace'].options = {}
+if( !('ace' in window) ) window['ace'] = {};
+if( !('helper' in window['ace']) ) window['ace'].helper = {};
+if( !('options' in window['ace']) ) window['ace'].options = {};
 if( !('vars' in window['ace']) ) {
   window['ace'].vars = {
 	 'icon'	: ' ace-icon ',
@@ -19,11 +19,11 @@ jQuery(function($) {
 
 	//sometimes the only good way to work around browser's pecularities is to detect them using user-agents
 	//though it's not accurate
-	var agent = navigator.userAgent
-	ace.vars['webkit'] = !!agent.match(/AppleWebKit/i)
+	var agent = navigator.userAgent;
+	ace.vars['webkit'] = !!agent.match(/AppleWebKit/i);
 	ace.vars['safari'] = !!agent.match(/Safari/i) && !agent.match(/Chrome/i);
-	ace.vars['android'] = ace.vars['safari'] && !!agent.match(/Android/i)
-	ace.vars['ios_safari'] = !!agent.match(/OS ([4-9])(_\d)+ like Mac OS X/i) && !agent.match(/CriOS/i)
+	ace.vars['android'] = ace.vars['safari'] && !!agent.match(/Android/i);
+	ace.vars['ios_safari'] = !!agent.match(/OS ([4-9])(_\d)+ like Mac OS X/i) && !agent.match(/CriOS/i);
 	ace.vars['old_ie'] = document.all && !document.addEventListener;
 	
 	ace.vars['non_auto_fixed'] = ace.vars['android'] || ace.vars['ios_safari'];
@@ -33,7 +33,7 @@ jQuery(function($) {
 	}
 
 	var docStyle = document.documentElement.style;
-	ace.vars['transition'] = 'transition' in docStyle || 'WebkitTransition' in docStyle || 'MozTransition' in docStyle || 'OTransition' in docStyle
+	ace.vars['transition'] = 'transition' in docStyle || 'WebkitTransition' in docStyle || 'MozTransition' in docStyle || 'OTransition' in docStyle;
 
 	/////////////////////////////
 
@@ -88,7 +88,7 @@ jQuery(function($) {
 		ace[func_name].apply(null, args);
 	}
 
-})
+});
 
 
 
@@ -106,7 +106,7 @@ ace.general_vars = function($) {
 
 	//update some basic variables
 	$(window).on('resize.ace.vars' , function(){
-		ace.vars['window'] = {width: parseInt($(this).width()), height: parseInt($(this).height())}
+		ace.vars['window'] = {width: parseInt($(this).width()), height: parseInt($(this).height())};
 		ace.vars['mobile_view'] = ace.vars['mobile_style'] < 4 && ace.helper.mobile_view();
 		ace.vars['collapsible'] = !ace.vars['mobile_view'] && ace.helper.collapsible();
 		ace.vars['nav_collapse'] = (ace.vars['collapsible'] || ace.vars['mobile_view']) && $('#navbar').hasClass('navbar-collapse');
@@ -115,17 +115,17 @@ ace.general_vars = function($) {
 		ace.vars['minimized'] = 
 		(!ace.vars['collapsible'] && sidebar.hasClass(minimized_menu_class))
 		 ||
-		(ace.vars['mobile_style'] == 3 && ace.vars['mobile_view'] && sidebar.hasClass(responsive_min_class))
+		(ace.vars['mobile_style'] == 3 && ace.vars['mobile_view'] && sidebar.hasClass(responsive_min_class));
 
 		ace.vars['horizontal'] = !(ace.vars['mobile_view'] || ace.vars['collapsible']) && sidebar.hasClass(horizontal_menu_class)
 	}).triggerHandler('resize.ace.vars');
-}
+};
 
 //
 ace.general_things = function($) {
 	//add scrollbars for user dropdowns
 	var has_scroll = !!$.fn.ace_scroll;
-	if(has_scroll) $('.dropdown-content').ace_scroll({reset: false, mouseWheelLock: true})
+	if(has_scroll) $('.dropdown-content').ace_scroll({reset: false, mouseWheelLock: true});
 	/**
 	//add scrollbars to body
 	 if(has_scroll) $('body').ace_scroll({size: ace.helper.winHeight()})
@@ -162,8 +162,8 @@ ace.general_things = function($) {
 	//prevent dropdowns from hiding when a tab is selected
 	$(document).on('click', '.dropdown-navbar .nav-tabs', function(e){
 		e.stopPropagation();
-		var $this , href
-		var that = e.target
+		var $this , href;
+		var that = e.target;
 		if( ($this = $(e.target).closest('[data-toggle=tab]')) && $this.length > 0) {
 			$this.tab('show');
 			e.preventDefault();
@@ -283,50 +283,50 @@ ace.general_things = function($) {
 	})
 	*/
 
-}
+};
 
 
 
 
 //some functions
 ace.helper.collapsible = function() {
-	var toggle
+	var toggle;
 	return (document.querySelector('#sidebar.navbar-collapse') != null)
 	&& ((toggle = document.querySelector('.navbar-toggle[data-target*=".sidebar"]')) != null)
-	&&  toggle.scrollHeight > 0
+	&&  toggle.scrollHeight > 0;
 	//sidebar is collapsible and collapse button is visible?
-}
+};
 ace.helper.mobile_view = function() {
-	var toggle
+	var toggle;
 	return ((toggle = document.getElementById('menu-toggler')) != null	&& toggle.scrollHeight > 0)
-}
+};
 
 ace.helper.redraw = function(elem) {
 	var saved_val = elem.style['display'];
 	elem.style.display = 'none';
 	elem.offsetHeight;
 	elem.style.display = saved_val;
-}
+};
 
 ace.helper.scrollTop = function() {
-	return document.scrollTop || document.documentElement.scrollTop || document.body.scrollTop
+	return document.scrollTop || document.documentElement.scrollTop || document.body.scrollTop;
 	//return $(window).scrollTop();
-}
+};
 ace.helper.winHeight = function() {
 	return window.innerHeight || document.documentElement.clientHeight;
 	//return $(window).innerHeight();
-}
+};
 ace.helper.camelCase = function(str) {
 	return str.replace(/-([\da-z])/gi, function(match, chr) {
 	  return chr ? chr.toUpperCase() : '';
 	});
-}
+};
 ace.helper.removeStyle = 
   'removeProperty' in document.documentElement.style
   ?
   function(elem, prop) { elem.style.removeProperty(prop) }
   :
-  function(elem, prop) { elem.style[ace.helper.camelCase(prop)] = '' }
+  function(elem, prop) { elem.style[ace.helper.camelCase(prop)] = '' };
 
 
 ace.helper.hasClass = 
@@ -334,4 +334,4 @@ ace.helper.hasClass =
   ?
   function(elem, className) { return elem.classList.contains(className); }
   :
-  function(elem, className) { return elem.className.indexOf(className) > -1; }
+  function(elem, className) { return elem.className.indexOf(className) > -1; };

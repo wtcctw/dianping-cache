@@ -76,8 +76,8 @@ public interface CacheKeyConfigurationDao extends GenericDao {
 	 */
 	PageModel paginate(PageModel paginater, CacheKeyConfigSearchCondition searchCondition);
 	
-	public List<CacheKeyConfiguration> paginate(@Param("pageId")int pageId,@Param("cond")CacheKeyConfigSearchCondition searchCondition);
-	public int paginate_COUNT(CacheKeyConfigSearchCondition searchCondition);
+	List<CacheKeyConfiguration> paginate(@Param("pageId") int pageId, @Param("cond") CacheKeyConfigSearchCondition searchCondition);
+	int paginate_COUNT(CacheKeyConfigSearchCondition searchCondition);
 	/**
 	 * @param category
 	 */

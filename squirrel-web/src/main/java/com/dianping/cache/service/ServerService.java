@@ -7,21 +7,21 @@ import org.springframework.dao.DuplicateKeyException;
 import com.dianping.cache.entity.Server;
 
 public interface ServerService {
-	public List<Server> findAll();
+	List<Server> findAll();
 	
-	public List<Server> findAllMemcachedServers();
+	List<Server> findAllMemcachedServers();
 	
-	public List<Server> findAllRedisServers();
+	List<Server> findAllRedisServers();
 
-	public void insert(String address, String appId,String instanceId, int type, String hostIp) throws DuplicateKeyException;
+	void insert(String address, String appId, String instanceId, int type, String hostIp) throws DuplicateKeyException;
 	
-	public Server findByAddress(String address);
+	Server findByAddress(String address);
 	
-	public void delete(String address);
+	void delete(String address);
 	
-	public void update(Server server);
+	void update(Server server);
 
-	public void setDeleteType(String instanceId);
+	void setDeleteType(String instanceId);
 
-	public void deleteByInstanceId(String instanceId);
+	void deleteByInstanceId(String instanceId);
 }

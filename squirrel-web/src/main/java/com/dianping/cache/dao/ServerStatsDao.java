@@ -13,9 +13,9 @@ public interface ServerStatsDao {
 	
 	List<ServerStats> findByServerWithInterval(@Param("address")String address,@Param("start")long start,@Param("end")long end);
 	
-	public void insert(ServerStats data);
+	void insert(ServerStats data);
 	
-	public void delete(long timeBefore);
+	void delete(long timeBefore);
 	
-	public ServerStats findLast(String server);
+	ServerStats findLast(String server);
 }

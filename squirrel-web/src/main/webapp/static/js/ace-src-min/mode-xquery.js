@@ -367,7 +367,7 @@ define('ace/mode/behaviour/xquery', ['require', 'exports', 'module' , 'ace/lib/o
 //        }
 //      return false;
 //      });
-  }
+  };
   oop.inherits(XQueryBehaviour, Behaviour);
 
   exports.XQueryBehaviour = XQueryBehaviour;

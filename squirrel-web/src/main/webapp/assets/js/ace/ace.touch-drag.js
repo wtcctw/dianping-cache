@@ -82,7 +82,7 @@ ace.add_touch_drag = function($) {
 							
 
 							if( direction !== false ) {
-							 var retval = {cancel: false}
+							 var retval = {cancel: false};
 							 start.origin.trigger({
 								'type': 'ace_drag',
 								//'start': start.coords,
@@ -91,7 +91,7 @@ ace.add_touch_drag = function($) {
 								'dx': dx,
 								'dy': dy,
 								'retval': retval
-							 })
+							 });
 
 		 					  // prevent document scrolling unless retval.cancel == true
 							  if( retval.cancel == false ) event.preventDefault();
@@ -113,4 +113,4 @@ ace.add_touch_drag = function($) {
 			});
 		}
 	}
-}
+};

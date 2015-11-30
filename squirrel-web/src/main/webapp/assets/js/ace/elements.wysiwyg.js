@@ -15,7 +15,7 @@
 			'#92e1c0','#9fe1e7','#9fc6e7','#4986e7','#9a9cff','#b99aff',
 			'#c2c2c2','#cabdbf','#cca6ac','#f691b2','#cd74e6','#a47ae2',
 			'#444444'
-		]
+		];
 
 		var button_defaults =
 		{
@@ -118,7 +118,7 @@
 				icon : 'fa fa-code',
 				title : 'View Source'
 			}
-		}
+		};
 		
 		var toolbar_buttons =
 		options.toolbar ||
@@ -153,7 +153,7 @@
 			'redo',
 			null,
 			'viewSource'
-		]
+		];
 
 
 		this.each(function() {
@@ -181,7 +181,7 @@
 						toolbar += ' <ul class="dropdown-menu dropdown-light dropdown-caret">';
 						for(var font in button.values)
 							if(button.values.hasOwnProperty(font))
-								toolbar += ' <li><a data-edit="fontName ' + button.values[font] +'" style="font-family:\''+ button.values[font]  +'\'">'+button.values[font]  + '</a></li> '
+								toolbar += ' <li><a data-edit="fontName ' + button.values[font] +'" style="font-family:\''+ button.values[font]  +'\'">'+button.values[font]  + '</a></li> ';
 						toolbar += ' </ul>';
 					break;
 
@@ -190,7 +190,7 @@
 						toolbar += ' <ul class="dropdown-menu dropdown-light dropdown-caret"> ';
 						for(var size in button.values)
 							if(button.values.hasOwnProperty(size))
-								toolbar += ' <li><a data-edit="fontSize '+size+'"><font size="'+size+'">'+ button.values[size] +'</font></a></li> '
+								toolbar += ' <li><a data-edit="fontSize '+size+'"><font size="'+size+'">'+ button.values[size] +'</font></a></li> ';
 						toolbar += ' </ul> ';
 					break;
 
@@ -220,7 +220,7 @@
 							 <label class="center block no-margin-bottom">\
 								<button class="btn btn-sm '+button.button_class+' wysiwyg-choose-file" type="button">'+button.button_text+'</button>\
 								<input type="file" data-edit="'+button.name+'" />\
-							  </label>'
+							  </label>';
 						toolbar += ' </div> </div>';
 					break;
 
@@ -292,7 +292,7 @@
 					$('<textarea />')
 					.css({'width':self.outerWidth(), 'height':self.outerHeight()})
 					.val(self.html())
-					.insertAfter(self)
+					.insertAfter(self);
 					self.hide();
 					
 					$(this).addClass('active');
@@ -309,7 +309,7 @@
 			});
 
 
-			var $options = $.extend({}, { activeToolbarClass: 'active' , toolbarSelector : toolbar }, options.wysiwyg || {})
+			var $options = $.extend({}, { activeToolbarClass: 'active' , toolbarSelector : toolbar }, options.wysiwyg || {});
 			$(this).wysiwyg( $options );
 		});
 

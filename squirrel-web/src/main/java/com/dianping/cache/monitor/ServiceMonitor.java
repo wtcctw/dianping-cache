@@ -40,7 +40,7 @@ public class ServiceMonitor implements CuratorHandler {
         CuratorManager.getInstance().addHandler(this);
         curatorClient = CuratorManager.getInstance().getCuratorClient();
         refreshServiceConfigs();
-    };
+    }
 
     private void refreshServiceConfigs() {
         lock.lock();
@@ -79,7 +79,7 @@ public class ServiceMonitor implements CuratorHandler {
             try {
                 CacheConfiguration config = loadServiceConfig(service);
                 if(config == null) {
-                    logger.error(service + "'s service config is empty");;
+                    logger.error(service + "'s service config is empty");
                     continue;
                 }
                 configs.put(config.getCacheKey(), config);

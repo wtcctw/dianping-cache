@@ -5,6 +5,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import com.dianping.cache.service.RedisStatsService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,6 +36,8 @@ public class TimedCleanData {
 	private MemcacheStatsService memcacheStatsService;
 	
 	private OperationLogService operationLogService;
+
+	private RedisStatsService redisStatsService;
 	
 	public TimedCleanData(){
 		init();
@@ -44,15 +47,17 @@ public class TimedCleanData {
 				cleanOperationLog();
 				cleanServerStats();
 				cleanMemcachedStats();
+				cleanRedisStats();
 			}
 			
-		},0 , 24 * 60 * 60, TimeUnit.SECONDS);
+		},60 , 24 * 60 * 60, TimeUnit.SECONDS);
 	}
 	
 	private void init(){
 		serverStatsService = SpringLocator.getBean("serverStatsService");
 		memcacheStatsService = SpringLocator.getBean("memcacheStatsService");
 		operationLogService = SpringLocator.getBean("operationLogService");
+		redisStatsService = SpringLocator.getBean("redisStatsService");
 	}
 	/**
 	 * 清理一个月前的日志
@@ -77,5 +82,12 @@ public class TimedCleanData {
 		date.setTime(System.currentTimeMillis() - TimeUnit.MILLISECONDS.convert(logtime * 24 * 60, TimeUnit.MINUTES));
 		operationLogService.delete(date);
 		logger.info("OperationLog clear!");
+	}
+
+	private void cleanRedisStats(){
+		logger.info("start to clean RedisStats !");
+		long timeBefore = (System.currentTimeMillis() - TimeUnit.MILLISECONDS.convert(statstime * 24 * 60, TimeUnit.MINUTES))/1000;
+		redisStatsService.delete(timeBefore);
+		logger.info("RedisStats clear!");
 	}
 }

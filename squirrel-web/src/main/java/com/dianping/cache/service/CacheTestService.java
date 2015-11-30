@@ -7,19 +7,19 @@ import com.dianping.cache.exception.CacheException;
 
 public interface CacheTestService {
 
-	public Object getKeyValue(String finalKey);
+	Object getKeyValue(String finalKey);
 	
-	public Object getKeyValue(String category, String key);
+	Object getKeyValue(String category, String key);
 
-	public boolean setKeyValue(String category, String key, String value) throws CacheException, TimeoutException;
+	boolean setKeyValue(String category, String key, String value) throws CacheException, TimeoutException;
 
-	public void asyncSetKeyValue(String category, String key, String value) throws CacheException;
+	void asyncSetKeyValue(String category, String key, String value) throws CacheException;
 
-	public void asyncSetKeyIntValue(String category, String key, int value) throws CacheException;
+	void asyncSetKeyIntValue(String category, String key, int value) throws CacheException;
 
-	public boolean asyncDeleteKey(String category, String key) throws CacheException, InterruptedException,
+	boolean asyncDeleteKey(String category, String key) throws CacheException, InterruptedException,
 			ExecutionException;
 	
-	public String getCategoryPath(String category);
+	String getCategoryPath(String category);
 	
 }

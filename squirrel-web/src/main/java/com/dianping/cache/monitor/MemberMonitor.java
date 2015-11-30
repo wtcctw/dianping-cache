@@ -49,8 +49,8 @@ public class MemberMonitor implements CuratorHandler {
         CuratorManager.getInstance().ensurePath(Constants.MEMBER_PATH);
         CuratorManager.getInstance().addHandler(this);
         refreshAll();
-    };
-    
+    }
+
     void refreshAll() {
         wlock.lock();
         try {

@@ -130,10 +130,10 @@ module.controller('OperatorController', [
 				$scope.searchPaginator = Paginator(fetchFunction,
 						$scope.pageId, $scope.operator, $scope.content,$scope.startTime,
 						$scope.endTime);
-			}
+			};
 			$scope.setContent = function(content){
 				$scope.modalcontent = content;
-			}
+			};
 
 			$scope.query();
 		} ]);

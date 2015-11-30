@@ -21,5 +21,5 @@ package com.dianping.cache.remote.jms;
  *
  */
 public interface MQSender {
-	public void sendMessageToTopic(final Object msg);
+	void sendMessageToTopic(final Object msg);
 }

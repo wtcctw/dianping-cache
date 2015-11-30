@@ -12,7 +12,7 @@
 						<div
 								class="widget-box widget-color-{{item.colors.alarm}} ui-sortable-handle collapsed">
 							<!-- #section:custom/widget-box.options.collapsed -->
-							<div class="widget-header widget-header-small">
+							<div class="widget-header widget-header-small" >
 								<h6 class="widget-title">
 									<div class="col-sm-2">{{item.clusterName}}</div>
 									<div class="col-sm-3">Memory:{{item.used}} %/
@@ -45,7 +45,7 @@
 											<th>Master</th>
 											<th>Slave</th>
 											<th>Stats</th>
-											<th>Operate</th>
+											<th style="#if(${isadmin})display: table-cell;#else display: none;#end;">Operate</th>
 										</tr>
 										</thead>
 
@@ -66,7 +66,18 @@
 											</td>
 											<td class="col-sm-4">slots数量:{{data.master.slotList.length}}|Mem
 												:{{data.master.info.usedMemory}}/{{data.master.info.maxMemory}}</td>
-											<td class="col-sm-2"></td>
+											<td class="col-sm-2" style="#if(${isadmin})display: table-cell;#else display: none;#end;">
+												<div class="hidden-sm hidden-xs btn-group">
+													<button class="btn btn-xs btn-success" ng-show="{{data.slave.address==null}}"
+															ng-click="addSlave(item.clusterName,data.master.address)">Slave
+														<i class="ace-icon fa fa-plus bigger-120"></i>
+													</button>
+													<button class="btn btn-xs btn-danger" ng-click="deleteSlave(item.clusterName,data.slave.address)"
+															ng-show="{{data.slave.address!=null}}">Slave
+														<i class="ace-icon fa fa-trash-o bigger-120"></i>
+													</button>
+												</div>
+											</td>
 										</tr>
 										</tbody>
 									</table>
@@ -81,6 +92,7 @@
 			</div>
 
 
-
+		</div>
 
 		</div>
+	</div>

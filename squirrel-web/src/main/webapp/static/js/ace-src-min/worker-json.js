@@ -842,7 +842,7 @@ if (Object.defineProperty) {
 
 if (!Object.defineProperty || definePropertyFallback) {
     var ERR_NON_OBJECT_DESCRIPTOR = "Property description must be an object: ";
-    var ERR_NON_OBJECT_TARGET = "Object.defineProperty called on non-object: "
+    var ERR_NON_OBJECT_TARGET = "Object.defineProperty called on non-object: ";
     var ERR_ACCESSORS_NOT_SUPPORTED = "getters & setters can not be defined " +
                                       "on this javascript engine";
 
@@ -1568,7 +1568,7 @@ var Document = function(text) {
     if ("aaa".split(/a/).length == 0)
         this.$split = function(text) {
             return text.replace(/\r\n|\r/g, "\n").split("\n");
-        }
+        };
     else
         this.$split = function(text) {
             return text.split(/\r\n|\r|\n/);
@@ -1968,7 +1968,7 @@ var Range = function(startRow, startColumn, endRow, endColumn) {
                 return 0;
             }
         }
-    }
+    };
 
     /** related to: Range.compare
      * Range.comparePoint(p) -> Number
@@ -1993,7 +1993,7 @@ var Range = function(startRow, startColumn, endRow, endColumn) {
      **/ 
     this.comparePoint = function(p) {
         return this.compare(p.row, p.column);
-    }
+    };
 
     /** related to: Range.comparePoint
      * Range.containsRange(range) -> Boolean
@@ -2004,7 +2004,7 @@ var Range = function(startRow, startColumn, endRow, endColumn) {
      **/ 
     this.containsRange = function(range) {
         return this.comparePoint(range.start) == 0 && this.comparePoint(range.end) == 0;
-    }
+    };
 
     /**
      * Range.intersects(range) -> Boolean
@@ -2016,7 +2016,7 @@ var Range = function(startRow, startColumn, endRow, endColumn) {
     this.intersects = function(range) {
         var cmp = this.compareRange(range);
         return (cmp == -1 || cmp == 0 || cmp == 1);
-    }
+    };
 
     /**
      * Range.isEnd(row, column) -> Boolean
@@ -2028,7 +2028,7 @@ var Range = function(startRow, startColumn, endRow, endColumn) {
      **/
     this.isEnd = function(row, column) {
         return this.end.row == row && this.end.column == column;
-    }
+    };
 
     /**
      * Range.isStart(row, column) -> Boolean
@@ -2040,7 +2040,7 @@ var Range = function(startRow, startColumn, endRow, endColumn) {
      **/ 
     this.isStart = function(row, column) {
         return this.start.row == row && this.start.column == column;
-    }
+    };
 
     /**
      * Range.setStart(row, column)
@@ -2058,7 +2058,7 @@ var Range = function(startRow, startColumn, endRow, endColumn) {
             this.start.row = row;
             this.start.column = column;
         }
-    }
+    };
 
     /**
      * Range.setEnd(row, column)
@@ -2076,7 +2076,7 @@ var Range = function(startRow, startColumn, endRow, endColumn) {
             this.end.row = row;
             this.end.column = column;
         }
-    }
+    };
 
     /** related to: Range.compare
      * Range.inside(row, column) -> Boolean
@@ -2095,7 +2095,7 @@ var Range = function(startRow, startColumn, endRow, endColumn) {
             }
         }
         return false;
-    }
+    };
 
     /** related to: Range.compare
      * Range.insideStart(row, column) -> Boolean
@@ -2114,7 +2114,7 @@ var Range = function(startRow, startColumn, endRow, endColumn) {
             }
         }
         return false;
-    }
+    };
 
     /** related to: Range.compare
      * Range.insideEnd(row, column) -> Boolean
@@ -2133,7 +2133,7 @@ var Range = function(startRow, startColumn, endRow, endColumn) {
             }
         }
         return false;
-    }
+    };
 
     /** 
      * Range.compare(row, column) -> Number
@@ -2160,7 +2160,7 @@ var Range = function(startRow, startColumn, endRow, endColumn) {
         if (!this.isMultiLine()) {
             if (row === this.start.row) {
                 return column < this.start.column ? -1 : (column > this.end.column ? 1 : 0);
-            };
+            }
         }
 
         if (row < this.start.row)
@@ -2183,7 +2183,7 @@ var Range = function(startRow, startColumn, endRow, endColumn) {
         } else {
             return this.compare(row, column);
         }
-    }
+    };
 
     /**
      * Range.compareEnd(row, column) -> Number
@@ -2212,7 +2212,7 @@ var Range = function(startRow, startColumn, endRow, endColumn) {
         } else {
             return this.compare(row, column);
         }
-    }
+    };
 
     /** 
      * Range.compareInside(row, column) -> Number
@@ -2237,7 +2237,7 @@ var Range = function(startRow, startColumn, endRow, endColumn) {
         } else {
             return this.compare(row, column);
         }
-    }
+    };
 
     /** 
      * Range.clipRows(firstRow, lastRow) -> Range
@@ -2301,7 +2301,7 @@ var Range = function(startRow, startColumn, endRow, endColumn) {
     };
     this.collapseRows = function() {
         if (this.end.column == 0)
-            return new Range(this.start.row, 0, Math.max(this.start.row, this.end.row-1), 0)
+            return new Range(this.start.row, 0, Math.max(this.start.row, this.end.row-1), 0);
         else
             return new Range(this.start.row, 0, this.end.row, 0)
     };

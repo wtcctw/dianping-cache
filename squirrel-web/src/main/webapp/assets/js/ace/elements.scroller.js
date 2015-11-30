@@ -91,7 +91,7 @@
 				}
 				move_bar = false;
 				if(trigger_scroll) this.$element.trigger('scroll', [content_wrap]);
-			})
+			});
 
 			if(settings.mouseWheel) {
 				var lock = settings.mouseWheelLock;
@@ -103,12 +103,12 @@
 
 					if(mouse_track) {
 						mouse_track = false;
-						$('html').off('.ace_scroll')
+						$('html').off('.ace_scroll');
 						$(mouse_release_target).off('.ace_scroll');
 						if(dragEvent) self.$element.trigger('drag.end');
 					}
 
-					var delta = event.originalEvent.detail < 0 || event.originalEvent.wheelDelta > 0 ? 1 : -1
+					var delta = event.originalEvent.detail < 0 || event.originalEvent.wheelDelta > 0 ? 1 : -1;
 					var scrollEnd = false//have we reached the end of scrolling?
 					
 					var clientSize = content_wrap[client_size], scrollAmount = content_wrap[scroll_direction];
@@ -123,12 +123,12 @@
 					content_wrap[scroll_direction] = scrollAmount - (delta * step);
 
 					return scrollEnd && !lock_anyway;
-				})
+				});
 			}
 			
 			
 			//swipe not available yet
-			var touchDrag = ace.vars['touch'] && 'ace_drag' in $.event.special && settings.touchDrag //&& !settings.touchSwipe;
+			var touchDrag = ace.vars['touch'] && 'ace_drag' in $.event.special && settings.touchDrag; //&& !settings.touchSwipe;
 			//add drag event for touch devices to scroll
 			if(touchDrag/** || ($.fn.swipe && settings.touchSwipe)*/) {
 				var dir = '', event_name = touchDrag ? 'ace_drag' : 'swipe';
@@ -174,16 +174,16 @@
 			
 			disabled = false;
 			created = true;
-		}
+		};
 		this.is_active = function() {
 			return active;
-		}
+		};
 		this.is_enabled = function() {
 			return !disabled;
-		}
+		};
 		this.move_bar = function($move) {
 			move_bar = $move;
-		}
+		};
 
 		this.reset = function() {
 			if(disabled) return;// this;
@@ -193,7 +193,7 @@
 			if( (vertical && content_size == 0) || (!vertical && this.element.scrollWidth == 0) ) {
 				//elemen is hidden
 				//this.$element.addClass('scroll-hidden');
-				this.$element.removeClass('scroll-active')
+				this.$element.removeClass('scroll-active');
 				return;// this;
 			}
 			
@@ -207,7 +207,7 @@
 				active = true;
 				$track.css(css_size, available_space).show();
 
-				ratio = parseFloat((available_space / content_size).toFixed(5))
+				ratio = parseFloat((available_space / content_size).toFixed(5));
 				
 				bar_size = parseInt(Math.round(available_space * ratio));
 				bar_size_2 = parseInt(Math.round(bar_size / 2));
@@ -218,7 +218,7 @@
 				bar_style[css_size] = bar_size + 'px';
 				bar_style[css_pos] = bar_pos + 'px';
 				
-				this.$element.addClass('scroll-active')
+				this.$element.addClass('scroll-active');
 
 				if(!reset_once) {
 					//this.$element.removeClass('scroll-hidden');
@@ -236,8 +236,8 @@
 				$content_wrap.css(max_css_size , '');
 			}
 
-			return;// this;
-		}
+			// this;
+		};
 		this.disable = function() {
 			content_wrap[scroll_direction] = 0;
 			bar_style[css_pos] = 0;
@@ -250,20 +250,20 @@
 			$content_wrap.css(max_css_size , '');
 
 			return this;
-		}
+		};
 		this.enable = function() {
 			disabled = false;
 			this.reset();
 
 			return this;
-		}
+		};
 		this.destroy = function() {
 			active = false;
 			disabled = false;
 			created = false;
 			
 			this.$element.removeClass('ace-scroll scroll-hz'+(settings.extraClass ? ' '+settings.extraClass : ''));
-			this.$element.off('.ace_scroll')
+			this.$element.off('.ace_scroll');
 
 			if(!vertical) {
 				//remove the extra wrapping div
@@ -277,7 +277,7 @@
 			if(inline_style !== false) this.element.style.position = inline_style;
 			
 			return this;
-		}
+		};
 		this.modify = function(_settings) {
 			if(_settings) settings = $.extend({}, $.fn.ace_scroll.defaults, _settings);
 			
@@ -286,19 +286,19 @@
 			this.reset();
 			
 			return this;
-		}
+		};
 		this.update = function(_settings) {
 			//if(_settings) settings = $.extend({}, $.fn.ace_scroll.defaults, _settings);
 			this.size = _settings.size;
 			return this;
-		}
+		};
 
 		
 		this.update_scroll = function() {
 			move_bar = false;
 			bar_style[css_pos] = bar_pos + 'px';
 			content_wrap[scroll_direction] = parseInt(Math.round(bar_pos / ratio));
-		}
+		};
 
 		function mouse_down_track(e) {
 			e.preventDefault();
@@ -334,7 +334,7 @@
 			}
 
 			mouse_track = true;
-			$('html').off('mousemove.ace_scroll').on('mousemove.ace_scroll', mouse_move_bar)
+			$('html').off('mousemove.ace_scroll').on('mousemove.ace_scroll', mouse_move_bar);
 			$(mouse_release_target).off('mouseup.ace_scroll').on('mouseup.ace_scroll', mouse_up_bar);
 			
 			$track.addClass('active');
@@ -374,7 +374,7 @@
 			e.stopPropagation();
 			
 			mouse_track = false;
-			$('html').off('.ace_scroll')
+			$('html').off('.ace_scroll');
 			$(mouse_release_target).off('.ace_scroll');
 
 			$track.removeClass('active');
@@ -385,7 +385,7 @@
 		this.reset();
 
 		return this;
-	}
+	};
 
 	
 	$.fn.ace_scroll = function (option,value) {
@@ -434,7 +434,7 @@
 		'thin': false,
 		'position': 'right'
 		*/
-     }
+     };
 
 	/**
 	$(document).on('ace.settings.ace_scroll', function(e, name) {

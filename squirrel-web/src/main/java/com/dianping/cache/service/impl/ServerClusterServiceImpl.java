@@ -30,7 +30,13 @@ public class ServerClusterServiceImpl implements ServerClusterService {
 		serverCluster.setCluster(cluster);
 		serverClusterDao.delete(serverCluster);
 	}
-	
+
+	@Override
+	public void deleteServer(String address) {
+		//Server server = serverDao.findByAddress(address);
+		serverClusterDao.deleteServer(address);
+	}
+
 	@Override
 	public List<ServerCluster> findByServer(String server) {
 		return serverClusterDao.findByServer(server);

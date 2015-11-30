@@ -198,7 +198,7 @@
 				if (!this.options.cacheItems) {
 					$treeFolderContentFirstChild.empty();
 				}
-			}
+			};
 
 			//$parent.find(classToTarget).eq(0)
 				//.removeClass('icon-folder-close icon-folder-open')
@@ -242,7 +242,7 @@
 				}
 			});
 		}
-	};
+	};;
 
 
 	// TREE PLUGIN DEFINITION

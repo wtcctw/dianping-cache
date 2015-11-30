@@ -842,7 +842,7 @@ if (Object.defineProperty) {
 
 if (!Object.defineProperty || definePropertyFallback) {
     var ERR_NON_OBJECT_DESCRIPTOR = "Property description must be an object: ";
-    var ERR_NON_OBJECT_TARGET = "Object.defineProperty called on non-object: "
+    var ERR_NON_OBJECT_TARGET = "Object.defineProperty called on non-object: ";
     var ERR_ACCESSORS_NOT_SUPPORTED = "getters & setters can not be defined " +
                                       "on this javascript engine";
 
@@ -1557,7 +1557,7 @@ var Document = function(text) {
     if ("aaa".split(/a/).length == 0)
         this.$split = function(text) {
             return text.replace(/\r\n|\r/g, "\n").split("\n");
-        }
+        };
     else
         this.$split = function(text) {
             return text.split(/\r\n|\r|\n/);
@@ -1957,7 +1957,7 @@ var Range = function(startRow, startColumn, endRow, endColumn) {
                 return 0;
             }
         }
-    }
+    };
 
     /** related to: Range.compare
      * Range.comparePoint(p) -> Number
@@ -1982,7 +1982,7 @@ var Range = function(startRow, startColumn, endRow, endColumn) {
      **/ 
     this.comparePoint = function(p) {
         return this.compare(p.row, p.column);
-    }
+    };
 
     /** related to: Range.comparePoint
      * Range.containsRange(range) -> Boolean
@@ -1993,7 +1993,7 @@ var Range = function(startRow, startColumn, endRow, endColumn) {
      **/ 
     this.containsRange = function(range) {
         return this.comparePoint(range.start) == 0 && this.comparePoint(range.end) == 0;
-    }
+    };
 
     /**
      * Range.intersects(range) -> Boolean
@@ -2005,7 +2005,7 @@ var Range = function(startRow, startColumn, endRow, endColumn) {
     this.intersects = function(range) {
         var cmp = this.compareRange(range);
         return (cmp == -1 || cmp == 0 || cmp == 1);
-    }
+    };
 
     /**
      * Range.isEnd(row, column) -> Boolean
@@ -2017,7 +2017,7 @@ var Range = function(startRow, startColumn, endRow, endColumn) {
      **/
     this.isEnd = function(row, column) {
         return this.end.row == row && this.end.column == column;
-    }
+    };
 
     /**
      * Range.isStart(row, column) -> Boolean
@@ -2029,7 +2029,7 @@ var Range = function(startRow, startColumn, endRow, endColumn) {
      **/ 
     this.isStart = function(row, column) {
         return this.start.row == row && this.start.column == column;
-    }
+    };
 
     /**
      * Range.setStart(row, column)
@@ -2047,7 +2047,7 @@ var Range = function(startRow, startColumn, endRow, endColumn) {
             this.start.row = row;
             this.start.column = column;
         }
-    }
+    };
 
     /**
      * Range.setEnd(row, column)
@@ -2065,7 +2065,7 @@ var Range = function(startRow, startColumn, endRow, endColumn) {
             this.end.row = row;
             this.end.column = column;
         }
-    }
+    };
 
     /** related to: Range.compare
      * Range.inside(row, column) -> Boolean
@@ -2084,7 +2084,7 @@ var Range = function(startRow, startColumn, endRow, endColumn) {
             }
         }
         return false;
-    }
+    };
 
     /** related to: Range.compare
      * Range.insideStart(row, column) -> Boolean
@@ -2103,7 +2103,7 @@ var Range = function(startRow, startColumn, endRow, endColumn) {
             }
         }
         return false;
-    }
+    };
 
     /** related to: Range.compare
      * Range.insideEnd(row, column) -> Boolean
@@ -2122,7 +2122,7 @@ var Range = function(startRow, startColumn, endRow, endColumn) {
             }
         }
         return false;
-    }
+    };
 
     /** 
      * Range.compare(row, column) -> Number
@@ -2149,7 +2149,7 @@ var Range = function(startRow, startColumn, endRow, endColumn) {
         if (!this.isMultiLine()) {
             if (row === this.start.row) {
                 return column < this.start.column ? -1 : (column > this.end.column ? 1 : 0);
-            };
+            }
         }
 
         if (row < this.start.row)
@@ -2172,7 +2172,7 @@ var Range = function(startRow, startColumn, endRow, endColumn) {
         } else {
             return this.compare(row, column);
         }
-    }
+    };
 
     /**
      * Range.compareEnd(row, column) -> Number
@@ -2201,7 +2201,7 @@ var Range = function(startRow, startColumn, endRow, endColumn) {
         } else {
             return this.compare(row, column);
         }
-    }
+    };
 
     /** 
      * Range.compareInside(row, column) -> Number
@@ -2226,7 +2226,7 @@ var Range = function(startRow, startColumn, endRow, endColumn) {
         } else {
             return this.compare(row, column);
         }
-    }
+    };
 
     /** 
      * Range.clipRows(firstRow, lastRow) -> Range
@@ -2290,7 +2290,7 @@ var Range = function(startRow, startColumn, endRow, endColumn) {
     };
     this.collapseRows = function() {
         if (this.end.column == 0)
-            return new Range(this.start.row, 0, Math.max(this.start.row, this.end.row-1), 0)
+            return new Range(this.start.row, 0, Math.max(this.start.row, this.end.row-1), 0);
         else
             return new Range(this.start.row, 0, this.end.row, 0)
     };
@@ -2711,7 +2711,7 @@ define('ace/mode/coffee/lexer', ['require', 'exports', 'module' , 'ace/mode/coff
       if (__indexOf.call(JS_FORBIDDEN, id) >= 0) {
         if (forcedIdentifier) {
           tag = 'IDENTIFIER';
-          id = new String(id);
+          id = String(id);
           id.reserved = true;
         } else if (__indexOf.call(RESERVED, id) >= 0) {
           this.error("reserved word \"" + id + "\"");
@@ -3498,7 +3498,7 @@ define('ace/mode/coffee/rewriter', ['require', 'exports', 'module' ], function(r
         }
         prevTag = this.tag(idx - 1);
         startsLine = !prevTag || (__indexOf.call(LINEBREAKS, prevTag) >= 0);
-        value = new String('{');
+        value = String('{');
         value.generated = true;
         tok = this.generate('{', value, token[2]);
         tokens.splice(idx, 0, tok);
@@ -3748,7 +3748,7 @@ define('ace/mode/coffee/helpers', ['require', 'exports', 'module' ], function(re
 define('ace/mode/coffee/parser', ['require', 'exports', 'module' ], function(require, exports, module) {
 /* Jison generated parser */
 
-undefined
+undefined;
 var parser = {trace: function trace() { },
 yy: {},
 symbols_: {"error":2,"Root":3,"Body":4,"Block":5,"TERMINATOR":6,"Line":7,"Expression":8,"Statement":9,"Return":10,"Comment":11,"STATEMENT":12,"Value":13,"Invocation":14,"Code":15,"Operation":16,"Assign":17,"If":18,"Try":19,"While":20,"For":21,"Switch":22,"Class":23,"Throw":24,"INDENT":25,"OUTDENT":26,"Identifier":27,"IDENTIFIER":28,"AlphaNumeric":29,"NUMBER":30,"STRING":31,"Literal":32,"JS":33,"REGEX":34,"DEBUGGER":35,"BOOL":36,"Assignable":37,"=":38,"AssignObj":39,"ObjAssignable":40,":":41,"ThisProperty":42,"RETURN":43,"HERECOMMENT":44,"PARAM_START":45,"ParamList":46,"PARAM_END":47,"FuncGlyph":48,"->":49,"=>":50,"OptComma":51,",":52,"Param":53,"ParamVar":54,"...":55,"Array":56,"Object":57,"Splat":58,"SimpleAssignable":59,"Accessor":60,"Parenthetical":61,"Range":62,"This":63,".":64,"?.":65,"::":66,"Index":67,"INDEX_START":68,"IndexValue":69,"INDEX_END":70,"INDEX_SOAK":71,"Slice":72,"{":73,"AssignList":74,"}":75,"CLASS":76,"EXTENDS":77,"OptFuncExist":78,"Arguments":79,"SUPER":80,"FUNC_EXIST":81,"CALL_START":82,"CALL_END":83,"ArgList":84,"THIS":85,"@":86,"[":87,"]":88,"RangeDots":89,"..":90,"Arg":91,"SimpleArgs":92,"TRY":93,"Catch":94,"FINALLY":95,"CATCH":96,"THROW":97,"(":98,")":99,"WhileSource":100,"WHILE":101,"WHEN":102,"UNTIL":103,"Loop":104,"LOOP":105,"ForBody":106,"FOR":107,"ForStart":108,"ForSource":109,"ForVariables":110,"OWN":111,"ForValue":112,"FORIN":113,"FOROF":114,"BY":115,"SWITCH":116,"Whens":117,"ELSE":118,"When":119,"LEADING_WHEN":120,"IfBlock":121,"IF":122,"POST_IF":123,"UNARY":124,"-":125,"+":126,"--":127,"++":128,"?":129,"MATH":130,"SHIFT":131,"COMPARE":132,"LOGIC":133,"RELATION":134,"COMPOUND_ASSIGN":135,"$accept":0,"$end":1},
@@ -4490,7 +4490,7 @@ define('ace/mode/coffee/nodes', ['require', 'exports', 'module' , 'ace/mode/coff
       var node;
       node = this;
       while (node !== (node = node.unwrap())) {
-        continue;
+
       }
       return node;
     };
@@ -6116,7 +6116,7 @@ define('ace/mode/coffee/nodes', ['require', 'exports', 'module' , 'ace/mode/coff
       var args, base, code, i, index, node, _i, _len;
       index = -1;
       while ((node = list[++index]) && !(node instanceof Splat)) {
-        continue;
+
       }
       if (index >= list.length) return '';
       if (list.length === 1) {

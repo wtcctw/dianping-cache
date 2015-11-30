@@ -1,4 +1,4 @@
-if( !('ace' in window) ) window['ace'] = {}
+if( !('ace' in window) ) window['ace'] = {};
 if( !('vars' in window['ace']) ) {
   window['ace'].vars = {
 	 'icon'	: ' ace-icon ',
@@ -9,7 +9,7 @@ if( !('vars' in window['ace']) ) {
 ace.config = {
  cookie_expiry : 604800, //1 week duration for saved settings
  storage_method: 2 //2 means use cookies, 1 means localStorage, 0 means localStorage if available otherwise cookies
-}
+};
 
 ace.settings = {
 	is : function(item, status) {
@@ -165,8 +165,8 @@ ace.settings = {
 			//webkit has a problem redrawing and moving around the sidebar background in realtime
 			//so we do this, to force redraw
 			//there will be no problems with webkit if the ".container" class is statically put inside HTML code.
-			var sidebar = document.getElementById('sidebar')
-			ace.toggleClass(sidebar , 'menu-min')
+			var sidebar = document.getElementById('sidebar');
+			ace.toggleClass(sidebar , 'menu-min');
 			setTimeout(function() {	ace.toggleClass(sidebar , 'menu-min') } , 0)
 		}
 		
@@ -219,7 +219,7 @@ ace.settings = {
 	select_skin : function(skin) {
 	}
 	*/
-}
+};
 
 
 //check the status of something
@@ -233,7 +233,7 @@ ace.settings.check = function(item, val) {
 		'breadcrumbs-fixed' : 'breadcrumbs-fixed',
 		'sidebar-collapsed' : 'menu-min',
 		'main-container-fixed' : 'container'
-	}
+	};
 
 
 	//if an element doesn't have a specified class, but saved settings say it should, then add it
@@ -245,7 +245,7 @@ ace.settings.check = function(item, val) {
 	if(status != ace.hasClass(target , mustHaveClass[item+'-'+val])) {
 		ace.settings[item.replace('-','_')+'_'+val](status);//call the relevant function to make the changes
 	}
-}
+};
 
 
 
@@ -279,17 +279,17 @@ ace.data_storage = function(method, undefined) {
 			value = key;
 			key = namespace;
 
-			if(value == null) storage.remove(prefix+key)
+			if(value == null) storage.remove(prefix+key);
 			else {
 				if(type == 1)
-					storage.set(prefix+key, value)
+					storage.set(prefix+key, value);
 				else if(type == 2)
 					storage.set(prefix+key, value, ace.config.cookie_expiry)
 			}
 		}
 		else {
 			if(type == 1) {//localStorage
-				if(value == null) storage.remove(prefix+namespace+'_'+key)
+				if(value == null) storage.remove(prefix+namespace+'_'+key);
 				else storage.set(prefix+namespace+'_'+key, value);
 			}
 			else if(type == 2) {//cookie
@@ -311,7 +311,7 @@ ace.data_storage = function(method, undefined) {
 				storage.set(prefix+namespace , JSON.stringify(tmp), ace.config.cookie_expiry)
 			}
 		}
-	}
+	};
 
 	this.get = function(namespace, key, undefined) {
 		if(!storage) return null;
@@ -330,21 +330,21 @@ ace.data_storage = function(method, undefined) {
 				return key in tmp ? tmp[key] : null;
 			}
 		}
-	}
+	};
 
 	
 	this.remove = function(namespace, key, undefined) {
 		if(!storage) return;
 		
 		if(key === undefined) {
-			key = namespace
+			key = namespace;
 			this.set(key, null);
 		}
 		else {
 			this.set(namespace, key, null);
 		}
 	}
-}
+};
 
 
 
@@ -443,36 +443,36 @@ ace.sizeof = function(obj) {
 	var size = 0;
 	for(var key in obj) if(obj.hasOwnProperty(key)) size++;
 	return size;
-}
+};
 
 //because jQuery may not be loaded at this stage, we use our own toggleClass
-ace.hasClass = function(elem, className) {	return (" " + elem.className + " ").indexOf(" " + className + " ") > -1; }
+ace.hasClass = function(elem, className) {	return (" " + elem.className + " ").indexOf(" " + className + " ") > -1; };
 
 ace.addClass = function(elem, className) {
  if (!ace.hasClass(elem, className)) {
 	var currentClass = elem.className;
 	elem.className = currentClass + (currentClass.length? " " : "") + className;
  }
-}
+};
 
-ace.removeClass = function(elem, className) {ace.replaceClass(elem, className);}
+ace.removeClass = function(elem, className) {ace.replaceClass(elem, className);};
 
 ace.replaceClass = function(elem, className, newClass) {
 	var classToRemove = new RegExp(("(^|\\s)" + className + "(\\s|$)"), "i");
 	elem.className = elem.className.replace(classToRemove, function (match, p1, p2) {
 		return newClass? (p1 + newClass + p2) : " ";
 	}).replace(/^\s+|\s+$/g, "");
-}
+};
 
 ace.toggleClass = function(elem, className) {
 	if(ace.hasClass(elem, className))
 		ace.removeClass(elem, className);
 	else ace.addClass(elem, className);
-}
+};
 
 ace.isHTTMlElement = function(elem) {
  return window.HTMLElement ? elem instanceof HTMLElement : ('nodeType' in elem ? elem.nodeType == 1 : false);
-}
+};
 
 
 //data_storage instance used inside ace.settings etc

@@ -41,8 +41,8 @@ public class ModelAndViewInterceptor extends HandlerInterceptorAdapter{
 		String logoutUrl = null;
 		try {
 			ConfigCache configCache = ConfigCache.getInstance(EnvZooKeeperConfig.getZKAddress());
-			String prelogoutUrl = configCache.getProperty("cas-server-webapp.logoutUrl").trim();;
-			logoutUrl = configCache.getProperty("cache-server.sso.url").trim();//localhost%3A8081%2Fcache-server
+			String prelogoutUrl = configCache.getProperty("cas-server-webapp.logoutUrl").trim();
+			logoutUrl = configCache.getProperty("squirrel-web.sso.url").trim();//localhost%3A8081%2Fcache-server
 			logoutUrl = prelogoutUrl + "?service=" + logoutUrl.replaceAll(":", "%3A").replaceAll("/", "%2F");
 		} catch (LionException e) {
 			logger.error("Use lion to get url error.", e);

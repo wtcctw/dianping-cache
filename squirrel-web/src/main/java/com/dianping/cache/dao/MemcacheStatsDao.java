@@ -14,9 +14,9 @@ public interface MemcacheStatsDao {
 	
 	List<MemcacheStats> findByServerWithInterval(@Param("address")String address,@Param("start")long start,@Param("end")long end);
 	
-	public void insert(MemcacheStats data);
+	void insert(MemcacheStats data);
 	
-	public MemcacheStats findLast(String server);
+	MemcacheStats findLast(String server);
 
 	void delete(long timeBefore);
 }

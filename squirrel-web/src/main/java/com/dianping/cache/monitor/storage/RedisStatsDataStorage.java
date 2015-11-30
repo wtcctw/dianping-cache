@@ -47,9 +47,9 @@ public class RedisStatsDataStorage extends AbstractStatsDataStorage{
 	}
 	
 	private void storage(){
-//		if(!isMaster()){
-//			return;
-//		}
+		if(!isMaster()){
+			return;
+		}
 		List<Server> serverList = serverService.findAllRedisServers();
 		for(Server server : serverList){
 			pool.submit(new InsertData(server));

@@ -14,9 +14,9 @@ public interface RedisStatsDao {
 	
 	List<RedisStats> findByServerWithInterval(@Param("address")String address,@Param("start")long start,@Param("end")long end);
 	
-	public void insert(RedisStats data);
+	void insert(RedisStats data);
 	
-	public RedisStats findLast(String server);
+	RedisStats findLast(String server);
 
 	void delete(long timeBefore);
 }

@@ -43,9 +43,9 @@
 	
 	<select id="findByServerWithInterval" resultMap="RedisStatsResult" parameterType="map">
 		<![CDATA[
-		SELECT id,serverId,curr_time, memory_used, total_commands, total_connections
-   		FROM redis_stats 
-   		WHERE curr_time >= #{start} AND curr_time <= #{end} AND serverId = (select id from servers  where address = #{address}) 
+		SELECT r.id,serverId,curr_time, memory_used, total_commands, total_connections
+   		FROM redis_stats AS  r  JOIN servers AS s ON  r.serverId = s.id
+   		WHERE r.curr_time >= #{start} AND r.curr_time <= #{end} AND  s.address = #{address}
    		ORDER BY curr_time ASC 
 		 ]]>
 	</select>

@@ -98,7 +98,7 @@ module.controller('ConfigNewController', [
 						$('#modal-wizard2').modal('hide');
 					},3000);
 				});
-			}
+			};
 			
 			$scope.validate = function(address){
 				var add = address.split(":");
@@ -111,7 +111,7 @@ module.controller('ConfigNewController', [
 					var flag = response.flag;
 					return flag;
 				});
-			}
+			};
 			
 			$scope.reset = function(){
 				$scope.mCacheKey = "";
@@ -119,7 +119,7 @@ module.controller('ConfigNewController', [
 				$scope.mServers = "";
 				$scope.servers = [];
 				$scope.mTranscoderClazz = "";
-			}
+			};
 
 			$scope.creatNew = function(myForm) {
 				$scope.process = true;
@@ -150,7 +150,7 @@ module.controller('ConfigNewController', [
 					$scope.success = false;
 					$scope.fail = true;
 				});
-			}
+			};
 			
 			$scope.deleteServer = function(info){
 				$scope.servers.splice($.inArray(info,$scope.servers),1);
@@ -161,7 +161,7 @@ module.controller('ConfigNewController', [
 					}
 					$scope.mServers += $scope.servers[i]; 
 				}
-			}
+			};
 			
 			
 			
@@ -174,7 +174,7 @@ module.controller('ConfigNewController', [
 			
 			$scope.addRedisServer = function(){
 				$scope.serverTable.push($scope.redisServerIp + ":" + $scope.redisServerPort);
-			}
+			};
 			
 			
 			$scope.implItems = ["com.dianping.cache.memcached.MemcachedClientImpl",
@@ -191,13 +191,13 @@ module.controller('ConfigNewController', [
 					$scope.implItems = response.impl;
 					$scope.coderItems = response.coder;
 				});
-			}
+			};
 			
 			$scope.initarray = function(){
 				$scope.redisServer.push([1,2]);
 				$scope.redisServer.push([2,2]);
 				$scope.redisServer.push([3,2]);
-			}
+			};
 			$scope.initarray();
 			
 		} ]);

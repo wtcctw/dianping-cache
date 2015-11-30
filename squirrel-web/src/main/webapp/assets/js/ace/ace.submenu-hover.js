@@ -16,7 +16,7 @@ ace.sidebar_hoverable = function($, options) {
 		$sidebar.find('.submenu').each(function() {
 			var sub = this, li = this.parentNode;
 			if(sub) {
-				sub.style.removeProperty('top')
+				sub.style.removeProperty('top');
 				sub.style.removeProperty('bottom');
 				
 				var menu_text = li.querySelector('.menu-text');
@@ -30,7 +30,7 @@ ace.sidebar_hoverable = function($, options) {
 			}
 		});
 	}
- }
+ };
 
 
 var is_element_pos =
@@ -38,16 +38,16 @@ var is_element_pos =
 	//el.offsetHeight is used to force redraw and recalculate 'el.style.position' esp for webkit!
 	function(el, pos) { el.offsetHeight; return window.getComputedStyle(el).position == pos }
 	:
-	function(el, pos) { el.offsetHeight; return $(el).css('position') == pos }
+	function(el, pos) { el.offsetHeight; return $(el).css('position') == pos };
 
  $(window).on('resize.ace_hover', function() {
 	navbar_fixed = is_element_pos(navbar, 'fixed');
 	ace.helper.sidebar_hover.reset();
- })
+ });
  $(document).on('settings.ace.hover', function(e, event_name, event_val) {
 	if(event_name == 'sidebar_collapsed') ace.helper.sidebar_hover.reset();
 	else if(event_name == 'navbar_fixed') navbar_fixed = event_val;
- })
+ });
 
  ///////////////////////////////////////////////
  var $sidebar = $('.sidebar').eq(0),
@@ -82,16 +82,16 @@ var is_element_pos =
 			adjust_submenu.call(this, sub);
 		}
 	}
- })
+ });
 
 
  var $diff = 50;
  function adjust_submenu(sub) {
 	var $sub = $(sub);
-	sub.style.removeProperty('top')
+	sub.style.removeProperty('top');
 	sub.style.removeProperty('bottom');
 
-	var menu_text = null
+	var menu_text = null;
 	if( ace.vars['minimized'] && (menu_text = sub.parentNode.querySelector('.menu-text')) ) {
 		//2nd level items don't have .menu-text
 		menu_text.style.removeProperty('margin-top')
@@ -101,7 +101,7 @@ var is_element_pos =
 	var scroll = ace.helper.scrollTop();
 	var pull_up = false;
 
-	var $scroll = scroll
+	var $scroll = scroll;
 	if( navbar_fixed ) {
 		$scroll += navbar.clientHeight + 1;
 		//let's avoid our submenu from going below navbar
@@ -114,9 +114,9 @@ var is_element_pos =
 		sub_h += 40;
 		off.top -= 40;
 	}
-	var sub_bottom = parseInt(off.top + sub_h)
+	var sub_bottom = parseInt(off.top + sub_h);
 
-	var diff
+	var diff;
 	var winh = window.innerHeight;
 	//if the bottom of menu is going to go below visible window
 	if( (diff = sub_bottom - (winh + scroll - 50)) > 0 ) {
@@ -195,6 +195,6 @@ var is_element_pos =
 
  }
  
-}
+};
 
 

@@ -5,7 +5,7 @@ public interface AutoScale {
 	
 	int scaleUp(AppId appId,int number);
 	
-	boolean scaleDown(String address);
+	boolean scaleDown(AppId appId,String address);
 	
 	Result operation(String appid,int operateid);
 

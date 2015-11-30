@@ -5,12 +5,12 @@ import java.util.List;
 import com.dianping.cache.entity.RedisStats;
 
 public interface RedisStatsService {
-	public List<RedisStats> findByServer(String server);
+	List<RedisStats> findByServer(String server);
 	
-	public void insert(RedisStats stat);
+	void insert(RedisStats stat);
 	
-	public List<RedisStats> findByServerWithInterval(String address,long start,long end);
+	List<RedisStats> findByServerWithInterval(String address, long start, long end);
 	
-	public void delete(long timeBefore);
+	void delete(long timeBefore);
 	
 }

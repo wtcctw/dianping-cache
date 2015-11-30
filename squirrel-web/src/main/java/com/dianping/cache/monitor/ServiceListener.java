@@ -4,10 +4,10 @@ import com.dianping.cache.entity.CacheConfiguration;
 
 public interface ServiceListener {
 
-    public void serviceChanged(CacheConfiguration cacheConfig);
+    void serviceChanged(CacheConfiguration cacheConfig);
 
-    public void serviceAdded(CacheConfiguration config);
+    void serviceAdded(CacheConfiguration config);
 
-    public void serviceRemoved(CacheConfiguration config);
+    void serviceRemoved(CacheConfiguration config);
     
 }

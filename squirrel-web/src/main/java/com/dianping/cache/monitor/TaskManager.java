@@ -182,11 +182,8 @@ public class TaskManager implements ServiceListener {
         String service = cacheConfig.getCacheKey();
         if(service == null) 
             return false;
-        if(service.equals("web") || service.startsWith("dcache") || 
-           service.equals("kvdb") || service.startsWith("redis")) {
-            return false;
-        }
-        return true;
+        return !(service.equals("web") || service.startsWith("dcache") ||
+                service.equals("kvdb") || service.startsWith("redis"));
     }
     
     @Override

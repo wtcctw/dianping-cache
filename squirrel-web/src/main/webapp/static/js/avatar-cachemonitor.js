@@ -185,13 +185,13 @@ module.controller('ClusterQpsController', function($scope, $http) {
 			$scope.endTime = new Date().getTime();
 		renderGraph("/monitor/cluster/" + $scope.key, "container",
 				$scope.endTime, $http);
-	}
+	};
 
 	$scope.setNow = function() {
 		$scope.endTime = new Date().getTime();
 		renderGraph("/monitor/cluster/" + $scope.key, "container",
 				$scope.endTime, $http);
-	}
+	};
 
 	$scope.getProducerServerQps();
 

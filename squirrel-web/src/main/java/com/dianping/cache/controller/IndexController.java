@@ -38,7 +38,7 @@ public class IndexController extends AbstractMenuController{
 	@ResponseBody
 	public Object dockerInfo(){
 		DockerScale ds = new DockerScale();
-		return ds.info();
+		return DockerScale.info();
 	}
 	
 	

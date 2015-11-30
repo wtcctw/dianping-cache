@@ -12,7 +12,7 @@ ace.settings_rtl = function($) {
  $('#ace-settings-rtl').removeAttr('checked').on('click', function(){
 	ace.switch_direction(jQuery);
  });
-}
+};
 
 //>>> you should hard code changes inside HTML for RTL direction
 //you shouldn't use this function to switch direction
@@ -62,7 +62,7 @@ ace.switch_direction = function($) {
 		for(var i = 0 ; i < l ; i++) {
 			var val = this.attributes[i].value;
 			if(val.match(/fa\-(?:[\w\-]+)\-left/)) 
-				this.attributes[i].value = val.replace(/fa\-([\w\-]+)\-(left)/i , 'fa-$1-right')
+				this.attributes[i].value = val.replace(/fa\-([\w\-]+)\-(left)/i , 'fa-$1-right');
 			 else if(val.match(/fa\-(?:[\w\-]+)\-right/)) 
 				this.attributes[i].value = val.replace(/fa\-([\w\-]+)\-(right)/i , 'fa-$1-left')
 		}
@@ -81,7 +81,7 @@ ace.switch_direction = function($) {
 		$('.scroll-hz').removeClass('make-ltr')
 		.find('.make-rtl').children().unwrap();
 	}
-	if($.fn.ace_scroll) $('.scroll-hz').ace_scroll('reset') //to reset scrollLeft
+	if($.fn.ace_scroll) $('.scroll-hz').ace_scroll('reset'); //to reset scrollLeft
 
 	//redraw the traffic pie chart on homepage with a different parameter
 	try {
@@ -98,4 +98,4 @@ ace.switch_direction = function($) {
 		ace.helper.redraw(document.body);
 		ace.helper.redraw($('.main-content').get(0));
 	}, 10);*/
-}
+};

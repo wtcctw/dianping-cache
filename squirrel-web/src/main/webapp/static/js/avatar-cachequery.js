@@ -41,7 +41,7 @@ module.controller('CacheQueryController', [
 						
 					});
 					
-			}
+			};
 			
 		
 			
@@ -85,7 +85,7 @@ module.controller('CacheQueryController', [
 					}).error(function(response) {
 					});
 				
-			}
+			};
 			
 			
 			
@@ -99,11 +99,11 @@ module.controller('CacheQueryController', [
 						$scope.address = response.address;
 					});
 				
-			}
+			};
 			
 			
 			$scope.setKeyValue = function(){
-				var tmpParams = new Array();
+				var tmpParams = [];
 				for(var i = 0; i < $scope.params.length; i++){
 					tmpParams.push($scope.params[i][1]);
 				}
@@ -116,7 +116,7 @@ module.controller('CacheQueryController', [
 					}).success(function(response){
 						$scope.status = response;
 					});
-			}
+			};
 			
 			$scope.$watch("params",function(newValue,oldValue, $scope){
 				var key = $scope.category+".";

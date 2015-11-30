@@ -1014,7 +1014,7 @@ var FoldMode = exports.FoldMode = function() {};
         var line = session.getLine(row);
         var startColumn = column || line.length;
         var startLevel = line.match(re)[0].length;
-        var maxRow = session.getLength()
+        var maxRow = session.getLength();
         
         while (++row < maxRow) {
             line = session.getLine(row);
@@ -1599,7 +1599,7 @@ var XmlBehaviour = function () {
         }
     });
     
-}
+};
 oop.inherits(XmlBehaviour, Behaviour);
 
 exports.XmlBehaviour = XmlBehaviour;
@@ -1850,7 +1850,7 @@ oop.inherits(FoldMode, BaseFoldMode);
             }
             else if (this.voidElements[top.tagName]) {
                 stack.pop();
-                continue;
+
             } else {
                 return null;
             }
@@ -2367,7 +2367,7 @@ var LuaHighlightRules = function() {
         
     };
 
-}
+};
 
 oop.inherits(LuaHighlightRules, TextHighlightRules);
 

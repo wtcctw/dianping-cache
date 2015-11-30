@@ -17,7 +17,7 @@ ace.auto_padding = function($) {
 	var breadcrumbs = $('.breadcrumbs').eq(0);
 	var page_content = $('.page-content').get(0);
 	
-	var default_padding = 8
+	var default_padding = 8;
 
 	if(navbar.length > 0) {
 	  $(window).on('resize.padding', function() {
@@ -77,4 +77,4 @@ ace.auto_padding = function($) {
 	  });*/
 	}
 
-}
+};

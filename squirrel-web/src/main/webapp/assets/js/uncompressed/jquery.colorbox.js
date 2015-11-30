@@ -667,7 +667,7 @@
 			$.each(css, function(i){
 				if (css[i] !== previousCSS[i]) {
 					tempSpeed = speed;
-					return;
+
 				}
 			});
 			speed = tempSpeed;
