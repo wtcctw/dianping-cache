@@ -164,4 +164,4 @@ ace.handle_side_menu = function($) {
 		ev.preventDefault();
 		return false;
 	 })
-}
+};

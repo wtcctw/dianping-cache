@@ -39,5 +39,12 @@
 		FROM server_cluster
 		WHERE cluster = #{cluster} AND serverId = #{serverId}
 	</delete>
-	
+
+	<delete id="deleteServer" parameterType="String">
+		DELETE *
+		FROM server_cluster AS sc LEFT JOIN servers AS s ON sc.serverId=s.id
+		WHERE s.address = #{address}
+	</delete>
+
+
 </mapper>

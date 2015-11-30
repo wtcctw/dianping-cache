@@ -96,7 +96,7 @@ module.controller('KeyController', [
 			$scope.category = "";
 			$scope.category1 = "";
 			$scope.category2 = "";
-			$scope.categoryForClear = ";"
+			$scope.categoryForClear = ";";
 			$scope.cacheType2 = "";
 			$scope.cacheType1 = "";
 			$scope.cacheType = "";
@@ -125,7 +125,7 @@ module.controller('KeyController', [
 				}
 				$scope.searchPaginator = Paginator(fetchFunction,
 						$scope.pageId, $scope.searchBy, $scope.category, $scope.cacheType);
-			}
+			};
 			$scope.setConfigParas = function(){
 				$http.get(window.contextPath + '/cache/config/findAll', {
 					params : {
@@ -168,7 +168,7 @@ module.controller('KeyController', [
 						
 					});
 				
-			}
+			};
 
 			$scope.setModalInput = function(category , duration, indexTemplate, cacheType,indexDesc,version,hot,sync2Dnet,extension){
 				$scope.category2 = category;
@@ -180,7 +180,7 @@ module.controller('KeyController', [
 				$scope.hot = hot;
 				$scope.sync2Dnet = sync2Dnet;
 				$scope.extension = extension;
-			}
+			};
 			$scope.creatCategory = function(myForm){
 				if(angular.isUndefined($scope.hot)){
 					$scope.hot="false";
@@ -205,7 +205,7 @@ module.controller('KeyController', [
 				).success(function(response) {
 					$scope.query();
 	        	});
-			}
+			};
 
 			$scope.updateCategory = function(myForm){
 
@@ -233,7 +233,7 @@ module.controller('KeyController', [
 				).success(function(response) {
 					$scope.query();
 	        	});
-			}
+			};
 			
 			$rootScope.deleteCacheKeyByCategory = function(category){
 				$http.post(window.contextPath + '/cache/key/delete',
@@ -241,7 +241,7 @@ module.controller('KeyController', [
 	        				$scope.query();
 	        	});
 				return true;
-			}
+			};
 			
 			$scope.dialog = function(category) {
 				$rootScope.mCategory = category;
@@ -270,7 +270,7 @@ module.controller('KeyController', [
 			
 			$scope.setClearCategory = function(category){
 				$scope.categoryForClear = category;
-			}
+			};
 			
 			$scope.applist=[];
 			$scope.getAppList = function(category){
@@ -284,7 +284,7 @@ module.controller('KeyController', [
 						});
 					}
 	        	});
-			}
+			};
 			
 			
 			$scope.clearCache = function(myForm){
@@ -293,7 +293,7 @@ module.controller('KeyController', [
 	        			{"category":$scope.categoryForClear}).success(function(response) {
 	        				$scope.query();
 	        	});
-			}
+			};
 			$scope.query();
 			$scope.setConfigParas();
 		} ]);

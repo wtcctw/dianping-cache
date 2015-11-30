@@ -91,7 +91,7 @@
 				}
 				move_bar = false;
 				if(trigger_scroll) this.$element.trigger('scroll', [content_wrap]);
-			})
+			});
 
 			if(settings.mouseWheel) {
 				var lock = settings.mouseWheelLock;
@@ -103,12 +103,12 @@
 
 					if(mouse_track) {
 						mouse_track = false;
-						$('html').off('.ace_scroll')
+						$('html').off('.ace_scroll');
 						$(mouse_release_target).off('.ace_scroll');
 						if(dragEvent) self.$element.trigger('drag.end');
 					}
 
-					var delta = event.originalEvent.detail < 0 || event.originalEvent.wheelDelta > 0 ? 1 : -1
+					var delta = event.originalEvent.detail < 0 || event.originalEvent.wheelDelta > 0 ? 1 : -1;
 					var scrollEnd = false//have we reached the end of scrolling?
 					
 					var clientSize = content_wrap[client_size], scrollAmount = content_wrap[scroll_direction];
@@ -123,12 +123,12 @@
 					content_wrap[scroll_direction] = scrollAmount - (delta * step);
 
 					return scrollEnd && !lock_anyway;
-				})
+				});
 			}
 			
 			
 			//swipe not available yet
-			var touchDrag = ace.vars['touch'] && 'ace_drag' in $.event.special && settings.touchDrag //&& !settings.touchSwipe;
+			var touchDrag = ace.vars['touch'] && 'ace_drag' in $.event.special && settings.touchDrag; //&& !settings.touchSwipe;
 			//add drag event for touch devices to scroll
 			if(touchDrag/** || ($.fn.swipe && settings.touchSwipe)*/) {
 				var dir = '', event_name = touchDrag ? 'ace_drag' : 'swipe';
@@ -174,16 +174,16 @@
 			
 			disabled = false;
 			created = true;
-		}
+		};
 		this.is_active = function() {
 			return active;
-		}
+		};
 		this.is_enabled = function() {
 			return !disabled;
-		}
+		};
 		this.move_bar = function($move) {
 			move_bar = $move;
-		}
+		};
 
 		this.reset = function() {
 			if(disabled) return;// this;
@@ -193,7 +193,7 @@
 			if( (vertical && content_size == 0) || (!vertical && this.element.scrollWidth == 0) ) {
 				//elemen is hidden
 				//this.$element.addClass('scroll-hidden');
-				this.$element.removeClass('scroll-active')
+				this.$element.removeClass('scroll-active');
 				return;// this;
 			}
 			
@@ -207,7 +207,7 @@
 				active = true;
 				$track.css(css_size, available_space).show();
 
-				ratio = parseFloat((available_space / content_size).toFixed(5))
+				ratio = parseFloat((available_space / content_size).toFixed(5));
 				
 				bar_size = parseInt(Math.round(available_space * ratio));
 				bar_size_2 = parseInt(Math.round(bar_size / 2));
@@ -218,7 +218,7 @@
 				bar_style[css_size] = bar_size + 'px';
 				bar_style[css_pos] = bar_pos + 'px';
 				
-				this.$element.addClass('scroll-active')
+				this.$element.addClass('scroll-active');
 
 				if(!reset_once) {
 					//this.$element.removeClass('scroll-hidden');
@@ -236,8 +236,8 @@
 				$content_wrap.css(max_css_size , '');
 			}
 
-			return;// this;
-		}
+			// this;
+		};
 		this.disable = function() {
 			content_wrap[scroll_direction] = 0;
 			bar_style[css_pos] = 0;
@@ -250,20 +250,20 @@
 			$content_wrap.css(max_css_size , '');
 
 			return this;
-		}
+		};
 		this.enable = function() {
 			disabled = false;
 			this.reset();
 
 			return this;
-		}
+		};
 		this.destroy = function() {
 			active = false;
 			disabled = false;
 			created = false;
 			
 			this.$element.removeClass('ace-scroll scroll-hz'+(settings.extraClass ? ' '+settings.extraClass : ''));
-			this.$element.off('.ace_scroll')
+			this.$element.off('.ace_scroll');
 
 			if(!vertical) {
 				//remove the extra wrapping div
@@ -277,7 +277,7 @@
 			if(inline_style !== false) this.element.style.position = inline_style;
 			
 			return this;
-		}
+		};
 		this.modify = function(_settings) {
 			if(_settings) settings = $.extend({}, $.fn.ace_scroll.defaults, _settings);
 			
@@ -286,19 +286,19 @@
 			this.reset();
 			
 			return this;
-		}
+		};
 		this.update = function(_settings) {
 			//if(_settings) settings = $.extend({}, $.fn.ace_scroll.defaults, _settings);
 			this.size = _settings.size;
 			return this;
-		}
+		};
 
 		
 		this.update_scroll = function() {
 			move_bar = false;
 			bar_style[css_pos] = bar_pos + 'px';
 			content_wrap[scroll_direction] = parseInt(Math.round(bar_pos / ratio));
-		}
+		};
 
 		function mouse_down_track(e) {
 			e.preventDefault();
@@ -334,7 +334,7 @@
 			}
 
 			mouse_track = true;
-			$('html').off('mousemove.ace_scroll').on('mousemove.ace_scroll', mouse_move_bar)
+			$('html').off('mousemove.ace_scroll').on('mousemove.ace_scroll', mouse_move_bar);
 			$(mouse_release_target).off('mouseup.ace_scroll').on('mouseup.ace_scroll', mouse_up_bar);
 			
 			$track.addClass('active');
@@ -374,7 +374,7 @@
 			e.stopPropagation();
 			
 			mouse_track = false;
-			$('html').off('.ace_scroll')
+			$('html').off('.ace_scroll');
 			$(mouse_release_target).off('.ace_scroll');
 
 			$track.removeClass('active');
@@ -385,7 +385,7 @@
 		this.reset();
 
 		return this;
-	}
+	};
 
 	
 	$.fn.ace_scroll = function (option,value) {
@@ -434,7 +434,7 @@
 		'thin': false,
 		'position': 'right'
 		*/
-     }
+     };
 
 	/**
 	$(document).on('ace.settings.ace_scroll', function(e, name) {
@@ -468,7 +468,7 @@
 				$class += ' selected';
 				color_selected = color;
 			}
-			color_array.push(color)
+			color_array.push(color);
 			color_list += '<li><a class="'+$class+'" href="#" style="background-color:'+color+';" data-color="'+color+'"></a></li>';
 		}).
 		end()
@@ -476,10 +476,10 @@
 			$element.next().find('.btn-colorpicker').css('background-color', this.value);
 		})
 		.after('<div class="dropdown dropdown-colorpicker">\
-		<a data-toggle="dropdown" class="dropdown-toggle" '+(options.auto_pos ? 'data-position="auto"' : '')+' href="#"><span class="btn-colorpicker" style="background-color:'+color_selected+'"></span></a><ul class="dropdown-menu'+(options.caret? ' dropdown-caret' : '')+(options.pull_right ? ' dropdown-menu-right' : '')+'">'+color_list+'</ul></div>')
+		<a data-toggle="dropdown" class="dropdown-toggle" '+(options.auto_pos ? 'data-position="auto"' : '')+' href="#"><span class="btn-colorpicker" style="background-color:'+color_selected+'"></span></a><ul class="dropdown-menu'+(options.caret? ' dropdown-caret' : '')+(options.pull_right ? ' dropdown-menu-right' : '')+'">'+color_list+'</ul></div>');
 
 		
-		var dropdown = $element.next().find('.dropdown-menu')
+		var dropdown = $element.next().find('.dropdown-menu');
 		dropdown.on(ace.click_event, function(e) {
 			var a = $(e.target);
 			if(!a.is('.colorpick-btn')) return false;
@@ -493,7 +493,7 @@
 
 			e.preventDefault();
 			return true;//to hide dropdown
-		})
+		});
 		selection = $element.next().find('a.selected');
 
 		this.pick = function(index, insert) {
@@ -524,14 +524,14 @@
 				if(index == -1) return;
 				dropdown.find('a:eq('+index+')').trigger(ace.click_event);
 			}
-		}
+		};
 
 		this.destroy = function() {
 			$element.removeClass('hide').off('change.color')
 			.next().remove();
 			color_array = [];
 		}
-	}
+	};
 
 
 	$.fn.ace_colorpicker = function(option, value) {
@@ -547,7 +547,7 @@
 		});
 
 		return (retval === undefined) ? $set : retval;
-	}
+	};
 	
 	$.fn.ace_colorpicker.defaults = {
 		'pull_right' : false,
@@ -586,13 +586,13 @@
 			//if(ret === false) e.preventDefault();
 		});
 
-		var parent_label = this.$element.closest('label').css({'display':'block'})
+		var parent_label = this.$element.closest('label').css({'display':'block'});
 		var tagName = parent_label.length == 0 ? 'label' : 'span';//if not inside a "LABEL" tag, use "LABEL" tag, otherwise use "SPAN"
 		this.$element.wrap('<'+tagName+' class="ace-file-input" />');
 
 		this.apply_settings();
 		this.reset_input_field();//for firefox as it keeps selected file after refresh
-	}
+	};
 	Ace_File_Input.error = {
 		'FILE_LOAD_FAILED' : 1,
 		'IMAGE_LOAD_FAILED' : 2,
@@ -638,7 +638,7 @@
 		if(this.settings.droppable && hasFileList) {
 			enable_drop_functionality.call(this);
 		}
-	}
+	};
 
 	Ace_File_Input.prototype.show_file_list = function($files) {
 		var files = typeof $files === "undefined" ? this.$element.data('ace_input_files') : $files;
@@ -689,17 +689,17 @@
 						if(self.settings.preview_error) self.settings.preview_error.call(self, filename, result.code);
 					});
 				}
-			}
+			};
 
 		}
 
 		return true;
-	}
+	};
 
 	Ace_File_Input.prototype.reset_input = function() {
 	    this.reset_input_ui();
 		this.reset_input_field();
-	}
+	};
 
 	Ace_File_Input.prototype.reset_input_ui = function() {
 		 this.$label.attr({'data-title':this.settings.btn_choose, 'class':'ace-file-container'})
@@ -711,7 +711,7 @@
 		this.$label.find('.ace-file-name').not(':first').remove();
 		
 		this.reset_input_data();
-	}
+	};
 	Ace_File_Input.prototype.reset_input_field = function() {
 		//http://stackoverflow.com/questions/1043957/clearing-input-type-file-using-jquery/13351234#13351234
 		this.$element.wrap('<form>').parent().get(0).reset();
@@ -724,38 +724,38 @@
 		//thus calling reset again and again and again
 		//so because when "reset" button of outer form is hit, file input is automatically reset
 		//we just reset_input_ui to avoid recursion
-	}
+	};
 	Ace_File_Input.prototype.reset_input_data = function() {
 		if(this.$element.data('ace_input_files')) {
 			this.$element.removeData('ace_input_files');
 			this.$element.removeData('ace_input_method');
 		}
-	}
+	};
 
 	Ace_File_Input.prototype.enable_reset = function(can_reset) {
 		this.can_reset = can_reset;
-	}
+	};
 
 	Ace_File_Input.prototype.disable = function() {
 		this.disabled = true;
 		this.$element.attr('disabled', 'disabled').addClass('disabled');
-	}
+	};
 	Ace_File_Input.prototype.enable = function() {
 		this.disabled = false;
 		this.$element.removeAttr('disabled').removeClass('disabled');
-	}
+	};
 
 	Ace_File_Input.prototype.files = function() {
 		return $(this).data('ace_input_files') || null;
-	}
+	};
 	Ace_File_Input.prototype.method = function() {
 		return $(this).data('ace_input_method') || '';
-	}
+	};
 	
 	Ace_File_Input.prototype.update_settings = function(new_settings) {
 		this.settings = $.extend({}, this.settings, new_settings);
 		this.apply_settings();
-	}
+	};
 	
 	Ace_File_Input.prototype.loading = function(is_loading) {
 		if(is_loading === false) {
@@ -777,7 +777,7 @@
 			}
 			loader.empty().append(inside);
 		}
-	}
+	};
 
 
 
@@ -823,7 +823,7 @@
 			self.$element.triggerHandler('change' , [true]);//true means ace_inner_call
 			return true;
 		});
-	}
+	};
 	
 	
 	var handle_on_change = function() {
@@ -838,7 +838,7 @@
 		this.show_file_list(file_list);
 		
 		return true;
-	}
+	};
 
 
 
@@ -846,7 +846,7 @@
 		var self = this;
 		var $span = self.$label.find('.ace-file-name:last');//it should be out of onload, otherwise all onloads may target the same span because of delays
 		
-		var deferred = new $.Deferred
+		var deferred = new $.Deferred;
 		var reader = new FileReader();
 		reader.onload = function (e) {
 			$span.prepend("<img class='middle' style='display:none;' />");
@@ -868,11 +868,13 @@
 				}
 
 				var w = thumb.w, h = thumb.h;
-				if(self.settings.thumbnail == 'small') {w=h=size;};
+				if (self.settings.thumbnail == 'small') {
+					w = h = size;
+				}
 				$(img).css({'background-image':'url('+thumb.src+')' , width:w, height:h})									
 						.data('thumb', thumb.src)
 						.attr({src:'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImWNgYGBgAAAABQABh6FO1AAAAABJRU5ErkJggg=='})
-						.show()
+						.show();
 
 				///////////////////
 				deferred.resolve();
@@ -883,21 +885,21 @@
 			});
 
 			img.src = e.target.result;
-		}
+		};
 		reader.onerror = function (e) {
 			deferred.reject({code:Ace_File_Input.error['FILE_LOAD_FAILED']});
-		}
+		};
 		reader.readAsDataURL(file);
 
 		return deferred.promise();
-	}
+	};
 
 	var get_thumbnail = function(img, size, type) {
 		var w = img.width, h = img.height;
 		
 		//**IE10** is not giving correct width using img.width so we use $(img).width()
-		w = w > 0 ? w : $(img).width()
-		h = h > 0 ? h : $(img).height()
+		w = w > 0 ? w : $(img).width();
+		h = h > 0 ? h : $(img).height();
 
 		if(w > size || h > size) {
 		  if(w > h) {
@@ -910,7 +912,7 @@
 		}
 
 
-		var dataURL
+		var dataURL;
 		try {
 			var canvas = document.createElement('canvas');
 			canvas.width = w; canvas.height = h;
@@ -929,7 +931,7 @@
 		
 
 		return {src: dataURL, w:w, h:h};
-	}
+	};
 	
 
 	
@@ -963,7 +965,7 @@
 		if (ret instanceof Array || (hasFileList && ret instanceof FileList)) file_list = ret;
 		
 		return file_list;
-	}
+	};
 	
 	
 	var getExtRegex = function(ext) {
@@ -971,13 +973,13 @@
 		if(typeof ext === 'string') ext = [ext];
 		if(ext.length == 0) return null;
 		return new RegExp("\.(?:"+ext.join('|')+")$", "i");
-	}
+	};
 	var getMimeRegex = function(mime) {
 		if(!mime) return null;
 		if(typeof mime === 'string') mime = [mime];
 		if(mime.length == 0) return null;
 		return new RegExp("^(?:"+mime.join('|').replace(/\//g, "\\/")+")$", "i");
-	}
+	};
 	var checkFileList = function(files, dropped) {
 		var allowExt   = getExtRegex(this.settings.allowExt);
 
@@ -993,7 +995,7 @@
 
 
 		var safe_files = [];
-		var error_list = {}
+		var error_list = {};
 		for(var f = 0; f < files.length; f++) {
 			var file = files[f];
 			
@@ -1050,12 +1052,12 @@
 		if(safe_files.length == files.length) return files;//return original file list if all are valid
 
 		/////////
-		var error_count = {'ext': 0, 'mime': 0, 'size': 0}
+		var error_count = {'ext': 0, 'mime': 0, 'size': 0};
 		if( 'ext' in error_list ) error_count['ext'] = error_list['ext'].length;
 		if( 'mime' in error_list ) error_count['mime'] = error_list['mime'].length;
 		if( 'size' in error_list ) error_count['size'] = error_list['size'].length;
 		
-		var event
+		var event;
 		this.$element.trigger(
 			event = new $.Event('file.error.ace'), 
 			{
@@ -1070,7 +1072,7 @@
 		//////////
 
 		return safe_files;//return safe_files
-	}
+	};
 
 
 
@@ -1151,27 +1153,27 @@
   * ================================= */
 
   var Typeahead = function (element, options) {
-    this.$element = $(element)
-    this.options = $.extend({}, $.fn.bs_typeahead.defaults, options)
-    this.matcher = this.options.matcher || this.matcher
-    this.sorter = this.options.sorter || this.sorter
-    this.highlighter = this.options.highlighter || this.highlighter
-    this.updater = this.options.updater || this.updater
-    this.source = this.options.source
-    this.$menu = $(this.options.menu)
-    this.shown = false
+    this.$element = $(element);
+    this.options = $.extend({}, $.fn.bs_typeahead.defaults, options);
+    this.matcher = this.options.matcher || this.matcher;
+    this.sorter = this.options.sorter || this.sorter;
+    this.highlighter = this.options.highlighter || this.highlighter;
+    this.updater = this.options.updater || this.updater;
+    this.source = this.options.source;
+    this.$menu = $(this.options.menu);
+    this.shown = false;
     this.listen()
-  }
+  };
 
   Typeahead.prototype = {
 
     constructor: Typeahead
 
   , select: function () {
-      var val = this.$menu.find('.active').attr('data-value')
+      var val = this.$menu.find('.active').attr('data-value');
       this.$element
         .val(this.updater(val))
-        .change()
+        .change();
       return this.hide()
     }
 
@@ -1182,7 +1184,7 @@
   , show: function () {
       var pos = $.extend({}, this.$element.position(), {
         height: this.$element[0].offsetHeight
-      })
+      });
 
       this.$menu
         .insertAfter(this.$element)
@@ -1190,40 +1192,40 @@
           top: pos.top + pos.height
         , left: pos.left
         })
-        .show()
+        .show();
 
-      this.shown = true
+      this.shown = true;
       return this
     }
 
   , hide: function () {
-      this.$menu.hide()
-      this.shown = false
+      this.$menu.hide();
+      this.shown = false;
       return this
     }
 
   , lookup: function (event) {
-      var items
+      var items;
 
-      this.query = this.$element.val()
+      this.query = this.$element.val();
 
       if (!this.query || this.query.length < this.options.minLength) {
         return this.shown ? this.hide() : this
       }
 
-      items = $.isFunction(this.source) ? this.source(this.query, $.proxy(this.process, this)) : this.source
+      items = $.isFunction(this.source) ? this.source(this.query, $.proxy(this.process, this)) : this.source;
 
       return items ? this.process(items) : this
     }
 
   , process: function (items) {
-      var that = this
+      var that = this;
 
       items = $.grep(items, function (item) {
         return that.matcher(item)
-      })
+      });
 
-      items = this.sorter(items)
+      items = this.sorter(items);
 
       if (!items.length) {
         return this.shown ? this.hide() : this
@@ -1240,11 +1242,11 @@
       var beginswith = []
         , caseSensitive = []
         , caseInsensitive = []
-        , item
+        , item;
 
       while (item = items.shift()) {
-        if (!item.toLowerCase().indexOf(this.query.toLowerCase())) beginswith.push(item)
-        else if (~item.indexOf(this.query)) caseSensitive.push(item)
+        if (!item.toLowerCase().indexOf(this.query.toLowerCase())) beginswith.push(item);
+        else if (~item.indexOf(this.query)) caseSensitive.push(item);
         else caseInsensitive.push(item)
       }
 
@@ -1252,29 +1254,29 @@
     }
 
   , highlighter: function (item) {
-      var query = this.query.replace(/[\-\[\]{}()*+?.,\\\^$|#\s]/g, '\\$&')
+      var query = this.query.replace(/[\-\[\]{}()*+?.,\\\^$|#\s]/g, '\\$&');
       return item.replace(new RegExp('(' + query + ')', 'ig'), function ($1, match) {
         return '<strong>' + match + '</strong>'
       })
     }
 
   , render: function (items) {
-      var that = this
+      var that = this;
 
       items = $(items).map(function (i, item) {
-        i = $(that.options.item).attr('data-value', item)
-        i.find('a').html(that.highlighter(item))
+        i = $(that.options.item).attr('data-value', item);
+        i.find('a').html(that.highlighter(item));
         return i[0]
-      })
+      });
 
-      items.first().addClass('active')
-      this.$menu.html(items)
+      items.first().addClass('active');
+      this.$menu.html(items);
       return this
     }
 
   , next: function (event) {
       var active = this.$menu.find('.active').removeClass('active')
-        , next = active.next()
+        , next = active.next();
 
       if (!next.length) {
         next = $(this.$menu.find('li')[0])
@@ -1285,7 +1287,7 @@
 
   , prev: function (event) {
       var active = this.$menu.find('.active').removeClass('active')
-        , prev = active.prev()
+        , prev = active.prev();
 
       if (!prev.length) {
         prev = this.$menu.find('li').last()
@@ -1299,7 +1301,7 @@
         .on('focus',    $.proxy(this.focus, this))
         .on('blur',     $.proxy(this.blur, this))
         .on('keypress', $.proxy(this.keypress, this))
-        .on('keyup',    $.proxy(this.keyup, this))
+        .on('keyup',    $.proxy(this.keyup, this));
 
       if (this.eventSupported('keydown')) {
         this.$element.on('keydown', $.proxy(this.keydown, this))
@@ -1312,32 +1314,32 @@
     }
 
   , eventSupported: function(eventName) {
-      var isSupported = eventName in this.$element
+      var isSupported = eventName in this.$element;
       if (!isSupported) {
-        this.$element.setAttribute(eventName, 'return;')
+        this.$element.setAttribute(eventName, 'return;');
         isSupported = typeof this.$element[eventName] === 'function'
       }
       return isSupported
     }
 
   , move: function (e) {
-      if (!this.shown) return
+      if (!this.shown) return;
 
       switch(e.keyCode) {
         case 9: // tab
         case 13: // enter
         case 27: // escape
-          e.preventDefault()
-          break
+          e.preventDefault();
+          break;
 
         case 38: // up arrow
-          e.preventDefault()
-          this.prev()
-          break
+          e.preventDefault();
+          this.prev();
+          break;
 
         case 40: // down arrow
-          e.preventDefault()
-          this.next()
+          e.preventDefault();
+          this.next();
           break
       }
 
@@ -1345,12 +1347,12 @@
     }
 
   , keydown: function (e) {
-      this.suppressKeyPressRepeat = ~$.inArray(e.keyCode, [40,38,9,13,27])
+      this.suppressKeyPressRepeat = ~$.inArray(e.keyCode, [40,38,9,13,27]);
       this.move(e)
     }
 
   , keypress: function (e) {
-      if (this.suppressKeyPressRepeat) return
+      if (this.suppressKeyPressRepeat) return;
       this.move(e)
     }
 
@@ -1361,24 +1363,24 @@
         case 16: // shift
         case 17: // ctrl
         case 18: // alt
-          break
+          break;
 
         case 9: // tab
         case 13: // enter
-          if (!this.shown) return
-          this.select()
-          break
+          if (!this.shown) return;
+          this.select();
+          break;
 
         case 27: // escape
-          if (!this.shown) return
-          this.hide()
-          break
+          if (!this.shown) return;
+          this.hide();
+          break;
 
         default:
           this.lookup()
       }
 
-      e.stopPropagation()
+      e.stopPropagation();
       e.preventDefault()
   }
 
@@ -1387,45 +1389,45 @@
     }
 
   , blur: function (e) {
-      this.focused = false
+      this.focused = false;
       if (!this.mousedover && this.shown) this.hide()
     }
 
   , click: function (e) {
-      e.stopPropagation()
-      e.preventDefault()
-      this.select()
+      e.stopPropagation();
+      e.preventDefault();
+      this.select();
       this.$element.focus()
     }
 
   , mouseenter: function (e) {
-      this.mousedover = true
-      this.$menu.find('.active').removeClass('active')
+      this.mousedover = true;
+      this.$menu.find('.active').removeClass('active');
       $(e.currentTarget).addClass('active')
     }
 
   , mouseleave: function (e) {
-      this.mousedover = false
+      this.mousedover = false;
       if (!this.focused && this.shown) this.hide()
     }
 
-  }
+  };
 
 
   /* TYPEAHEAD PLUGIN DEFINITION
    * =========================== */
 
-  var old = $.fn.bs_typeahead
+  var old = $.fn.bs_typeahead;
 
   $.fn.bs_typeahead = function (option) {
     return this.each(function () {
       var $this = $(this)
         , data = $this.data('bs_typeahead')
-        , options = typeof option == 'object' && option
-      if (!data) $this.data('bs_typeahead', (data = new Typeahead(this, options)))
+        , options = typeof option == 'object' && option;
+      if (!data) $this.data('bs_typeahead', (data = new Typeahead(this, options)));
       if (typeof option == 'string') data[option]()
     })
-  }
+  };
 
   $.fn.bs_typeahead.defaults = {
     source: []
@@ -1433,26 +1435,26 @@
   , menu: '<ul class="typeahead dropdown-menu"></ul>'
   , item: '<li><a href="#"></a></li>'
   , minLength: 1
-  }
+  };
 
-  $.fn.bs_typeahead.Constructor = Typeahead
+  $.fn.bs_typeahead.Constructor = Typeahead;
 
 
  /* TYPEAHEAD NO CONFLICT
   * =================== */
 
   $.fn.bs_typeahead.noConflict = function () {
-    $.fn.bs_typeahead = old
+    $.fn.bs_typeahead = old;
     return this
-  }
+  };
 
 
  /* TYPEAHEAD DATA-API
   * ================== */
 
   $(document).on('focus.bs_typeahead.data-api', '[data-provide="bs_typeahead"]', function (e) {
-    var $this = $(this)
-    if ($this.data('bs_typeahead')) return
+    var $this = $(this);
+    if ($this.data('bs_typeahead')) return;
     $this.bs_typeahead($this.data())
   })
 
@@ -1475,7 +1477,7 @@
 			'#92e1c0','#9fe1e7','#9fc6e7','#4986e7','#9a9cff','#b99aff',
 			'#c2c2c2','#cabdbf','#cca6ac','#f691b2','#cd74e6','#a47ae2',
 			'#444444'
-		]
+		];
 
 		var button_defaults =
 		{
@@ -1578,7 +1580,7 @@
 				icon : 'fa fa-code',
 				title : 'View Source'
 			}
-		}
+		};
 		
 		var toolbar_buttons =
 		options.toolbar ||
@@ -1613,7 +1615,7 @@
 			'redo',
 			null,
 			'viewSource'
-		]
+		];
 
 
 		this.each(function() {
@@ -1641,7 +1643,7 @@
 						toolbar += ' <ul class="dropdown-menu dropdown-light dropdown-caret">';
 						for(var font in button.values)
 							if(button.values.hasOwnProperty(font))
-								toolbar += ' <li><a data-edit="fontName ' + button.values[font] +'" style="font-family:\''+ button.values[font]  +'\'">'+button.values[font]  + '</a></li> '
+								toolbar += ' <li><a data-edit="fontName ' + button.values[font] +'" style="font-family:\''+ button.values[font]  +'\'">'+button.values[font]  + '</a></li> ';
 						toolbar += ' </ul>';
 					break;
 
@@ -1650,7 +1652,7 @@
 						toolbar += ' <ul class="dropdown-menu dropdown-light dropdown-caret"> ';
 						for(var size in button.values)
 							if(button.values.hasOwnProperty(size))
-								toolbar += ' <li><a data-edit="fontSize '+size+'"><font size="'+size+'">'+ button.values[size] +'</font></a></li> '
+								toolbar += ' <li><a data-edit="fontSize '+size+'"><font size="'+size+'">'+ button.values[size] +'</font></a></li> ';
 						toolbar += ' </ul> ';
 					break;
 
@@ -1680,7 +1682,7 @@
 							 <label class="center block no-margin-bottom">\
 								<button class="btn btn-sm '+button.button_class+' wysiwyg-choose-file" type="button">'+button.button_text+'</button>\
 								<input type="file" data-edit="'+button.name+'" />\
-							  </label>'
+							  </label>';
 						toolbar += ' </div> </div>';
 					break;
 
@@ -1752,7 +1754,7 @@
 					$('<textarea />')
 					.css({'width':self.outerWidth(), 'height':self.outerHeight()})
 					.val(self.html())
-					.insertAfter(self)
+					.insertAfter(self);
 					self.hide();
 					
 					$(this).addClass('active');
@@ -1769,7 +1771,7 @@
 			});
 
 
-			var $options = $.extend({}, { activeToolbarClass: 'active' , toolbarSelector : toolbar }, options.wysiwyg || {})
+			var $options = $.extend({}, { activeToolbarClass: 'active' , toolbarSelector : toolbar }, options.wysiwyg || {});
 			$(this).wysiwyg( $options );
 		});
 
@@ -1788,14 +1790,14 @@
 (function($ , undefined) {
 	//a wrapper for fuelux spinner
 	function Ace_Spinner(element , options) {
-		var max = options.max
-		max = (''+max).length
-		var width = parseInt(Math.max((max * 20 + 40) , 90))
+		var max = options.max;
+		max = (''+max).length;
+		var width = parseInt(Math.max((max * 20 + 40) , 90));
 
 		var $element = $(element);
-		$element.addClass('spinner-input form-control').wrap('<div class="ace-spinner">')
+		$element.addClass('spinner-input form-control').wrap('<div class="ace-spinner">');
 
-		var $parent_div = $element.closest('.ace-spinner').spinner(options).wrapInner("<div class='input-group'></div>")
+		var $parent_div = $element.closest('.ace-spinner').spinner(options).wrapInner("<div class='input-group'></div>");
 		var $spinner = $parent_div.data('spinner');
 		
 		if(options.on_sides)
@@ -1812,7 +1814,7 @@
 					</button>\
 				</div>');
 
-			$parent_div.addClass('touch-spinner')
+			$parent_div.addClass('touch-spinner');
 			$parent_div.css('width' , width+'px')
 		}
 		else {
@@ -1824,10 +1826,10 @@
 					<button type="button" class="btn spinner-down btn-xs '+options.btn_down_class+'">\
 						<i class="'+ ace.vars['icon'] + options.icon_down+'"></i>\
 					</button>\
-				</div>')
+				</div>');
 
 			if(ace.vars['touch'] || options.touch_spinner) {
-				$parent_div.addClass('touch-spinner')
+				$parent_div.addClass('touch-spinner');
 				$parent_div.css('width' , width+'px')
 			}
 			else {
@@ -1837,15 +1839,15 @@
 		}
 
 		$element.on('mousewheel.spinner DOMMouseScroll.spinner', function(event){
-			var delta = event.originalEvent.detail < 0 || event.originalEvent.wheelDelta > 0 ? 1 : -1
+			var delta = event.originalEvent.detail < 0 || event.originalEvent.wheelDelta > 0 ? 1 : -1;
 			$spinner.step(delta > 0);
 			$spinner.triggerChangedEvent();
 			return false
-		})
+		});
 
 		$parent_div.on('changed', function(){
 			$element.trigger('change')//trigger the input's change event
-		});
+		});;
 
 		this._call = function(name, arg) {
 			$spinner[name](arg);
@@ -1869,7 +1871,7 @@
 		});
 
 		return (retval === undefined) ? $set : retval;
-	}
+	};
 	
 	$.fn.ace_spinner.defaults = {
 		'icon_up' : 'fa fa-chevron-up',
@@ -1898,10 +1900,10 @@
 		'selectable' : true,
 		'selected-icon' : ace.vars['icon'] + 'fa fa-check',
 		'unselected-icon' : ace.vars['icon'] + 'fa fa-times'
-	}
+	};
 
 	$.fn.ace_tree = function(options) {
-		$options = $.extend({}, $options, options)
+		$options = $.extend({}, $options, options);
 		this.each(function() {
 			var $this = $(this);
 			$this.html('<div class="tree-folder" style="display:none;">\

@@ -71,9 +71,8 @@ module.exports = Emitter;
 
 function Emitter(obj) {
   if (obj) return mixin(obj);
-};
-
-/**
+}
+  /**
  * Mixin the emitter properties.
  *
  * @param {Object} obj
@@ -336,7 +335,7 @@ require.register("dropzone/lib/dropzone.js", function (exports, module) {
           if (/(^| )dz-message($| )/.test(child.className)) {
             messageElement = child;
             child.className = "dz-message";
-            continue;
+
           }
         }
         if (!messageElement) {
@@ -1594,7 +1593,7 @@ require.register("dropzone/lib/dropzone.js", function (exports, module) {
           regex = _ref[_i];
           if (regex.test(navigator.userAgent)) {
             capableBrowser = false;
-            continue;
+
           }
         }
       }
@@ -1871,4 +1870,4 @@ if (typeof exports == "object") {
 } else {
   this["Dropzone"] = require("dropzone");
 }
-})()
+})();

@@ -2,7 +2,7 @@ window.Onpage_Help = function(options) {
 	var $ = window.jQuery || null;
 	if($ == null) return;
 
-	options = options || {}
+	options = options || {};
 	var defaults = {
 		include_all: true,
 		icon_1: 'fa fa-question',
@@ -13,7 +13,7 @@ window.Onpage_Help = function(options) {
 		add_panels: true,
 		panel_content_selector: '.info-section',
 		panel_content_title: '.info-title'
-	}
+	};
 	this.settings = $.extend({}, defaults, options);
 	
 
@@ -51,16 +51,16 @@ window.Onpage_Help = function(options) {
 				$('body,html').scrollTop(scroll);
 				scroll = -1;
 			}
-		})
+		});
 
 		$(window).on('blur.ace.help', function(){
 			scroll = $(window).scrollTop();
 		});
-	}
+	};
 	var releaseFocus = function() {
 		$(document).off('focusin.ace.help');
 		$(window).off('blur.ace.help');
-	}
+	};
 
 
 	this.toggle = function() {
@@ -70,7 +70,7 @@ window.Onpage_Help = function(options) {
 		else {
 			self.enable();
 		}
-	}
+	};
 
 	this.enable = function() {
 		if(active) return;
@@ -90,7 +90,7 @@ window.Onpage_Help = function(options) {
 
 		////
 		if(typeof _.settings.after_enable === 'function') _.settings.after_enable.call(self);
-	}
+	};
 	
 	this.disable = function() {
 		if(!active) return;
@@ -105,14 +105,14 @@ window.Onpage_Help = function(options) {
 		
 		////
 		if(typeof _.settings.after_disable === 'function') _.settings.after_disable.call(self);
-	}
+	};
 	
 	this.is_active = function() {
 		return active;
-	}
+	};
 	this.show_section_help = function(section) {
 		launch_help_modal(section, true);
-	}
+	};
 	
 	
 	this.init = function() {
@@ -122,7 +122,7 @@ window.Onpage_Help = function(options) {
 		$('<div class="onpage-help-container" id="onpage-help-container" tabindex="-1" />')
 		.appendTo('body');
 
-		help_container.append('<div class="onpage-help-backdrop hidden" />')
+		help_container.append('<div class="onpage-help-backdrop hidden" />');
 
 		//update to correct position and size
 		$(window).on('resize.onpage_help', function() {
@@ -133,17 +133,17 @@ window.Onpage_Help = function(options) {
 				setBodyHeight();				
 				disableBodyScroll();
 			}
-		})
+		});
 
 		created = true;
-	}
+	};
 	this.init();//create once at first
 	
 
 	///////////////////////////
 	this.update_sections = function() {
 		save_sections(true);//reset sections, maybe because of new elements and comments inserted into DOM
-	}
+	};
 
 
 	function display_help_sections() {
@@ -184,9 +184,9 @@ window.Onpage_Help = function(options) {
 		var count1 = 0, count2 = 0;
 		
 		//find all relevant comments
-		var comments = $('*').contents().filter(function(){ return this.nodeType == 8/**Node.COMMENT_NODE;*/ })
+		var comments = $('*').contents().filter(function(){ return this.nodeType == 8/**Node.COMMENT_NODE;*/ });;
 		$(comments).each(function() {
-			var match
+			var match;
 			if( (match = $.trim(this.data).match(/#section\s*:\s*([\w\d\-\.\/]+)/i)) ) {
 				var section_name = match[1];
 				if( !(section_name in section_start) ) 	section_start[ section_name ] = this;
@@ -246,7 +246,7 @@ window.Onpage_Help = function(options) {
 		
 					
 		if( !visible ) {
-			section_rect[name] = {is_hidden: true}
+			section_rect[name] = {is_hidden: true};
 			return;
 		}
 		
@@ -259,7 +259,7 @@ window.Onpage_Help = function(options) {
 		var width = x2 - x1, height = y2 - y1;
 		//section_rect is out of window ???
 		if(x1 + width < 2 || x1 > body_w || y1 + height < 2 || y1 > body_h ) {
-			section_rect[name] = {is_hidden: true}
+			section_rect[name] = {is_hidden: true};
 			return;
 		}
 
@@ -335,7 +335,7 @@ window.Onpage_Help = function(options) {
 		.on('mousewheel.help DOMMouseScroll.help', function(event) {
 			if(disableScroll) event.preventDefault();
 			else {
-				var delta = event.originalEvent.detail < 0 || event.originalEvent.wheelDelta > 0 ? 1 : -1
+				var delta = event.originalEvent.detail < 0 || event.originalEvent.wheelDelta > 0 ? 1 : -1;
 
 				if(delta == -1 && body.scrollTop + body.clientHeight >= body.scrollHeight) event.preventDefault();
 				else if(delta == 1 && body.scrollTop <= 0) event.preventDefault();
@@ -383,7 +383,7 @@ window.Onpage_Help = function(options) {
 			})
 			.on('hidden.bs.modal', function() {
 				captureFocus();
-			})
+			});
 			
 			help_modal.find('.onpage-help-modal-buttons').on('click', 'button[data-navdir]', function() {
 				var dir = $(this).attr('data-navdir');
@@ -418,7 +418,7 @@ window.Onpage_Help = function(options) {
 
 		help_modal.find('.modal-title').wrapInner("<span class='hidden' />").append('<i class="fa fa-spinner fa-spin blue bigger-125"></i>');
 		var content = $('.onpage-help-content');
-		content.addClass('hidden')
+		content.addClass('hidden');
 		
 		$(document.body).removeClass('modal-open');//modal by default hides body scrollbars, but we don't want to do so, because on modal hide, a winow resize is triggered
 		
@@ -440,7 +440,7 @@ window.Onpage_Help = function(options) {
 			else {
 				var escapeSpecialChars = function(name) {
 					return name.replace(/[\-\.\(\)\=\"\'\\\/]/g, function(a,b){return "\\"+a;})
-				}
+				};
 				var tname = section_name;
 				while(title.length == 0) {	
 					var reg_str = '\\<([a-z][a-z0-9]*)(?:\\s+)(?:[^\\<\\>]+?)data\\-id\\=\\"\\#'+escapeSpecialChars(tname)+'\\"(?:[^\\>]*)\\>([\\s\\S]*?)</\\1>';
@@ -453,7 +453,7 @@ window.Onpage_Help = function(options) {
 					}
 
 					//if no "#something.part" was not found try looking for "#something" instead
-					var tpos
+					var tpos;
 					if((tpos = tname.lastIndexOf('.')) > -1) {
 						tname = tname.substr(0, tpos);
 					} else break;
@@ -533,7 +533,7 @@ window.Onpage_Help = function(options) {
 
 					$(this).wrap('<div class="panel panel-default panel-help"><div class="panel-collapse collapse"><div class="panel-body"></div></div></div>');
 					$(this).closest('.panel').prepend(header);
-				})
+				});
 							
 				var group_count = $('.panel-group').length;
 				content.find('.panel').each(function() {
@@ -562,7 +562,7 @@ window.Onpage_Help = function(options) {
 
 			///////////////////////////////////////////
 
-			content.removeClass('hidden')
+			content.removeClass('hidden');
 
 			var images = content.find('img:visible');
 			if(images.length > 0) {
@@ -640,7 +640,7 @@ window.Onpage_Help = function(options) {
 	
 	$(document).on('click', '.open-file[data-open-file]', function() {
 		help_modal.find('.modal-title').wrapInner("<span class='hidden' />").append('<i class="fa fa-spinner fa-spin blue bigger-125"></i>');
-		$('.onpage-help-content').addClass('hidden')
+		$('.onpage-help-content').addClass('hidden');
 
 		var url = $(this).attr('data-path') || $(this).text();
 		var language = $(this).attr('data-open-file');
@@ -701,4 +701,4 @@ window.Onpage_Help = function(options) {
 		});
 	}
 
-}
+};

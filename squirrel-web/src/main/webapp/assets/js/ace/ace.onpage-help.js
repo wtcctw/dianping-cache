@@ -4,17 +4,17 @@ jQuery(function($) {
 	
 	//for ace demo pages, we temporarily disable fixed navbar, etc ... when help is enabled
 	//because when an element is fixed, its highlighted help section should also become fixed?!
-	var page_settings = {}
+	var page_settings = {};
 	var before_enable_help = function() {
 		$('#btn-scroll-up').css('z-index', 1000000);//bring btn-scroll-up  higher , to be over our help area
 
 		//save our current state of navbar, sidebar and breadcrumbs before enabling help
-		page_settings['navbar'] = ace.settings.is('navbar', 'fixed')
-		page_settings['sidebar'] = ace.settings.is('sidebar', 'fixed')
-		page_settings['breadcrumbs'] = ace.settings.is('breadcrumbs', 'fixed')
+		page_settings['navbar'] = ace.settings.is('navbar', 'fixed');
+		page_settings['sidebar'] = ace.settings.is('sidebar', 'fixed');
+		page_settings['breadcrumbs'] = ace.settings.is('breadcrumbs', 'fixed');
 		
 		ace.settings.navbar_fixed(false , false);//now disable fixed navbar, which automatically disabled fixed sidebar and breadcrumbs
-	}
+	};
 	var after_disable_help = function() {
 		$('#btn-scroll-up').css('z-index', '');
 
@@ -22,12 +22,12 @@ jQuery(function($) {
 		if( page_settings['breadcrumbs'] ) ace.settings.breadcrumbs_fixed(true, false, false);
 		if( page_settings['sidebar'] ) ace.settings.sidebar_fixed(true, false, false);
 		if( page_settings['navbar'] ) ace.settings.navbar_fixed(true, false, false);
-	}
+	};
 	
 	var get_file_url = function(url, language) {
 		//function that return the real path to a file which is being loaded
 		return this.settings.base + '/' + url;
-	}
+	};
 	var get_section_url = function(section_name) {
 		//according to a section_name such as `basics/navbar.toggle` return the file url which contains help content
 		section_name = section_name || '';
@@ -47,10 +47,10 @@ jQuery(function($) {
 			url = url + '.html';
 		}
 		return this.settings.base + '/docs/sections/' + url;
-	}
+	};
 	var get_img_url = function(src) {
 		return this.settings.base + '/docs/' +src;
-	}
+	};
 
 	/**
 	var code_highlight = function(e, language) {
@@ -91,7 +91,7 @@ jQuery(function($) {
 			'after_disable': after_disable_help
 			
 			//,'code_highlight': code_highlight
-		})
+		});
 
 		
 		
@@ -106,7 +106,7 @@ jQuery(function($) {
 		$('#onpage-help-toggle-btn').on('click', function(e) {
 			e.preventDefault();
 			toggleHelp();
-		})
+		});
 		
 		//add .container class to help container div when our content is put inside a ".container"
 		$(document).on('settings.ace.help', function(ev, event_name, fixed) {
@@ -114,7 +114,7 @@ jQuery(function($) {
 			  if(fixed) help_container.addClass('container');
 			  else help_container.removeClass('container');
 		   }
-		}).triggerHandler('settings.ace.help', ['main_container_fixed', $('.main-container').hasClass('container')])
+		}).triggerHandler('settings.ace.help', ['main_container_fixed', $('.main-container').hasClass('container')]);
 		
 		//in ajax mode when a content is loaded via ajax, we may want to update help sections
 		$(document).on('ajaxloadcomplete.ace.help', function() {

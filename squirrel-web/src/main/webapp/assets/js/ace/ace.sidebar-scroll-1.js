@@ -8,7 +8,7 @@ ace.sidebar_scrollable = function($ , options) {
 	if( !$.fn.ace_scroll ) return;
 	
 
-	var old_safari = ace.vars['safari'] && navigator.userAgent.match(/version\/[1-5]/i)
+	var old_safari = ace.vars['safari'] && navigator.userAgent.match(/version\/[1-5]/i);
 	//NOTE
 	//Safari on windows has not been updated for a long time.
 	//And it has a problem when sidebar is fixed&scrollable and there is a CSS3 animation inside page content.
@@ -52,7 +52,7 @@ ace.sidebar_scrollable = function($ , options) {
 	//sidebar.offsetHeight is used to force redraw and recalculate 'sidebar.style.position' esp for webkit!
 	function() { sidebar.offsetHeight; return window.getComputedStyle(sidebar).position == 'fixed' }
 	:
-	function() { sidebar.offsetHeight; return $sidebar.css('position') == 'fixed' }
+	function() { sidebar.offsetHeight; return $sidebar.css('position') == 'fixed' };
 	//sometimes when navbar is fixed, sidebar automatically becomes fixed without needing ".sidebar-fixed" class
 	//currently when mobile_style == 1
 
@@ -146,7 +146,7 @@ ace.sidebar_scrollable = function($ , options) {
 					
 					var distance = event.dy;
 					
-					distance = parseInt(Math.min($avail_height, distance))
+					distance = parseInt(Math.min($avail_height, distance));
 					if(Math.abs(distance) > 2) distance = distance * 2;
 					
 					if(distance != 0) {
@@ -195,8 +195,8 @@ ace.sidebar_scrollable = function($ , options) {
 			
 			
 			if( typeof smooth_scroll === 'number' && smooth_scroll > 0) {
-				$nav.css({'transition-property': 'top', 'transition-duration': (smooth_scroll / 1000).toFixed(2)+'s'})
-				bar.css({'transition-property': 'top', 'transition-duration': (smooth_scroll / 1500).toFixed(2)+'s'})
+				$nav.css({'transition-property': 'top', 'transition-duration': (smooth_scroll / 1000).toFixed(2)+'s'});
+				bar.css({'transition-property': 'top', 'transition-duration': (smooth_scroll / 1500).toFixed(2)+'s'});
 				
 				scroll_div
 				.on('drag.start', function(e) {
@@ -239,12 +239,12 @@ ace.sidebar_scrollable = function($ , options) {
 				//sometimes there's no active item or not 'offsetTop' property
 				var $active;
 
-				var nav_list = $sidebar.find('.nav-list')
+				var nav_list = $sidebar.find('.nav-list');
 				if(ace.vars['minimized'] && !ace.vars['collapsible']) {
 					$active = nav_list.find('> .active')
 				}
 				else {
-					$active = $nav.find('> .active.hover')
+					$active = $nav.find('> .active.hover');
 					if($active.length == 0)	$active = $nav.find('.active:not(.open)')
 				}
 
@@ -290,7 +290,7 @@ ace.sidebar_scrollable = function($ , options) {
 			is_scrolling = true;
 			if( enable_scroll ) {
 				scroll_content_div.css({height: $content_height, width: 8});
-				scroll_div.prev().css({'max-height' : $avail_height})
+				scroll_div.prev().css({'max-height' : $avail_height});
 				ace_scroll.update({size: $avail_height}).enable().reset();
 			}
 			if( !enable_scroll || !ace_scroll.is_active() ) {
@@ -307,7 +307,7 @@ ace.sidebar_scrollable = function($ , options) {
 			if(scroll_div) {
 				scroll_div.css({'height' : '', 'max-height' : ''});
 				scroll_content_div.css({height: '', width: ''});//otherwise it will have height and takes up some space even when invisible
-				scroll_div.prev().css({'max-height' : ''})
+				scroll_div.prev().css({'max-height' : ''});
 				ace_scroll.disable();
 			}
 
@@ -331,7 +331,7 @@ ace.sidebar_scrollable = function($ , options) {
 			else if(height_change < 0) {
 				//if content height is decreasing
 				//let's move nav down while a submenu is being hidden
-				var scroll_top = scroll_content.scrollTop() + height_change
+				var scroll_top = scroll_content.scrollTop() + height_change;
 				if(scroll_top < 0) return;
 
 				nav.style.top = (-1 * scroll_top) + 'px';
@@ -342,7 +342,7 @@ ace.sidebar_scrollable = function($ , options) {
 				setTimeout(function() { scrollbars.reset() } , 0);
 			else scrollbars.reset();
 		}
-	}
+	};
 	scrollbars.initiate(true);//true = on_page_load
 
 	//reset on document and window changes
@@ -352,7 +352,7 @@ ace.sidebar_scrollable = function($ , options) {
 		}
 		else if( event_name === 'sidebar_fixed' || event_name === 'navbar_fixed' ) {
 			//sidebar_fixed = event_val;
-			sidebar_fixed = is_sidebar_fixed()
+			sidebar_fixed = is_sidebar_fixed();
 			
 			if(sidebar_fixed && !is_scrolling) {
 				scrollbars.reset();
@@ -363,9 +363,9 @@ ace.sidebar_scrollable = function($ , options) {
 		}
 	});
 	$window.on('resize.ace.scroll', function(){
-		sidebar_fixed = is_sidebar_fixed()
+		sidebar_fixed = is_sidebar_fixed();
 		scrollbars.reset();
-	})
+	});
 	
 
 	//change scrollbar size after a submenu is hidden/shown
@@ -379,4 +379,4 @@ ace.sidebar_scrollable = function($ , options) {
 		}
 	});
 
-}
+};

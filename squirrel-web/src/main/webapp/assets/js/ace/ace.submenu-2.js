@@ -8,7 +8,7 @@ ace.submenu = {
 	var $sub = $(sub);
 
 	var event;
-	$sub.trigger(event = $.Event('show.ace.submenu'))
+	$sub.trigger(event = $.Event('show.ace.submenu'));
 	if (event.isDefaultPrevented()) return false;
 	
 	$sub
@@ -17,12 +17,12 @@ ace.submenu = {
 	
 	var complete = function() {
 		$sub
-		.css({overflow:'', height:''})
+		.css({overflow:'', height:''});
 
 		if(ace.vars.webkit) ace.helper.redraw(sub);//little webkit issue, force redraw ;)
 
 		$sub.trigger($.Event('shown.ace.submenu'))
-	}
+	};
 
 	$sub.parent().addClass('open');
 	if(duration > 0) {
@@ -40,7 +40,7 @@ ace.submenu = {
 	var $sub = $(sub);
 		
 	var event;
-	$sub.trigger(event = $.Event('hide.ace.submenu'))
+	$sub.trigger(event = $.Event('hide.ace.submenu'));
 	if (event.isDefaultPrevented()) return false;
 
 	var complete = function() {
@@ -49,7 +49,7 @@ ace.submenu = {
 		.removeClass('nav-show').addClass('nav-hide')//only for window < @grid-float-breakpoint and .navbar-collapse.menu-min
 		
 		$sub.trigger($.Event('hidden.ace.submenu'))
-	}
+	};;
 
 	$sub
 	.css({overflow:'hidden', height:sub.scrollHeight})
@@ -73,4 +73,4 @@ ace.submenu = {
 	}
 	return 0;
  }
-}
+};;

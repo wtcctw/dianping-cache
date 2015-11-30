@@ -203,7 +203,7 @@ define('ace/mode/golang_highlight_rules', ['require', 'exports', 'module' , 'ace
 		
 		this.embedRules(DocCommentHighlightRules, "doc-",
 			[ DocCommentHighlightRules.getEndRule("start") ]);
-    }
+    };
     oop.inherits(GolangHighlightRules, TextHighlightRules);
 
     exports.GolangHighlightRules = GolangHighlightRules;

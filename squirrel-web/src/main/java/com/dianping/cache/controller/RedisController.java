@@ -1,16 +1,20 @@
 package com.dianping.cache.controller;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
+import com.dianping.cache.autoscale.AppId;
+import com.dianping.cache.autoscale.AutoScale;
+import com.dianping.cache.autoscale.dockerscale.DockerScale;
+import com.dianping.cache.entity.ServerCluster;
+import com.dianping.cache.service.*;
+import com.dianping.cache.util.ParseServersUtil;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -30,23 +34,22 @@ import com.dianping.cache.scale.impl.RedisNode;
 import com.dianping.cache.scale.impl.RedisScaler;
 import com.dianping.cache.scale.impl.RedisServer;
 import com.dianping.cache.scale.impl.RedisUtil;
-import com.dianping.cache.service.CacheConfigurationService;
-import com.dianping.cache.service.RedisStatsService;
-import com.dianping.cache.service.ServerService;
 
 import edu.emory.mathcs.backport.java.util.Arrays;
 
 @Controller
 public class RedisController extends AbstractCacheController{
-	
-	
-	@Resource(name = "cacheConfigurationService")
-	private CacheConfigurationService cacheConfigurationService;
-	
-	@Resource(name = "redisStatsService")
+
+	@Autowired
 	private RedisStatsService redisStatsService;
-	
-	@Resource(name = "serverService")
+
+	@Autowired
+	private CacheConfigurationService cacheConfigurationService ;
+
+	@Autowired
+	private ServerClusterService serverClusterService;
+
+	@Autowired
 	private ServerService serverService;
 	
 	private String subside;
@@ -67,7 +70,7 @@ public class RedisController extends AbstractCacheController{
 	}
 	
 	@RequestMapping(value = "/redis/dashboard", method = RequestMethod.GET)
-	public ModelAndView viewClusterDashBoard(HttpServletRequest request, HttpServletResponse response){
+	public ModelAndView viewClusterDashBoard(){
 		return new ModelAndView("monitor/redisdashboard",createViewMap());
 	}
 	
@@ -78,8 +81,7 @@ public class RedisController extends AbstractCacheController{
 	}
 	
 	@RequestMapping(value = "/redis/serverinfo", method = RequestMethod.GET)
-	public ModelAndView viewRedisServerInfo(HttpServletRequest request, HttpServletResponse response){
-		
+	public ModelAndView viewRedisServerInfo(){
 		subside = "dashboard";
 		return new ModelAndView("monitor/redisserverinfo",createViewMap());
 	}
@@ -91,29 +93,20 @@ public class RedisController extends AbstractCacheController{
 	}
 	
 	@RequestMapping(value = "/redis/scale", method = RequestMethod.GET)
-	public ModelAndView redisScale(HttpServletRequest request, HttpServletResponse response){
+	public ModelAndView redisScale(){
 		
 		subside = "dashboard";
 		return new ModelAndView("cache/redisscale",createViewMap());
 	}
-	
-	
+
 	@RequestMapping(value = "/redis/historydata", method = RequestMethod.GET)
 	@ResponseBody
 	public List<HighChartsWrapper> getRedisHistoryData(String address,long endTime){
-		long start = (endTime - TimeUnit.MILLISECONDS.convert(2, TimeUnit.DAYS))/1000;
+		long start = (endTime - TimeUnit.MILLISECONDS.convert(4, TimeUnit.HOURS))/1000;
 		long end = endTime/1000;
-		List<HighChartsWrapper> charts = null;
 		List<RedisStats> data = redisStatsService.findByServerWithInterval(address, start, end);
 		RedisStatsData statsData = new RedisStatsData(data);
 		return ChartsBuilder.buildRedisStatsCharts(statsData);
-	}
-	
-	
-	private RedisStatsData convertStats(List<RedisStats> data) {
-		// TODO Auto-generated method stub
-		
-		return null;
 	}
 
 	@RequestMapping(value = "/redis/addmaster", method = RequestMethod.POST)
@@ -146,7 +139,8 @@ public class RedisController extends AbstractCacheController{
 	
 	@RequestMapping(value = "/redis/destroy", method = RequestMethod.POST)
 	public void destroy(String address){
-		RedisUtil.destroy(address);
+		Server server = serverService.findByAddress(address);
+		RedisUtil.destroy(server.getAppId(),address);
 	}
 
 
@@ -154,8 +148,6 @@ public class RedisController extends AbstractCacheController{
 	public void des(String instanceId){
 		RedisUtil.des(instanceId);
 	}
-
-
 
 	private String getClusterAppId(String cluster) {
 		CacheConfiguration config = cacheConfigurationService.find(cluster);
@@ -170,11 +162,11 @@ public class RedisController extends AbstractCacheController{
 	public int autoScaleUp(String cluster,String appid,int instances) throws ScaleException{
 		return RedisUtil.scaleNode(cluster, instances, appid);
 	}
-	
-	@RequestMapping(value = "/redis/autoaddslave", method = RequestMethod.POST)
+
+	@RequestMapping(value = "/redis/autoaddslave", method = RequestMethod.GET)
 	@ResponseBody
-	public int autoScaleUpSlave(String master) throws ScaleException{
-		return RedisUtil.scaleSlave(master);
+	public int autoScaleUpSlave(String cluster, String address) throws ScaleException {
+		return RedisUtil.scaleSlave(cluster,address);
 	}
 	
 	@RequestMapping(value = "/redis/getscalestatus", method = RequestMethod.POST)
@@ -189,12 +181,13 @@ public class RedisController extends AbstractCacheController{
 		return RedisUtil.deleteMaster(cluster, address);
 	}
 	
-	@RequestMapping(value = "/redis/delslave", method = RequestMethod.POST)
+	@RequestMapping(value = "/redis/delslave", method = RequestMethod.GET)
 	@ResponseBody
-	public int delSlave(String cluster,String address) throws ScaleException{
-		return RedisUtil.deleteSlave(cluster, address);
+	public void delSlave(String cluster,String address) throws ScaleException{
+		if(RedisUtil.deleteSlave(cluster, address)){
+			postProcess(address);
+		}
 	}
-	
 	
 
 	private List<String> parseServers(String url) {
@@ -211,11 +204,62 @@ public class RedisController extends AbstractCacheController{
 		}
 		return serverList;
 	}
-	
-	public static void main(String [] agr) throws ScaleException{
-	
+
+	private void postProcess(String address){
+		Server server = serverService.findByAddress(address);
+		if(server == null)
+			return;
+		deleteServer(address);// delete server from cluster config and server_cluster table  before in servers table
+		String instanceId = server.getInstanceId();
+		if(null != instanceId  &&  !"".equals(instanceId)){
+			// container instance
+			String appId = server.getAppId();
+			AutoScale autoScale = new DockerScale();
+			autoScale.scaleDown(AppId.valueOf(appId),address);
+		}else{
+			// none container
+			serverService.delete(address);
+		}
 	}
-	
+	private void deleteServer(String server){
+		List<ServerCluster> relate = serverClusterService.findByServer(server);
+		if(relate == null)
+			return;
+		for(ServerCluster sc : relate){
+			String cluster = sc.getCluster();
+			deleteServerFromConfig(cluster, server);
+		}
+		serverClusterService.deleteServer(server);//delete all servercluster which contains server
+	}
+
+	private void deleteServerFromConfig(String cluster, String server) {
+		CacheConfiguration config = cacheConfigurationService.find(cluster);
+		String servers = config.getServers();
+		if(cluster.contains("redis")){
+			config.setAddTime(System.currentTimeMillis());
+			List<String> serverlist = ParseServersUtil.parseRedisServers(servers);
+			String urlHead = "redis-cluster://";
+			String urlTail = servers.substring(servers.indexOf("?"));
+			serverlist.remove(server);
+			String newServers = "";
+			for(String str : serverlist){
+				newServers = newServers + str + ";";
+			}
+			newServers = newServers.substring(0,newServers.length()-1);//delete last ";"
+			newServers = urlHead + newServers + urlTail;
+			config.setServers(newServers);
+			cacheConfigurationService.update(config);
+		}else if(cluster.contains("memcached")){
+			config.setAddTime(System.currentTimeMillis());
+			List<String> serverList = new ArrayList<String>(config.getServerList());
+			server = server.trim();
+			serverList.remove(server);
+			config.setServerList(serverList);
+			config.setAddTime(System.currentTimeMillis());
+			cacheConfigurationService.update(config);
+		}
+	}
+
 	@Override
 	protected String getSide() {
 		// TODO Auto-generated method stub

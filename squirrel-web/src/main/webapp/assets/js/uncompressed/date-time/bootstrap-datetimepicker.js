@@ -46,8 +46,7 @@ THE SOFTWARE.
     if (typeof moment === 'undefined') {
         alert("momentjs is requried");
         throw new Error('momentjs is required');
-    };
-
+    }
     var dpgId = 0,
 
     pMoment = moment,
@@ -211,7 +210,7 @@ THE SOFTWARE.
         },
 
         dataToOptions = function () {
-            var eData
+            var eData;
             if (picker.element.is('input')) {
                 eData = picker.element.data();
             }
@@ -256,7 +255,7 @@ THE SOFTWARE.
                 } else {
                     placePosition = 'bottom';
                 }
-            };
+            }
             if (placePosition === 'top') {
                 offset.top -= picker.widget.height() + picker.element.outerHeight() + 15;
                 picker.widget.addClass('top').removeClass('bottom');
@@ -320,7 +319,7 @@ THE SOFTWARE.
             pMoment.lang(picker.options.language);
             var dateStr = newDate;
             if (!dateStr) {
-                dateStr = getPickerInput().val()
+                dateStr = getPickerInput().val();
                 if (dateStr) picker.date = pMoment(dateStr, picker.format, picker.options.useStrict);
                 if (!picker.date) picker.date = pMoment();
             }
@@ -676,7 +675,7 @@ THE SOFTWARE.
 
 		    selectHour: function (e) {
 		        var period = picker.widget.find('.timepicker [data-action=togglePeriod]').text(), hour = parseInt($(e.target).text(), 10);
-		        if (period == "PM") hour += 12
+		        if (period == "PM") hour += 12;
 		        picker.date.hours(hour);
 		        actions.showPicker.call(picker);
 		    },
@@ -822,7 +821,6 @@ THE SOFTWARE.
                         break;
                     }
                 }
-                ;
                 return inFixed;
             } else {
                 return false;
@@ -1040,7 +1038,7 @@ THE SOFTWARE.
             if (picker.options.useCurrent === true) {
                 if (getPickerInput().val() == '') {
                     picker.setValue(pMoment().format(picker.format))
-                };
+                }
             }
             picker.widget.show();
             picker.height = picker.component ? picker.component.outerHeight() : picker.element.outerHeight();

@@ -5,14 +5,14 @@
 (function($ , undefined) {
 	//a wrapper for fuelux spinner
 	function Ace_Spinner(element , options) {
-		var max = options.max
-		max = (''+max).length
-		var width = parseInt(Math.max((max * 20 + 40) , 90))
+		var max = options.max;
+		max = (''+max).length;
+		var width = parseInt(Math.max((max * 20 + 40) , 90));
 
 		var $element = $(element);
-		$element.addClass('spinner-input form-control').wrap('<div class="ace-spinner">')
+		$element.addClass('spinner-input form-control').wrap('<div class="ace-spinner">');
 
-		var $parent_div = $element.closest('.ace-spinner').spinner(options).wrapInner("<div class='input-group'></div>")
+		var $parent_div = $element.closest('.ace-spinner').spinner(options).wrapInner("<div class='input-group'></div>");
 		var $spinner = $parent_div.data('spinner');
 		
 		if(options.on_sides)
@@ -29,7 +29,7 @@
 					</button>\
 				</div>');
 
-			$parent_div.addClass('touch-spinner')
+			$parent_div.addClass('touch-spinner');
 			$parent_div.css('width' , width+'px')
 		}
 		else {
@@ -41,10 +41,10 @@
 					<button type="button" class="btn spinner-down btn-xs '+options.btn_down_class+'">\
 						<i class="'+ ace.vars['icon'] + options.icon_down+'"></i>\
 					</button>\
-				</div>')
+				</div>');
 
 			if(ace.vars['touch'] || options.touch_spinner) {
-				$parent_div.addClass('touch-spinner')
+				$parent_div.addClass('touch-spinner');
 				$parent_div.css('width' , width+'px')
 			}
 			else {
@@ -54,15 +54,15 @@
 		}
 
 		$element.on('mousewheel.spinner DOMMouseScroll.spinner', function(event){
-			var delta = event.originalEvent.detail < 0 || event.originalEvent.wheelDelta > 0 ? 1 : -1
+			var delta = event.originalEvent.detail < 0 || event.originalEvent.wheelDelta > 0 ? 1 : -1;
 			$spinner.step(delta > 0);
 			$spinner.triggerChangedEvent();
 			return false
-		})
+		});
 
 		$parent_div.on('changed', function(){
 			$element.trigger('change')//trigger the input's change event
-		});
+		});;
 
 		this._call = function(name, arg) {
 			$spinner[name](arg);
@@ -86,7 +86,7 @@
 		});
 
 		return (retval === undefined) ? $set : retval;
-	}
+	};
 	
 	$.fn.ace_spinner.defaults = {
 		'icon_up' : 'fa fa-chevron-up',

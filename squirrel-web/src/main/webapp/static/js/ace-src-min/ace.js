@@ -960,7 +960,7 @@ if (Object.defineProperty) {
 
 if (!Object.defineProperty || definePropertyFallback) {
     var ERR_NON_OBJECT_DESCRIPTOR = "Property description must be an object: ";
-    var ERR_NON_OBJECT_TARGET = "Object.defineProperty called on non-object: "
+    var ERR_NON_OBJECT_TARGET = "Object.defineProperty called on non-object: ";
     var ERR_ACCESSORS_NOT_SUPPORTED = "getters & setters can not be defined " +
                                       "on this javascript engine";
 
@@ -1804,7 +1804,7 @@ exports.addMultiMouseDownListener = function(el, timeouts, eventHandler, callbac
             clicks += 1;
 
             if (timer)
-                clearTimeout(timer)
+                clearTimeout(timer);
             timer = setTimeout(function() {timer = null}, timeouts[clicks - 1] || 600);
         }
         if (clicks == 1) {
@@ -2448,7 +2448,7 @@ var Editor = function(renderer, session) {
             this.$updateHighlightActiveLine();
         }
 
-        var re = this.$highlightSelectedWord && this.$getSelectionHighLightRegexp()
+        var re = this.$highlightSelectedWord && this.$getSelectionHighLightRegexp();
         this.session.highlight(re);
         
         this._emit("changeSelection");
@@ -2966,7 +2966,7 @@ var Editor = function(renderer, session) {
 			var row = range.start.row;
 			doc.duplicateLines(row, row);
 		} else {
-			var reverse = sel.isBackwards()
+			var reverse = sel.isBackwards();
 			var point = sel.isBackwards() ? range.start : range.end;
 			var endPoint = doc.insert(point, doc.getTextRange(range), false);
 			range.start = point;
@@ -3113,7 +3113,7 @@ var Editor = function(renderer, session) {
         var pos = {
             row: Math.floor(range.start.row + (range.end.row - range.start.row) / 2),
             column: Math.floor(range.start.column + (range.end.column - range.start.column) / 2)
-        }
+        };
         this.renderer.alignCursor(pos, 0.5);
     };
     this.getCursorPosition = function() {
@@ -3797,7 +3797,7 @@ var TextInput = function(parentNode, host) {
                 host.renderer.$moveTextAreaToCursor();
             }
         }, 0);
-    };
+    }
     this.onContextMenuClose = onContextMenuClose;
 
     // firefox fires contextmenu event after opening it
@@ -3922,7 +3922,7 @@ var MouseHandler = function(editor) {
 
         var onCaptureInterval = function() {
             self[self.state] && self[self.state]();
-        }
+        };
         
         if (useragent.isOldIE && ev.domEvent.type == "dblclick") {
             setTimeout(function() {
@@ -4799,7 +4799,7 @@ var EditSession = function(text, mode) {
             str += "\n" + foldLine.toString();
         });
         return str;
-    }
+    };
 
     if (typeof text == "object" && text.getLine) {
         this.setDocument(text);
@@ -4948,7 +4948,7 @@ var EditSession = function(text, mode) {
             this.$searchHighlight = this.addDynamicMarker(highlight);
         }
         this.$searchHighlight.setRegexp(re);
-    }
+    };
     /**
     * EditSession.setUndoManager(undoManager)
     * - undoManager (UndoManager): The new undo manager
@@ -4993,7 +4993,7 @@ var EditSession = function(text, mode) {
                 }
 
                 self.$deltas = [];
-            }
+            };
             this.$informUndoManager =
                 lang.deferredCall(this.$syncInformUndoManager);
         }
@@ -5107,7 +5107,7 @@ var EditSession = function(text, mode) {
             clazz : clazz,
             inFront: !!inFront,
             id: id
-        }
+        };
 
         if (inFront) {
             this.$frontMarkers[id] = marker;
@@ -5264,7 +5264,8 @@ var EditSession = function(text, mode) {
         var module;
         try {
             module = require(mode);
-        } catch (e) {};
+        } catch (e) {
+        }
         // sometimes require returns empty object (this bug is present in requirejs 2 as well)
         if (module && module.Mode)
             return done(module);
@@ -5891,7 +5892,7 @@ var EditSession = function(text, mode) {
                 var foldLine = this.getFoldLine(firstRow);
                 var idx = 0;
                 if (foldLine) {
-                    var cmp = foldLine.range.compareInside(start.row, start.column)
+                    var cmp = foldLine.range.compareInside(start.row, start.column);
                     // Inside of the foldLine range. Need to split stuff up.
                     if (cmp == 0) {
                         foldLine = foldLine.split(start.row, start.column);
@@ -6418,7 +6419,7 @@ var EditSession = function(text, mode) {
         }
 
         return screenRows;
-    }
+    };
 
     // For every keystroke this gets called once per char in the whole doc!!
     // Wouldn't hurt to make it a bit faster for c >= 0x1100
@@ -6457,8 +6458,7 @@ var EditSession = function(text, mode) {
                c >= 0xFE68 && c <= 0xFE6B ||
                c >= 0xFF01 && c <= 0xFF60 ||
                c >= 0xFFE0 && c <= 0xFFE6;
-    };
-
+    }
 }).call(EditSession.prototype);
 
 require("./edit_session/folding").Folding.call(EditSession.prototype);
@@ -6796,7 +6796,7 @@ var Selection = function(session) {
     };
     this.getSelectionAnchor = function() {
         if (this.$isEmpty)
-            return this.getSelectionLead()
+            return this.getSelectionLead();
         else
             return this.anchor.getPosition();
     };
@@ -6807,8 +6807,7 @@ var Selection = function(session) {
         if (this.$isEmpty) {
             this.moveCursorTo(this.lead.row, this.lead.column + columns);
             return;
-        };
-
+        }
         var anchor = this.getSelectionAnchor();
         var lead = this.getSelectionLead();
 
@@ -7150,7 +7149,7 @@ var Selection = function(session) {
                     index ++;
                     if (whitespaceRe.test(ch)) {
                         if (index > 2) {
-                            index--
+                            index--;
                             break;
                         } else {
                             while ((ch = rightOfCursor[index]) && whitespaceRe.test(ch))
@@ -7182,10 +7181,10 @@ var Selection = function(session) {
             do {    
                 row++;
                 rightOfCursor = this.doc.getLine(row)
-            } while (row < l && /^\s*$/.test(rightOfCursor))
+            } while (row < l && /^\s*$/.test(rightOfCursor));
             
             if (!/^\s+/.test(rightOfCursor))
-                rightOfCursor = ""
+                rightOfCursor = "";
             column = 0;
         }
 
@@ -7207,7 +7206,7 @@ var Selection = function(session) {
             do {    
                 row--;
                 line = this.doc.getLine(row);
-            } while (row > 0 && /^\s*$/.test(line))
+            } while (row > 0 && /^\s*$/.test(line));
             
             column = line.length;
             if (!/\s+$/.test(line))
@@ -7279,12 +7278,12 @@ var Selection = function(session) {
         this.lead.detach();
         this.anchor.detach();
         this.session = this.doc = null;
-    }
+    };
 
     this.fromOrientedRange = function(range) {
         this.setSelectionRange(range, range.cursor == range.start);
         this.$desiredColumn = range.desiredColumn || this.$desiredColumn;
-    }
+    };
 
     this.toOrientedRange = function(range) {
         var r = this.getRange();
@@ -7388,7 +7387,7 @@ var Range = function(startRow, startColumn, endRow, endColumn) {
                 return 0;
             }
         }
-    }
+    };
 
     /** related to: Range.compare
      * Range.comparePoint(p) -> Number
@@ -7413,7 +7412,7 @@ var Range = function(startRow, startColumn, endRow, endColumn) {
      **/ 
     this.comparePoint = function(p) {
         return this.compare(p.row, p.column);
-    }
+    };
 
     /** related to: Range.comparePoint
      * Range.containsRange(range) -> Boolean
@@ -7424,7 +7423,7 @@ var Range = function(startRow, startColumn, endRow, endColumn) {
      **/ 
     this.containsRange = function(range) {
         return this.comparePoint(range.start) == 0 && this.comparePoint(range.end) == 0;
-    }
+    };
 
     /**
      * Range.intersects(range) -> Boolean
@@ -7436,7 +7435,7 @@ var Range = function(startRow, startColumn, endRow, endColumn) {
     this.intersects = function(range) {
         var cmp = this.compareRange(range);
         return (cmp == -1 || cmp == 0 || cmp == 1);
-    }
+    };
 
     /**
      * Range.isEnd(row, column) -> Boolean
@@ -7448,7 +7447,7 @@ var Range = function(startRow, startColumn, endRow, endColumn) {
      **/
     this.isEnd = function(row, column) {
         return this.end.row == row && this.end.column == column;
-    }
+    };
 
     /**
      * Range.isStart(row, column) -> Boolean
@@ -7460,7 +7459,7 @@ var Range = function(startRow, startColumn, endRow, endColumn) {
      **/ 
     this.isStart = function(row, column) {
         return this.start.row == row && this.start.column == column;
-    }
+    };
 
     /**
      * Range.setStart(row, column)
@@ -7478,7 +7477,7 @@ var Range = function(startRow, startColumn, endRow, endColumn) {
             this.start.row = row;
             this.start.column = column;
         }
-    }
+    };
 
     /**
      * Range.setEnd(row, column)
@@ -7496,7 +7495,7 @@ var Range = function(startRow, startColumn, endRow, endColumn) {
             this.end.row = row;
             this.end.column = column;
         }
-    }
+    };
 
     /** related to: Range.compare
      * Range.inside(row, column) -> Boolean
@@ -7515,7 +7514,7 @@ var Range = function(startRow, startColumn, endRow, endColumn) {
             }
         }
         return false;
-    }
+    };
 
     /** related to: Range.compare
      * Range.insideStart(row, column) -> Boolean
@@ -7534,7 +7533,7 @@ var Range = function(startRow, startColumn, endRow, endColumn) {
             }
         }
         return false;
-    }
+    };
 
     /** related to: Range.compare
      * Range.insideEnd(row, column) -> Boolean
@@ -7553,7 +7552,7 @@ var Range = function(startRow, startColumn, endRow, endColumn) {
             }
         }
         return false;
-    }
+    };
 
     /** 
      * Range.compare(row, column) -> Number
@@ -7580,7 +7579,7 @@ var Range = function(startRow, startColumn, endRow, endColumn) {
         if (!this.isMultiLine()) {
             if (row === this.start.row) {
                 return column < this.start.column ? -1 : (column > this.end.column ? 1 : 0);
-            };
+            }
         }
 
         if (row < this.start.row)
@@ -7603,7 +7602,7 @@ var Range = function(startRow, startColumn, endRow, endColumn) {
         } else {
             return this.compare(row, column);
         }
-    }
+    };
 
     /**
      * Range.compareEnd(row, column) -> Number
@@ -7632,7 +7631,7 @@ var Range = function(startRow, startColumn, endRow, endColumn) {
         } else {
             return this.compare(row, column);
         }
-    }
+    };
 
     /** 
      * Range.compareInside(row, column) -> Number
@@ -7657,7 +7656,7 @@ var Range = function(startRow, startColumn, endRow, endColumn) {
         } else {
             return this.compare(row, column);
         }
-    }
+    };
 
     /** 
      * Range.clipRows(firstRow, lastRow) -> Range
@@ -7721,7 +7720,7 @@ var Range = function(startRow, startColumn, endRow, endColumn) {
     };
     this.collapseRows = function() {
         if (this.end.column == 0)
-            return new Range(this.start.row, 0, Math.max(this.start.row, this.end.row-1), 0)
+            return new Range(this.start.row, 0, Math.max(this.start.row, this.end.row-1), 0);
         else
             return new Range(this.start.row, 0, this.end.row, 0)
     };
@@ -7827,7 +7826,7 @@ var Mode = function() {
               }
             } (this));
         }
-    }
+    };
     
     this.$delegator = function(method, args, defaultHandler) {
         var state = args[0];
@@ -8086,7 +8085,7 @@ var TextHighlightRules = function() {
             this.$embeds = [];
         }
         this.$embeds.push(prefix);
-    }
+    };
     
     this.getEmbeds = function() {
         return this.$embeds;
@@ -8114,7 +8113,7 @@ var Behaviour = function() {
               this.$behaviours[name] = {};
         }
         this.$behaviours[name][action] = callback;
-    }
+    };
     
     this.addBehaviours = function (behaviours) {
         for (var key in behaviours) {
@@ -8122,13 +8121,13 @@ var Behaviour = function() {
                 this.add(key, action, behaviours[key][action]);
             }
         }
-    }
+    };
     
     this.remove = function (name) {
         if (this.$behaviours && this.$behaviours[name]) {
             delete this.$behaviours[name];
         }
-    }
+    };
     
     this.inherit = function (mode, filter) {
         if (typeof mode === "function") {
@@ -8137,13 +8136,13 @@ var Behaviour = function() {
             var behaviours = mode.getBehaviours(filter);
         }
         this.addBehaviours(behaviours);
-    }
+    };
     
     this.getBehaviours = function (filter) {
         if (!filter) {
             return this.$behaviours;
         } else {
-            var ret = {}
+            var ret = {};
             for (var i = 0; i < filter.length; i++) {
                 if (this.$behaviours[filter[i]]) {
                     ret[filter[i]] = this.$behaviours[filter[i]];
@@ -8261,8 +8260,7 @@ function addUnicodePackage (pack) {
     var codePoint = /\w{4}/g;
     for (var name in pack)
         exports.packages[name] = pack[name].replace(codePoint, "\\u$&");
-};
-
+}
 });
 
 define('ace/document', ['require', 'exports', 'module' , 'ace/lib/oop', 'ace/lib/event_emitter', 'ace/range', 'ace/anchor'], function(require, exports, module) {
@@ -8314,7 +8312,7 @@ var Document = function(text) {
     if ("aaa".split(/a/).length == 0)
         this.$split = function(text) {
             return text.replace(/\r\n|\r/g, "\n").split("\n");
-        }
+        };
     else
         this.$split = function(text) {
             return text.split(/\r\n|\r|\n/);
@@ -9707,7 +9705,7 @@ function FoldLine(foldData, folds) {
         folds = this.folds = [ folds ];
     }
 
-    var last = folds[folds.length - 1]
+    var last = folds[folds.length - 1];
     this.range = new Range(folds[0].start.row, folds[0].start.column,
                            last.end.row, last.end.column);
     this.start = this.range.start;
@@ -9729,7 +9727,7 @@ function FoldLine(foldData, folds) {
             fold.start.row += shift;
             fold.end.row += shift;
         });
-    }
+    };
 
     this.addFold = function(fold) {
         if (fold.sameRow) {
@@ -9759,11 +9757,11 @@ function FoldLine(foldData, folds) {
             throw "Trying to add fold to FoldRow that doesn't have a matching row";
         }
         fold.foldLine = this;
-    }
+    };
 
     this.containsRow = function(row) {
         return row >= this.start.row && row <= this.end.row;
-    }
+    };
 
     this.walk = function(callback, endRow, endColumn) {
         var lastEnd = 0,
@@ -9801,7 +9799,7 @@ function FoldLine(foldData, folds) {
             lastEnd = fold.end.column;
         }
         callback(null, endRow, endColumn, lastEnd, isNewRow);
-    }
+    };
 
     this.getNextFoldTo = function(row, column) {
         var fold, cmp;
@@ -9821,7 +9819,7 @@ function FoldLine(foldData, folds) {
             }
         }
         return null;
-    }
+    };
 
     this.addRemoveChars = function(row, column, len) {
         var ret = this.getNextFoldTo(row, column),
@@ -9852,7 +9850,7 @@ function FoldLine(foldData, folds) {
                 this.end.column += len;
             }
         }
-    }
+    };
 
     this.split = function(row, column) {
         var fold = this.getNextFoldTo(row, column).fold,
@@ -9874,7 +9872,7 @@ function FoldLine(foldData, folds) {
         var newFoldLine = new FoldLine(foldData, folds);
         foldData.splice(foldData.indexOf(this) + 1, 0, newFoldLine);
         return newFoldLine;
-    }
+    };
 
     this.merge = function(foldLineNext) {
         var folds = foldLineNext.folds;
@@ -9885,7 +9883,7 @@ function FoldLine(foldData, folds) {
         // it's merged now with foldLineNext.
         var foldData = this.foldData;
         foldData.splice(foldData.indexOf(foldLineNext), 1);
-    }
+    };
 
     this.toString = function() {
         var ret = [this.range.toString() + ": [" ];
@@ -9893,9 +9891,9 @@ function FoldLine(foldData, folds) {
         this.folds.forEach(function(fold) {
             ret.push("  " + fold.toString());
         });
-        ret.push("]")
+        ret.push("]");
         return ret.join("\n");
-    }
+    };
 
     this.idxToPosition = function(idx) {
         var lastFoldEndColumn = 0;
@@ -10732,9 +10730,8 @@ function HashHandler(config, platform) {
     this.commmandKeyBinding = {};
 
     this.addCommands(config);
-};
-
-(function() {
+}
+    (function() {
 
     this.addCommand = function(command) {
         if (this.commands[command.name])
@@ -10849,7 +10846,7 @@ function HashHandler(config, platform) {
         };
     };
 
-}).call(HashHandler.prototype)
+}).call(HashHandler.prototype);
 
 exports.HashHandler = HashHandler;
 });
@@ -12249,7 +12246,8 @@ var VirtualRenderer = function(container, theme) {
             var module;
             try {
                 module = require(moduleName);
-            } catch (e) {};
+            } catch (e) {
+            }
             if (module)
                 return afterLoad(module);
 
@@ -12469,7 +12467,7 @@ var Gutter = function(parentEl) {
         if (!this.element.firstChild)
             return {left: 0, right: 0};
         var style = dom.computedStyle(this.element.firstChild);
-        this.$padding = {}
+        this.$padding = {};
         this.$padding.left = parseInt(style.paddingLeft) + 1;
         this.$padding.right = parseInt(style.paddingRight);  
         return this.$padding;
@@ -12991,7 +12989,7 @@ var Text = function(parentEl) {
                 container.className = 'ace_line_group';
                 fragment.appendChild(container);
             } else {
-                var lines = container.childNodes
+                var lines = container.childNodes;
                 while(lines.length)
                     fragment.appendChild(lines[0]);
             }
@@ -13021,7 +13019,7 @@ var Text = function(parentEl) {
                 break;
 
             if (this.$useLineGroups())
-                html.push("<div class='ace_line_group'>")
+                html.push("<div class='ace_line_group'>");
 
             this.$renderLine(html, row, false, row == foldStart ? foldLine : false);
 
@@ -13193,7 +13191,7 @@ var Text = function(parentEl) {
 
         if (this.showInvisibles) {
             if (foldLine)
-                row = foldLine.end.row
+                row = foldLine.end.row;
 
             stringBuilder.push(
                 "<span class='ace_invisible'>",
@@ -14441,7 +14439,7 @@ var Editor = require("./editor").Editor;
             range.start.row = tmp.start.row;
             range.start.column = tmp.start.column;
         }
-    }
+    };
 
     /** extension
      * Editor.selectMore(dir, skip) 
@@ -15256,7 +15254,7 @@ StateHandler.prototype = {
      */
     handleKeyboard: function(data, hashId, key, keyCode, e) {
         if (hashId == -1)
-            hashId = 0
+            hashId = 0;
         // If we pressed any command key but no other key, then ignore the input.
         // Otherwise "shift-" is added to the buffer, and later on "shift-g"
         // which results in "shift-shift-g" which doesn't make sense.
@@ -15277,7 +15275,7 @@ StateHandler.prototype = {
 
         return r;
     }
-}
+};
 
 /*
  * This is a useful matching function and therefore is defined here so that
@@ -15676,8 +15674,7 @@ define("ace/requirejs/text!ace/theme/textmate.css", [], ".ace-tm .ace_editor {\n
 }\n\
 ");
 
-;
-            (function() {
+(function() {
                 window.require(["ace/ace"], function(a) {
                     a && a.config.init();
                     if (!window.ace)

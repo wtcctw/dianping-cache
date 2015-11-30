@@ -23,6 +23,6 @@ import java.io.IOException;
  *
  */
 public interface Object2BytesConverter {
-	public byte[] convertObject2Bytes(Object object) throws IOException;
+	byte[] convertObject2Bytes(Object object) throws IOException;
 
 }

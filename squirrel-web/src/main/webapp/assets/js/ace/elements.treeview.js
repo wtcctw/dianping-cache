@@ -9,10 +9,10 @@
 		'selectable' : true,
 		'selected-icon' : ace.vars['icon'] + 'fa fa-check',
 		'unselected-icon' : ace.vars['icon'] + 'fa fa-times'
-	}
+	};
 
 	$.fn.ace_tree = function(options) {
-		$options = $.extend({}, $options, options)
+		$options = $.extend({}, $options, options);
 		this.each(function() {
 			var $this = $(this);
 			$this.html('<div class="tree-folder" style="display:none;">\

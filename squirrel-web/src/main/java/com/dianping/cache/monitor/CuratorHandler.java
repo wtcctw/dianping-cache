@@ -4,8 +4,8 @@ import org.apache.zookeeper.WatchedEvent;
 
 public interface CuratorHandler {
 
-    public void reconnected();
+    void reconnected();
     
-    public void eventReceived(WatchedEvent watchedEvent);
+    void eventReceived(WatchedEvent watchedEvent);
     
 }

@@ -9,7 +9,7 @@ public class Result {
 	
 	private int need;
 	
-	private AppId appid;
+	private AppId appId;
 	
 	private List<Instance> instances = new ArrayList<Instance>();
 	
@@ -29,11 +29,11 @@ public class Result {
 		this.instances = instances;
 	}
 	
-	public void setAppId(String appId){
-		for(Instance ins : instances){
-			ins.setAppid(AppId.valueOf(appId).toString());
-		}
-	}
+//	public void setAppId(String appId){
+//		for(Instance ins : instances){
+//			ins.setAppid(AppId.valueOf(appId).toString());
+//		}
+//	}
 
 	public int getNeed() {
 		return need;
@@ -43,12 +43,12 @@ public class Result {
 		this.need = need;
 	}
 
-	public AppId getAppid() {
-		return appid;
+	public AppId getAppId() {
+		return appId;
 	}
 
-	public void setAppid(AppId appid) {
-		this.appid = appid;
+	public void setAppId(AppId appId) {
+		this.appId = appId;
 	}
 	
 }

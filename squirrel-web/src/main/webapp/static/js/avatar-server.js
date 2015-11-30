@@ -13,7 +13,7 @@ module.controller('ServerController', [
 					}).success(function(response){
 						$scope.servers = response;
 					});
-			}
+			};
 			
 			$scope.getServers();
 		} ]);

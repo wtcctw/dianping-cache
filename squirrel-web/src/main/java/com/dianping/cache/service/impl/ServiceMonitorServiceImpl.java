@@ -60,7 +60,7 @@ public class ServiceMonitorServiceImpl implements ServiceMonitorService {
 		while (true) {
 			try {
 				MBeanServerConnFactoryExtend serverConnFactory = getMBeanConnection(clientIp);
-				MBeanServerConnection serverConn = (MBeanServerConnection) serverConnFactory.factory.getObject();
+				MBeanServerConnection serverConn = serverConnFactory.factory.getObject();
 				return (String) serverConn.invoke(getStatMbeanName(), "getServiceStats", new Object[] {skip, size}, 
 						new String[] {Integer.TYPE.getName(), Integer.TYPE.getName()});
 			} catch (IOException e) {

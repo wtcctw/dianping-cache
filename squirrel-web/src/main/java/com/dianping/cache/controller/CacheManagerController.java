@@ -358,8 +358,7 @@ public class CacheManagerController extends AbstractCacheController {
 		newConfig.setCacheKey(cacheKey);
 
 		cacheConfigurationService.delete(cacheKey);
-		//TODO   delete some info on servers and server_cluster 
-		;
+		//TODO   delete some info on servers and server_cluster
 
 	}
 

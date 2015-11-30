@@ -27,13 +27,13 @@
 			//if(ret === false) e.preventDefault();
 		});
 
-		var parent_label = this.$element.closest('label').css({'display':'block'})
+		var parent_label = this.$element.closest('label').css({'display':'block'});
 		var tagName = parent_label.length == 0 ? 'label' : 'span';//if not inside a "LABEL" tag, use "LABEL" tag, otherwise use "SPAN"
 		this.$element.wrap('<'+tagName+' class="ace-file-input" />');
 
 		this.apply_settings();
 		this.reset_input_field();//for firefox as it keeps selected file after refresh
-	}
+	};
 	Ace_File_Input.error = {
 		'FILE_LOAD_FAILED' : 1,
 		'IMAGE_LOAD_FAILED' : 2,
@@ -79,7 +79,7 @@
 		if(this.settings.droppable && hasFileList) {
 			enable_drop_functionality.call(this);
 		}
-	}
+	};
 
 	Ace_File_Input.prototype.show_file_list = function($files) {
 		var files = typeof $files === "undefined" ? this.$element.data('ace_input_files') : $files;
@@ -130,17 +130,17 @@
 						if(self.settings.preview_error) self.settings.preview_error.call(self, filename, result.code);
 					});
 				}
-			}
+			};
 
 		}
 
 		return true;
-	}
+	};
 
 	Ace_File_Input.prototype.reset_input = function() {
 	    this.reset_input_ui();
 		this.reset_input_field();
-	}
+	};
 
 	Ace_File_Input.prototype.reset_input_ui = function() {
 		 this.$label.attr({'data-title':this.settings.btn_choose, 'class':'ace-file-container'})
@@ -152,7 +152,7 @@
 		this.$label.find('.ace-file-name').not(':first').remove();
 		
 		this.reset_input_data();
-	}
+	};
 	Ace_File_Input.prototype.reset_input_field = function() {
 		//http://stackoverflow.com/questions/1043957/clearing-input-type-file-using-jquery/13351234#13351234
 		this.$element.wrap('<form>').parent().get(0).reset();
@@ -165,38 +165,38 @@
 		//thus calling reset again and again and again
 		//so because when "reset" button of outer form is hit, file input is automatically reset
 		//we just reset_input_ui to avoid recursion
-	}
+	};
 	Ace_File_Input.prototype.reset_input_data = function() {
 		if(this.$element.data('ace_input_files')) {
 			this.$element.removeData('ace_input_files');
 			this.$element.removeData('ace_input_method');
 		}
-	}
+	};
 
 	Ace_File_Input.prototype.enable_reset = function(can_reset) {
 		this.can_reset = can_reset;
-	}
+	};
 
 	Ace_File_Input.prototype.disable = function() {
 		this.disabled = true;
 		this.$element.attr('disabled', 'disabled').addClass('disabled');
-	}
+	};
 	Ace_File_Input.prototype.enable = function() {
 		this.disabled = false;
 		this.$element.removeAttr('disabled').removeClass('disabled');
-	}
+	};
 
 	Ace_File_Input.prototype.files = function() {
 		return $(this).data('ace_input_files') || null;
-	}
+	};
 	Ace_File_Input.prototype.method = function() {
 		return $(this).data('ace_input_method') || '';
-	}
+	};
 	
 	Ace_File_Input.prototype.update_settings = function(new_settings) {
 		this.settings = $.extend({}, this.settings, new_settings);
 		this.apply_settings();
-	}
+	};
 	
 	Ace_File_Input.prototype.loading = function(is_loading) {
 		if(is_loading === false) {
@@ -218,7 +218,7 @@
 			}
 			loader.empty().append(inside);
 		}
-	}
+	};
 
 
 
@@ -264,7 +264,7 @@
 			self.$element.triggerHandler('change' , [true]);//true means ace_inner_call
 			return true;
 		});
-	}
+	};
 	
 	
 	var handle_on_change = function() {
@@ -279,7 +279,7 @@
 		this.show_file_list(file_list);
 		
 		return true;
-	}
+	};
 
 
 
@@ -287,7 +287,7 @@
 		var self = this;
 		var $span = self.$label.find('.ace-file-name:last');//it should be out of onload, otherwise all onloads may target the same span because of delays
 		
-		var deferred = new $.Deferred
+		var deferred = new $.Deferred;
 		var reader = new FileReader();
 		reader.onload = function (e) {
 			$span.prepend("<img class='middle' style='display:none;' />");
@@ -309,11 +309,13 @@
 				}
 
 				var w = thumb.w, h = thumb.h;
-				if(self.settings.thumbnail == 'small') {w=h=size;};
+				if (self.settings.thumbnail == 'small') {
+					w = h = size;
+				}
 				$(img).css({'background-image':'url('+thumb.src+')' , width:w, height:h})									
 						.data('thumb', thumb.src)
 						.attr({src:'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImWNgYGBgAAAABQABh6FO1AAAAABJRU5ErkJggg=='})
-						.show()
+						.show();
 
 				///////////////////
 				deferred.resolve();
@@ -324,21 +326,21 @@
 			});
 
 			img.src = e.target.result;
-		}
+		};
 		reader.onerror = function (e) {
 			deferred.reject({code:Ace_File_Input.error['FILE_LOAD_FAILED']});
-		}
+		};
 		reader.readAsDataURL(file);
 
 		return deferred.promise();
-	}
+	};
 
 	var get_thumbnail = function(img, size, type) {
 		var w = img.width, h = img.height;
 		
 		//**IE10** is not giving correct width using img.width so we use $(img).width()
-		w = w > 0 ? w : $(img).width()
-		h = h > 0 ? h : $(img).height()
+		w = w > 0 ? w : $(img).width();
+		h = h > 0 ? h : $(img).height();
 
 		if(w > size || h > size) {
 		  if(w > h) {
@@ -351,7 +353,7 @@
 		}
 
 
-		var dataURL
+		var dataURL;
 		try {
 			var canvas = document.createElement('canvas');
 			canvas.width = w; canvas.height = h;
@@ -370,7 +372,7 @@
 		
 
 		return {src: dataURL, w:w, h:h};
-	}
+	};
 	
 
 	
@@ -404,7 +406,7 @@
 		if (ret instanceof Array || (hasFileList && ret instanceof FileList)) file_list = ret;
 		
 		return file_list;
-	}
+	};
 	
 	
 	var getExtRegex = function(ext) {
@@ -412,13 +414,13 @@
 		if(typeof ext === 'string') ext = [ext];
 		if(ext.length == 0) return null;
 		return new RegExp("\.(?:"+ext.join('|')+")$", "i");
-	}
+	};
 	var getMimeRegex = function(mime) {
 		if(!mime) return null;
 		if(typeof mime === 'string') mime = [mime];
 		if(mime.length == 0) return null;
 		return new RegExp("^(?:"+mime.join('|').replace(/\//g, "\\/")+")$", "i");
-	}
+	};
 	var checkFileList = function(files, dropped) {
 		var allowExt   = getExtRegex(this.settings.allowExt);
 
@@ -434,7 +436,7 @@
 
 
 		var safe_files = [];
-		var error_list = {}
+		var error_list = {};
 		for(var f = 0; f < files.length; f++) {
 			var file = files[f];
 			
@@ -491,12 +493,12 @@
 		if(safe_files.length == files.length) return files;//return original file list if all are valid
 
 		/////////
-		var error_count = {'ext': 0, 'mime': 0, 'size': 0}
+		var error_count = {'ext': 0, 'mime': 0, 'size': 0};
 		if( 'ext' in error_list ) error_count['ext'] = error_list['ext'].length;
 		if( 'mime' in error_list ) error_count['mime'] = error_list['mime'].length;
 		if( 'size' in error_list ) error_count['size'] = error_list['size'].length;
 		
-		var event
+		var event;
 		this.$element.trigger(
 			event = new $.Event('file.error.ace'), 
 			{
@@ -511,7 +513,7 @@
 		//////////
 
 		return safe_files;//return safe_files
-	}
+	};
 
 
 

@@ -11,28 +11,35 @@
 	</appender>
 
 	<appender name="avatarAppender" class="org.apache.log4j.DailyRollingFileAppender">
-		<param name="File" value="/data/applogs/cache-server/logs/avatar.log" />
+		<param name="File" value="/data/applogs/squirrel-web/logs/avatar.log" />
 		<layout class="org.apache.log4j.PatternLayout">
 			<param name="ConversionPattern" value="%d %-5p %t [%c] %m%n" />
 		</layout>
 	</appender>
 
 	<appender name="appAppender" class="org.apache.log4j.DailyRollingFileAppender">
-		<param name="File" value="/data/applogs/cache-server/logs/app.log" />
+		<param name="File" value="/data/applogs/squirrel-web/logs/app.log" />
 		<layout class="org.apache.log4j.PatternLayout">
 			<param name="ConversionPattern" value="%d %-5p %t [%c] %m%n" />
 		</layout>
 	</appender>
     
 	<appender name="monitorAppender" class="org.apache.log4j.DailyRollingFileAppender">
-		<param name="File" value="/data/applogs/cache-server/logs/monitor.log" />
+		<param name="File" value="/data/applogs/squirrel-web/logs/monitor.log" />
 		<layout class="org.apache.log4j.PatternLayout">
 			<param name="ConversionPattern" value="%d{MM-DD HH:mm:ss,SSS} %-5p %t [%c{1}] %m%n" />
 		</layout>
 	</appender>
 	
 	<appender name="ibatisAppender" class="org.apache.log4j.DailyRollingFileAppender">
-		<param name="File" value="/data/applogs/cache-server/logs/ibatis.log" />
+		<param name="File" value="/data/applogs/squirrel-web/logs/ibatis.log" />
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%d %-5p %t [%c] %m%n" />
+		</layout>
+	</appender>
+
+	<appender name="scaleAppender" class="org.apache.log4j.DailyRollingFileAppender">
+		<param name="File" value="/data/applogs/squirrel-web/logs/scale.log" />
 		<layout class="org.apache.log4j.PatternLayout">
 			<param name="ConversionPattern" value="%d %-5p %t [%c] %m%n" />
 		</layout>
@@ -57,6 +64,11 @@
         <appender-ref  ref="ibatisAppender"/>
 	</logger>
 	
+	<logger name="com.dianping.cache.scale" additivity="false">
+		<level value="ERROR"/>
+		<appender-ref  ref="scaleAppender"/>
+	</logger>
+
 	<root>
 		<level value="INFO" />
 		<appender-ref ref="appAppender" />

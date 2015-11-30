@@ -9,8 +9,8 @@ import com.dianping.squirrel.common.config.ConfigManagerLoader;
 
 public class ServerState {
 
-    public enum State {Alive, Dead, Unknown};
-    
+    public enum State {Alive, Dead, Unknown}
+
     private static final Logger logger = LoggerFactory.getLogger(ServerState.class);
     
     private ServerListener taskListener;

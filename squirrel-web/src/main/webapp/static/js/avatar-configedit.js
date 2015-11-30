@@ -110,7 +110,7 @@ module.controller('ConfigEditController', [
 				}).error(function(){
 					
 				});
-			}
+			};
 			
 			$scope.manualAddNode = function(){
 				
@@ -161,7 +161,7 @@ module.controller('ConfigEditController', [
         			$scope.fail = true;
 					
 				});
-			}
+			};
 			
 			$scope.autoAddNode = function(){
 				$('#modal-wizard1').modal('show');
@@ -200,7 +200,7 @@ module.controller('ConfigEditController', [
 	        			$scope.btndisable1 = false;
 					});
 				
-			}
+			};
 			
 			$scope.isOperationDone = function(operationId){
 				$http.get(window.contextPath + '/cache/config/operateResult',{
@@ -246,7 +246,7 @@ module.controller('ConfigEditController', [
         			
         			$scope.btndisable1 = false;
 				});
-			}
+			};
 			
 			$scope.validate = function(address){
 				var add = address.split(":");
@@ -259,7 +259,7 @@ module.controller('ConfigEditController', [
 					var flag = response.flag;
 					return flag;
 				});
-			}
+			};
 			
 			$scope.addServer = function(server){
 				 $scope.message2 = "添加服务器……";
@@ -304,7 +304,7 @@ module.controller('ConfigEditController', [
 		        			$scope.fail = true;
 		        		});
 		        		$scope.btndisable2 = false; //释放添加按钮
-			}
+			};
 			
 			
 			
@@ -355,7 +355,7 @@ module.controller('ConfigEditController', [
 			        			
 			        		});
 					$scope.btndisable2 = false; //释放添加按钮
-			}
+			};
 			
 			//
 			$scope.updateConfig = function(){
@@ -371,7 +371,7 @@ module.controller('ConfigEditController', [
 								}, 1000);
 			        		});
 
-			}
+			};
 			
 			$scope.updateDcacheConfig = function(){
 				 $scope.submiticon = true;
@@ -391,7 +391,7 @@ module.controller('ConfigEditController', [
 									 $scope.submiticon = false;
 								}, 1000);
 			        		});
-			}
+			};
 			
 			
 			$scope.preDeleteServer = function(index){
@@ -399,7 +399,7 @@ module.controller('ConfigEditController', [
 				$scope.serverToDeleteIndex = index;
 				$('#modal-wizard3').modal('show');
 				
-			}
+			};
 			
 			//delete server 2.0
 			$scope.deleteServer = function(){
@@ -431,7 +431,7 @@ module.controller('ConfigEditController', [
 		        			$scope.servers = $scope.mServers.split(/;~;|\|/);
 		        		});
 				
-			}
+			};
 			
 			
 			// delete server 3.0
@@ -456,7 +456,7 @@ module.controller('ConfigEditController', [
 				
 				
 				
-			}
+			};
 			$scope.isShutDownDone = function(operationId){
 				$http.get(window.contextPath + '/cache/config/operateResult',{
 					params : {
@@ -496,7 +496,7 @@ module.controller('ConfigEditController', [
         			$scope.fail = true;
         			
 				});
-			}
+			};
 			
 			$scope.isReduceDone = function(operationId){
 				$http.get(window.contextPath + '/cache/config/operateResult',{
@@ -539,7 +539,7 @@ module.controller('ConfigEditController', [
         			$scope.fail = true;
         			
 				});
-			}
+			};
 			//临时摘除 2.0
 			$scope.dropServer = function(index){
 				
@@ -572,7 +572,7 @@ module.controller('ConfigEditController', [
 		        			$scope.servers = $scope.mServers.split(/;~;|\|/);
 		        		});
 				
-			}
+			};
 /*****************************    Redis	  **************************************************/
 			$scope.instances = 1;
 			$scope.appid = "redis10";
@@ -583,7 +583,7 @@ module.controller('ConfigEditController', [
 						"ip":$scope.ip,
 	        			"port":$scope.port
 	        		}).success();
-			}
+			};
 			
 			$scope.redisAutoScaleNode = function(){
 				$http.post(window.contextPath + '/redis/autoscaleup',
@@ -591,14 +591,14 @@ module.controller('ConfigEditController', [
 					"instances":$scope.instances,
 	        			"appid":$scope.appid
 	        		}).success();
-			}
+			};
 			
 			$scope.delRedisMasterNode = function(address){
 				$http.post(window.contextPath + '/redis/delmaster',
 			        	{"cluster":$scope.mCacheKey,
 						"address":address
 		        		}).success();
-			}
+			};
 			
 			//重新上线机器
 			$scope.resetServer = function(index){
@@ -628,7 +628,7 @@ module.controller('ConfigEditController', [
 						}else{
 							$scope.tempServers =ipT + ":" + portT;
 						}
-						$scope.updateConfigServers() // 添加服务器，更新服务器列表
+						$scope.updateConfigServers(); // 添加服务器，更新服务器列表
 						$scope.dropservers.splice(index,1);//从摘除队列中移除
 						
 						
@@ -650,7 +650,7 @@ module.controller('ConfigEditController', [
         			$scope.fail = true;
 				});				
 				
-			}
+			};
 			
 			
 			$scope.implItems = ["com.dianping.cache.memcached.MemcachedClientImpl",
@@ -667,7 +667,7 @@ module.controller('ConfigEditController', [
 					$scope.implItems = response.impl;
 					$scope.coderItems = response.coder;
 				});
-			}
+			};
 			
 			$scope.initpage();
 		} ]);

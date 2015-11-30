@@ -13,9 +13,7 @@
 	}
 })(function($, moment) {
 
-;;
-
-var defaults = {
+	var defaults = {
 
 	lang: 'en',
 
@@ -164,9 +162,7 @@ var rtlDefaults = {
 
 
 
-;;
-
-var fc = $.fullCalendar = { version: "2.0.2" };
+	var fc = $.fullCalendar = { version: "2.0.2" };
 var fcViews = fc.views = {};
 
 
@@ -244,8 +240,6 @@ function isForcedAtomicOption(name) {
 // FIX: find a different solution for view-option-hashes and have a whitelist
 // for options that can be recursively merged.
 
-;;
-
 //var langOptionHash = {}; // initialized in defaults.js
 fc.langs = langOptionHash; // expose
 
@@ -317,10 +311,7 @@ fc.lang = function(langCode, options) {
 	// set it as the default language for FullCalendar
 	defaults.lang = langCode;
 };
-;;
-
- 
-function Calendar(element, instanceOptions) {
+	function Calendar(element, instanceOptions) {
 	var t = this;
 
 
@@ -1075,9 +1066,7 @@ function Calendar(element, instanceOptions) {
 
 }
 
-;;
-
-function Header(calendar, options) {
+	function Header(calendar, options) {
 	var t = this;
 	
 	
@@ -1249,9 +1238,7 @@ function Header(calendar, options) {
 
 }
 
-;;
-
-fc.sourceNormalizers = [];
+	fc.sourceNormalizers = [];
 fc.sourceFetchers = [];
 
 var ajaxDefaults = {
@@ -1964,9 +1951,7 @@ function backupEventDates(event) {
 	event._end = event.end ? event.end.clone() : null;
 }
 
-;;
-
-fc.applyAll = applyAll;
+	fc.applyAll = applyAll;
 
 
 
@@ -2248,9 +2233,7 @@ function firstDefined() {
 }
 
 
-;;
-
-var ambigDateOfMonthRegex = /^\s*\d{4}-\d\d$/;
+	var ambigDateOfMonthRegex = /^\s*\d{4}-\d\d$/;
 var ambigTimeOrZoneRegex = /^\s*\d{4}-(?:(\d\d-\d\d)|(W\d\d$)|(W\d\d-\d)|(\d\d\d))((T| )(\d\d(:\d\d(:\d\d(\.\d+)?)?)?)?)?$/;
 
 
@@ -2614,8 +2597,6 @@ function commonlyAmbiguate(inputs) {
 	return outputs;
 }
 
-;;
-
 // Single Date Formatting
 // -------------------------------------------------------------------------------------------------
 
@@ -2841,9 +2822,7 @@ function chunkFormatString(formatStr) {
 	return chunks;
 }
 
-;;
-
-fcViews.month = MonthView;
+	fcViews.month = MonthView;
 
 function MonthView(element, calendar) {
 	var t = this;
@@ -2894,9 +2873,7 @@ function MonthView(element, calendar) {
 	
 }
 
-;;
-
-fcViews.basicWeek = BasicWeekView;
+	fcViews.basicWeek = BasicWeekView;
 
 function BasicWeekView(element, calendar) { // TODO: do a WeekView mixin
 	var t = this;
@@ -2937,9 +2914,7 @@ function BasicWeekView(element, calendar) { // TODO: do a WeekView mixin
 	
 }
 
-;;
-
-fcViews.basicDay = BasicDayView;
+	fcViews.basicDay = BasicDayView;
 
 function BasicDayView(element, calendar) { // TODO: make a DayView mixin
 	var t = this;
@@ -2974,9 +2949,7 @@ function BasicDayView(element, calendar) { // TODO: make a DayView mixin
 	
 }
 
-;;
-
-setDefaults({
+	setDefaults({
 	weekMode: 'fixed'
 });
 
@@ -3487,9 +3460,7 @@ function BasicView(element, calendar, viewName) {
 	
 }
 
-;;
-
-function BasicEventRenderer() {
+	function BasicEventRenderer() {
 	var t = this;
 	
 	
@@ -3516,9 +3487,7 @@ function BasicEventRenderer() {
 
 }
 
-;;
-
-fcViews.agendaWeek = AgendaWeekView;
+	fcViews.agendaWeek = AgendaWeekView;
 
 function AgendaWeekView(element, calendar) { // TODO: do a WeekView mixin
 	var t = this;
@@ -3559,9 +3528,7 @@ function AgendaWeekView(element, calendar) { // TODO: do a WeekView mixin
 
 }
 
-;;
-
-fcViews.agendaDay = AgendaDayView;
+	fcViews.agendaDay = AgendaDayView;
 
 function AgendaDayView(element, calendar) { // TODO: make a DayView mixin
 	var t = this;
@@ -3596,9 +3563,7 @@ function AgendaDayView(element, calendar) { // TODO: make a DayView mixin
 
 }
 
-;;
-
-setDefaults({
+	setDefaults({
 	allDaySlot: true,
 	allDayText: 'all-day',
 
@@ -4555,9 +4520,7 @@ function AgendaView(element, calendar, viewName) {
 
 }
 
-;;
-
-function AgendaEventRenderer() {
+	function AgendaEventRenderer() {
 	var t = this;
 	
 	
@@ -5499,10 +5462,7 @@ function compareSlotSegs(seg1, seg2) {
 }
 
 
-;;
-
-
-function View(element, calendar, viewName) {
+	function View(element, calendar, viewName) {
 	var t = this;
 	
 	
@@ -6009,9 +5969,7 @@ function View(element, calendar, viewName) {
 
 }
 
-;;
-
-function DayEventRenderer() {
+	function DayEventRenderer() {
 	var t = this;
 
 	
@@ -6775,8 +6733,6 @@ function compareDaySegments(a, b) {
 }
 
 
-;;
-
 //BUG: unselect needs to be triggered when events are dragged+dropped
 
 function SelectionManager() {
@@ -6899,9 +6855,7 @@ function SelectionManager() {
 
 }
 
-;;
- 
-function OverlayManager() {
+	function OverlayManager() {
 	var t = this;
 	
 	
@@ -6938,9 +6892,7 @@ function OverlayManager() {
 
 }
 
-;;
-
-function CoordinateGrid(buildFunc) {
+	function CoordinateGrid(buildFunc) {
 
 	var t = this;
 	var rows;
@@ -6986,9 +6938,7 @@ function CoordinateGrid(buildFunc) {
 
 }
 
-;;
-
-function HoverListener(coordinateGrid) {
+	function HoverListener(coordinateGrid) {
 
 
 	var t = this;
@@ -7049,9 +6999,7 @@ function _fixUIEvent(event) { // for issue 1168
 		event.pageY = event.originalEvent.pageY;
 	}
 }
-;;
-
-function HorizontalPositionCache(getElement) {
+	function HorizontalPositionCache(getElement) {
 
 	var t = this,
 		elements = {},
@@ -7077,7 +7025,5 @@ function HorizontalPositionCache(getElement) {
 	};
 	
 }
-
-;;
 
 });

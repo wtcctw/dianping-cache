@@ -18,7 +18,7 @@ public abstract class AbstractStatsDataStorage {
 		add("10.3.8.62");//线上
 		add("10.2.8.147");//ppe
 		add("192.168.211.117");//beta
-		add("10.128.120.31");//my host
+		//add("10.128.120.31");//my host
 	}};
 	
 	protected final Logger logger = LoggerFactory.getLogger(getClass());

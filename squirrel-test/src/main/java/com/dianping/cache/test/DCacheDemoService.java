@@ -3,15 +3,15 @@ package com.dianping.cache.test;
 
 public interface DCacheDemoService {
 
-	public void put();
+	void put();
 
-	public void get();
+	void get();
 	
-	public void getWithCondition();
+	void getWithCondition();
 	
-	public void update();
+	void update();
 	
-	public void updateWithCondition();
+	void updateWithCondition();
 	
-	public void delete();
+	void delete();
 }

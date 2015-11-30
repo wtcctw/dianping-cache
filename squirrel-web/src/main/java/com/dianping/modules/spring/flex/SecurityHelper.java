@@ -51,7 +51,7 @@ public class SecurityHelper {
     	if (details != null) {
     		realName = (String) details.get("realName");
     	}
-    	return (String) authentication.get("name") + (realName != null ? "(" + realName + ")" : "");
+    	return authentication.get("name") + (realName != null ? "(" + realName + ")" : "");
     }
     
     public static boolean isEmbededPrincipal(String principal) {

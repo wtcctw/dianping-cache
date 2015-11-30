@@ -7,11 +7,13 @@ import com.dianping.cache.entity.ServerCluster;
 
 public interface ServerClusterDao {
 	
-	public void insert(ServerCluster serverCluster);
+	 void insert(ServerCluster serverCluster);
 	
-	public List<ServerCluster> findByServer(String server);
+	 List<ServerCluster> findByServer(String server);
 	
-	public List<Server> findByCluster(String cluster);
+	 List<Server> findByCluster(String cluster);
 	
-	public void delete(ServerCluster serverCluster);
+	void delete(ServerCluster serverCluster);
+
+	void deleteServer(String address);
 }

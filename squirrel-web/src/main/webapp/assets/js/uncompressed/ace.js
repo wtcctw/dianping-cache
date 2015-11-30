@@ -1,9 +1,9 @@
 /**
  Required. Ace's Basic File to Initiliaze Different Parts & Some Variables.
 */
-if( !('ace' in window) ) window['ace'] = {}
-if( !('helper' in window['ace']) ) window['ace'].helper = {}
-if( !('options' in window['ace']) ) window['ace'].options = {}
+if( !('ace' in window) ) window['ace'] = {};
+if( !('helper' in window['ace']) ) window['ace'].helper = {};
+if( !('options' in window['ace']) ) window['ace'].options = {};
 if( !('vars' in window['ace']) ) {
   window['ace'].vars = {
 	 'icon'	: ' ace-icon ',
@@ -19,11 +19,11 @@ jQuery(function($) {
 
 	//sometimes the only good way to work around browser's pecularities is to detect them using user-agents
 	//though it's not accurate
-	var agent = navigator.userAgent
-	ace.vars['webkit'] = !!agent.match(/AppleWebKit/i)
+	var agent = navigator.userAgent;
+	ace.vars['webkit'] = !!agent.match(/AppleWebKit/i);
 	ace.vars['safari'] = !!agent.match(/Safari/i) && !agent.match(/Chrome/i);
-	ace.vars['android'] = ace.vars['safari'] && !!agent.match(/Android/i)
-	ace.vars['ios_safari'] = !!agent.match(/OS ([4-9])(_\d)+ like Mac OS X/i) && !agent.match(/CriOS/i)
+	ace.vars['android'] = ace.vars['safari'] && !!agent.match(/Android/i);
+	ace.vars['ios_safari'] = !!agent.match(/OS ([4-9])(_\d)+ like Mac OS X/i) && !agent.match(/CriOS/i);
 	ace.vars['old_ie'] = document.all && !document.addEventListener;
 	
 	ace.vars['non_auto_fixed'] = ace.vars['android'] || ace.vars['ios_safari'];
@@ -33,7 +33,7 @@ jQuery(function($) {
 	}
 
 	var docStyle = document.documentElement.style;
-	ace.vars['transition'] = 'transition' in docStyle || 'WebkitTransition' in docStyle || 'MozTransition' in docStyle || 'OTransition' in docStyle
+	ace.vars['transition'] = 'transition' in docStyle || 'WebkitTransition' in docStyle || 'MozTransition' in docStyle || 'OTransition' in docStyle;
 
 	/////////////////////////////
 
@@ -88,7 +88,7 @@ jQuery(function($) {
 		ace[func_name].apply(null, args);
 	}
 
-})
+});
 
 
 
@@ -106,7 +106,7 @@ ace.general_vars = function($) {
 
 	//update some basic variables
 	$(window).on('resize.ace.vars' , function(){
-		ace.vars['window'] = {width: parseInt($(this).width()), height: parseInt($(this).height())}
+		ace.vars['window'] = {width: parseInt($(this).width()), height: parseInt($(this).height())};
 		ace.vars['mobile_view'] = ace.vars['mobile_style'] < 4 && ace.helper.mobile_view();
 		ace.vars['collapsible'] = !ace.vars['mobile_view'] && ace.helper.collapsible();
 		ace.vars['nav_collapse'] = (ace.vars['collapsible'] || ace.vars['mobile_view']) && $('#navbar').hasClass('navbar-collapse');
@@ -115,17 +115,17 @@ ace.general_vars = function($) {
 		ace.vars['minimized'] = 
 		(!ace.vars['collapsible'] && sidebar.hasClass(minimized_menu_class))
 		 ||
-		(ace.vars['mobile_style'] == 3 && ace.vars['mobile_view'] && sidebar.hasClass(responsive_min_class))
+		(ace.vars['mobile_style'] == 3 && ace.vars['mobile_view'] && sidebar.hasClass(responsive_min_class));
 
 		ace.vars['horizontal'] = !(ace.vars['mobile_view'] || ace.vars['collapsible']) && sidebar.hasClass(horizontal_menu_class)
 	}).triggerHandler('resize.ace.vars');
-}
+};
 
 //
 ace.general_things = function($) {
 	//add scrollbars for user dropdowns
 	var has_scroll = !!$.fn.ace_scroll;
-	if(has_scroll) $('.dropdown-content').ace_scroll({reset: false, mouseWheelLock: true})
+	if(has_scroll) $('.dropdown-content').ace_scroll({reset: false, mouseWheelLock: true});
 	/**
 	//add scrollbars to body
 	 if(has_scroll) $('body').ace_scroll({size: ace.helper.winHeight()})
@@ -162,8 +162,8 @@ ace.general_things = function($) {
 	//prevent dropdowns from hiding when a tab is selected
 	$(document).on('click', '.dropdown-navbar .nav-tabs', function(e){
 		e.stopPropagation();
-		var $this , href
-		var that = e.target
+		var $this , href;
+		var that = e.target;
 		if( ($this = $(e.target).closest('[data-toggle=tab]')) && $this.length > 0) {
 			$this.tab('show');
 			e.preventDefault();
@@ -283,50 +283,50 @@ ace.general_things = function($) {
 	})
 	*/
 
-}
+};
 
 
 
 
 //some functions
 ace.helper.collapsible = function() {
-	var toggle
+	var toggle;
 	return (document.querySelector('#sidebar.navbar-collapse') != null)
 	&& ((toggle = document.querySelector('.navbar-toggle[data-target*=".sidebar"]')) != null)
-	&&  toggle.scrollHeight > 0
+	&&  toggle.scrollHeight > 0;
 	//sidebar is collapsible and collapse button is visible?
-}
+};
 ace.helper.mobile_view = function() {
-	var toggle
+	var toggle;
 	return ((toggle = document.getElementById('menu-toggler')) != null	&& toggle.scrollHeight > 0)
-}
+};
 
 ace.helper.redraw = function(elem) {
 	var saved_val = elem.style['display'];
 	elem.style.display = 'none';
 	elem.offsetHeight;
 	elem.style.display = saved_val;
-}
+};
 
 ace.helper.scrollTop = function() {
-	return document.scrollTop || document.documentElement.scrollTop || document.body.scrollTop
+	return document.scrollTop || document.documentElement.scrollTop || document.body.scrollTop;
 	//return $(window).scrollTop();
-}
+};
 ace.helper.winHeight = function() {
 	return window.innerHeight || document.documentElement.clientHeight;
 	//return $(window).innerHeight();
-}
+};
 ace.helper.camelCase = function(str) {
 	return str.replace(/-([\da-z])/gi, function(match, chr) {
 	  return chr ? chr.toUpperCase() : '';
 	});
-}
+};
 ace.helper.removeStyle = 
   'removeProperty' in document.documentElement.style
   ?
   function(elem, prop) { elem.style.removeProperty(prop) }
   :
-  function(elem, prop) { elem.style[ace.helper.camelCase(prop)] = '' }
+  function(elem, prop) { elem.style[ace.helper.camelCase(prop)] = '' };
 
 
 ace.helper.hasClass = 
@@ -420,7 +420,7 @@ ace.add_touch_drag = function($) {
 							
 
 							if( direction !== false ) {
-							 var retval = {cancel: false}
+							 var retval = {cancel: false};
 							 start.origin.trigger({
 								'type': 'ace_drag',
 								//'start': start.coords,
@@ -429,7 +429,7 @@ ace.add_touch_drag = function($) {
 								'dx': dx,
 								'dy': dy,
 								'retval': retval
-							 })
+							 });
 
 		 					  // prevent document scrolling unless retval.cancel == true
 							  if( retval.cancel == false ) event.preventDefault();
@@ -629,7 +629,7 @@ ace.handle_side_menu = function($) {
 ace.enable_ajax_content = function($, options) {
 	//var has_history = 'history' in window && typeof window.history.pushState === 'function';
 	
-	 var content_url = options.content_url || false
+	 var content_url = options.content_url || false;
 	 var default_url = options.default_url || false;
 	var loading_icon = options.loading_icon || 'fa-spinner fa-2x orange';
 	var loading_text = options.loading_text || '';
@@ -664,26 +664,26 @@ ace.enable_ajax_content = function($, options) {
 
 
 	function getUrl(url, hash, manual_trigger) {
-		var event
-		$(document).trigger(event = $.Event('ajaxloadstart'), {url: url, hash: hash})
+		var event;
+		$(document).trigger(event = $.Event('ajaxloadstart'), {url: url, hash: hash});
 		if (event.isDefaultPrevented()) return;
 
 		
 		var contentArea = $('.page-content-area');
 		contentArea
-		.css('opacity', 0.25)
+		.css('opacity', 0.25);
 		
 		var loader = $('<div style="position: fixed; z-index: 2000;" class="ajax-loading-overlay"><i class="ajax-loading-icon fa fa-spin '+loading_icon+'"></i> '+loading_text+'</div>').insertBefore(contentArea);
 		var offset = contentArea.offset();
-		loader.css({top: offset.top, left: offset.left})
+		loader.css({top: offset.top, left: offset.left});
 	
 		$.ajax({
 			'url': url
 		})
 		.complete(function() {
-			contentArea.css('opacity', 0.8)
+			contentArea.css('opacity', 0.8);
 			$(document).on('ajaxscriptsloaded', function() {
-				contentArea.css('opacity', 1)
+				contentArea.css('opacity', 1);
 				contentArea.prevAll('.ajax-loading-overlay').remove();
 			});
 		})
@@ -709,7 +709,7 @@ ace.enable_ajax_content = function($, options) {
 								//var sub = $(this).find(' > .submenu').get(0);
 								//if(sub) ace.submenu.hide(sub, 200)
 							}
-						})
+						});
 						link_element.closest('li').addClass('active').parents('.nav li').addClass('active open');
 						if('sidebar_scroll' in ace.helper) {
 							ace.helper.sidebar_scroll.reset();
@@ -726,7 +726,7 @@ ace.enable_ajax_content = function($, options) {
 			//convert "title" and "link" tags to "div" tags for later processing
 			result = String(result)
 				.replace(/<(title|link)([\s\>])/gi,'<div class="hidden ajax-append-$1"$2')
-				.replace(/<\/(title|link)\>/gi,'</div>')
+				.replace(/<\/(title|link)\>/gi,'</div>');
 		
 			contentArea.empty().html(result);
 			contentArea.css('opacity', 0.6);
@@ -738,7 +738,7 @@ ace.enable_ajax_content = function($, options) {
 				contentArea.find('.ajax-append-link').each(function(e) {
 					var $link = $(this);
 					if ( $link.attr('href') ) {
-						var new_link = jQuery('<link />', {type : 'text/css', rel: 'stylesheet', 'class': 'ajax-stylesheet'})
+						var new_link = jQuery('<link />', {type : 'text/css', rel: 'stylesheet', 'class': 'ajax-stylesheet'});
 						if( ace_style.length > 0 ) new_link.insertBefore(ace_style);
 						else new_link.appendTo('head');
 						new_link.attr('href', $link.attr('href'));//we set "href" after insertion, for IE to work
@@ -809,7 +809,7 @@ ace.enable_ajax_content = function($, options) {
 		}
 	 }
 
-}
+};
 
 ace.load_ajax_scripts = function(scripts, callback) {
 
@@ -817,7 +817,7 @@ ace.load_ajax_scripts = function(scripts, callback) {
  setTimeout(function() {
 
 	//let's keep a list of loaded scripts so that we don't load them more than once!
-	if(! ('ajax_loaded_scripts' in ace.vars) ) ace.vars['ajax_loaded_scripts'] = {}
+	if(! ('ajax_loaded_scripts' in ace.vars) ) ace.vars['ajax_loaded_scripts'] = {};
 
 	var deferreds = [];
 	for(var i = 0; i < scripts.length; i++) if(scripts[i]) {
@@ -864,7 +864,7 @@ ace.submenu = {
 	var $sub = $(sub);
 
 	var event;
-	$sub.trigger(event = $.Event('show.ace.submenu'))
+	$sub.trigger(event = $.Event('show.ace.submenu'));
 	if (event.isDefaultPrevented()) return false;
 
 	$sub
@@ -885,12 +885,12 @@ ace.submenu = {
 	var complete = function(ev, trigger) {
 		ev && ev.stopPropagation();
 		$sub
-		.css({'transition-property': '', 'transition-duration': '', overflow:'', height: ''})
+		.css({'transition-property': '', 'transition-duration': '', overflow:'', height: ''});
 		//if(ace.vars['webkit']) ace.helper.redraw(sub);//little Chrome issue, force redraw ;)
 
 		if(ace.vars['transition']) $sub.off('.trans');
 		if(trigger !== false) $sub.trigger($.Event('shown.ace.submenu'))
-	}
+	};
 	if( duration > 0 && ace.vars['transition'] ) {
 	  $sub.one('transitionend.trans webkitTransitionEnd.trans mozTransitionEnd.trans oTransitionEnd.trans', complete);
 	}
@@ -911,7 +911,7 @@ ace.submenu = {
 	var $sub = $(sub);
 
 	var event;
-	$sub.trigger(event = $.Event('hide.ace.submenu'))
+	$sub.trigger(event = $.Event('hide.ace.submenu'));
 	if (event.isDefaultPrevented()) return false;
 
 	$sub
@@ -939,7 +939,7 @@ ace.submenu = {
 
 		if(ace.vars['transition']) $sub.off('.trans');
 		if(trigger !== false) $sub.trigger($.Event('hidden.ace.submenu'))
-	}
+	};;
 	if( duration > 0 && ace.vars['transition'] ) {
 	  $sub.one('transitionend.trans webkitTransitionEnd.trans mozTransitionEnd.trans oTransitionEnd.trans', complete);
 	}
@@ -977,7 +977,7 @@ ace.sidebar_scrollable = function($ , options) {
 	if( !$.fn.ace_scroll ) return;
 	
 
-	var old_safari = ace.vars['safari'] && navigator.userAgent.match(/version\/[1-5]/i)
+	var old_safari = ace.vars['safari'] && navigator.userAgent.match(/version\/[1-5]/i);
 	//NOTE
 	//Safari on windows has not been updated for a long time.
 	//And it has a problem when sidebar is fixed&scrollable and there is a CSS3 animation inside page content.
@@ -1021,7 +1021,7 @@ ace.sidebar_scrollable = function($ , options) {
 	//sidebar.offsetHeight is used to force redraw and recalculate 'sidebar.style.position' esp for webkit!
 	function() { sidebar.offsetHeight; return window.getComputedStyle(sidebar).position == 'fixed' }
 	:
-	function() { sidebar.offsetHeight; return $sidebar.css('position') == 'fixed' }
+	function() { sidebar.offsetHeight; return $sidebar.css('position') == 'fixed' };
 	//sometimes when navbar is fixed, sidebar automatically becomes fixed without needing ".sidebar-fixed" class
 	//currently when mobile_style == 1
 
@@ -1115,7 +1115,7 @@ ace.sidebar_scrollable = function($ , options) {
 					
 					var distance = event.dy;
 					
-					distance = parseInt(Math.min($avail_height, distance))
+					distance = parseInt(Math.min($avail_height, distance));
 					if(Math.abs(distance) > 2) distance = distance * 2;
 					
 					if(distance != 0) {
@@ -1164,8 +1164,8 @@ ace.sidebar_scrollable = function($ , options) {
 			
 			
 			if( typeof smooth_scroll === 'number' && smooth_scroll > 0) {
-				$nav.css({'transition-property': 'top', 'transition-duration': (smooth_scroll / 1000).toFixed(2)+'s'})
-				bar.css({'transition-property': 'top', 'transition-duration': (smooth_scroll / 1500).toFixed(2)+'s'})
+				$nav.css({'transition-property': 'top', 'transition-duration': (smooth_scroll / 1000).toFixed(2)+'s'});
+				bar.css({'transition-property': 'top', 'transition-duration': (smooth_scroll / 1500).toFixed(2)+'s'});
 				
 				scroll_div
 				.on('drag.start', function(e) {
@@ -1208,12 +1208,12 @@ ace.sidebar_scrollable = function($ , options) {
 				//sometimes there's no active item or not 'offsetTop' property
 				var $active;
 
-				var nav_list = $sidebar.find('.nav-list')
+				var nav_list = $sidebar.find('.nav-list');
 				if(ace.vars['minimized'] && !ace.vars['collapsible']) {
 					$active = nav_list.find('> .active')
 				}
 				else {
-					$active = $nav.find('> .active.hover')
+					$active = $nav.find('> .active.hover');
 					if($active.length == 0)	$active = $nav.find('.active:not(.open)')
 				}
 
@@ -1259,7 +1259,7 @@ ace.sidebar_scrollable = function($ , options) {
 			is_scrolling = true;
 			if( enable_scroll ) {
 				scroll_content_div.css({height: $content_height, width: 8});
-				scroll_div.prev().css({'max-height' : $avail_height})
+				scroll_div.prev().css({'max-height' : $avail_height});
 				ace_scroll.update({size: $avail_height}).enable().reset();
 			}
 			if( !enable_scroll || !ace_scroll.is_active() ) {
@@ -1276,7 +1276,7 @@ ace.sidebar_scrollable = function($ , options) {
 			if(scroll_div) {
 				scroll_div.css({'height' : '', 'max-height' : ''});
 				scroll_content_div.css({height: '', width: ''});//otherwise it will have height and takes up some space even when invisible
-				scroll_div.prev().css({'max-height' : ''})
+				scroll_div.prev().css({'max-height' : ''});
 				ace_scroll.disable();
 			}
 
@@ -1300,7 +1300,7 @@ ace.sidebar_scrollable = function($ , options) {
 			else if(height_change < 0) {
 				//if content height is decreasing
 				//let's move nav down while a submenu is being hidden
-				var scroll_top = scroll_content.scrollTop() + height_change
+				var scroll_top = scroll_content.scrollTop() + height_change;
 				if(scroll_top < 0) return;
 
 				nav.style.top = (-1 * scroll_top) + 'px';
@@ -1311,7 +1311,7 @@ ace.sidebar_scrollable = function($ , options) {
 				setTimeout(function() { scrollbars.reset() } , 0);
 			else scrollbars.reset();
 		}
-	}
+	};
 	scrollbars.initiate(true);//true = on_page_load
 
 	//reset on document and window changes
@@ -1321,7 +1321,7 @@ ace.sidebar_scrollable = function($ , options) {
 		}
 		else if( event_name === 'sidebar_fixed' || event_name === 'navbar_fixed' ) {
 			//sidebar_fixed = event_val;
-			sidebar_fixed = is_sidebar_fixed()
+			sidebar_fixed = is_sidebar_fixed();
 			
 			if(sidebar_fixed && !is_scrolling) {
 				scrollbars.reset();
@@ -1332,9 +1332,9 @@ ace.sidebar_scrollable = function($ , options) {
 		}
 	});
 	$window.on('resize.ace.scroll', function(){
-		sidebar_fixed = is_sidebar_fixed()
+		sidebar_fixed = is_sidebar_fixed();
 		scrollbars.reset();
-	})
+	});
 	
 
 	//change scrollbar size after a submenu is hidden/shown
@@ -1368,7 +1368,7 @@ ace.sidebar_hoverable = function($, options) {
 		$sidebar.find('.submenu').each(function() {
 			var sub = this, li = this.parentNode;
 			if(sub) {
-				sub.style.removeProperty('top')
+				sub.style.removeProperty('top');
 				sub.style.removeProperty('bottom');
 				
 				var menu_text = li.querySelector('.menu-text');
@@ -1382,7 +1382,7 @@ ace.sidebar_hoverable = function($, options) {
 			}
 		});
 	}
- }
+ };
 
 
 var is_element_pos =
@@ -1390,16 +1390,16 @@ var is_element_pos =
 	//el.offsetHeight is used to force redraw and recalculate 'el.style.position' esp for webkit!
 	function(el, pos) { el.offsetHeight; return window.getComputedStyle(el).position == pos }
 	:
-	function(el, pos) { el.offsetHeight; return $(el).css('position') == pos }
+	function(el, pos) { el.offsetHeight; return $(el).css('position') == pos };
 
  $(window).on('resize.ace_hover', function() {
 	navbar_fixed = is_element_pos(navbar, 'fixed');
 	ace.helper.sidebar_hover.reset();
- })
+ });
  $(document).on('settings.ace.hover', function(e, event_name, event_val) {
 	if(event_name == 'sidebar_collapsed') ace.helper.sidebar_hover.reset();
 	else if(event_name == 'navbar_fixed') navbar_fixed = event_val;
- })
+ });
 
  ///////////////////////////////////////////////
  var $sidebar = $('.sidebar').eq(0),
@@ -1434,16 +1434,16 @@ var is_element_pos =
 			adjust_submenu.call(this, sub);
 		}
 	}
- })
+ });
 
 
  var $diff = 50;
  function adjust_submenu(sub) {
 	var $sub = $(sub);
-	sub.style.removeProperty('top')
+	sub.style.removeProperty('top');
 	sub.style.removeProperty('bottom');
 
-	var menu_text = null
+	var menu_text = null;
 	if( ace.vars['minimized'] && (menu_text = sub.parentNode.querySelector('.menu-text')) ) {
 		//2nd level items don't have .menu-text
 		menu_text.style.removeProperty('margin-top')
@@ -1453,7 +1453,7 @@ var is_element_pos =
 	var scroll = ace.helper.scrollTop();
 	var pull_up = false;
 
-	var $scroll = scroll
+	var $scroll = scroll;
 	if( navbar_fixed ) {
 		$scroll += navbar.clientHeight + 1;
 		//let's avoid our submenu from going below navbar
@@ -1466,9 +1466,9 @@ var is_element_pos =
 		sub_h += 40;
 		off.top -= 40;
 	}
-	var sub_bottom = parseInt(off.top + sub_h)
+	var sub_bottom = parseInt(off.top + sub_h);
 
-	var diff
+	var diff;
 	var winh = window.innerHeight;
 	//if the bottom of menu is going to go below visible window
 	if( (diff = sub_bottom - (winh + scroll - 50)) > 0 ) {
@@ -1558,34 +1558,34 @@ var is_element_pos =
 ace.widget_boxes = function($) {
 	//bootstrap collapse component icon toggle
 	$(document).on('hide.bs.collapse show.bs.collapse', function (ev) {
-		var panel_id = ev.target.getAttribute('id')
+		var panel_id = ev.target.getAttribute('id');
 		var panel = $('a[href*="#'+ panel_id+'"]');
 		if(panel.length == 0) panel = $('a[data-target*="#'+ panel_id+'"]');
 		if(panel.length == 0) return;
 
 		panel.find(ace.vars['.icon']).each(function(){
-			var $icon = $(this)
+			var $icon = $(this);
 
-			var $match
-			var $icon_down = null
-			var $icon_up = null
+			var $match;
+			var $icon_down = null;
+			var $icon_up = null;
 			if( ($icon_down = $icon.attr('data-icon-show')) ) {
 				$icon_up = $icon.attr('data-icon-hide')
 			}
 			else if( $match = $icon.attr('class').match(/fa\-(.*)\-(up|down)/) ) {
-				$icon_down = 'fa-'+$match[1]+'-down'
+				$icon_down = 'fa-'+$match[1]+'-down';
 				$icon_up = 'fa-'+$match[1]+'-up'
 			}
 
 			if($icon_down) {
-				if(ev.type == 'show') $icon.removeClass($icon_down).addClass($icon_up)
-					else $icon.removeClass($icon_up).addClass($icon_down)
+				if(ev.type == 'show') $icon.removeClass($icon_down).addClass($icon_up);
+					else $icon.removeClass($icon_up).addClass($icon_down);
 					
 				return false;//ignore other icons that match, one is enough
 			}
 
 		});
-	})
+	});
 
 
 	var Widget_Box = function(box, options) {
@@ -1606,7 +1606,7 @@ ace.widget_boxes = function($) {
 				$box.find('.widget-box-overlay').remove();
 				if($remove_position) $box.removeClass('position-relative');
 			});
-		}
+		};
 
 		this.close = function() {
 			var $box = this.$box;
@@ -1616,7 +1616,7 @@ ace.widget_boxes = function($) {
 					$box.remove();
 				}
 			)
-		}
+		};
 		
 		this.toggle = function(type, button) {
 			var $box = this.$box;
@@ -1634,14 +1634,14 @@ ace.widget_boxes = function($) {
 			if(button) {
 				$icon = button.find(ace.vars['.icon']).eq(0);
 
-				var $match
-				var $icon_down = null
-				var $icon_up = null
+				var $match;
+				var $icon_down = null;
+				var $icon_up = null;
 				if( ($icon_down = $icon.attr('data-icon-show')) ) {
 					$icon_up = $icon.attr('data-icon-hide')
 				}
 				else if( $match = $icon.attr('class').match(/fa\-(.*)\-(up|down)/) ) {
-					$icon_down = 'fa-'+$match[1]+'-down'
+					$icon_down = 'fa-'+$match[1]+'-down';
 					$icon_up = 'fa-'+$match[1]+'-up'
 				}
 			}
@@ -1661,25 +1661,25 @@ ace.widget_boxes = function($) {
 			else {
 				if($icon) $icon.removeClass($icon_up).addClass($icon_down);
 				$body.slideUp(collapseSpeed, function(){
-						$box.addClass('collapsed')
+						$box.addClass('collapsed');
 						$box.trigger(event_complete_name+'.ace.widget')
 					}
 				);
 			}
-		}
+		};
 		
 		this.hide = function() {
 			this.toggle('hide');
-		}
+		};
 		this.show = function() {
 			this.toggle('show');
-		}
+		};
 		
 		
 		this.fullscreen = function() {
 			var $icon = this.$box.find('> .widget-header a[data-action=fullscreen]').find(ace.vars['.icon']).eq(0);
-			var $icon_expand = null
-			var $icon_compress = null
+			var $icon_expand = null;
+			var $icon_compress = null;
 			if( ($icon_expand = $icon.attr('data-icon1')) ) {
 				$icon_compress = $icon.attr('data-icon2')
 			}
@@ -1701,7 +1701,7 @@ ace.widget_boxes = function($) {
 			this.$box.trigger('fullscreened.ace.widget')
 		}
 
-	}
+	};
 	
 	$.fn.widget_box = function (option, value) {
 		var method_call;
@@ -1735,31 +1735,31 @@ ace.widget_boxes = function($) {
 		if($action == 'collapse') {
 			var event_name = $box.hasClass('collapsed') ? 'show' : 'hide';
 
-			var event
-			$box.trigger(event = $.Event(event_name+'.ace.widget'))
-			if (event.isDefaultPrevented()) return
+			var event;
+			$box.trigger(event = $.Event(event_name+'.ace.widget'));
+			if (event.isDefaultPrevented()) return;
 
 			$widget_box.toggle(event_name, $this);
 		}
 		else if($action == 'close') {
-			var event
-			$box.trigger(event = $.Event('close.ace.widget'))
-			if (event.isDefaultPrevented()) return
+			var event;
+			$box.trigger(event = $.Event('close.ace.widget'));
+			if (event.isDefaultPrevented()) return;
 
 			$widget_box.close();
 		}
 		else if($action == 'reload') {
 			$this.blur();
-			var event
-			$box.trigger(event = $.Event('reload.ace.widget'))
-			if (event.isDefaultPrevented()) return
+			var event;
+			$box.trigger(event = $.Event('reload.ace.widget'));
+			if (event.isDefaultPrevented()) return;
 
 			$widget_box.reload();
 		}
 		else if($action == 'fullscreen') {
-			var event
-			$box.trigger(event = $.Event('fullscreen.ace.widget'))
-			if (event.isDefaultPrevented()) return
+			var event;
+			$box.trigger(event = $.Event('fullscreen.ace.widget'));
+			if (event.isDefaultPrevented()) return;
 		
 			$widget_box.fullscreen();
 		}
@@ -1788,25 +1788,25 @@ ace.settings_box = function($) {
 	
 	//force redraw?
 	//if(ace.vars['webkit']) ace.helper.redraw(document.body);
- }).each(function(){this.checked = ace.settings.is('navbar', 'fixed')})
+ }).each(function(){this.checked = ace.settings.is('navbar', 'fixed')});
 
  $('#ace-settings-sidebar').on('click', function(){
 	ace.settings.sidebar_fixed(this.checked);//@ ace-extra.js
 	
 	//if(ace.vars['webkit']) ace.helper.redraw(document.body);
- }).each(function(){this.checked = ace.settings.is('sidebar', 'fixed')})
+ }).each(function(){this.checked = ace.settings.is('sidebar', 'fixed')});
 
  $('#ace-settings-breadcrumbs').on('click', function(){
 	ace.settings.breadcrumbs_fixed(this.checked);//@ ace-extra.js
 	
 	//if(ace.vars['webkit']) ace.helper.redraw(document.body);
- }).each(function(){this.checked = ace.settings.is('breadcrumbs', 'fixed')})
+ }).each(function(){this.checked = ace.settings.is('breadcrumbs', 'fixed')});
 
  $('#ace-settings-add-container').on('click', function(){
 	ace.settings.main_container_fixed(this.checked);//@ ace-extra.js
 	
 	//if(ace.vars['webkit']) ace.helper.redraw(document.body);
- }).each(function(){this.checked = ace.settings.is('main-container', 'fixed')})
+ }).each(function(){this.checked = ace.settings.is('main-container', 'fixed')});
 
 
 
@@ -1868,7 +1868,7 @@ ace.settings_rtl = function($) {
  $('#ace-settings-rtl').removeAttr('checked').on('click', function(){
 	ace.switch_direction(jQuery);
  });
-}
+};
 
 //>>> you should hard code changes inside HTML for RTL direction
 //you shouldn't use this function to switch direction
@@ -1918,7 +1918,7 @@ ace.switch_direction = function($) {
 		for(var i = 0 ; i < l ; i++) {
 			var val = this.attributes[i].value;
 			if(val.match(/fa\-(?:[\w\-]+)\-left/)) 
-				this.attributes[i].value = val.replace(/fa\-([\w\-]+)\-(left)/i , 'fa-$1-right')
+				this.attributes[i].value = val.replace(/fa\-([\w\-]+)\-(left)/i , 'fa-$1-right');
 			 else if(val.match(/fa\-(?:[\w\-]+)\-right/)) 
 				this.attributes[i].value = val.replace(/fa\-([\w\-]+)\-(right)/i , 'fa-$1-left')
 		}
@@ -1937,7 +1937,7 @@ ace.switch_direction = function($) {
 		$('.scroll-hz').removeClass('make-ltr')
 		.find('.make-rtl').children().unwrap();
 	}
-	if($.fn.ace_scroll) $('.scroll-hz').ace_scroll('reset') //to reset scrollLeft
+	if($.fn.ace_scroll) $('.scroll-hz').ace_scroll('reset'); //to reset scrollLeft
 
 	//redraw the traffic pie chart on homepage with a different parameter
 	try {
@@ -1998,11 +1998,11 @@ ace.settings_skin = function($) {
 		
 		//undo skin-3
 		$('.ace-nav > li.grey').removeClass('red').find('.badge').removeClass('badge-yellow');
-		$('.sidebar-shortcuts .btn').removeClass('btn-primary btn-white')
+		$('.sidebar-shortcuts .btn').removeClass('btn-primary btn-white');
 		var i = 0;
 		$('.sidebar-shortcuts .btn').each(function() {
 			$(this).find(ace.vars['.icon']).removeClass(skin3_colors[i++]);
-		})
+		});
 	
 	
 
@@ -2085,7 +2085,7 @@ The autocomplete dropdown when typing inside search box.
 <u><i class="glyphicon glyphicon-flash"></i> You don't need this. Used for demo only</u>
 */
 ace.enable_searchbox_autocomplete = function($) {
-	ace.vars['US_STATES'] = ["Alabama","Alaska","Arizona","Arkansas","California","Colorado","Connecticut","Delaware","Florida","Georgia","Hawaii","Idaho","Illinois","Indiana","Iowa","Kansas","Kentucky","Louisiana","Maine","Maryland","Massachusetts","Michigan","Minnesota","Mississippi","Missouri","Montana","Nebraska","Nevada","New Hampshire","New Jersey","New Mexico","New York","North Dakota","North Carolina","Ohio","Oklahoma","Oregon","Pennsylvania","Rhode Island","South Carolina","South Dakota","Tennessee","Texas","Utah","Vermont","Virginia","Washington","West Virginia","Wisconsin","Wyoming"]
+	ace.vars['US_STATES'] = ["Alabama","Alaska","Arizona","Arkansas","California","Colorado","Connecticut","Delaware","Florida","Georgia","Hawaii","Idaho","Illinois","Indiana","Iowa","Kansas","Kentucky","Louisiana","Maine","Maryland","Massachusetts","Michigan","Minnesota","Mississippi","Missouri","Montana","Nebraska","Nevada","New Hampshire","New Jersey","New Mexico","New York","North Dakota","North Carolina","Ohio","Oklahoma","Oregon","Pennsylvania","Rhode Island","South Carolina","South Dakota","Tennessee","Texas","Utah","Vermont","Virginia","Washington","West Virginia","Wisconsin","Wyoming"];
 	try {
 		$('#nav-search-input').bs_typeahead({
 			source: ace.vars['US_STATES'],

@@ -24,4 +24,4 @@ ace.widget_reload_handler = function($) {
 		$(this).trigger('reloaded.ace.widget');
 	});
 	*/
-}
+};

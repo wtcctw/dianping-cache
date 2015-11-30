@@ -53,12 +53,12 @@ Image editable input.
 			this.options.image.before_remove = this.options.image.before_remove || function() {
 				self.$input.val(null);
 				return true;
-			}
+			};
 
 			this.$file.ace_file_input(this.options.image).on('change', function(){
 				var $rand = (self.$file.val() || self.$file.data('ace_input_files')) ? Math.random() + "" + (new Date()).getTime() : null;
 				self.$input.val($rand)//set a random value, so that selected file is uploaded each time, even if it's the same file, because inline editable plugin does not update if the value is not changed!
-			}).closest('.ace-file-input').css({'width':'150px'}).closest('.editable-input').addClass('editable-image');
+			}).closest('.ace-file-input').css({'width':'150px'}).closest('.editable-input').addClass('editable-image');;
 			
 			this.$file
 			.off('file.error.ace')
@@ -238,7 +238,7 @@ Spinner editable input.
 				}
 				else {
 					this.$input.get(0).type = 'number';
-					var options = ['min', 'max', 'step']
+					var options = ['min', 'max', 'step'];
 					for(var o = 0 ; o < options.length; o++) {
 						if(options[o] in this.options.spinner)
 							this.$input.attr(options[o] , this.options.spinner[options[o]])
@@ -349,7 +349,7 @@ Slider editable input.
 				}
 				else {
 					this.$input.get(0).type = 'range';
-					var options = ['min', 'max', 'step']
+					var options = ['min', 'max', 'step'];
 					for(var o = 0 ; o < options.length; o++) {
 						if(options[o] in this.options.slider) {							
 							this.$input[0][options[o]] = this.options.slider[options[o]]
@@ -451,7 +451,7 @@ ADate editable input.
 
 			if(!this.nativeUI) {
 				var inp = this.$input;
-				this.$input.datepicker(this.options.date)
+				this.$input.datepicker(this.options.date);
 				var picker = inp.data('datepicker');
 				if(picker) {
 					inp.on('click', function() {

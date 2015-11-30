@@ -18,7 +18,7 @@ module.controller('ScaleController', [
 					}).success(function(response){
 						$scope.isOperationDone(operationId);
 					});
-			}
+			};
 			
 			$scope.isOperationDone = function(operationId){
 				$http.get(window.contextPath + '/redis/getresult',{
@@ -36,7 +36,7 @@ module.controller('ScaleController', [
 							});
 						}
 					});
-			}
+			};
 			
 			
 			$scope.destroy = function(address){
@@ -45,7 +45,7 @@ module.controller('ScaleController', [
 						"address":address+":6379"
 					}
 					});
-			}
+			};
 			
 			
 			
@@ -55,7 +55,7 @@ module.controller('ScaleController', [
 					}).success(function(response){
 						$scope.docker = response;
 					});
-			}
+			};
 			
 			$scope.getDockerInfo();
 

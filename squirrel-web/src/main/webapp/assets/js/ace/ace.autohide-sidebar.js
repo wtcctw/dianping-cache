@@ -16,4 +16,4 @@ ace.auto_hide_sidebar = function($) {
 		sidebar.removeClass('display');
 		toggler.removeClass('display');
 	})
-}
+};

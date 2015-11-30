@@ -24,7 +24,7 @@ public class SpringLocator implements ApplicationContextAware{
 	
 	@SuppressWarnings("unchecked")
 	public static <T> T getBean(Class<T> clazz) {
-		return (T) BeanFactoryUtils.beanOfType(applicationContext, clazz);
+		return BeanFactoryUtils.beanOfType(applicationContext, clazz);
 	}
 	
 	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException{

@@ -15,25 +15,25 @@ ace.settings_box = function($) {
 	
 	//force redraw?
 	//if(ace.vars['webkit']) ace.helper.redraw(document.body);
- }).each(function(){this.checked = ace.settings.is('navbar', 'fixed')})
+ }).each(function(){this.checked = ace.settings.is('navbar', 'fixed')});
 
  $('#ace-settings-sidebar').on('click', function(){
 	ace.settings.sidebar_fixed(this.checked);//@ ace-extra.js
 	
 	//if(ace.vars['webkit']) ace.helper.redraw(document.body);
- }).each(function(){this.checked = ace.settings.is('sidebar', 'fixed')})
+ }).each(function(){this.checked = ace.settings.is('sidebar', 'fixed')});
 
  $('#ace-settings-breadcrumbs').on('click', function(){
 	ace.settings.breadcrumbs_fixed(this.checked);//@ ace-extra.js
 	
 	//if(ace.vars['webkit']) ace.helper.redraw(document.body);
- }).each(function(){this.checked = ace.settings.is('breadcrumbs', 'fixed')})
+ }).each(function(){this.checked = ace.settings.is('breadcrumbs', 'fixed')});
 
  $('#ace-settings-add-container').on('click', function(){
 	ace.settings.main_container_fixed(this.checked);//@ ace-extra.js
 	
 	//if(ace.vars['webkit']) ace.helper.redraw(document.body);
- }).each(function(){this.checked = ace.settings.is('main-container', 'fixed')})
+ }).each(function(){this.checked = ace.settings.is('main-container', 'fixed')});
 
 
 
@@ -79,4 +79,4 @@ ace.settings_box = function($) {
 	if('sidebar_scroll' in ace.helper) ace.helper.sidebar_scroll.reset();
  });
 
-}
+};

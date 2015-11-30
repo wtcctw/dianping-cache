@@ -57,5 +57,5 @@ public class Instance {
 	public void setAgentip(String agentip) {
 		this.agentip = agentip;
 	}
-	
+
 }

@@ -37,6 +37,7 @@
 			<mvc:mapping path="/cache/config/new"/>
 			<mvc:mapping path="/monitor/cluster"/>
 			<mvc:mapping path="/monitor/dashboard"/>
+			<mvc:mapping path="/redis/dashboard"/>
 			<bean class="com.dianping.cache.interceptor.ModelAndViewInterceptor">
 			</bean>
 		</mvc:interceptor>

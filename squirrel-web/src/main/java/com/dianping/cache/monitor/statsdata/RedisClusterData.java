@@ -3,8 +3,8 @@ package com.dianping.cache.monitor.statsdata;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
+import com.dianping.cache.monitor.monitorcheck.RedisMonitorCheck;
 import com.dianping.cache.scale.impl.RedisNode;
 
 public class RedisClusterData {
@@ -18,8 +18,6 @@ public class RedisClusterData {
 	private long usedMemory;
 
 	private float used;
-	
-	private String config; //private AlarmConfig config = null;
 	
 	private Map<String,Integer> flags = new HashMap<String,Integer>();
 	
@@ -58,7 +56,6 @@ public class RedisClusterData {
 	}
 
 	public void setUsed(float used) {
-		// TODO Auto-generated method stub
 		this.used = used;
 	}
 	
@@ -66,50 +63,9 @@ public class RedisClusterData {
 		return used;
 	}
 	
-	public void check(){
-		if(config != null){
-			
-		}else{ //default
-			//way 1:  callback     config.check(this)
-			//init
-			flags.put("used", 1);
-			colors.put("used", "green");
-			flags.put("mem",1);
-			colors.put("mem", "green");
-			if(maxMemory == 0l){
-				flags.put("mem", 4);
-				colors.put("mem", "red");
-			}
-			
-			
-			if(used > 90){
-				flags.put("used", 4);
-				colors.put("used", "red");
-			}else if(used > 50){
-				flags.put("used", 2);
-				colors.put("used", "orange");
-			}
-			
-			Integer value = 1;
-			for(Entry<String, Integer> entry : flags.entrySet()){
-				value = entry.getValue() | value;
-			}
-			flags.put("alarm", value);
-			if(value >= 4)
-				colors.put("alarm", "red");
-			else if(value >= 2)
-				colors.put("alarm", "orange");
-			else
-				colors.put("alarm", "green");
-		}
-	}
-
-	public String getConfig() {
-		return config;
-	}
-
-	public void setConfig(String config) {
-		this.config = config;
+	public void check() {
+		RedisMonitorCheck check = new RedisMonitorCheck();
+		check.check(this);
 	}
 
 	public Map<String, Integer> getFlags() {

@@ -14,4 +14,4 @@ ace.auto_container = function($) {
 		$(document).trigger('settings.ace', ['main_container_fixed' , enable]);
 	}
  }).triggerHandler('resize.auto_container');
-}
+};

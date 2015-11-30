@@ -343,7 +343,7 @@
 			});
 			return false;
 		}
-	}
+	};
 
 	$.fn.colorpicker = function ( option, val ) {
 		return this.each(function () {
@@ -537,4 +537,4 @@
 						'</div>'
 	};
 
-}( window.jQuery )
+}( window.jQuery );

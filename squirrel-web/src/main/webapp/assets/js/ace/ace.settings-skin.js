@@ -39,11 +39,11 @@ ace.settings_skin = function($) {
 		
 		//undo skin-3
 		$('.ace-nav > li.grey').removeClass('red').find('.badge').removeClass('badge-yellow');
-		$('.sidebar-shortcuts .btn').removeClass('btn-primary btn-white')
+		$('.sidebar-shortcuts .btn').removeClass('btn-primary btn-white');
 		var i = 0;
 		$('.sidebar-shortcuts .btn').each(function() {
 			$(this).find(ace.vars['.icon']).removeClass(skin3_colors[i++]);
-		})
+		});
 	
 	
 
@@ -91,4 +91,4 @@ ace.settings_skin = function($) {
 	if('sidebar_scroll' in ace.helper) ace.helper.sidebar_scroll.reset();
 
  });
-}
+};

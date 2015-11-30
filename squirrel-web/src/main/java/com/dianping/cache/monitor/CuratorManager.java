@@ -52,8 +52,8 @@ public class CuratorManager {
         } catch (Exception e) {
             logger.error("failed to initialize cache zookeeper: " + zkAddress, e);
         }
-    };
-    
+    }
+
     private void init() throws Exception {
         zkAddress = configManager.getStringValue(Constants.KEY_ZOOKEEPER_ADDRESS);
         if (StringUtils.isBlank(zkAddress))

@@ -5,7 +5,7 @@
 ace.enable_ajax_content = function($, options) {
 	//var has_history = 'history' in window && typeof window.history.pushState === 'function';
 	
-	 var content_url = options.content_url || false
+	 var content_url = options.content_url || false;
 	 var default_url = options.default_url || false;
 	var loading_icon = options.loading_icon || 'fa-spinner fa-2x orange';
 	var loading_text = options.loading_text || '';
@@ -40,26 +40,26 @@ ace.enable_ajax_content = function($, options) {
 
 
 	function getUrl(url, hash, manual_trigger) {
-		var event
-		$(document).trigger(event = $.Event('ajaxloadstart'), {url: url, hash: hash})
+		var event;
+		$(document).trigger(event = $.Event('ajaxloadstart'), {url: url, hash: hash});
 		if (event.isDefaultPrevented()) return;
 
 		
 		var contentArea = $('.page-content-area');
 		contentArea
-		.css('opacity', 0.25)
+		.css('opacity', 0.25);
 		
 		var loader = $('<div style="position: fixed; z-index: 2000;" class="ajax-loading-overlay"><i class="ajax-loading-icon fa fa-spin '+loading_icon+'"></i> '+loading_text+'</div>').insertBefore(contentArea);
 		var offset = contentArea.offset();
-		loader.css({top: offset.top, left: offset.left})
+		loader.css({top: offset.top, left: offset.left});
 	
 		$.ajax({
 			'url': url
 		})
 		.complete(function() {
-			contentArea.css('opacity', 0.8)
+			contentArea.css('opacity', 0.8);
 			$(document).on('ajaxscriptsloaded', function() {
-				contentArea.css('opacity', 1)
+				contentArea.css('opacity', 1);
 				contentArea.prevAll('.ajax-loading-overlay').remove();
 			});
 		})
@@ -85,7 +85,7 @@ ace.enable_ajax_content = function($, options) {
 								//var sub = $(this).find(' > .submenu').get(0);
 								//if(sub) ace.submenu.hide(sub, 200)
 							}
-						})
+						});
 						link_element.closest('li').addClass('active').parents('.nav li').addClass('active open');
 						if('sidebar_scroll' in ace.helper) {
 							ace.helper.sidebar_scroll.reset();
@@ -102,7 +102,7 @@ ace.enable_ajax_content = function($, options) {
 			//convert "title" and "link" tags to "div" tags for later processing
 			result = String(result)
 				.replace(/<(title|link)([\s\>])/gi,'<div class="hidden ajax-append-$1"$2')
-				.replace(/<\/(title|link)\>/gi,'</div>')
+				.replace(/<\/(title|link)\>/gi,'</div>');
 		
 			contentArea.empty().html(result);
 			contentArea.css('opacity', 0.6);
@@ -114,7 +114,7 @@ ace.enable_ajax_content = function($, options) {
 				contentArea.find('.ajax-append-link').each(function(e) {
 					var $link = $(this);
 					if ( $link.attr('href') ) {
-						var new_link = jQuery('<link />', {type : 'text/css', rel: 'stylesheet', 'class': 'ajax-stylesheet'})
+						var new_link = jQuery('<link />', {type : 'text/css', rel: 'stylesheet', 'class': 'ajax-stylesheet'});
 						if( ace_style.length > 0 ) new_link.insertBefore(ace_style);
 						else new_link.appendTo('head');
 						new_link.attr('href', $link.attr('href'));//we set "href" after insertion, for IE to work
@@ -185,7 +185,7 @@ ace.enable_ajax_content = function($, options) {
 		}
 	 }
 
-}
+};
 
 ace.load_ajax_scripts = function(scripts, callback) {
 
@@ -193,7 +193,7 @@ ace.load_ajax_scripts = function(scripts, callback) {
  setTimeout(function() {
 
 	//let's keep a list of loaded scripts so that we don't load them more than once!
-	if(! ('ajax_loaded_scripts' in ace.vars) ) ace.vars['ajax_loaded_scripts'] = {}
+	if(! ('ajax_loaded_scripts' in ace.vars) ) ace.vars['ajax_loaded_scripts'] = {};
 
 	var deferreds = [];
 	for(var i = 0; i < scripts.length; i++) if(scripts[i]) {
@@ -225,4 +225,4 @@ ace.load_ajax_scripts = function(scripts, callback) {
 	}
 
  }, 10)
-}
+};

@@ -25,7 +25,7 @@ public class TaskMonitor implements CuratorHandler {
 
     private enum State {
         Alive, Dead, Unsure
-    };
+    }
 
     private TaskManager taskManager;
 
@@ -83,7 +83,7 @@ public class TaskMonitor implements CuratorHandler {
         }
 
         refreshServerStatus();
-    };
+    }
 
     private void refreshServerStatus() {
         try {

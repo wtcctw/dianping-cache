@@ -41,8 +41,8 @@ public interface OperationLogDao extends GenericDao {
 	
 	PageModel paginate(PageModel paginater, OperationLogSearchCondition searchCondition);
 	
-	public List<OperationLog> paginate(@Param("pageId")int pageId,@Param("cond")OperationLogSearchCondition searchCondition);
-	public int paginate_COUNT(@Param("cond")OperationLogSearchCondition searchCondition);
+	List<OperationLog> paginate(@Param("pageId") int pageId, @Param("cond") OperationLogSearchCondition searchCondition);
+	int paginate_COUNT(@Param("cond") OperationLogSearchCondition searchCondition);
 
 	void delete(Date before);
 

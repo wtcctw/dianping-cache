@@ -15,7 +15,12 @@ public class Server implements Node {
         this.address = address;
         parseAddress(address);
     }
-    
+
+    public Server(String ip,int port){
+        this.address = ip +":" + port;
+        this.ip = ip;
+        this.port = port;
+    }
     private void parseAddress(String address) {
         if(address == null) {
             throw new NullPointerException("server address is null");
