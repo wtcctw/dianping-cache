@@ -191,8 +191,12 @@ public class TaskManager implements ServiceListener {
     
     @Override
     public void serviceAdded(CacheConfiguration cacheConfig) {
-        CacheConfiguration oldCacheConfig = clusterConfigMap.put(cacheConfig.getCacheKey(), cacheConfig);
-        _serviceChanged(cacheConfig, oldCacheConfig);
+        if(isMonitorable(cacheConfig)) {
+            CacheConfiguration oldCacheConfig = clusterConfigMap.put(cacheConfig.getCacheKey(), cacheConfig);
+            _serviceChanged(cacheConfig, oldCacheConfig);
+        } else {
+            logger.info("service is not monitorable: " + cacheConfig);
+        }
     }
     
     @Override
@@ -203,8 +207,12 @@ public class TaskManager implements ServiceListener {
     
     @Override
     public void serviceChanged(CacheConfiguration cacheConfig) {
-        CacheConfiguration oldCacheConfig = clusterConfigMap.put(cacheConfig.getCacheKey(), cacheConfig);
-        _serviceChanged(cacheConfig, oldCacheConfig);
+        if(isMonitorable(cacheConfig)) {
+            CacheConfiguration oldCacheConfig = clusterConfigMap.put(cacheConfig.getCacheKey(), cacheConfig);
+            _serviceChanged(cacheConfig, oldCacheConfig);
+        } else {
+            logger.info("service is not monitorable: " + cacheConfig);
+        }
     }
     
     private void _serviceChanged(CacheConfiguration newCacheConfig, CacheConfiguration oldCacheConfig) {

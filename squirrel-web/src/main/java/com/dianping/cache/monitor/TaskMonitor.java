@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.dianping.cache.util.CollectionUtils;
+import com.dianping.cat.Cat;
 import com.dianping.lion.Environment;
 import com.dianping.squirrel.common.config.ConfigChangeListener;
 import com.dianping.squirrel.common.config.ConfigManager;
@@ -217,6 +218,7 @@ public class TaskMonitor implements CuratorHandler {
 
     private void fireServerDead(String server, List<String> status) {
         logger.info("server " + server + " is confirmed dead by " + CollectionUtils.toString(status));
+        Cat.logEvent("Squirrel.monitor", server + ":dead");
         serverStates.put(server, State.Dead);
         if (memberMonitor.isMaster()) {
             notifyServerDead(server);
@@ -228,6 +230,7 @@ public class TaskMonitor implements CuratorHandler {
 
     private void fireServerAlive(String server, List<String> status) {
         logger.info("server " + server + " is confirmed alive");
+        Cat.logEvent("Squirrel.monitor", server + ":alive");
         serverStates.put(server, State.Alive);
         if (memberMonitor.isMaster()) {
             notifyServerAlive(server);
