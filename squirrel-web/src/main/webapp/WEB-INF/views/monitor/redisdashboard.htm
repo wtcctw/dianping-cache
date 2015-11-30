@@ -67,7 +67,7 @@
 											<td class="col-sm-4">slots数量:{{data.master.slotList.length}}|Mem
 												:{{data.master.info.usedMemory}}/{{data.master.info.maxMemory}}</td>
 											<td class="col-sm-2" style="#if(${isadmin})display: table-cell;#else display: none;#end;">
-												<div class="hidden-sm hidden-xs btn-group">
+												<!--<div class="hidden-sm hidden-xs btn-group">
 													<button class="btn btn-xs btn-success" ng-show="{{data.slave.address==null}}"
 															ng-click="addSlave(item.clusterName,data.master.address)">Slave
 														<i class="ace-icon fa fa-plus bigger-120"></i>
@@ -76,7 +76,7 @@
 															ng-show="{{data.slave.address!=null}}">Slave
 														<i class="ace-icon fa fa-trash-o bigger-120"></i>
 													</button>
-												</div>
+												</div>-->
 											</td>
 										</tr>
 										</tbody>
