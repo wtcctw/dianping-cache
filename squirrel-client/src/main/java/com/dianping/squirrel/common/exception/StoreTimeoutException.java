@@ -1,14 +1,13 @@
 package com.dianping.squirrel.common.exception;
 
-import java.util.concurrent.TimeoutException;
 
 public class StoreTimeoutException extends StoreException {
 
-	public StoreTimeoutException(TimeoutException e) {
+	public StoreTimeoutException(Throwable e) {
 		super(e);
 	}
 
-	public StoreTimeoutException(String message, TimeoutException e) {
+	public StoreTimeoutException(String message, Throwable e) {
 		super(message, e);
 	}
 

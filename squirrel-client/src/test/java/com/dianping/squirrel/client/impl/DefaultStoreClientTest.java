@@ -24,7 +24,7 @@ public class DefaultStoreClientTest extends TestCase {
             "mymemcache", "mydcache", "myredis", "myehcache"
     };
     
-    static String CATEGORY = "myehcache";
+    static String CATEGORY = "myredis";
     
     private static final String VALUE = "dp@123456";
     
@@ -277,7 +277,7 @@ public class DefaultStoreClientTest extends TestCase {
     public void testDecrease() {
         StoreClient client = StoreClientFactory.getStoreClient();
         StoreKey key = new StoreKey(CATEGORY, "test");
-        client.set(key, 1000);
+        client.set(key, 1000L);
         Object result = client.decrease(key, 100);
         assertEquals(900L, result);
         result = client.decrease(key, 100);

@@ -2,6 +2,7 @@ package com.dianping.squirrel.client.impl.redis;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -14,14 +15,23 @@ import java.util.concurrent.Future;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import redis.clients.jedis.JedisCallback;
 import redis.clients.jedis.JedisCluster;
+import redis.clients.jedis.exceptions.JedisConnectionException;
 
+import com.dianping.cat.Cat;
+import com.dianping.cat.message.Message;
+import com.dianping.cat.message.Transaction;
 import com.dianping.squirrel.client.StoreKey;
 import com.dianping.squirrel.client.config.StoreCategoryConfig;
 import com.dianping.squirrel.client.config.StoreClientConfig;
 import com.dianping.squirrel.client.core.StoreCallback;
+import com.dianping.squirrel.client.core.StoreFuture;
 import com.dianping.squirrel.client.core.Transcoder;
 import com.dianping.squirrel.client.impl.AbstractStoreClient;
+import com.dianping.squirrel.client.monitor.StatusHolder;
+import com.dianping.squirrel.common.exception.StoreException;
+import com.dianping.squirrel.common.exception.StoreTimeoutException;
 
 public class RedisStoreClientImpl extends AbstractStoreClient implements RedisStoreClient {
 
@@ -34,7 +44,15 @@ public class RedisStoreClientImpl extends AbstractStoreClient implements RedisSt
     private volatile JedisCluster client;
 
     private Transcoder<String> transcoder;
+    
+    private String eventType = "Squirrel.redis.server";
 
+    @Override
+    public void setStoreType(String storeType) {
+        super.setStoreType(storeType);
+        eventType = "Squirrel." + storeType + ".server";
+    }
+    
     @Override
     public void configure(StoreClientConfig config) {
         this.config = (RedisClientConfig) config;
@@ -61,6 +79,54 @@ public class RedisStoreClientImpl extends AbstractStoreClient implements RedisSt
         client.close();
     }
 
+    protected <T> T executeWithMonitor(Command command, StoreCategoryConfig categoryConfig, String finalKey, String action) {
+        String storeType = categoryConfig.getCacheType();
+        String category = categoryConfig.getCategory();
+        
+        Transaction t = null;
+        if (needMonitor(storeType)) {
+            t = Cat.getProducer().newTransaction("Squirrel." + storeType, category + ":" + action);
+            t.addData("finalKey", finalKey);
+            t.setStatus(Message.SUCCESS);
+        }
+        StatusHolder.flowIn(storeType, category, action);
+        long begin = System.nanoTime();
+        int second = (int) (begin / 1000000000 % 60) + 1;
+        try {
+            Cat.getProducer().logEvent("Squirrel." + storeType + ".qps", "S"+second);
+            Object result = command.execute();
+            return (T) result;
+        } catch (JedisConnectionException e) {
+            StoreException se = null;
+            if(e.getCause() instanceof SocketTimeoutException) {
+                Cat.getProducer().logEvent("Squirrel." + storeType, category + ":timeout");
+                if(e.getHost() != null) {
+                    Cat.getProducer().logEvent(eventType, e.getHost() + ":" + e.getPort() + ":timeout");
+                }
+                se = new StoreTimeoutException(e.getCause());
+            } else {
+                se = new StoreException(e);
+            }
+            Cat.getProducer().logError(se);
+            if (t != null) {
+                t.setStatus(se);
+            }
+            throw se;
+        } catch (Throwable e) {
+            StoreException se = new StoreException(e);
+            Cat.getProducer().logError(se);
+            if (t != null) {
+                t.setStatus(se);
+            }
+            throw se;
+        } finally {
+            StatusHolder.flowOut(storeType, category, action);
+            if (t != null) {
+                t.complete();
+            }
+        }
+    }
+    
     @Override
     protected <T> T doGet(StoreCategoryConfig categoryConfig, String finalKey) {
         String value = client.get(finalKey);
@@ -115,79 +181,253 @@ public class RedisStoreClientImpl extends AbstractStoreClient implements RedisSt
 
     @Override
     protected <T> Future<T> doAsyncGet(StoreCategoryConfig categoryConfig, String finalKey) {
-        // TODO Auto-generated method stub
-        return null;
+        final StoreFuture<T> future = new StoreFuture<T>(finalKey);
+        client.asyncGet(finalKey, new JedisCallback<String>() {
+
+            @Override
+            public void onSuccess(String result) {
+                if(result != null) {
+                    T object = transcoder.decode(result);
+                    future.onSuccess(object);
+                } else {
+                    future.onSuccess(null);
+                }
+            }
+
+            @Override
+            public void onFailure(Throwable e) {
+                future.onFailure(e);
+            }
+            
+        });
+        return future;
     }
 
     @Override
     protected Future<Boolean> doAsyncSet(StoreCategoryConfig categoryConfig, String finalKey, Object value) {
-        // TODO Auto-generated method stub
-        return null;
+        final StoreFuture<Boolean> future = new StoreFuture<Boolean>(finalKey);
+        String string = transcoder.encode(value);
+        if (categoryConfig.getDurationSeconds() > 0) {
+            client.asyncSetex(finalKey, categoryConfig.getDurationSeconds(), string, new JedisCallback<String>() {
+    
+                @Override
+                public void onSuccess(String result) {
+                    future.onSuccess(OK.equals(result));
+                }
+    
+                @Override
+                public void onFailure(Throwable e) {
+                    future.onFailure(e);
+                }
+                
+            });
+        } else {
+            client.asyncSet(finalKey, string, new JedisCallback<String>() {
+                
+                @Override
+                public void onSuccess(String result) {
+                    future.onSuccess(OK.equals(result));
+                }
+    
+                @Override
+                public void onFailure(Throwable e) {
+                    future.onFailure(e);
+                }
+                
+            });
+        }
+        return future;
     }
 
     @Override
     protected Future<Boolean> doAsyncAdd(StoreCategoryConfig categoryConfig, String finalKey, Object value) {
-        // TODO Auto-generated method stub
-        return null;
+        final StoreFuture<Boolean> future = new StoreFuture<Boolean>(finalKey);
+        String str = transcoder.encode(value);
+        if (categoryConfig.getDurationSeconds() > 0) {
+            client.asyncSet(finalKey, str, "NX", "EX", categoryConfig.getDurationSeconds(), new JedisCallback<String>() {
+
+                @Override
+                public void onSuccess(String result) {
+                    future.onSuccess(OK.equals(result));
+                }
+
+                @Override
+                public void onFailure(Throwable ex) {
+                    future.onFailure(ex);
+                }
+                
+            });
+        } else {
+            client.asyncSetnx(finalKey, str, new JedisCallback<Long>() {
+
+                @Override
+                public void onSuccess(Long result) {
+                    future.onSuccess(1 == result);
+                }
+
+                @Override
+                public void onFailure(Throwable ex) {
+                    future.onFailure(ex);
+                }
+                
+            });
+        }
+        return future;
     }
 
     @Override
     protected Future<Boolean> doAsyncDelete(StoreCategoryConfig categoryConfig, String finalKey) {
-        // TODO Auto-generated method stub
+        final StoreFuture<Boolean> future = new StoreFuture<Boolean>(finalKey);
+        client.asyncDel(finalKey, new JedisCallback<Long>() {
+
+            @Override
+            public void onSuccess(Long result) {
+                future.onSuccess(1 == result);
+            }
+
+            @Override
+            public void onFailure(Throwable ex) {
+                future.onFailure(ex);
+            }
+            
+        });
+        return future;
+    }
+
+    @Override
+    protected <T> Void doAsyncGet(StoreCategoryConfig categoryConfig, String finalKey, final StoreCallback<T> callback) {
+        client.asyncGet(finalKey, new JedisCallback<String>() {
+
+            @Override
+            public void onSuccess(String result) {
+                if(result != null) {
+                    T object = transcoder.decode(result);
+                    callback.onSuccess(object);
+                } else {
+                    callback.onSuccess(null);
+                }
+            }
+
+            @Override
+            public void onFailure(Throwable e) {
+                callback.onFailure(e);
+            }
+            
+        });
         return null;
     }
 
     @Override
-    protected <T> Void doAsyncGet(StoreCategoryConfig categoryConfig, String finalKey, StoreCallback<T> callback) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    protected Void doAsyncSet(StoreCategoryConfig categoryConfig, String finalKey, Object value, StoreCallback<Boolean> callback) {
-        // TODO Auto-generated method stub
+    protected Void doAsyncSet(StoreCategoryConfig categoryConfig, String finalKey, Object value, final StoreCallback<Boolean> callback) {
+        String string = transcoder.encode(value);
+        if (categoryConfig.getDurationSeconds() > 0) {
+            client.asyncSetex(finalKey, categoryConfig.getDurationSeconds(), string, new JedisCallback<String>() {
+    
+                @Override
+                public void onSuccess(String result) {
+                    callback.onSuccess(OK.equals(result));
+                }
+    
+                @Override
+                public void onFailure(Throwable e) {
+                    callback.onFailure(e);
+                }
+                
+            });
+        } else {
+            client.asyncSet(finalKey, string, new JedisCallback<String>() {
+                
+                @Override
+                public void onSuccess(String result) {
+                    callback.onSuccess(OK.equals(result));
+                }
+    
+                @Override
+                public void onFailure(Throwable e) {
+                    callback.onFailure(e);
+                }
+                
+            });
+        }
         return null;
     }
 
     @Override
     protected Void doAsyncAdd(StoreCategoryConfig categoryConfig, String finalKey, Object value,
-                              StoreCallback<Boolean> callback) {
-        // TODO Auto-generated method stub
+                              final StoreCallback<Boolean> callback) {
+        String str = transcoder.encode(value);
+        if (categoryConfig.getDurationSeconds() > 0) {
+            client.asyncSet(finalKey, str, "NX", "EX", categoryConfig.getDurationSeconds(), new JedisCallback<String>() {
+
+                @Override
+                public void onSuccess(String result) {
+                    callback.onSuccess(OK.equals(result));
+                }
+
+                @Override
+                public void onFailure(Throwable ex) {
+                    callback.onFailure(ex);
+                }
+                
+            });
+        } else {
+            client.asyncSetnx(finalKey, str, new JedisCallback<Long>() {
+
+                @Override
+                public void onSuccess(Long result) {
+                    callback.onSuccess(1 == result);
+                }
+
+                @Override
+                public void onFailure(Throwable ex) {
+                    callback.onFailure(ex);
+                }
+                
+            });
+        }
         return null;
     }
 
     @Override
-    protected Void doAsyncDelete(StoreCategoryConfig categoryConfig, String finalKey, StoreCallback<Boolean> callback) {
-        // TODO Auto-generated method stub
+    protected Void doAsyncDelete(StoreCategoryConfig categoryConfig, String finalKey, final StoreCallback<Boolean> callback) {
+        client.asyncDel(finalKey, new JedisCallback<Long>() {
+
+            @Override
+            public void onSuccess(Long result) {
+                callback.onSuccess(1 == result);
+            }
+
+            @Override
+            public void onFailure(Throwable ex) {
+                callback.onFailure(ex);
+            }
+            
+        });
         return null;
     }
     
 
     @Override
     protected <T> Map<String, T> doMultiGet(StoreCategoryConfig categoryConfig, List<String> finalKeyList) throws Exception {
-        // TODO Auto-generated method stub
-        return null;
+        throw new UnsupportedOperationException("redis multi get support will release soon");
     }
 
     @Override
     protected <T> Void doAsyncMultiGet(StoreCategoryConfig categoryConfig, List<String> finalKeyList,
                                        StoreCallback<Map<String, T>> callback) throws Exception {
-        // TODO Auto-generated method stub
-        return null;
+        throw new UnsupportedOperationException("redis multi get support will release soon");
     }
 
     @Override
     protected <T> Boolean doMultiSet(StoreCategoryConfig categoryConfig, List<String> finalKeyList, 
                                      List<T> values) throws Exception {
-        // TODO Auto-generated method stub
-        return null;
+        throw new UnsupportedOperationException("redis multi set support will release soon");
     }
 
     @Override
     protected <T> Void doAsyncMultiSet(StoreCategoryConfig categoryConfig, List<String> keys, List<T> values,
                                     StoreCallback<Boolean> callback) {
-        // TODO Auto-generated method stub
-        return null;
+        throw new UnsupportedOperationException("redis multi set support will release soon");
     }
     
     @Override
