@@ -6,13 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import com.dianping.cache.entity.CacheConfiguration;
-import com.dianping.cache.entity.Server;
-import com.dianping.cache.service.CacheConfigurationService;
-import com.dianping.cache.service.ServerClusterService;
-import com.dianping.cache.service.ServerService;
-import com.dianping.cache.support.spring.SpringLocator;
-import com.dianping.cache.util.ParseServersUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,8 +17,14 @@ import com.dianping.cache.autoscale.AutoScale;
 import com.dianping.cache.autoscale.Instance;
 import com.dianping.cache.autoscale.Result;
 import com.dianping.cache.autoscale.dockerscale.DockerScale;
+import com.dianping.cache.entity.CacheConfiguration;
+import com.dianping.cache.entity.Server;
 import com.dianping.cache.scale.ScaleException;
-import sun.swing.SwingLazyValue;
+import com.dianping.cache.service.CacheConfigurationService;
+import com.dianping.cache.service.ServerClusterService;
+import com.dianping.cache.service.ServerService;
+import com.dianping.cache.support.spring.SpringLocator;
+import com.dianping.cache.util.ParseServersUtil;
 
 public class RedisUtil {
 
