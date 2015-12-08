@@ -133,6 +133,7 @@ module.controller('ConfigController', [
 			                    "com.dianping.cache.ehcache.EhcacheClientImpl"];
 			
 			$scope.coderItems = ["com.dianping.cache.memcached.HessianTranscoder",
+								"com.dianping.cached.dcache.",
 			     				"com.dianping.cache.memcached.KvdbTranscoder"];
 			
 			$scope.openModalForCreat = function(){
