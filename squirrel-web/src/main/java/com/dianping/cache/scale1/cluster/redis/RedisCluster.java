@@ -60,7 +60,7 @@ public class RedisCluster implements Cluster<RedisNode>{
 		for(RedisNode node : nodes){
 			if(node.getMaster().isAlive())
 				servers.add(node.getMaster());
-			if(node.getSlave().isAlive())
+			if(node.getSlave() != null && node.getSlave().isAlive())
 				servers.add(node.getSlave());
 		}
 		return servers;

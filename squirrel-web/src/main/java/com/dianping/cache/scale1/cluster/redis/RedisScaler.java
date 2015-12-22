@@ -172,8 +172,8 @@ public class RedisScaler {
 	}
 	
 	private static Result loadSlave(Server master,List<Result> tempResult){
-		if(master.getHostIp() == null){
-			return tempResult.get(0);
+		if(master == null || master.getHostIp() == null){
+			return tempResult.remove(0);
 		}
 		for(int i = 0; i < tempResult.size(); i++){
 			if(!	(tempResult.get(i).getInstances().get(0).getAgentIp())	.	equals	(master.getHostIp())){
