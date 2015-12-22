@@ -3,7 +3,7 @@ package com.dianping.squirrel.client.config.zookeeper;
 public class CacheEvent {
 
     enum CacheEventType {
-        ServiceChange, CategoryChange, VersionChange, KeyRemove, BatchKeyRemove
+        ServiceChange, CategoryChange, VersionChange, KeyRemove, BatchKeyRemove, ServiceRemove
     }
     
     private CacheEventType type;

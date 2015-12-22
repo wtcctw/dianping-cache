@@ -11,12 +11,12 @@ public class CategoryToAppServiceImpl implements CategoryToAppService{
 	private CategoryToAppDao categoryToAppDao;
 
 	@Override
-	public void insert(String category,String node) {
+	public int insert(String category,String node) {
 		// TODO Auto-generated method stub
 		CategoryToApp cta = new CategoryToApp();
 		cta.setApplication(node);
 		cta.setCategory(category);
-		categoryToAppDao.insert(cta);
+		return categoryToAppDao.insert(cta);
 	}
 
 	@Override

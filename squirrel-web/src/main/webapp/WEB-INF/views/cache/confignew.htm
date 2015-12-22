@@ -26,8 +26,7 @@
 						<form class="form-horizontal" role="form" name="configform">
 							<!-- #section:elements.form -->
 							<div class="form-group">
-								<label class="col-sm-3 control-label no-padding-right"
-									for="form-field-1"> 集群名 </label>
+								<label class="col-sm-3 control-label no-padding-right"> 集群名 </label>
 
 								<div class="col-sm-9">
 									<input type="text" id="mCacheKey" class="col-xs-10 col-sm-5"
@@ -39,8 +38,19 @@
 							<div class="space-4"></div>
 
 							<div class="form-group">
-								<label class="col-sm-3 control-label no-padding-right"
-									for="form-field-2"> 集群实现类 </label>
+								<label class="col-sm-3 control-label no-padding-right">泳道</label>
+
+								<div class="col-sm-9">
+									<input type="text" id="mSwimLane" class="col-xs-10 col-sm-5"
+										   ng-model="mSwimLane">
+								</div>
+							</div>
+
+							<!-- /section:elements.form -->
+							<div class="space-4"></div>
+
+							<div class="form-group">
+								<label class="col-sm-3 control-label no-padding-right"> 集群实现类 </label>
 
 								<div class="col-sm-9">
 									<select class="col-xs-10 col-sm-5" ng-model="mClientClazz"
@@ -53,8 +63,7 @@
 							<div class="space-4"></div>
 
 							<div class="form-group">
-								<label class="col-sm-3 control-label no-padding-right"
-									for="form-field-2">Transcoder</label>
+								<label class="col-sm-3 control-label no-padding-right">Transcoder</label>
 
 								<div class="col-sm-9">
 									<select class=" col-xs-10 col-sm-5" ng-model="mTranscoderClazz"
@@ -119,8 +128,7 @@
 
 
 												<div class="form-group">
-													<label class="col-sm-3 control-label no-padding-right"
-														for="form-field-2">手动扩容</label>
+													<label class="col-sm-3 control-label no-padding-right">手动扩容</label>
 
 													<div class="col-sm-3">
 														<input type="text" placeholder="ip" id="ip" name="ip"
@@ -167,8 +175,7 @@
 
 										<div id="faq-tab-2" class="tab-pane fade">
 											<div class="form-group">
-												<label class="col-sm-3 control-label no-padding-right"
-													for="form-field-1"> servers </label>
+												<label class="col-sm-3 control-label no-padding-right"> servers </label>
 
 												<div class="col-sm-9">
 													<textarea type="text" class="col-xs-10 col-sm-5" rows="8"

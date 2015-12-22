@@ -29,11 +29,11 @@ public class Result {
 		this.instances = instances;
 	}
 	
-//	public void setAppId(String appId){
-//		for(Instance ins : instances){
-//			ins.setAppid(AppId.valueOf(appId).toString());
-//		}
-//	}
+	public void setAppId(String appId){
+		for(Instance ins : instances){
+			ins.setAppid(AppId.valueOf(appId).toString());
+		}
+	}
 
 	public int getNeed() {
 		return need;
@@ -47,8 +47,8 @@ public class Result {
 		return appId;
 	}
 
-	public void setAppId(AppId appId) {
-		this.appId = appId;
+	public void setAppId(AppId appid) {
+		this.appId = appid;
 	}
 	
 }

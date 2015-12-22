@@ -49,9 +49,10 @@ public interface CacheConfigurationWebService {
 	/**
 	 * retrieve cache client configuration for a specific cache service
 	 * 
-	 * @param cacheKey 
+	 * @param service
 	 * @return
 	 */
     CacheConfigurationDTO getCacheConfiguration(String service);
-	
+
+	CacheConfigurationDTO getCacheConfiguration(String cacheKey, String swimlane);
 }

@@ -21,6 +21,8 @@
     
     <bean id="monitor" class="com.dianping.cache.monitor.TaskManager" init-method="start"/>
 
+    <bean class="com.dianping.cache.alarm.lifecycle.LifecycleComponentManager" />
+
      <bean id="dataStorage" class="com.dianping.cache.monitor.storage.MemcacheStatsDataStorage"></bean>
      <bean id="store" class="com.dianping.cache.monitor.storage.ServerStatsDataStorage"></bean>
      <bean id="cleanData" class="com.dianping.cache.timedtask.TimedCleanData"></bean>

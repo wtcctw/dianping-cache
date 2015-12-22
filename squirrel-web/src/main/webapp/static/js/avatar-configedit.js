@@ -8,6 +8,7 @@ module.controller('ConfigEditController', [
 			$scope.mCacheKey = "";
 			$scope.mClientClazz = "";
 			$scope.mServers = "";
+			$scope.mSwimLane="";
 			$scope.servers = [];
 			$scope.dropservers = [];
 			$scope.redisnodes = [];
@@ -52,11 +53,12 @@ module.controller('ConfigEditController', [
 			$scope.initpage = function(){
 				var localstore = window.localStorage;
 				$scope.mCacheKey = localstore.cacheKey;
-				
-				
+				$scope.mSwimLane = localstore.swimlane;
+				$scope.servers = [];
 				$http.get(window.contextPath + '/cache/config/find',{
 					params : {
 			        	"cacheKey":$scope.mCacheKey,
+						"swimlane" : $scope.mSwimLane
 			        	}
 				}).success(function(response){
 					$scope.mClientClazz = response.config.clientClazz;
@@ -259,55 +261,55 @@ module.controller('ConfigEditController', [
 					var flag = response.flag;
 					return flag;
 				});
-			};
-			
-			$scope.addServer = function(server){
-				 $scope.message2 = "添加服务器……";
-				 $scope.process = true;
-				 $scope.success = false;
-				 $scope.fail = false;
-				 if($scope.mServers == null){
-					 $scope.mServers = "";
-				 }
-				$http.post(window.contextPath + '/cache/config/addServer',
-		        		{"key":$scope.mCacheKey,"oldservers":$scope.mServers,
-		        		"server":server
-		        		}).success(function(response){
-		        			var flag = response.flag;
-		        			if(flag == true){//成功
-		        				
-		        				$scope.message2 = "添加服务器成功,无需再次提交";
-		        				$scope.isStep23 = true;
-		        				$scope.initpage();
-		        				
-		        				// 模态框图片切换
-		        				$scope.process = false;
-		        				$scope.success = true;
-		        				$scope.fail = false;
-		        				
-		        			}else{//失败
-		        				$scope.message2 = "数据冲突，请刷新页面";
-			        			$scope.isStep23 = false;
-			        			
-			        			// 模态框图片切换
-			        			$scope.process = false;
-			        			$scope.success = false;
-			        			$scope.fail = true;
-		        			}
-		        		}).error(function(response){
-		        			$scope.message2 = "添加服务器失败";
-		        			$scope.isStep23 = false;
-		        			
-		        			// 模态框图片切换
-		        			$scope.process = false;
-		        			$scope.success = false;
-		        			$scope.fail = true;
-		        		});
-		        		$scope.btndisable2 = false; //释放添加按钮
-			};
-			
-			
-			
+			}
+
+			$scope.addServer = function (server) {
+				$scope.message2 = "添加服务器……";
+				$scope.process = true;
+				$scope.success = false;
+				$scope.fail = false;
+				if ($scope.mServers == null) {
+					$scope.mServers = "";
+				}
+				$http.get(window.contextPath + '/cache/config/addServer', {
+							params: {
+								"key": $scope.mCacheKey, "oldservers": $scope.mServers, "swimlane": $scope.mSwimLane,
+								"server": server
+							}
+						}
+				).success(function (response) {
+					var flag = response.flag;
+					if (flag == true) {//成功
+
+						$scope.message2 = "添加服务器成功,无需再次提交";
+						$scope.isStep23 = true;
+						$scope.initpage();
+
+						// 模态框图片切换
+						$scope.process = false;
+						$scope.success = true;
+						$scope.fail = false;
+
+					} else {//失败
+						$scope.message2 = "数据冲突，请刷新页面";
+						$scope.isStep23 = false;
+
+						// 模态框图片切换
+						$scope.process = false;
+						$scope.success = false;
+						$scope.fail = true;
+					}
+				}).error(function (response) {
+					$scope.message2 = "添加服务器失败";
+					$scope.isStep23 = false;
+
+					// 模态框图片切换
+					$scope.process = false;
+					$scope.success = false;
+					$scope.fail = true;
+				});
+				$scope.btndisable2 = false; //释放添加按钮
+			}
 			
 			//更新服务器列表
 			$scope.updateConfigServers = function(){
@@ -363,15 +365,16 @@ module.controller('ConfigEditController', [
 				 $scope.submiticon = true;
 				 $http.post(window.contextPath + '/cache/config/update',
 			        		{"key":$scope.mCacheKey,"clientClazz":$scope.mClientClazz,
-			        		"servers":$scope.mServers,"transcoderClazz":$scope.mTranscoderClazz
+			        		"servers":$scope.mServers,"transcoderClazz":$scope.mTranscoderClazz,
+								"swimlane":$scope.mSwimLane
 			        		}).success(function(response){
-			    				
-								$timeout(function() {
-									 $scope.submiticon = false;
-								}, 1000);
+
 			        		});
 
-			};
+				$timeout(function() {
+					$scope.submiticon = false;
+				}, 1000);
+			}
 			
 			$scope.updateDcacheConfig = function(){
 				 $scope.submiticon = true;
@@ -435,28 +438,28 @@ module.controller('ConfigEditController', [
 			
 			
 			// delete server 3.0
-			$scope.reduceServer = function(){
+			$scope.reduceServer = function () {
 				$('#modal-wizard3').modal('hide');
 				//$('#modal-wizard4').modal('show');
-				$http.post(window.contextPath + '/cache/config/deleteServer',
-		        		{"key":$scope.mCacheKey,"server":$scope.serverToDelete,
-		        		"oldservers":$scope.mServers
-		        		}).success(function(response){
-		        			var flag = response.flag;
-		        			if(flag == true){//docker
-		        				var operationId = response.operationId;
-								//轮询
-								$scope.isShutDownDone(operationId);
-		        			}else{//old 
-		        				$scope.initpage();
-		        			}
-		        		}).error(function(response){
-		        			$scope.initpage();
-		        		});
-				
-				
-				
-			};
+				$http.get(window.contextPath + '/cache/config/deleteServer', {
+							params: {
+								key: $scope.mCacheKey, server: $scope.serverToDelete,
+								oldservers: $scope.mServers, swimlane: $scope.mSwimLane
+							}
+						}
+				).success(function (response) {
+					var flag = response.flag;
+					if (flag == true) {//docker
+						var operationId = response.operationId;
+						//轮询
+						$scope.isShutDownDone(operationId);
+					} else {//old
+						$scope.initpage();
+					}
+				}).error(function () {
+					$scope.initpage();
+				});
+			}
 			$scope.isShutDownDone = function(operationId){
 				$http.get(window.contextPath + '/cache/config/operateResult',{
 					params : {
@@ -572,34 +575,8 @@ module.controller('ConfigEditController', [
 		        			$scope.servers = $scope.mServers.split(/;~;|\|/);
 		        		});
 				
-			};
-/*****************************    Redis	  **************************************************/
-			$scope.instances = 1;
-			$scope.appid = "redis10";
-			
-			$scope.redisAddMasterNode = function(){
-				$http.post(window.contextPath + '/redis/addmaster',
-		        	{"cluster":$scope.mCacheKey,
-						"ip":$scope.ip,
-	        			"port":$scope.port
-	        		}).success();
-			};
-			
-			$scope.redisAutoScaleNode = function(){
-				$http.post(window.contextPath + '/redis/autoscaleup',
-		        	{"cluster":$scope.mCacheKey,
-					"instances":$scope.instances,
-	        			"appid":$scope.appid
-	        		}).success();
-			};
-			
-			$scope.delRedisMasterNode = function(address){
-				$http.post(window.contextPath + '/redis/delmaster',
-			        	{"cluster":$scope.mCacheKey,
-						"address":address
-		        		}).success();
-			};
-			
+			}
+
 			//重新上线机器
 			$scope.resetServer = function(index){
 				var add = $scope.dropservers[index].split(":");
@@ -628,7 +605,7 @@ module.controller('ConfigEditController', [
 						}else{
 							$scope.tempServers =ipT + ":" + portT;
 						}
-						$scope.updateConfigServers(); // 添加服务器，更新服务器列表
+						$scope.updateConfigServers() // 添加服务器，更新服务器列表
 						$scope.dropservers.splice(index,1);//从摘除队列中移除
 						
 						
@@ -650,24 +627,20 @@ module.controller('ConfigEditController', [
         			$scope.fail = true;
 				});				
 				
-			};
-			
-			
+			}
+
+
 			$scope.implItems = ["com.dianping.cache.memcached.MemcachedClientImpl",
-			                    "com.dianping.cache.ehcache.EhcacheClientImpl"];
-			
+				"com.dianping.cache.redis.RedisClientImpl",
+				"com.dianping.cache.danga.DangaClientImpl",
+				"com.dianping.cache.dcache.DCacheClientImpl",
+				"com.dianping.cache.ehcache.EhcacheClientImpl"];
+
 			$scope.coderItems = ["com.dianping.cache.memcached.HessianTranscoder",
-			     				"com.dianping.cache.memcached.KvdbTranscoder"];
-			
-			$scope.openModalForCreat = function(){
-				$http.get(window.contextPath + '/cache/config/baseInfo', {
-					params : {
-					}
-				}).success(function(response) {
-					$scope.implItems = response.impl;
-					$scope.coderItems = response.coder;
-				});
-			};
-			
+				"com.dianping.cache.redis.RedisTranscoder",
+				"com.dianping.cache.danga.DangaTranscoder",
+				"com.dianping.cache.dcache.HessianTranscoder",
+				"com.dianping.cache.memcached.KvdbTranscoder"];
+
 			$scope.initpage();
 		} ]);

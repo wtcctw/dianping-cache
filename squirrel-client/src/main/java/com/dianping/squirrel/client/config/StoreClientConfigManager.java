@@ -254,4 +254,7 @@ public class StoreClientConfigManager {
         }
 	}
 
+	public void removeCacheConfig(String cacheKey) {
+		configMap.remove(cacheKey);
+	}
 }

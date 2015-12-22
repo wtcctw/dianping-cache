@@ -26,21 +26,28 @@
 						<form class="form-horizontal" role="form" name="configform">
 							<!-- #section:elements.form -->
 							<div class="form-group">
-								<label class="col-sm-3 control-label no-padding-right"
-									for="form-field-1"> 集群名 </label>
+								<label class="col-sm-3 control-label no-padding-right"> 集群名 </label>
 
 								<div class="col-sm-9">
 									<input disabled type="text" id="mCacheKey"
 										class="col-xs-10 col-sm-5" ng-model="mCacheKey">
 								</div>
 							</div>
-
 							<!-- /section:elements.form -->
 							<div class="space-4"></div>
 
 							<div class="form-group">
-								<label class="col-sm-3 control-label no-padding-right"
-									for="form-field-2"> 集群实现类 </label>
+								<label class="col-sm-3 control-label no-padding-right"> 泳道 </label>
+								<div class="col-sm-9">
+									<input disabled type="text" id="mSwimLane"
+										   class="col-xs-10 col-sm-5" ng-model="mSwimLane">
+								</div>
+							</div>
+							<!-- /section:elements.form -->
+							<div class="space-4"></div>
+
+							<div class="form-group">
+								<label class="col-sm-3 control-label no-padding-right"> 集群实现类 </label>
 
 								<div class="col-sm-9">
 									<select class="col-xs-10 col-sm-5" ng-model="mClientClazz"
@@ -53,8 +60,7 @@
 							<div class="space-4"></div>
 
 							<div class="form-group">
-								<label class="col-sm-3 control-label no-padding-right"
-									for="form-field-2">Transcoder</label>
+								<label class="col-sm-3 control-label no-padding-right">Transcoder</label>
 
 								<div class="col-sm-9">
 									<select class=" col-xs-10 col-sm-5" ng-model="mTranscoderClazz"
@@ -69,7 +75,7 @@
 								<button class="btn btn-info btn-sm" type="button"
 									ng-click="updateConfig()">
 									<i class="icon-check bigger-110"></i> Submit <i
-										class="icon-spinner icon-spin orange bigger-110"
+										class="ace-icon fa fa-spinner fa-spin orange bigger-125"
 										ng-show="submiticon"></i>
 								</button>
 								&nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp;
@@ -123,8 +129,7 @@
 
 
 								<div class="form-group">
-									<label class="col-sm-3 control-label no-padding-right"
-										for="form-field-2">手动扩容</label>
+									<label class="col-sm-3 control-label no-padding-right">手动扩容</label>
 
 									<div class="col-sm-3">
 										<input type="text" placeholder="ip" id="ip" name="ip"
@@ -162,9 +167,9 @@
 										<td>
 											<button class="btn btn-xs btn-danger"
 												ng-click="preDeleteServer($index)">删除</button> &nbsp; &nbsp;
-											&nbsp;&nbsp;
-											<!--<button class="btn btn-xs btn-danger"-->
-												<!--ng-click="dropServer($index)">临时禁用</button>-->
+											<!-- &nbsp;&nbsp;
+											<button class="btn btn-xs btn-danger"
+												ng-click="dropServer($index)">临时禁用</button> -->
 										</td>
 									</tr>
 									<tr ng-repeat="info in dropservers track by $index">
@@ -187,8 +192,7 @@
 						<div id="faq-tab-2" class=" " ng-show="showDcache">
 							<form class="form-horizontal" id="sample-form" role="form">
 								<div class="form-group">
-									<label class="col-sm-3 control-label no-padding-right"
-										for="form-field-1"> module </label>
+									<label class="col-sm-3 control-label no-padding-right"> module </label>
 
 									<div class="col-sm-9">
 										<input type="text" class="col-xs-10 col-sm-5"
@@ -198,8 +202,7 @@
 
 
 								<div class="form-group">
-									<label class="col-sm-3 control-label no-padding-right"
-										for="form-field-1"> proxy </label>
+									<label class="col-sm-3 control-label no-padding-right"> proxy </label>
 
 									<div class="col-sm-9">
 										<input type="text" class="col-xs-10 col-sm-5" ng-model="proxy">
@@ -207,8 +210,7 @@
 								</div>
 
 								<div class="form-group">
-									<label class="col-sm-3 control-label no-padding-right"
-										for="form-field-1"> locator </label>
+									<label class="col-sm-3 control-label no-padding-right"> locator </label>
 
 									<div class="col-sm-9">
 										<textarea type="text" class="col-xs-10 col-sm-5" rows="3"
@@ -243,8 +245,7 @@
 						 <div id="faq-tab-3" ng-show="showRedis">
 							<form class="form-horizontal"  role="form">
 								<div class="form-group">
-									<label class="col-sm-3 control-label no-padding-right"
-										for="form-field-1"> servers </label>
+									<label class="col-sm-3 control-label no-padding-right"> servers </label>
 
 									<div class="col-sm-9">
 										<textarea type="text" class="col-xs-10 col-sm-5" rows="8"
@@ -636,7 +637,7 @@
 						$(this).find('.chosen-drop').css('width' , '320px');
 						$(this).find('.chosen-search input').css('width' , '200px');
 					});
-				});
+				})
 				/**
 				//or you can activate the chosen plugin after modal is shown
 				//this way select element becomes visible with dimensions and chosen works as expected

@@ -100,6 +100,10 @@ public class PathUtils {
         return buf.toString();
     }
 
+    public static String getServicePath(String service,String swimlane) {
+        return getServicePath(service) + "/" + swimlane;
+    }
+
     public static String getRuntimeServicePath(String appName) {
         StringBuilder buf = new StringBuilder(80);
         buf.append(CACHE_RUNTIME_PATH).append('/').append(appName).append("/service");

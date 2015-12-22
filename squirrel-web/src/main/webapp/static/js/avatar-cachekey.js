@@ -23,24 +23,6 @@ module.factory('Paginator',function() {
 											items = response.entitys;
 											self.totalPage = response.totalpage;
 											self.endPage = self.totalPage;
-											// 生成链接
-//											if (self.currentPage > 1
-//													&& self.currentPage < self.totalPage) {
-//												self.pages = [
-//														self.currentPage - 1,
-//														self.currentPage,
-//														self.currentPage + 1 ];
-//											} else if (self.currentPage == 1
-//													&& self.totalPage > 1) {
-//												self.pages = [
-//														self.currentPage,
-//														self.currentPage + 1 ];
-//											} else if (self.currentPage == self.totalPage
-//													&& self.totalPage > 1) {
-//												self.pages = [
-//														self.currentPage - 1,
-//														self.currentPage ];
-//											}
 											self.pages = [self.currentPage];
 											self.currentPageItems = items;
 											self.hasNextVar = self.currentPage < self.totalPage;
@@ -82,8 +64,7 @@ module.controller('KeyController', [
 		'ngDialog',
 		function($scope, $http, $rootScope,Paginator,ngDialog) {
 			var fetchFunction = function(pageId,searchBy,category, cacheType, callback) {
-
-				$http.get(window.contextPath + $scope.suburl, {
+				$http.get(window.contextPath + '/cache/key/search', {
 					params : {
 						pageId : pageId,
 						searchBy : searchBy,
@@ -95,9 +76,7 @@ module.controller('KeyController', [
 
 			$scope.category = "";
 			$scope.category1 = "";
-			$scope.category2 = "";
-			$scope.categoryForClear = ";";
-			$scope.cacheType2 = "";
+			$scope.categoryForClear = ";"
 			$scope.cacheType1 = "";
 			$scope.cacheType = "";
 			$scope.duration="";
@@ -108,7 +87,6 @@ module.controller('KeyController', [
 			$scope.sync2Dnet = "";
 			$scope.indexDesc = "";
 			$scope.extension = "";
-			$scope.suburl = "/cache/key/search";
 			$scope.pageId = 1;
 			$scope.searchBy = "Category";
 			$scope.queryCount = 0;
@@ -125,123 +103,96 @@ module.controller('KeyController', [
 				}
 				$scope.searchPaginator = Paginator(fetchFunction,
 						$scope.pageId, $scope.searchBy, $scope.category, $scope.cacheType);
-			};
-			$scope.setConfigParas = function(){
-				$http.get(window.contextPath + '/cache/config/findAll', {
-					params : {
-					}
-				}).success(function(response){
-					for (var i=0,len=response.entitys.length; i<len; i++)
-						{
+			}
+			$scope.setConfigParas = function () {
+				$http.get(window.contextPath + '/cache/config/findAll', {params: {}}
+				).success(function (response) {
+					for (var i = 0, len = response.entitys.length; i < len; i++) {
 						$scope.configParas[i] = response.entitys[i].cacheKey;
-						}
+					}
 				});
-				
-				$http.get(window.contextPath + '/cache/key/findAllCategory',{
-					params : {
-					},
+				$http.get(window.contextPath + '/cache/key/findAllCategory', {
+					params: {},
 					cache: true
-					}).success(function(response) {
-						$scope.categorySet = response.categorySet;
-						$scope.cacheTypeSet = response.cacheTypeSet;
-						$('#category').typeahead({
-							items: 16, 
-							source : $scope.categorySet,
-							updater : function(c) {
-								$scope.category = c;
-								$scope.$apply();
-								return c;
-							}
-						});
-						$('#cacheType').typeahead({
-							items: 16, 
-							source : $scope.cacheTypeSet,
-							updater : function(c) {
-								$scope.cacheType = c;
-								$scope.$apply();
-								return c;
-							}
-						});
-						
-					}).error(function(response) {
-						$scope.categorySet = "null";
-						
+				}).success(function (response) {
+					$scope.categorySet = response.categorySet;
+					$scope.cacheTypeSet = response.cacheTypeSet;
+					$('#category').typeahead({
+						items: 16,
+						source: $scope.categorySet,
+						updater: function (c) {
+							$scope.category = c;
+							$scope.$apply();
+							return c;
+						}
 					});
-				
-			};
+					$('#cacheType').typeahead({
+						items: 16,
+						source: $scope.cacheTypeSet,
+						updater: function (c) {
+							$scope.cacheType = c;
+							$scope.$apply();
+							return c;
+						}
+					});
 
+				}).error(function (response) {
+					$scope.categorySet = "null";
+				});
+
+			}
+			$scope.categoryParams;
 			$scope.setModalInput = function(category , duration, indexTemplate, cacheType,indexDesc,version,hot,sync2Dnet,extension){
-				$scope.category2 = category;
+				$scope.category1 = category;
 				$scope.duration = duration;
 				$scope.indexTemplate = indexTemplate;
 				$scope.indexDesc = indexDesc;
-				$scope.cacheType2 = cacheType;
+				$scope.cacheType1 = cacheType;
 				$scope.version = version;
 				$scope.hot = hot;
 				$scope.sync2Dnet = sync2Dnet;
 				$scope.extension = extension;
-			};
-			$scope.creatCategory = function(myForm){
-				if(angular.isUndefined($scope.hot)){
-					$scope.hot="false";
-				}		
-				if(angular.isUndefined($scope.sync2Dnet)){
-					$scope.sync2Dnet="false";
-				}
-				if(angular.isUndefined($scope.version)){
-					$scope.version="0";
-				}
-				if(angular.isUndefined($scope.extension)){
-					$scope.extension="";
-				}
+			}
+
+			$scope.wrapperParams = function () {
+				$scope.categoryParams = {};
+				$scope.categoryParams.category = $scope.category1;
+				$scope.categoryParams.duration = $scope.duration;
+				$scope.categoryParams.indexTemplate = $scope.indexTemplate;
+				$scope.categoryParams.indexDesc = $scope.indexDesc;
+				$scope.categoryParams.cacheType = $scope.cacheType1;
+				$scope.categoryParams.version = $scope.version;
+				$scope.categoryParams.hot = $scope.hot;
+				$scope.categoryParams.sync2Dnet = $scope.sync2Dnet;
+				$scope.categoryParams.extension = $scope.extension;
+
+			}
+			$scope.creatCategory = function(){
 				$('#keyModal').modal('hide');
-				
-				$http.post(window.contextPath + '/cache/key/create',
-	        		{"category":$scope.category1,"duration":$scope.duration,
-	        		"indexTemplate":$scope.indexTemplate,"indexDesc":$scope.indexDesc,
-	        		"cacheType":$scope.cacheType1,"version":$scope.version,
-	        		"hot":$scope.hot,"sync2Dnet":$scope.sync2Dnet,
-	        		"extension":$scope.extension}
-				).success(function(response) {
+				$scope.wrapperParams();
+				$http.post(window.contextPath + '/cache/key/create',$scope.categoryParams
+				).success(function() {
 					$scope.query();
 	        	});
-			};
+			}
 
-			$scope.updateCategory = function(myForm){
-
+			$scope.updateCategory = function(){
 				$('#keyModal2').modal('hide');
-				
-				if($scope.indexDesc == null){
-					$scope.indexDesc = "";
-				}
-				if($scope.indexTemplate == null){
-					$scope.indexTemplate = "";
-				}
-				if($scope.duration == null){
-					$scope.duration = "";
-				}
-				if($scope.extension == null){
-					$scope.extension = "";
-				}
-				
-				$http.post(window.contextPath + '/cache/key/update',
-	        		{"category":$scope.category2,"duration":$scope.duration,
-	        		"indexTemplate":$scope.indexTemplate,"indexDesc":$scope.indexDesc,
-	        		"cacheType":$scope.cacheType2,"version":$scope.version,
-	        		"hot":$scope.hot,"sync2Dnet":$scope.sync2Dnet,
-	        		"extension":$scope.extension}
-				).success(function(response) {
+				$scope.wrapperParams();
+                $http.post(window.contextPath + '/cache/key/update',$scope.categoryParams
+                ).success(function() {
 					$scope.query();
 	        	});
-			};
+			}
 			
 			$rootScope.deleteCacheKeyByCategory = function(category){
-				$http.post(window.contextPath + '/cache/key/delete',
-	        			{"category":category}).success(function(response) {
-	        				$scope.query();
+				$scope.wrapperParams();
+				$http.post(window.contextPath + '/cache/key/delete',$scope.categoryParams
+				).success(function() {
+					$scope.query();
 	        	});
 				return true;
-			};
+			}
 			
 			$scope.dialog = function(category) {
 				$rootScope.mCategory = category;
@@ -270,12 +221,14 @@ module.controller('KeyController', [
 			
 			$scope.setClearCategory = function(category){
 				$scope.categoryForClear = category;
-			};
+				$scope.category1 = category;
+			}
 			
 			$scope.applist=[];
 			$scope.getAppList = function(category){
-				$http.post(window.contextPath + '/cache/key/applist',
-	        			{"category":category}
+				$scope.category1 = category;
+				$scope.wrapperParams();
+				$http.post(window.contextPath + '/cache/key/applist',$scope.categoryParams
 				).success(function(response) {
 					if(response != null){
 						$scope.applist = [];
@@ -284,16 +237,16 @@ module.controller('KeyController', [
 						});
 					}
 	        	});
-			};
-			
-			
-			$scope.clearCache = function(myForm){
+			}
+
+			$scope.clearCache = function(){
 				$('#keyModal3').modal('hide');
-				$http.post(window.contextPath + '/cache/key/clear',
-	        			{"category":$scope.categoryForClear}).success(function(response) {
-	        				$scope.query();
+				$scope.wrapperParams();
+				$http.post(window.contextPath + '/cache/key/clear',$scope.categoryParams
+				).success(function() {
+					$scope.query();
 	        	});
-			};
+			}
 			$scope.query();
 			$scope.setConfigParas();
 		} ]);

@@ -17,10 +17,7 @@ package com.dianping.cache.remote.translator;
 
 import com.dianping.cache.entity.CacheConfiguration;
 import com.dianping.cache.entity.SupportedSpecification.SupportedCacheClients;
-import com.dianping.remote.cache.dto.CacheConfigDetailDTO;
-import com.dianping.remote.cache.dto.CacheConfigurationDTO;
-import com.dianping.remote.cache.dto.EhcacheConfigDetailDTO;
-import com.dianping.remote.cache.dto.MemcachedConfigDetailDTO;
+import com.dianping.remote.cache.dto.*;
 //import com.dianping.remote.cache.dto.XMemcachedConfigDetailDTO;
 //import com.dianping.remote.cache.dto.DCacheConfigDetailDTO;
 import com.dianping.squirrel.client.util.DTOUtils;
@@ -55,6 +52,12 @@ public class CacheConfiguration2DTOTranslator implements Translator<CacheConfigu
 			return translateMemcachedConfigDetail(source);
 		} else if (SupportedCacheClients.EHCACHE_CLIENT_CLAZZ.equals(clientClazz)) {
 			return translateEhcacheConfigDetail(source);
+		} else if (SupportedCacheClients.DCACHE_CLIENT_CLAZZ.equals(clientClazz)) {
+			return translateDcacheConfigDetail(source);
+		} else if (SupportedCacheClients.DANGA_CLIENT_CLAZZ.equals(clientClazz)) {
+			return translateDangaConfigDetail(source);
+		} else if (SupportedCacheClients.REDIS_CLIENT_CLAZZ.equals(clientClazz)) {
+			return null;
 		}
 //		} else if(SupportedCacheClients.DCACHE_CLIENT_CLAZZ.equals(clientClazz)){
 //			return translateDcacheConfigDetail(source);
@@ -81,26 +84,25 @@ public class CacheConfiguration2DTOTranslator implements Translator<CacheConfigu
 	private CacheConfigDetailDTO translateMemcachedConfigDetail(CacheConfiguration source) {
 		MemcachedConfigDetailDTO detail = new MemcachedConfigDetailDTO();
 		detail.setServerList(source.getServerList());
+		detail.setClientClazz(source.getClientClazz());
 		detail.setTranscoderClazz(source.getTranscoderClazz());
 		return detail;
 	}
-//	
-//	private CacheConfigDetailDTO translateXMemcachedConfigDetail(CacheConfiguration source){
-//		// TODO
-//		XMemcachedConfigDetailDTO detail = new XMemcachedConfigDetailDTO();
-//		detail.setServerList(source.getServerList());
-//		detail.setTranscoderClazz(source.getTranscoderClazz());
-//		return detail;
-//		
-//	}
-//	private CacheConfigDetailDTO translateDcacheConfigDetail(
-//			CacheConfiguration source) {
-//		// TODO Auto-generated method stub
-//		DCacheConfigDetailDTO detail = new DCacheConfigDetailDTO();
-//		detail.setServerList(source.getServerList());
-//		detail.setTranscoderClazz(source.getTranscoderClazz());
-//		return detail;
-//	}
+
+	private CacheConfigDetailDTO translateDangaConfigDetail(CacheConfiguration source){
+		DangaConfigDetailDTO detail = new DangaConfigDetailDTO();
+		detail.setClientClazz(source.getClientClazz());
+		detail.setServerList(source.getServerList());
+		detail.setTranscoderClazz(source.getTranscoderClazz());
+		return detail;
+	}
+
+	private CacheConfigDetailDTO translateDcacheConfigDetail(CacheConfiguration source){
+		DcacheConfigDetailDTO detail = new DcacheConfigDetailDTO();
+		detail.setClientClazz(source.getClientClazz());
+		detail.setTranscoderClazz(source.getTranscoderClazz());
+		return detail;
+	}
 
 
 }

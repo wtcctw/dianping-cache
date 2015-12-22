@@ -40,7 +40,9 @@ public class CacheConfiguration implements Serializable {
 	private String clientClazz;
 	
 	private String servers;
-	
+
+	private String swimlane="";
+
 	private String transcoderClazz;
 
     private long addTime = System.currentTimeMillis();
@@ -103,5 +105,13 @@ public class CacheConfiguration implements Serializable {
     public String toString() {
         return "cache config: " + cacheKey + ", servers: " + servers;
     }
-    
+
+	public String getSwimlane() {
+		return swimlane;
+	}
+
+	public void setSwimlane(String swimlane) {
+		this.swimlane = swimlane;
+	}
+
 }

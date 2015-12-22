@@ -21,7 +21,7 @@ import com.dianping.combiz.spring.context.SpringLocator;
 
 public class ServerStatsDataStorage extends AbstractStatsDataStorage {
 	
-	public static boolean START_SS = false;
+	public static boolean START_SS = true;
 
 	private ServerService serverService;
 	

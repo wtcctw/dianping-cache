@@ -25,6 +25,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import com.dianping.remote.cache.dto.CacheConfigurationRemoveDTO;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -132,7 +133,12 @@ public class CacheConfigurationServiceImpl implements CacheConfigurationService,
 	}
 
 	@Override
-	public CacheConfiguration find(String cacheKey) {
+	public CacheConfiguration findWithSwimLane(String cacheKey,String swimlane) {
+		return configurationDao.findWithSwimLane(cacheKey,swimlane);
+	}
+
+	@Override
+	public CacheConfiguration find(String cacheKey){
 		return configurationDao.find(cacheKey);
 	}
 
@@ -140,14 +146,15 @@ public class CacheConfigurationServiceImpl implements CacheConfigurationService,
 	public CacheConfiguration create(CacheConfiguration config) throws DuplicatedIdentityException {
 		try {
 			String cacheKey = config.getCacheKey();
-			CacheConfiguration found = find(cacheKey);
+			String swimlane = config.getSwimlane();
+			CacheConfiguration found = findWithSwimLane(cacheKey,swimlane);
 			if (found != null) {
 				throw new DuplicatedIdentityException("cache key[" + cacheKey + "] already exists.");
 			}
 			configurationDao.create(config);
-			CacheConfiguration created = configurationDao.find(cacheKey);
+			CacheConfiguration created = configurationDao.findWithSwimLane(cacheKey,swimlane);
 			cacheMessageProducer.sendMessageToTopic(translator.translate(created));
-			com.dianping.squirrel.client.core.CacheConfiguration.addCache(cacheKey, created.getClientClazz());
+			//com.dianping.cache.core.CacheConfiguration.addCache(cacheKey, created.getClientClazz());
 			logConfigurationCreate(config, true);
 			return created;
 		} catch (RuntimeException e) {
@@ -161,18 +168,20 @@ public class CacheConfigurationServiceImpl implements CacheConfigurationService,
 	public CacheConfiguration update(CacheConfiguration config) {
 		CacheConfiguration oldConfig = null;
 		try {
-			oldConfig = find(config.getCacheKey());
+			oldConfig = findWithSwimLane(config.getCacheKey(),config.getSwimlane());
 			configurationDao.update(config);
 			// 保存后，从新从数据库加载数据，可能有数据库级别的触发逻辑
-			CacheConfiguration updated = configurationDao.find(config.getCacheKey());
+			CacheConfiguration updated = configurationDao.findWithSwimLane(config.getCacheKey(),config.getSwimlane());
 			if (updated == null) {
 				throw new RuntimeException("Config maybe already removed by others.");
 			}
 			cacheMessageProducer.sendMessageToTopic(translator.translate(updated));
 			String cacheKey = config.getCacheKey();
 			StoreClientBuilder.closeStoreClient(cacheKey);
+			if(config.getSwimlane() != null && config.getSwimlane().equals(Environment.getSwimlane())){
 			com.dianping.squirrel.client.core.CacheConfiguration.removeCache(cacheKey);
 			com.dianping.squirrel.client.core.CacheConfiguration.addCache(cacheKey, updated.getClientClazz());
+			}
 			logConfigurationUpdate(oldConfig, updated, true);
 			return updated;
 		} catch (RuntimeException e) {
@@ -192,6 +201,35 @@ public class CacheConfigurationServiceImpl implements CacheConfigurationService,
 				com.dianping.squirrel.client.core.CacheConfiguration.removeCache(cacheKey);
 				configurationDao.delete(cacheKey);
 				logConfigurationDelete(configFound, true);
+				final CacheConfigurationRemoveDTO msg = new CacheConfigurationRemoveDTO();
+				msg.setCacheKey(cacheKey);
+				msg.setClientClazz(configFound.getClientClazz());
+				msg.setServers(configFound.getServers());
+				cacheMessageProducer.sendMessageToTopic(msg);
+			}
+		} catch (RuntimeException e) {
+			logger.error("Delete cache configuration failed.", e);
+			logConfigurationDelete(configFound, false);
+			throw e;
+		}
+	}
+
+	@Override
+	public void deleteWithSwimLane(String cacheKey,String swimlane) {
+		CacheConfiguration configFound = null;
+		try {
+			configFound = findWithSwimLane(cacheKey,swimlane);
+			if (configFound != null) {
+				StoreClientBuilder.closeStoreClient(cacheKey);
+				com.dianping.squirrel.client.core.CacheConfiguration.removeCache(cacheKey);
+				configurationDao.deleteWithSwimLane(cacheKey,swimlane);
+				logConfigurationDelete(configFound, true);
+				final CacheConfigurationRemoveDTO msg = new CacheConfigurationRemoveDTO();
+				msg.setSwimlane(configFound.getSwimlane());
+				msg.setCacheKey(cacheKey);
+				msg.setClientClazz(configFound.getClientClazz());
+				msg.setServers(configFound.getServers());
+				cacheMessageProducer.sendMessageToTopic(msg);
 			}
 		} catch (RuntimeException e) {
 			logger.error("Delete cache configuration failed.", e);
@@ -429,8 +467,9 @@ public class CacheConfigurationServiceImpl implements CacheConfigurationService,
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		for (CacheConfiguration configuration : findAll()) {
-			com.dianping.squirrel.client.core.CacheConfiguration.addCache(configuration.getCacheKey(),
-					configuration.getClientClazz());
+			String cacheKey = configuration.getCacheKey();
+			if(com.dianping.squirrel.client.core.CacheConfiguration.getCache(cacheKey) == null)
+				com.dianping.squirrel.client.core.CacheConfiguration.addCache(cacheKey,configuration.getClientClazz());
 		}
 	}
 

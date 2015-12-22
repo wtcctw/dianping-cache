@@ -23,6 +23,7 @@ import com.dianping.avatar.dao.annotation.DAOActionType;
 import com.dianping.avatar.dao.annotation.DAOParam;
 import com.dianping.avatar.dao.annotation.DAOParamType;
 import com.dianping.cache.entity.CacheConfiguration;
+import org.apache.ibatis.annotations.Param;
 
 /**
  * CacheKeyConfiguration data access object
@@ -38,11 +39,12 @@ public interface CacheConfigurationDao extends GenericDao {
 	List<CacheConfiguration> findAll();
 
 	/**
-	 * @param key
+	 * @param key swimlane
 	 * @return
 	 */
-	CacheConfiguration find( String key);
+	CacheConfiguration findWithSwimLane(@Param("key") String key ,@Param("swimlane") String swimlane);
 
+	CacheConfiguration find(@Param("key") String key);
 	/**
 	 * @param config
 	 * @return
@@ -58,5 +60,7 @@ public interface CacheConfigurationDao extends GenericDao {
 	 * @param key
 	 */
 	void delete(String key);
+
+	void deleteWithSwimLane(@Param("key") String key ,@Param("swimlane") String swimlane);
 	
 }

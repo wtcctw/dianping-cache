@@ -41,12 +41,14 @@ public class SupportedSpecification {
 		public static final String MEMCACHED_CLIENT_CLAZZ = "com.dianping.cache.memcached.MemcachedClientImpl";
 		public static final String DCACHE_CLIENT_CLAZZ = "com.dianping.cache.dcache.DCacheClientImpl";
 		public static final String REDIS_CLIENT_CLAZZ = "com.dianping.cache.redis.RedisClientImpl";
+		public static final String DANGA_CLIENT_CLAZZ = "com.dianping.cache.danga.DangaClientImpl";
 		
 		static {
 			supportedClazzes.add(MEMCACHED_CLIENT_CLAZZ);
 			supportedClazzes.add(EHCACHE_CLIENT_CLAZZ);
 			supportedClazzes.add(DCACHE_CLIENT_CLAZZ);
 			supportedClazzes.add(REDIS_CLIENT_CLAZZ);
+			supportedClazzes.add(DANGA_CLIENT_CLAZZ);
 		}
 
 		public static List<String> getSupportedClazzes() {

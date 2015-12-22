@@ -1,65 +1,68 @@
 <div class="main-content" id="ClusterDashBoardController" ng-controller="ClusterDashBoardController">
-	<script type="text/javascript"
-				src="${rc.contextPath}/static/js/avatar-cachedashboard.js"></script>
-	<div class="page-content" id="container">
-		<div class="row">
-			<!-- #section:pages/pricing.small-header -->
-			<div class="col-xs-4 col-sm-3 pricing-span-header">
-				<div class="widget-box transparent">
-					<div class="widget-header">
-						<h5 class="widget-title bigger lighter">集群</h5>
-					</div>
+    <script type="text/javascript"
+            src="${rc.contextPath}/static/js/avatar-cachedashboard.js"></script>
+    <div class="page-content" id="container">
+        <div class="row">
+            <!-- #section:pages/pricing.small-header -->
+            <div class="col-xs-4 col-sm-3 pricing-span-header">
+                <div class="widget-box transparent">
+                    <div class="widget-header">
+                        <h5 class="widget-title bigger lighter">集群</h5>
+                    </div>
 
-					<div class="widget-body">
-						<div class="widget-main no-padding">
-							<ul class="list-unstyled list-striped pricing-table-header">
-								<li>实例(TimeOut/Total)</li>
-								<li>内存(Used/Total)</li>
-								<li>QPS(Max/Min/Avg)</li>
-								<li>命中率(Max/Min/Avg)</li>
-								<li>当前连接数(Max/Min/Avg)</li>
-								<li>Evictions(Max/Min/Avg)</li>
-							</ul>
-						</div>
-					</div>
-				</div>
-			</div>
+                    <div class="widget-body">
+                        <div class="widget-main no-padding">
+                            <ul class="list-unstyled list-striped pricing-table-header">
+                                <li>实例(TimeOut/Total)</li>
+                                <li>内存(Used/Total)</li>
+                                <li>QPS(Max/Min/Avg)</li>
+                                <li>命中率(Max/Min/Avg)</li>
+                                <li>当前连接数(Max/Min/Avg)</li>
+                                <li>Evictions(Max/Min/Avg)</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-			<!-- /section:pages/pricing.small-header -->
+            <!-- /section:pages/pricing.small-header -->
 
-			<!-- #section:pages/pricing.small-body -->
-			<div class="col-xs-8 col-sm-9 pricing-span-body">
-				<div ng-repeat="info in dashboard" class="pricing-span">
-					<div ng-class="{'widget-box':true, 'pricing-box-small':true, 'widget-color-red':info.alarm==1,'widget-color-orange':info.alarm==2,'widget-color-green':info.alarm==3}">
-						<div class="widget-header">
-							<h6 class="widget-title bigger white" style="text-align: center; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">{{info.key}}</h5>
-						</div>
+            <!-- #section:pages/pricing.small-body -->
+            <div class="col-xs-8 col-sm-9 pricing-span-body">
+                <div ng-repeat="info in dashboard" class="pricing-span">
+                    <div ng-class="{'widget-box':true, 'pricing-box-small':true, 'widget-color-red':info.alarm==1,'widget-color-orange':info.alarm==2,'widget-color-green':info.alarm==3}">
+                        <div class="widget-header">
+                            <h6 class="widget-title bigger white"
+                                style="text-align: center; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">
+                                {{info.key}}</h5>
+                        </div>
 
-						<div class="widget-body" >
-							<div class="widget-main no-padding">
-								<ul class="list-unstyled list-striped pricing-table">
-									<li>{{info.numbers}}</li>
-									<li>{{info.memory}}</li>
-									<li>{{info.QPS}}</li>
-									<li>{{info.hitrate}}</li>
-									<li>{{info.conn}}</li>
-									<li>{{info.evict}}</li>
-								</ul>
-							</div>
+                        <div class="widget-body">
+                            <div class="widget-main no-padding">
+                                <ul class="list-unstyled list-striped pricing-table">
+                                    <li>{{info.numbers}}</li>
+                                    <li>{{info.memory}}</li>
+                                    <li>{{info.QPS}}</li>
+                                    <li>{{info.hitrate}}</li>
+                                    <li>{{info.conn}}</li>
+                                    <li>{{info.evict}}</li>
+                                </ul>
+                            </div>
+                            <div>
+                                <a href="${rc.contextPath}/monitor/cluster" class="btn btn-block btn-sm " ng-click="transport(info.key)"> <span>详情</span>
+                                </a>
+                            </div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-							<div>
-								<a href="${rc.contextPath}/monitor/cluster" class="btn btn-block btn-sm " ng-click="transport(info.key)"> <span>详情</span>
-								</a>
-							</div>
-						</div>
-					</div>
-				</div>
-				
-			</div>
 
-			<!-- /section:pages/pricing.small-body -->
-		</div>
+        <!-- /section:pages/pricing.small-body -->
+    </div>
 
-	</div>
+</div>
 
 </div>

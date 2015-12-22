@@ -1,0 +1,61 @@
+<div class="main-content" ng-controller="AlarmRecordController"
+     id="AlarmRecordController">
+
+    <div class="breadcrumbs" id="breadcrumbs">
+        <script type="text/javascript"
+                src="${rc.contextPath}/static/js/alarm/avatar-alarmrecord.js"></script>
+        <script type="text/javascript">
+            try {
+                ace.settings.check('breadcrumbs', 'fixed')
+            } catch (e) {
+            }
+        </script>
+        <ul class="breadcrumb">
+            <li class="active">告警记录</li>
+        </ul>
+    </div>
+
+        <!-- page-content -->
+        <div class="page-content">
+            <div>
+                <!--row  -->
+                <div class="row">
+                    <table
+                            class="table table-bordered table-striped table-condensed  table-hover">
+                        <tr>
+                            <th>序号</th>
+                            <th>标题</th>
+                            <th>内容</th>
+                            <th>时间</th>
+                        </tr>
+                        <tr ng-repeat="m in searchPaginator.currentPageItems">
+                            <td style="text-align: center">{{$index+1}}</td>
+                            <td style="text-align: center">{{m.alarmTitle}}</td>
+                            <td style="text-align: center" class="row-table-td">{{m.alarmDetail}}</td>
+                            <td style="text-align: center">{{m.createTime |
+                                date:'yyyy-MM-dd HH:mm:ss'}}</td>
+                        </tr>
+                    </table>
+
+                    <ul style="margin-top: 20px;" class="pagination">
+                        <li><a href="" ng-click="searchPaginator.fetch(1)">首页</a></li>
+                        <li><a href="" ng-click="searchPaginator.previous()"
+                               ng-show="searchPaginator.hasPrevious()">上一页</a></li>
+                        <li ng-repeat="p in searchPaginator.pages"><a href=""
+                                                                      ng-click="searchPaginator.fetch(p)" ng-bind="p"></a></li>
+                        <li class="disabled"><a href="javascript:;">...</a></li>
+
+                        <li><a href="" ng-click="searchPaginator.next()"
+                               ng-show="searchPaginator.hasNext()">下一页</a></li>
+
+                        <li><a href=""
+                               ng-click="searchPaginator.fetch(searchPaginator.endPage)">末页</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <!--end page-header  -->
+        </div>
+        <!-- end page-content -->
+    </div>
+</div>
