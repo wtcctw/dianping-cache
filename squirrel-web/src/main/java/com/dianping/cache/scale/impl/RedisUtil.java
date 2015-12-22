@@ -25,7 +25,6 @@ import com.dianping.cache.autoscale.Instance;
 import com.dianping.cache.autoscale.Result;
 import com.dianping.cache.autoscale.dockerscale.DockerScale;
 import com.dianping.cache.scale.ScaleException;
-import sun.swing.SwingLazyValue;
 
 public class RedisUtil {
 
@@ -418,11 +417,11 @@ public class RedisUtil {
     }
 
     public static void destroy(String appId, String address) {
-        autoScale.scaleDown(AppId.valueOf(appId), address);
+        autoScale.scaleDown(address);
     }
 
     public static void des(String instanceId) {
-        autoScale.destroyByInstanceId(instanceId);
+        //autoScale.destroyByInstanceId(instanceId);
     }
 
     private static String[] splitClusterInfo(String str) {

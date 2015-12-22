@@ -26,7 +26,9 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
  */
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "className")
 @JsonSubTypes({ @JsonSubTypes.Type(value = EhcacheConfigDetailDTO.class, name = "EhcacheConfigDetailDTO"),
-		@JsonSubTypes.Type(value = MemcachedConfigDetailDTO.class, name = "MemcachedConfigDetailDTO") })
+		@JsonSubTypes.Type(value = MemcachedConfigDetailDTO.class, name = "MemcachedConfigDetailDTO"),
+		@JsonSubTypes.Type(value = DcacheConfigDetailDTO.class, name = "DcacheConfigDetailDTO"),
+		@JsonSubTypes.Type(value = DangaConfigDetailDTO.class, name = "DangaConfigDetailDTO")  })
 public abstract class CacheConfigDetailDTO extends AbstractDTO {
 
 	/**

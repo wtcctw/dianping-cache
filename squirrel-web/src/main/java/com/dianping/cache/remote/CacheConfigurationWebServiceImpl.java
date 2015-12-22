@@ -68,7 +68,8 @@ public class CacheConfigurationWebServiceImpl implements CacheConfigurationWebSe
 		List<CacheConfiguration> configurations = configurationService.findAll();
 		CacheConfigurationsDTO configurationsDTO = new CacheConfigurationsDTO();
 		for (CacheConfiguration configuration : configurations) {
-			configurationsDTO.addConfiguration(cacheTranslator.translate(configuration));
+			if("".equals(configuration.getSwimlane()))
+				configurationsDTO.addConfiguration(cacheTranslator.translate(configuration));
 		}
 		return configurationsDTO;
 	}
@@ -84,6 +85,12 @@ public class CacheConfigurationWebServiceImpl implements CacheConfigurationWebSe
         CacheConfiguration config = configurationService.find(service);
         return cacheTranslator.translate(config);
     }
+
+	@Override
+	public CacheConfigurationDTO getCacheConfiguration(String cacheKey, String swimlane){
+		CacheConfiguration config = configurationService.findWithSwimLane(cacheKey,swimlane);
+		return cacheTranslator.translate(config);
+	}
     
 	public void setItemConfigurationService(CacheKeyConfigurationService configurationService) {
 		this.itemConfigurationService = configurationService;

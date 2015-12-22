@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.dianping.cache.alarm.dao.RedisAlarmConfigDao">
+
+    <resultMap id="RedisAlarmConfigResult" type="RedisAlarmConfig">
+        <result column="id" property="id"/>
+        <result column="redisKey" property="redisKey"/>
+        <result column="alarmSwitch" property="alarmSwitch"/>
+        <result column="memThreshold" property="memThreshold"/>
+        <result column="qpsThreshold" property="qpsThreshold"/>
+        <result column="connThreshold" property="connThreshold"/>
+        <result column="createTime" property="createTime"/>
+        <result column="updateTime" property="updateTime"/>
+    </resultMap>
+
+    <insert id="insert" parameterType="RedisAlarmConfig">
+        INSERT INTO redis_alarm_config(id,redisKey,alarmSwitch, memThreshold, qpsThreshold, connThreshold,createTime, updateTime)
+        VALUES(#{id}, #{redisKey},#{alarmSwitch}, #{memThreshold}, #{qpsThreshold},#{connThreshold},#{createTime},#{updateTime})
+    </insert>
+
+    <insert id="update" parameterType="RedisAlarmConfig">
+        UPDATE redis_alarm_config
+        SET  redisKey = #{redisKey}, alarmSwitch = #{alarmSwitch}, memThreshold = #{memThreshold},
+          qpsThreshold = #{qpsThreshold}, connThreshold = #{connThreshold}, updateTime = #{updateTime}
+        WHERE id = #{id}
+    </insert>
+
+    <delete id="deleteByRedisKey" parameterType="String">
+        DELETE FROM redis_alarm_config
+        WHERE redisKey= #{redisKey}
+    </delete>
+
+    <select id="findByRedisKey" resultMap="RedisAlarmConfigResult" parameterType="String">
+        SELECT id,redisKey,alarmSwitch, memThreshold, qpsThreshold, connThreshold,createTime, updateTime
+        FROM redis_alarm_config
+        WHERE redisKey = #{redisKey}
+        ORDER BY id ASC
+    </select>
+
+    <select id="findByPage" resultMap="RedisAlarmConfigResult" parameterType="map">
+        SELECT id,redisKey,alarmSwitch, memThreshold, qpsThreshold, connThreshold,createTime, updateTime
+        FROM redis_alarm_config
+        ORDER BY id ASC
+        LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+</mapper>

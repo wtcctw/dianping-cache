@@ -1,28 +1,23 @@
 package com.dianping.cache.controller;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.dianping.cache.alarm.controller.dto.AlarmConfigDto;
+import com.dianping.cache.alarm.controller.mapper.AlarmConfigMapper;
+import com.dianping.cache.alarm.entity.MemcacheAlarmConfig;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.dianping.cache.entity.CacheConfiguration;
 import com.dianping.cache.entity.MemcacheStats;
 import com.dianping.cache.entity.Server;
-import com.dianping.cache.entity.ServerCluster;
 import com.dianping.cache.entity.ServerStats;
 import com.dianping.cache.monitor.highcharts.HighChartsWrapper;
 import com.dianping.cache.service.CacheConfigurationService;
@@ -31,9 +26,6 @@ import com.dianping.cache.service.ServerClusterService;
 import com.dianping.cache.service.ServerService;
 import com.dianping.cache.service.ServerStatsService;
 import com.dianping.cache.monitor.highcharts.ChartsBuilder;
-import com.dianping.cache.monitor.highcharts.HighChartsWrapper.Series;
-import com.dianping.cache.monitor.highcharts.HighChartsWrapper.PlotOption;
-import com.dianping.cache.monitor.highcharts.HighChartsWrapper.PlotOptionSeries;
 import com.dianping.cache.monitor.statsdata.MemcachedStatsData;
 import com.dianping.cache.monitor.statsdata.ServerStatsData;
 
@@ -59,7 +51,7 @@ public class CacheMonitorController  extends AbstractSidebarController {
 	@RequestMapping(value = "/monitor/cluster", method = RequestMethod.GET)
 	public ModelAndView viewCacheConfig(HttpServletRequest request, HttpServletResponse response){
 		
-		subside = "dashboard";
+		subside = "mdashboard";
 		return new ModelAndView("monitor/cluster",createViewMap());
 	}
 	
@@ -94,11 +86,14 @@ public class CacheMonitorController  extends AbstractSidebarController {
 		for (CacheConfiguration item : configList) { 
 			//遍历所有的集群  对于集群名称为memcached的进行监控
 			if(item.getCacheKey().contains("memcached")
-					&& !"memcached-leo".equals(item.getCacheKey())){
+					&& !"memcached-leo".equals(item.getCacheKey())
+					&& "".equals(item.getSwimlane())){
 				HashMap<String, Object> info = new HashMap<String, Object>();
 				info.put("key", item.getCacheKey());
+
 				List<String> serverList = item.getServerList();
-				
+				if(serverList == null)
+					continue;
 				long mem = 0,memused=0;
 				long qpsmax = Long.MIN_VALUE,qpsmin = Long.MAX_VALUE,qpsavg = 0;
 				long evictmax = Long.MIN_VALUE,evictmin = Long.MAX_VALUE, evictavg = 0;
@@ -180,11 +175,11 @@ public class CacheMonitorController  extends AbstractSidebarController {
 	@ResponseBody
 	public List<HighChartsWrapper> getClusterStats(@PathVariable("cluster") String cluster,@RequestParam("endTime") long endTime){
 		
-		Map<String,List<MemcacheStats>> stats0 = getClusterServerStats(cluster,endTime);
+		Map<String,List<MemcacheStats>> stats0 = getClusterServerStats(cluster, endTime);
 		
 		Map<String,MemcachedStatsData> data0 = convertStats(stats0);
 		
-		Map<String,List<ServerStats>> stats = getClusterServerStats2(cluster,endTime);
+		Map<String,List<ServerStats>> stats = getClusterServerStats2(cluster, endTime);
 		
 		Map<String,ServerStatsData> data = convertStats2(stats);
 		

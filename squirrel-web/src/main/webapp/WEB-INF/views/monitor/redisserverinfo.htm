@@ -15,6 +15,21 @@
 					</small>
 				</h1>
 			</div>
+			<div>
+				<div class="pull-right">
+					{{endTime | date:'yyyy-MM-dd HH:mm:ss'}}
+					&nbsp;[
+					<!-- <a href="#" ng-click="setTime(-168)">-7d</a> ] &nbsp;[  -->
+					<a href="#" ng-click="setTime(-24)">-1d</a> ] &nbsp;[
+					<a href="#" ng-click="setTime(-2)">-2h</a> ] &nbsp;[
+					<a href="#" ng-click="setTime(-1)">-1h</a> ] &nbsp;[
+					<a href="#" ng-click="setTime(1)">+1h</a> ] &nbsp;[
+					<a href="#" ng-click="setTime(2)">+2h</a> ] &nbsp;[
+					<a href="#" ng-click="setTime(24)">+1d</a> ] &nbsp;[
+					<a href="#" ng-click="setNow()">now</a> ] &nbsp;
+				</div>
+
+			</div>
 		</div>
 	</div>
 	<div class="page-content">

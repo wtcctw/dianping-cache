@@ -39,7 +39,7 @@ public class DockerScale implements AutoScale{
 	public int scaleUp(AppId appId, int number){
 		int operationid = sendScaleRequest(appId.toString(),number);
 		Result value = new Result();
-		value.setAppId(appId);
+		value.setAppId(appId.toString());
 		value.setNeed(number);
 		operationResultMap.put(operationid, value);
 		operate(value, operationid);
@@ -47,10 +47,8 @@ public class DockerScale implements AutoScale{
 	}
 
 	@Override
-	public boolean scaleDown(AppId appId,String address) {
-		// TODO Auto-generated method stub
-		destroy(appId.toString(), address);
-		return true;
+	public boolean scaleDown(String address) {
+		return false;
 	}
 
 	private void operate(final Result value,final int operationId){
@@ -197,11 +195,6 @@ public class DockerScale implements AutoScale{
 		String resultstr = RequestUtil.sendGet(OPERATION_RESULT_URL + operationId, null);
 		DockerResultParse.parse(value,resultstr);
 		return value;
-	}
-
-	@Override
-	public void destroyByInstanceId(String instanceId) {
-
 	}
 
 	public static void main(String[] arges){

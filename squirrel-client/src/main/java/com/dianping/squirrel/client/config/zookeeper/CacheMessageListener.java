@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+import com.dianping.remote.cache.dto.*;
+import com.dianping.squirrel.client.config.listener.*;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.api.CuratorEvent;
 import org.apache.curator.framework.api.CuratorEventType;
@@ -16,15 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.dianping.cat.Cat;
-import com.dianping.remote.cache.dto.CacheConfigurationDTO;
-import com.dianping.remote.cache.dto.CacheKeyConfigurationDTO;
-import com.dianping.remote.cache.dto.CacheKeyTypeVersionUpdateDTO;
-import com.dianping.remote.cache.dto.SingleCacheRemoveDTO;
 import com.dianping.remote.cache.util.SedesUtils;
-import com.dianping.squirrel.client.config.listener.CacheConfigurationUpdateListener;
-import com.dianping.squirrel.client.config.listener.CacheKeyConfigUpdateListener;
-import com.dianping.squirrel.client.config.listener.CacheKeyTypeVersionUpdateListener;
-import com.dianping.squirrel.client.config.listener.SingleCacheRemoveListener;
 import com.dianping.squirrel.client.config.zookeeper.CacheEvent.CacheEventType;
 import com.dianping.squirrel.common.util.JsonUtils;
 import com.dianping.squirrel.common.util.PathUtils;
@@ -45,7 +39,7 @@ public class CacheMessageListener implements CuratorListener {
     private SingleCacheRemoveListener keyRemoveListener = new SingleCacheRemoveListener();
     private CacheConfigurationUpdateListener serviceChangeListener = new CacheConfigurationUpdateListener();
     private CacheKeyConfigUpdateListener categoryChangeListener = new CacheKeyConfigUpdateListener();
-    
+    private CacheConfigurationRemoveListener serviceRemoveListener = new CacheConfigurationRemoveListener();
     private ConcurrentMap<String, List<String>> pathChildrenMap =  new ConcurrentHashMap<String, List<String>>();
 
     @Override
@@ -73,8 +67,10 @@ public class CacheMessageListener implements CuratorListener {
                 } else if(we.getType() == EventType.NodeChildrenChanged) {
                     // cache server added, removed or ip address changed will trigger this event
                     processChildrenChanged(client, path);
-                } else {
+                } else if(we.getType() == EventType.NodeDeleted){
                     // we.getType() == EventType.NodeDeleted
+                    processNodeDeleted(client, path);
+                } else {
                     watch(client, path);
                 }
             } catch (Exception e) {
@@ -82,7 +78,26 @@ public class CacheMessageListener implements CuratorListener {
             }
         }
     }
-
+    private void processNodeDeleted(CuratorFramework client, String path) throws Exception  {
+        // TODO Auto-generated method stub
+        //String content = getData(client, path, true);
+        logger.info("received cache notification, removed node path:" + path);
+        if(path.startsWith(CACHE_SERVICE_PATH)){
+            String cacheKey = path.substring(CACHE_SERVICE_PATH.length());
+            String swimlane = "";
+            if(cacheKey.contains("/")){
+                String[] cs = cacheKey.split("/");
+                cacheKey = cs[0];
+                swimlane = cs[1];
+            }
+            CacheConfigurationRemoveDTO content = new CacheConfigurationRemoveDTO();
+            content.setCacheKey(cacheKey);
+            content.setSwimlane(swimlane);
+            CacheEvent ce = new CacheEvent(CacheEventType.ServiceRemove, null);
+            ce.setContent(content);
+            dispatchCacheEvent(ce);
+        }
+    }
     public void watchChildren(CuratorFramework curatorClient, String parentPath) throws Exception {
         if(!pathChildrenMap.containsKey(parentPath)) {
             ZKPaths.mkdirs(curatorClient.getZookeeperClient().getZooKeeper(), parentPath);
@@ -212,6 +227,11 @@ public class CacheMessageListener implements CuratorListener {
                 return true;
             }
             return false;
+        case ServiceRemove:
+        	CacheConfigurationRemoveDTO serviceRemove = (CacheConfigurationRemoveDTO) ce.getContent();
+        	Cat.logEvent(CAT_EVENT_TYPE, "service.remove:" + serviceRemove.getCacheKey(), "0", "" + ce.getContent());
+        	serviceRemoveListener.handleMessage(serviceRemove);
+        	return true;
         default:
             logger.error("invalid store event");
             return false;

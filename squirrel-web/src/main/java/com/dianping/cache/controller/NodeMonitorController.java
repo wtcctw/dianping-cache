@@ -54,8 +54,8 @@ public class NodeMonitorController  extends AbstractSidebarController{
 		if(null != instanceId  &&  !"".equals(instanceId)){
 			// container instance
 			String appId = server.getAppId();
-			AutoScale autoScale = new DockerScale();
-			autoScale.scaleDown(AppId.valueOf(appId),address);
+			//AutoScale autoScale = new DockerScale();
+			//autoScale.scaleDown(AppId.valueOf(appId),address);
 		}else{
 			// none container
 			serverService.delete(address);

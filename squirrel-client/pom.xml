@@ -88,6 +88,10 @@
             <artifactId>xmemcached</artifactId>
         </dependency>
         <dependency>
+            <groupId>com.danga</groupId>
+            <artifactId>memcached</artifactId>
+        </dependency>
+        <dependency>
             <groupId>qq-central</groupId>
             <artifactId>dcache_client_api</artifactId>
         </dependency>

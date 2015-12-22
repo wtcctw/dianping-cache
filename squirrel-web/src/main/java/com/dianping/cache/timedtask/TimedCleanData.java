@@ -6,6 +6,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import com.dianping.cache.service.RedisStatsService;
+import com.dianping.cache.support.spring.SpringLocator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,7 +15,6 @@ import com.dianping.cache.config.ConfigManagerLoader;
 import com.dianping.cache.service.MemcacheStatsService;
 import com.dianping.cache.service.OperationLogService;
 import com.dianping.cache.service.ServerStatsService;
-import com.dianping.combiz.spring.context.SpringLocator;
 
 public class TimedCleanData {
 	private Logger logger = LoggerFactory.getLogger(TimedCleanData.class);
@@ -50,7 +50,7 @@ public class TimedCleanData {
 				cleanRedisStats();
 			}
 			
-		},60 , 24 * 60 * 60, TimeUnit.SECONDS);
+		},20 , 24 * 60 * 60, TimeUnit.SECONDS);
 	}
 	
 	private void init(){

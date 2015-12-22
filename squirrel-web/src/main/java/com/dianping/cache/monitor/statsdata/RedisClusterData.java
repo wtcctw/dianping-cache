@@ -1,23 +1,38 @@
 package com.dianping.cache.monitor.statsdata;
 
+import com.dianping.cache.scale1.cluster.redis.RedisNode;
+import com.dianping.cache.scale1.cluster.redis.RedisServer;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
-import com.dianping.cache.monitor.monitorcheck.RedisMonitorCheck;
-import com.dianping.cache.scale.impl.RedisNode;
 
 public class RedisClusterData {
 	
 	private String clusterName;
 	
 	private List<RedisNode> nodes;
+
+	private List<RedisServer> failedServers;
 	
 	private long maxMemory;
 	
 	private long usedMemory;
 
+	private int masterNum;
+
+	private int slaveNum;
+
+	private int qps;
+
 	private float used;
+
+	private boolean migrate;
+
+	private String config;
+
 	
 	private Map<String,Integer> flags = new HashMap<String,Integer>();
 	
@@ -62,11 +77,20 @@ public class RedisClusterData {
 	public float getUsed(){
 		return used;
 	}
-	
-	public void check() {
-		RedisMonitorCheck check = new RedisMonitorCheck();
-		check.check(this);
+
+	public void check(){
+		ColorsCheck check = new ColorsCheck();
+		check.check();
 	}
+
+	public String getConfig() {
+		return config;
+	}
+
+	public void setConfig(String config) {
+		this.config = config;
+	}
+
 
 	public Map<String, Integer> getFlags() {
 		return flags;
@@ -83,5 +107,97 @@ public class RedisClusterData {
 	public void setColors(Map<String, String> colors) {
 		this.colors = colors;
 	}
-	
+
+	public int getMasterNum() {
+		return masterNum;
+	}
+
+	public void setMasterNum(int masterNum) {
+		this.masterNum = masterNum;
+	}
+
+	public int getSlaveNum() {
+		return slaveNum;
+	}
+
+	public void setSlaveNum(int slaveNum) {
+		this.slaveNum = slaveNum;
+	}
+
+	public boolean isMigrate() {
+		return migrate;
+	}
+
+	public void setMigrate(boolean migrate) {
+		this.migrate = migrate;
+	}
+
+	public List<RedisServer> getFailedServers() {
+		return failedServers;
+	}
+
+	public void setFailedServers(List<RedisServer> failedServers) {
+		this.failedServers = failedServers;
+	}
+
+	public int getQps() {
+		return qps;
+	}
+
+	public void setQps(int qps) {
+		this.qps = qps;
+	}
+
+	class ColorsCheck{
+
+		private int alarm = 1;
+
+		private final int WARN = 2;
+
+		private final int DANGER = 4;
+
+		private float memUsedWarn = 50.0f;
+		private float memUsedDanger = 90.0f;
+
+		public  void check(){
+			if(maxMemory == 0L)
+				alarm = 4;
+			colors.put("used",switchColors(used,memUsedWarn,memUsedDanger));
+			colors.put("dead",switchColors(masterNum,slaveNum+1,slaveNum+1));
+			colors.put("alarm",switchColors(alarm,WARN,DANGER));
+		}
+
+		private String switchColors(int value,int warn,int danger){
+			if(value >= danger){
+				alarm |= DANGER;
+				return "red";
+			} else if(value >= warn){
+				alarm |= WARN;
+				return "orange";
+			}
+			return "green";
+		}
+
+		private String switchColors(float value,float warn,float danger){
+			if(value >= danger){
+				alarm |= DANGER;
+				return "red";
+			} else if(value >= warn){
+				alarm |= WARN;
+				return "orange";
+			}
+			return "green";
+		}
+
+		private String switchColors(long value,long warn,long danger){
+			if(value >= danger){
+				alarm |= DANGER;
+				return "red";
+			} else if(value >= warn){
+				alarm |= WARN;
+				return "orange";
+			}
+			return "green";
+		}
+	}
 }

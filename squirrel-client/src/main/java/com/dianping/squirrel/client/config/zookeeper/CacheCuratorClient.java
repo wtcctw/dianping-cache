@@ -8,6 +8,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import com.dianping.lion.Environment;
 import org.apache.commons.lang.StringUtils;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
@@ -15,6 +16,7 @@ import org.apache.curator.framework.state.ConnectionState;
 import org.apache.curator.framework.state.ConnectionStateListener;
 import org.apache.curator.retry.RetryNTimes;
 import org.apache.zookeeper.KeeperException.NoNodeException;
+import org.apache.zookeeper.data.Stat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.CollectionUtils;
@@ -102,11 +104,27 @@ public class CacheCuratorClient {
 	
 	public CacheConfigurationDTO getServiceConfig(String service) throws Exception {
 		if (PathUtils.isZookeeperEnabled() && isZookeeperConnected()) {
-			String path = PathUtils.getServicePath(service);
-			String content = getData(path, true);
-			if (StringUtils.isBlank(content)) {
-				logger.warn("store service config [" + service + "] is empty");
-				return null;
+
+			String path;
+			String content = null;
+			String swimlane = Environment.getSwimlane();
+			if(swimlane != null){
+				path = PathUtils.getServicePath(service,swimlane);
+				if(exists(path)){
+					content = getData(path, true);
+					if (StringUtils.isBlank(content)) {
+						logger.warn("cache service config [" + service + "/" + swimlane + "] is empty");
+						return null;
+					}
+				}
+			}
+			if(StringUtils.isBlank(content)){
+				path = PathUtils.getServicePath(service);
+				content = getData(path, true);
+				if (StringUtils.isBlank(content)) {
+					logger.warn("cache service config [" + service + "/" + swimlane + "] is empty");
+					return null;
+				}
 			}
 			CacheConfigurationDTO serviceConfig = JsonUtils.fromStr(content, CacheConfigurationDTO.class);
 			CacheMessageManager.takeMessage(serviceConfig);
@@ -494,4 +512,9 @@ public class CacheCuratorClient {
         
         return curatorClient;
     }
+
+	private boolean exists(String path) throws Exception {
+		Stat stat = curatorClient.checkExists().forPath(path);
+		return stat != null;
+	}
 }

@@ -185,13 +185,13 @@ module.controller('ClusterQpsController', function($scope, $http) {
 			$scope.endTime = new Date().getTime();
 		renderGraph("/monitor/cluster/" + $scope.key, "container",
 				$scope.endTime, $http);
-	};
+	}
 
 	$scope.setNow = function() {
 		$scope.endTime = new Date().getTime();
 		renderGraph("/monitor/cluster/" + $scope.key, "container",
 				$scope.endTime, $http);
-	};
+	}
 
 	$scope.getProducerServerQps();
 
@@ -227,6 +227,20 @@ module.controller('RedisServerController', [ '$scope', '$http', '$timeout',
 				});
 			};
 			$scope.refresh();
+
+			$scope.setTime = function(val) {
+				$scope.endTime = $scope.endTime + val * 3600 * 1000;
+				if ($scope.endTime > new Date().getTime())
+					$scope.endTime = new Date().getTime();
+				renderGraph2("/redis/historydata",$scope.address, "container",
+						$scope.endTime, $http);
+			}
+
+			$scope.setNow = function() {
+				$scope.endTime = new Date().getTime();
+				renderGraph2("/redis/historydata",$scope.address, "container",
+						$scope.endTime, $http);
+			}
 			$scope.getRedisHistoryData();
 
 		} ]);
