@@ -208,7 +208,7 @@ public class DockerScale implements AutoScale{
 //		}
 	
 		String OPERATION_RESULT_URL = "http://10.3.21.21:8080/api/v1/operations/";
-		String resultstr = RequestUtil.sendGet(OPERATION_RESULT_URL + 675, null);
+		String resultstr = RequestUtil.sendGet(OPERATION_RESULT_URL + 670, null);
 		Result result = new Result();
 		DockerResultParse.parse(result,resultstr);
 		System.out.println(result.getInstances().size());
@@ -216,7 +216,7 @@ public class DockerScale implements AutoScale{
 			System.out.println(ins.getIp() +"  --   " + ins.getAgentip());
 			//if(des.contains(ins.getIp())){
 				//System.out.println(ins.getInstanceid());
-				//destroyStatic("redis10",ins.getInstanceid());
+				destroyStatic("redis10",ins.getInstanceid());
 			//}
 		}
 	}

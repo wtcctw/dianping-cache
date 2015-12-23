@@ -9,7 +9,6 @@ import java.util.Map;
 import redis.clients.jedis.Jedis;
 
 import com.dianping.cache.monitor.statsdata.RedisClusterData;
-import com.dianping.cache.scale.impl.RedisConnectionFactory;
 
 import static com.dianping.cache.scale.cluster.redis.RedisManager.getClusterCache;
 
@@ -59,11 +58,12 @@ public class RedisDashBoardUtil {
     }
 
     public static Map<String, Object> getRedisServerData(String address) {
-        Jedis jedis = RedisConnectionFactory.getConnection(address);
+        String[] server = address.split(":");
+        Jedis jedis = new Jedis(server[0],6379);
         String info = jedis.info();
+        jedis.close();
         return parseRedisInfo(info);
     }
-
 
     private static Map<String, Object> parseRedisInfo(String infoString) {
         Map<String, Object> data = new HashMap<String, Object>();
@@ -80,17 +80,6 @@ public class RedisDashBoardUtil {
     private static float convert(float value) {
         int tmp = Math.round(value * 10000);
         return (float) (tmp / 100.0);
-    }
-
-    public static void main(String[] args) {
-        Jedis jedis = RedisConnectionFactory.getConnection("10.3.21.26:");
-        String info = jedis.info();
-        List<String> data = jedis.configGet("*");
-        for (String a : data) {
-            System.out.println(a);
-        }
-        System.out.println(info);
-        parseRedisInfo(info);
     }
 
 }
