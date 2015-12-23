@@ -1,7 +1,8 @@
 package com.dianping.cache.alarm.receiver;
 
-import com.dianping.ba.base.organizationalstructure.api.user.UserService;
-import com.dianping.ba.base.organizationalstructure.api.user.dto.UserDto;
+
+import com.dianping.ba.hris.md.api.dto.EmployeeDto;
+import com.dianping.ba.hris.md.api.service.EmployeeService;
 import com.dianping.cache.alarm.utils.DateUtil;
 import com.dianping.cache.util.CollectionUtils;
 import com.dianping.ops.cmdb.CmdbManager;
@@ -11,17 +12,17 @@ import com.dianping.ops.http.HttpConfig;
 import com.dianping.ops.http.HttpGetter;
 import com.dianping.ops.http.HttpResult;
 import org.apache.http.client.utils.URIBuilder;
-import org.dom4j.*;
+import org.dom4j.Attribute;
+import org.dom4j.Document;
+import org.dom4j.DocumentException;
+import org.dom4j.DocumentHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-
-import javax.xml.bind.Element;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -31,11 +32,15 @@ import java.util.List;
 public class ReceiverServiceImpl implements ReceiverService {
 
     @Autowired
-    private UserService userServiceReceiver;
+    private EmployeeService employeeService;
 
-    public List<String> getSmsReceiver(String smsReceiver, String domain) throws URISyntaxException, DocumentException, InterruptedException {
+    public List<String> getSmsReceiver(String smsReceiver, String domain, boolean sendToBusiness) throws URISyntaxException, DocumentException, InterruptedException {
 
-        List<String> defalutReceiver = getDefaultReceiver(domain);
+        List<String> defalutReceiver = null;
+        if (sendToBusiness) {
+            defalutReceiver = getDefaultReceiver(domain);
+        }
+
 
         List<String> adReceiverList = CollectionUtils.toList(smsReceiver, ",");
         if (null != defalutReceiver) {
@@ -44,7 +49,7 @@ public class ReceiverServiceImpl implements ReceiverService {
         List<String> smsReceiverList = new ArrayList<String>();
 
         for (String receiver : adReceiverList) {
-            List<UserDto> userDtoList = userServiceReceiver.queryUserByKeyword(receiver);
+            List<EmployeeDto> userDtoList = employeeService.queryEmployeeByKeyword(receiver);
             smsReceiverList.add(userDtoList.get(0).getMobileNo());
         }
 
@@ -53,9 +58,13 @@ public class ReceiverServiceImpl implements ReceiverService {
 
     }
 
-    public List<String> getWeiXinReceiver(String weiXinReceiver, String domain) throws InterruptedException, DocumentException, URISyntaxException {
+    public List<String> getWeiXinReceiver(String weiXinReceiver, String domain, boolean sendToBusiness) throws InterruptedException, DocumentException, URISyntaxException {
 
-        List<String> defalutReceiver = getDefaultReceiver(domain);
+        List<String> defalutReceiver = null;
+        if (sendToBusiness) {
+            defalutReceiver = getDefaultReceiver(domain);
+        }
+
 
         List<String> adReceiverList = CollectionUtils.toList(weiXinReceiver, ",");
 
@@ -65,17 +74,21 @@ public class ReceiverServiceImpl implements ReceiverService {
         List<String> weiXinReceiverList = new ArrayList<String>();
 
         for (String receiver : adReceiverList) {
-            List<UserDto> userDtoList = userServiceReceiver.queryUserByKeyword(receiver);
-            weiXinReceiverList.add(userDtoList.get(0).getSerialNumber());
+            List<EmployeeDto> userDtoList = employeeService.queryEmployeeByKeyword(receiver);
+            weiXinReceiverList.add(userDtoList.get(0).getEmployeeId());
         }
 
         return weiXinReceiverList;
 
     }
 
-    public List<String> getMailReceiver(String mailReceiver, String domain) throws InterruptedException, DocumentException, URISyntaxException {
+    public List<String> getMailReceiver(String mailReceiver, String domain, boolean sendToBusiness) throws InterruptedException, DocumentException, URISyntaxException {
 
-        List<String> defalutReceiver = getDefaultReceiver(domain);
+        List<String> defalutReceiver = null;
+        if (sendToBusiness) {
+            defalutReceiver = getDefaultReceiver(domain);
+        }
+
 
         List<String> adReceiverList = CollectionUtils.toList(mailReceiver, ",");
 
@@ -85,7 +98,7 @@ public class ReceiverServiceImpl implements ReceiverService {
         List<String> mailReceiverList = new ArrayList<String>();
 
         for (String receiver : adReceiverList) {
-            List<UserDto> userDtoList = userServiceReceiver.queryUserByKeyword(receiver);
+            List<EmployeeDto> userDtoList = employeeService.queryEmployeeByKeyword(receiver);
             mailReceiverList.add(userDtoList.get(0).getEmail());
         }
 
@@ -159,12 +172,11 @@ public class ReceiverServiceImpl implements ReceiverService {
         return defaultReceiverList;
     }
 
-
-    public UserService getUserServiceReceiver() {
-        return userServiceReceiver;
+    public EmployeeService getEmployeeService() {
+        return employeeService;
     }
 
-    public void setUserServiceReceiver(UserService userServiceReceiver) {
-        this.userServiceReceiver = userServiceReceiver;
+    public void setEmployeeService(EmployeeService employeeService) {
+        this.employeeService = employeeService;
     }
 }

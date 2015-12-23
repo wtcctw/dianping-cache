@@ -1,7 +1,5 @@
 package com.dianping.cache.alarm.controller.dto;
 
-import com.dianping.cache.alarm.AlarmType;
-
 import java.util.Date;
 
 /**
@@ -28,6 +26,8 @@ public class AlarmConfigDto {
     private boolean smsMode;
 
     private boolean weixinMode;
+
+    private boolean toBusiness;
 
     private Date createTime;
 
@@ -121,6 +121,14 @@ public class AlarmConfigDto {
 
     public void setWeixinMode(boolean weixinMode) {
         this.weixinMode = weixinMode;
+    }
+
+    public boolean isToBusiness() {
+        return toBusiness;
+    }
+
+    public void setToBusiness(boolean toBusiness) {
+        this.toBusiness = toBusiness;
     }
 
     public Date getCreateTime() {

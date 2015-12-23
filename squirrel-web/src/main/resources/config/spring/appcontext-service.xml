@@ -92,26 +92,14 @@
         <property name="timeout" value="5000" />
     </bean>
 
-    <bean id="userServiceReceiver" class="com.dianping.dpsf.spring.ProxyBeanFactory"
+    <bean id="masterDataEmployeeService" class="com.dianping.dpsf.spring.ProxyBeanFactory"
           init-method="init">
         <property name="serviceName"
-                  value="http://service.dianping.com/ba/base/organizationalstructure/UserService_1.0.0"/>
+                  value="http://service.dianping.com/ba/hris/masterdata/EmployeeService_1.0.0" />
         <property name="iface"
-                  value="com.dianping.ba.base.organizationalstructure.api.user.UserService"/>
-        <property name="serialize" value="hessian"/>
-        <property name="callMethod" value="sync"/>
-        <property name="timeout" value="5000"/>
-    </bean>
-
-    <bean id="organizationService" class="com.dianping.dpsf.spring.ProxyBeanFactory"
-          init-method="init">
-        <property name="serviceName"
-                  value="http://service.dianping.com/ba/base/organizationalstructure/OrganizationService_1.0.0"/>
-        <property name="iface"
-                  value="com.dianping.ba.base.organizationalstructure.api.organization.OrganizationService"/>
-        <property name="serialize" value="hessian"/>
-        <property name="callMethod" value="sync"/>
-        <property name="timeout" value="5000"/>
+                  value="com.dianping.ba.hris.md.api.service.EmployeeService"/>
+        <property name="callMethod" value="sync" />
+        <property name="timeout" value="5000" />
     </bean>
 
 

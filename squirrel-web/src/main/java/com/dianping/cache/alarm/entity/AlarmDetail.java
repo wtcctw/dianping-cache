@@ -27,6 +27,7 @@ public class AlarmDetail extends  AlarmConfig {
                 .setMailMode(alarmConfig.isMailMode())
                 .setSmsMode(alarmConfig.isSmsMode())
                 .setWeixinMode(alarmConfig.isWeixinMode())
+                .setToBusiness(alarmConfig.isToBusiness())
                 .setCreateTime(alarmConfig.getCreateTime())
                 .setUpdateTime(alarmConfig.getUpdateTime());
     }

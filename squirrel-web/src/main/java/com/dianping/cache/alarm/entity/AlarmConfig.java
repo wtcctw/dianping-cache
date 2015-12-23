@@ -27,6 +27,8 @@ public class AlarmConfig {
 
     private boolean weixinMode;
 
+    private boolean toBusiness;
+
     private Date createTime;
 
     private Date updateTime;
@@ -118,6 +120,15 @@ public class AlarmConfig {
 
     public AlarmConfig setWeixinMode(boolean weixinMode) {
         this.weixinMode = weixinMode;
+        return this;
+    }
+
+    public boolean isToBusiness() {
+        return toBusiness;
+    }
+
+    public AlarmConfig setToBusiness(boolean toBusiness) {
+        this.toBusiness = toBusiness;
         return this;
     }
 

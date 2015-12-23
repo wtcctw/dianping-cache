@@ -24,6 +24,7 @@ public class AlarmConfigMapper {
         alarmConfig.setMailMode(alarmConfigDto.isMailMode());
         alarmConfig.setSmsMode(alarmConfigDto.isSmsMode());
         alarmConfig.setWeixinMode(alarmConfigDto.isWeixinMode());
+        alarmConfig.setToBusiness(alarmConfigDto.isToBusiness());
         alarmConfig.setCreateTime(alarmConfigDto.getCreateTime());
         alarmConfig.setUpdateTime(alarmConfigDto.getUpdateTime());
 

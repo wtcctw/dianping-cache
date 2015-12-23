@@ -152,6 +152,7 @@ module
                 $scope.alarmConfigEntity.mailMode = $scope.searchPaginator.currentPageItems[index].mailMode;
                 $scope.alarmConfigEntity.smsMode = $scope.searchPaginator.currentPageItems[index].smsMode;
                 $scope.alarmConfigEntity.weixinMode = $scope.searchPaginator.currentPageItems[index].weixinMode;
+                $scope.alarmConfigEntity.toBusiness = $scope.searchPaginator.currentPageItems[index].toBusiness;
                 $scope.alarmConfigEntity.isUpdate = true;
             }
 

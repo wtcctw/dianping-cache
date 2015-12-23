@@ -5,16 +5,13 @@ import com.dianping.ba.es.qyweixin.adapter.api.dto.MessageDto;
 import com.dianping.ba.es.qyweixin.adapter.api.dto.media.TextDto;
 import com.dianping.ba.es.qyweixin.adapter.api.exception.QyWeixinAdaperException;
 import com.dianping.ba.es.qyweixin.adapter.api.service.MessageService;
-import com.dianping.cache.alarm.entity.AlarmDetail;
-import com.dianping.cache.alarm.entity.AlarmDetail;
 import com.dianping.cache.alarm.AlarmType;
+import com.dianping.cache.alarm.entity.AlarmDetail;
 import com.dianping.cache.alarm.receiver.ReceiverService;
-import com.dianping.cache.alarm.receiver.ReceiverServiceImpl;
 import com.dianping.cache.config.ConfigChangeListener;
 import com.dianping.cache.config.ConfigManager;
 import com.dianping.cache.config.ConfigManagerLoader;
 import com.dianping.cache.monitor.Constants;
-import com.dianping.cache.support.spring.SpringLocator;
 import com.dianping.cache.util.RequestUtil;
 import com.dianping.lion.Environment;
 import com.dianping.mailremote.remote.MailService;
@@ -22,9 +19,7 @@ import com.dianping.pigeon.remoting.ServiceFactory;
 import org.dom4j.DocumentException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 
-import javax.sound.midi.Receiver;
 import java.net.URISyntaxException;
 import java.util.*;
 
@@ -138,17 +133,19 @@ public abstract class Event {
 
         String receiver = alarmDetail.getReceiver();
 
+        boolean sendToBusiness = alarmDetail.isToBusiness();
+
         if (enableNotify) {
             if (alarmDetail.isMailMode()) {
-                notifyEmail(title, message, receiver,domain);
+                notifyEmail(title, message, receiver,domain,sendToBusiness);
             }
 //            notifySms(message, receiver);
 //            if (isProductEnv()) {
             if (alarmDetail.isSmsMode()) {
-                notifySms(message, receiver,domain);
+                notifySms(message, receiver,domain,sendToBusiness);
             }
             if (alarmDetail.isWeixinMode()) {
-                notifyWeixin(message, receiver,domain);
+                notifyWeixin(message, receiver,domain,sendToBusiness);
             }
 //            }
         }
@@ -160,13 +157,13 @@ public abstract class Event {
 
     }
 
-    public boolean notifyEmail(String title, String message, String receiver, String domain) throws InterruptedException, DocumentException, URISyntaxException {
+    public boolean notifyEmail(String title, String message, String receiver, String domain, boolean sendToBusiness) throws InterruptedException, DocumentException, URISyntaxException {
 
         Map<String, String> subPair = new HashMap<String, String>();
         subPair.put("title", title);
         subPair.put("body", message);
 
-        List<String> emailList = receiverService.getMailReceiver(receiver, domain);
+        List<String> emailList = receiverService.getMailReceiver(receiver, domain,sendToBusiness);
 
         boolean result = mailService.send(emailType, emailList, subPair, "");
 
@@ -176,11 +173,11 @@ public abstract class Event {
         return result;
     }
 
-    public boolean notifySms(String message, String receiver, String domain) throws DocumentException, InterruptedException, URISyntaxException {
+    public boolean notifySms(String message, String receiver, String domain, boolean sendToBusiness) throws DocumentException, InterruptedException, URISyntaxException {
         Map<String, String> subPair = new HashMap<String, String>();
         subPair.put("body", message);
 //        String[] mobiles = smsList.split(",");
-        List<String> mobiles = receiverService.getSmsReceiver(receiver, domain);
+        List<String> mobiles = receiverService.getSmsReceiver(receiver, domain,sendToBusiness);
 
         boolean success = true;
         for (String mobile : mobiles) {
@@ -195,12 +192,12 @@ public abstract class Event {
         return success;
     }
 
-    public void notifyWeixin(String message, String receiver, String domain) throws InterruptedException, DocumentException, URISyntaxException {
+    public void notifyWeixin(String message, String receiver, String domain, boolean sendToBusiness) throws InterruptedException, DocumentException, URISyntaxException {
         TextDto text = new TextDto();
         text.setContent(message);
         List<String> users = new ArrayList<String>();
 //        users.addAll(CollectionUtils.toList(weixinList, ","));
-        users.addAll(receiverService.getWeiXinReceiver(receiver, domain));
+        users.addAll(receiverService.getWeiXinReceiver(receiver, domain,sendToBusiness));
         MessageDto messageDto = new MessageDto();
         messageDto.setAgentid(weixinType);
         messageDto.setMediaDto(text);

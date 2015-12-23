@@ -53,6 +53,10 @@
                                     <span class="label arrowed-in" ng-class="{'label-success':e.weixinMode==true,'label-danger':e.weixinMode==false}">
                                         <i class="bigger-110" ng-class="{'ace-icon fa fa-check':e.weixinMode==true,'ace-icon fa fa-times':e.weixinMode==false}">微信</i>
                                     </span>
+                                    <span class="label arrowed-in" ng-class="{'label-success':e.toBusiness==true,'label-danger':e.toBusiness==false}">
+                                        <i class="bigger-110" ng-class="{'ace-icon fa fa-check':e.toBusiness==true,'ace-icon fa fa-times':e.toBusiness==false}">业务线</i>
+                                    </span>
+
                                 </span>
                             </td>
 
@@ -164,6 +168,9 @@
                                         <input type="checkbox"  ng-model="alarmConfigEntity.smsMode" name="smsMode">
                                         &nbsp&nbsp微信：
                                         <input type="checkbox"  ng-model="alarmConfigEntity.weixinMode" name="weixinMode">
+                                        &nbsp&nbsp是否发送业务线:
+                                        <input type="checkbox"  ng-model="alarmConfigEntity.toBusiness" name="toBusiness">
+
                                     </div>
                                 </div>
                                 <div class="control-group" style="margin-top: 20px;text-align: center;">

@@ -20,19 +20,19 @@
             <div>
                 <!--row  -->
                 <div class="row">
-                    <table
+                    <table style="table-layout: fixed;"
                             class="table table-bordered table-striped table-condensed  table-hover">
                         <tr>
-                            <th>序号</th>
-                            <th>标题</th>
-                            <th>内容</th>
-                            <th>时间</th>
+                            <th style="text-align: center; width: 20px">序号</th>
+                            <th style="text-align: center; width: 60px">标题</th>
+                            <th style="text-align: center; width: 400px">内容</th>
+                            <th style="text-align: center; width: 80px">时间</th>
                         </tr>
                         <tr ng-repeat="m in searchPaginator.currentPageItems">
-                            <td style="text-align: center">{{$index+1}}</td>
-                            <td style="text-align: center">{{m.alarmTitle}}</td>
-                            <td style="text-align: center" class="row-table-td">{{m.alarmDetail}}</td>
-                            <td style="text-align: center">{{m.createTime |
+                            <td style="text-align: center; width: 20px">{{$index+1}}</td>
+                            <td style="text-align: center; width: 60px">{{m.alarmTitle}}</td>
+                            <td style="text-align: center; width: 400px" class="row-table-td">{{m.alarmDetail}}</td>
+                            <td style="text-align: center; width: 80px">{{m.createTime |
                                 date:'yyyy-MM-dd HH:mm:ss'}}</td>
                         </tr>
                     </table>
