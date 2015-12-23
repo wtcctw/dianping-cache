@@ -1,4 +1,4 @@
-package com.dianping.cache.scale1.cluster.redis;
+package com.dianping.cache.scale.cluster.redis;
 
 import java.util.*;
 import java.util.concurrent.Executors;
@@ -93,6 +93,7 @@ public class RedisManager {
 					conn.close();
 				}
 			}
+			deleteNode.close();
 			refreshCache(cluster);
 			return true;
 		}

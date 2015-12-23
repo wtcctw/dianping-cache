@@ -1,4 +1,4 @@
-package com.dianping.cache.scale1.cluster.redis;
+package com.dianping.cache.scale.cluster.redis;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -11,9 +11,9 @@ import org.slf4j.LoggerFactory;
 
 import redis.clients.jedis.Jedis;
 
-import com.dianping.cache.scale1.cluster.Cluster;
-import com.dianping.cache.scale1.cluster.Server;
-import com.dianping.cache.scale1.exceptions.ScaleException;
+import com.dianping.cache.scale.cluster.Cluster;
+import com.dianping.cache.scale.cluster.Server;
+import com.dianping.cache.scale.exceptions.ScaleException;
 
 public class RedisCluster implements Cluster<RedisNode>{
 	
@@ -53,9 +53,7 @@ public class RedisCluster implements Cluster<RedisNode>{
 	}
 	
 	public List<RedisServer> getAllAliveServer(){
-		if(nodes == null && serverList != null){
-			loadClusterInfo();
-		}
+		loadClusterInfo();
 		List<RedisServer> servers = new ArrayList<RedisServer>();
 		for(RedisNode node : nodes){
 			if(node.getMaster().isAlive())

@@ -1,4 +1,4 @@
-package com.dianping.cache.scale1.instance;
+package com.dianping.cache.scale.instance;
 
 import java.util.ArrayList;
 import java.util.List;

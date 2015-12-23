@@ -1,4 +1,4 @@
-package com.dianping.cache.scale1.instance;
+package com.dianping.cache.scale.instance;
 
 public enum AppId {
 	redis10("redis10", 1, 6379), redis15("redis15", 1, 6379), redis30(

@@ -1,4 +1,4 @@
-package com.dianping.cache.scale1.cluster.redis;
+package com.dianping.cache.scale.cluster.redis;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -12,7 +12,7 @@ import org.apache.commons.lang.StringUtils;
 
 import redis.clients.jedis.Jedis;
 
-import com.dianping.cache.scale1.cluster.Server;
+import com.dianping.cache.scale.cluster.Server;
 
 public class RedisServer extends Server {
 

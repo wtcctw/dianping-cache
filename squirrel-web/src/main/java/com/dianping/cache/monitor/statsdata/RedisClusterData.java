@@ -1,12 +1,11 @@
 package com.dianping.cache.monitor.statsdata;
 
-import com.dianping.cache.scale1.cluster.redis.RedisNode;
-import com.dianping.cache.scale1.cluster.redis.RedisServer;
+import com.dianping.cache.scale.cluster.redis.RedisNode;
+import com.dianping.cache.scale.cluster.redis.RedisServer;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 
 public class RedisClusterData {

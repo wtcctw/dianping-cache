@@ -208,7 +208,7 @@ public class DockerScale implements AutoScale{
 //		}
 	
 		String OPERATION_RESULT_URL = "http://10.3.21.21:8080/api/v1/operations/";
-		String resultstr = RequestUtil.sendGet(OPERATION_RESULT_URL + 311, null);
+		String resultstr = RequestUtil.sendGet(OPERATION_RESULT_URL + 675, null);
 		Result result = new Result();
 		DockerResultParse.parse(result,resultstr);
 		System.out.println(result.getInstances().size());

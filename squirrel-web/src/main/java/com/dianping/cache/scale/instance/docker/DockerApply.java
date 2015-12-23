@@ -1,4 +1,4 @@
-package com.dianping.cache.scale1.instance.docker;
+package com.dianping.cache.scale.instance.docker;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -8,11 +8,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.dianping.cache.entity.Server;
-import com.dianping.cache.scale1.instance.AppId;
-import com.dianping.cache.scale1.instance.Apply;
-import com.dianping.cache.scale1.instance.Instance;
-import com.dianping.cache.scale1.instance.Result;
-import com.dianping.cache.scale1.instance.docker.DockerResultParse.OperateResult;
+import com.dianping.cache.scale.instance.AppId;
+import com.dianping.cache.scale.instance.Apply;
+import com.dianping.cache.scale.instance.Instance;
+import com.dianping.cache.scale.instance.Result;
+import com.dianping.cache.scale.instance.docker.DockerResultParse.OperateResult;
 import com.dianping.cache.service.ServerService;
 import com.dianping.cache.support.spring.SpringLocator;
 import com.dianping.cache.util.RequestUtil;
@@ -167,32 +167,37 @@ public class DockerApply implements Apply{
 								delOperationId = opid.getOperationId();
 							} catch (Exception e) {
 								logger.error("ShutDown docker container failed,cause by Parse operationid with error !" + e);
+								break;
 							}
 							while(true){
 								response = RequestUtil.sendGet(OPERATION_RESULT_URL + delOperationId, null);
 								try{
 									result = objectMapper.readValue(response, OperateResult.class);
 									if(result.getOperationStatus() == 200){
-										logger.info("Remove docker instances success ! appId : " + appId + " \n instancesId : " + instances);
 										for(String instance : instances){
+											logger.info("Remove docker instances success ! appId : " + appId + " \n instancesId : " + instance);
 											serverService.deleteByInstanceId(instance);
 										}
+										break;
 									}else if(result.getOperationStatus() == 500){
 										logger.error("Delete instances error,need to remove instance manal !" + result.getLog());
+										break;
 									}
 									Thread.sleep(500);
 								} catch (Exception e) {
 									logger.error("Delete instances error,need to remove instance manal !" + e);
+									break;
 								}
 							}
 							
 						} else if (result.getOperationStatus() == 500) {
-							logger.error("ShutDown instances " + paras
-									+ "  failed,need to remove instance manal !");
+							logger.error("ShutDown instances " + paras + "  failed,need to remove instance manal !");
+							break;
 						}
 						Thread.sleep(100);
 					} catch (Exception e) {
 						logger.error("ShutDown instances with Parse OperateResult with error,need to remove instance manal !" + e);
+						break;
 					}
 				}
 				

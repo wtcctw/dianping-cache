@@ -50,7 +50,7 @@
         <appender-ref  ref="monitorAppender"/>
     </logger>
 
-	<logger name="com.dianping.cache.scale1" additivity="false">
+	<logger name="com.dianping.cache.scale" additivity="false">
 		<level value="INFO"/>
 		<appender-ref  ref="scaleAppender"/>
 	</logger>

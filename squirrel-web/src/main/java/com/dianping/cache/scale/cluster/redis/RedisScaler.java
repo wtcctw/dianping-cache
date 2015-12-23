@@ -1,6 +1,5 @@
-package com.dianping.cache.scale1.cluster.redis;
+package com.dianping.cache.scale.cluster.redis;
 
-import java.awt.image.LookupOp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -8,11 +7,11 @@ import com.dianping.cache.support.spring.SpringLocator;
 
 import com.dianping.cache.entity.CacheConfiguration;
 import com.dianping.cache.entity.Server;
-import com.dianping.cache.scale1.exceptions.ScaleException;
-import com.dianping.cache.scale1.instance.AppId;
-import com.dianping.cache.scale1.instance.Apply;
-import com.dianping.cache.scale1.instance.Result;
-import com.dianping.cache.scale1.instance.docker.DockerApply;
+import com.dianping.cache.scale.exceptions.ScaleException;
+import com.dianping.cache.scale.instance.AppId;
+import com.dianping.cache.scale.instance.Apply;
+import com.dianping.cache.scale.instance.Result;
+import com.dianping.cache.scale.instance.docker.DockerApply;
 import com.dianping.cache.service.CacheConfigurationService;
 import com.dianping.cache.service.ServerService;
 import com.dianping.cache.util.ParseServersUtil;
