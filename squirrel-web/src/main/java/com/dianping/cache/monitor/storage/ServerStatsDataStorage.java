@@ -10,15 +10,13 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-import com.dianping.squirrel.common.util.JsonUtils;
-import org.codehaus.jackson.map.ObjectMapper;
-
 import com.dianping.cache.entity.Server;
 import com.dianping.cache.entity.ServerStats;
 import com.dianping.cache.service.ServerService;
 import com.dianping.cache.service.ServerStatsService;
+import com.dianping.cache.support.spring.SpringLocator;
 import com.dianping.cache.util.RequestUtil;
-import com.dianping.combiz.spring.context.SpringLocator;
+import com.dianping.squirrel.common.util.JsonUtils;
 
 public class ServerStatsDataStorage extends AbstractStatsDataStorage {
 	
@@ -72,19 +70,20 @@ public class ServerStatsDataStorage extends AbstractStatsDataStorage {
 		new ServerStatsDataStorage().storage();
 
 	}
+	
 	protected void init(){
 		setPool(Executors.newFixedThreadPool(5));
 		serverService = SpringLocator.getBean("serverService");
 		serverStatsService = SpringLocator.getBean("serverStatsService");
 	}
+	
 	private void refreshZabbixInfo() {
 		logger.info("Refresh Zabbix Info !");
 		ZabbixInfo zb = this.getZbInfo();
 		String result;
-		ObjectMapper objectMapper = new ObjectMapper();
 		try {
 			result = RequestUtil.sendPost(ZBURL,this.getAuthJson());
-			AuthenResult ar = objectMapper.readValue(result, AuthenResult.class);
+			AuthenResult ar = JsonUtils.fromStr(result, AuthenResult.class);
 			zb.setAuthToken(ar.getResult());
 		} catch (Exception e) {
 			logger.error("Convert AuthenResult from Zabbix response error ! "+e);
@@ -95,7 +94,7 @@ public class ServerStatsDataStorage extends AbstractStatsDataStorage {
 			try {
 				ServerInfo serverInfo = parseServer(server.getAddress());
 				result = RequestUtil.sendPost(ZBURL,this.getHostJson(serverInfo.ip));
-				Result hr = objectMapper.readValue(result, Result.class);
+				Result hr = JsonUtils.fromStr(result, Result.class);
 				List<Map<String, String>> items =hr.getResult();
 				if(items.size() < 1)
 					continue;
@@ -368,7 +367,6 @@ public class ServerStatsDataStorage extends AbstractStatsDataStorage {
 	
 	private class InsertData implements Runnable{
 		private Map.Entry<String, String> host;
-		private ObjectMapper objectMapper;
 		private Set<String> itemKey ;
 		
 		public InsertData(){}
@@ -376,11 +374,10 @@ public class ServerStatsDataStorage extends AbstractStatsDataStorage {
 		public InsertData(Map.Entry<String, String> host){
 			this.host = host;
 			itemKey = zbInfo.getItemTokey();
-			objectMapper = new ObjectMapper();
 		}
+		
 		@Override
 		public void run() {
-			// TODO Auto-generated method stub
 			logger.info("Start to collect data");
 			String server = host.getKey();
 			String hostid = host.getValue();
@@ -395,7 +392,7 @@ public class ServerStatsDataStorage extends AbstractStatsDataStorage {
 			result = RequestUtil.sendPost(ZBURL,params);
 
 			try {
-				Result ir = objectMapper.readValue(result, Result.class);
+				Result ir = JsonUtils.fromStr(result, Result.class);
 				List<Map<String, String>> items = ir.getResult();
 				Map<String, String> stats = new HashMap<String, String>();
 				for (Map<String, String> item : items) {
