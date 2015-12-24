@@ -14,6 +14,7 @@ import redis.clients.jedis.exceptions.JedisClusterException;
 import com.dianping.cache.service.CacheConfigurationService;
 import com.dianping.cache.support.spring.SpringLocator;
 import com.dianping.cache.util.ParseServersUtil;
+import redis.clients.jedis.exceptions.JedisConnectionException;
 
 public class RedisManager {
 	
@@ -52,6 +53,9 @@ public class RedisManager {
 		try {
 			RedisServer m = new RedisServer(master);
 			RedisServer s = new RedisServer(slave);
+			if(!checkPort(s,60000)){
+				return;
+			}
 			String masterNodeId = getNodeId(m);
 			Jedis mJedis = new Jedis(m.getIp(), m.getPort());
 			mJedis.clusterMeet(s.getIp(), s.getPort());
@@ -65,7 +69,25 @@ public class RedisManager {
 		} finally {
 		}
 	}
-	
+	private static boolean checkPort(RedisServer redisServer,long timeout) throws InterruptedException {
+		Jedis jedis = new Jedis(redisServer.getIp(),redisServer.getPort());
+		JedisConnectionException ex = null;
+		long wait = 0;
+		while (wait < timeout){
+			try {
+				if (jedis.ping().contains("PONG")){
+					jedis.close();
+					return true;
+				}
+			}catch (JedisConnectionException e){
+				Thread.sleep(1000);
+				wait += 1000;
+				ex = e;
+			}
+		}
+		logger.error("TimeOut for wait " + redisServer.getAddress() + " response .",ex);
+		return false;
+	}
 	public static boolean removeServer(String cluster,String address) {
 		refreshCache(cluster);
 		RedisCluster rc = clusterCache.get(cluster);

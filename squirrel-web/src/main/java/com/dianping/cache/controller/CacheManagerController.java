@@ -5,18 +5,13 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.ServiceLoader;
 import java.util.Set;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.dianping.cache.controller.dto.CategoryParams;
@@ -24,16 +19,9 @@ import com.dianping.cache.controller.dto.ConfigurationParams;
 import jodd.util.StringUtil;
 import net.spy.memcached.AddrUtil;
 import net.spy.memcached.MemcachedClient;
-import net.spy.memcached.MemcachedNode;
 import net.spy.memcached.internal.OperationFuture;
 
 import org.codehaus.plexus.util.StringUtils;
-import org.dom4j.Attribute;
-import org.dom4j.Document;
-import org.dom4j.DocumentException;
-import org.dom4j.DocumentHelper;
-import org.dom4j.Element;
-import org.mortbay.util.ajax.JSON;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
@@ -48,7 +36,6 @@ import com.dianping.cache.service.*;
 import com.dianping.cache.service.condition.CacheKeyConfigSearchCondition;
 import com.dianping.cache.service.condition.OperationLogSearchCondition;
 import com.dianping.cache.util.NetUtil;
-import com.dianping.cache.util.RequestUtil;
 import com.dianping.core.type.PageModel;
 import com.dianping.squirrel.client.StoreClient;
 import com.dianping.squirrel.client.StoreClientFactory;
@@ -445,7 +432,6 @@ public class CacheManagerController extends AbstractCacheController {
 	}
 	
 	@RequestMapping(value = "/cache/operator")
-	@ResponseBody
 	public ModelAndView viewCacheOperator() {
 		subside = "operator";
 		return new ModelAndView("cache/operator", createViewMap());

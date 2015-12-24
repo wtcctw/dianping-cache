@@ -7,10 +7,6 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.dianping.cache.alarm.controller.dto.AlarmConfigDto;
-import com.dianping.cache.alarm.controller.mapper.AlarmConfigMapper;
-import com.dianping.cache.alarm.entity.MemcacheAlarmConfig;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
