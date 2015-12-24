@@ -19,9 +19,12 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.dianping.cache.controller.dto.CategoryParams;
+import com.dianping.cache.controller.dto.ConfigurationParams;
 import jodd.util.StringUtil;
 import net.spy.memcached.AddrUtil;
 import net.spy.memcached.MemcachedClient;
+import net.spy.memcached.MemcachedNode;
 import net.spy.memcached.internal.OperationFuture;
 
 import org.codehaus.plexus.util.StringUtils;
@@ -34,10 +37,7 @@ import org.mortbay.util.ajax.JSON;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.dianping.avatar.exception.DuplicatedIdentityException;
@@ -57,8 +57,6 @@ import com.dianping.squirrel.client.core.Locatable;
 
 @Controller
 public class CacheManagerController extends AbstractCacheController {
-
-	private Map<String, String> operationStatus = new HashMap<String, String>();
 
 	@Resource(name = "cacheConfigurationService")
 	private CacheConfigurationService cacheConfigurationService;
@@ -81,22 +79,20 @@ public class CacheManagerController extends AbstractCacheController {
 	@Resource(name = "categoryToAppService")
 	private CategoryToAppService categoryToAppService;
 
-	@RequestMapping(value = "/cache/config", method = RequestMethod.GET)
-	public ModelAndView viewCacheConfig(HttpServletRequest request,
-			HttpServletResponse response) {
-
+	@RequestMapping(value = "/cache/config")
+	public ModelAndView viewCacheConfig() {
 		subside = "config";
 		return new ModelAndView("cache/config", createViewMap());
 	}
 
-	@RequestMapping(value = "/cache/config/edit", method = RequestMethod.GET)
+	@RequestMapping(value = "/cache/config/edit")
 	public ModelAndView viewCacheConfigEdit() {
 
 		subside = "config";
 		return new ModelAndView("cache/configedit", createViewMap());
 	}
 
-	@RequestMapping(value = "/cache/config/new", method = RequestMethod.GET)
+	@RequestMapping(value = "/cache/config/new")
 	public ModelAndView viewCacheConfigNew() {
 
 		subside = "config";
@@ -104,59 +100,43 @@ public class CacheManagerController extends AbstractCacheController {
 	}
 
 	// 根据集群名获取集群配置
-	@RequestMapping(value = "/cache/config/find", method = RequestMethod.GET, produces = "application/json; charset=utf-8")
+	@RequestMapping(value = "/cache/config/find")
 	@ResponseBody
-	public Object findByCacheKey(@RequestParam("cacheKey") String cacheKey) {
+	public Object findByCacheKey(@RequestParam("cacheKey") String cacheKey,@RequestParam("swimlane") String swimlane ) {
 		subside = "config";
 		Map<String, Object> paras = super.createViewMap();
 
-		CacheConfiguration config = cacheConfigurationService.find(cacheKey);
+		CacheConfiguration config = cacheConfigurationService.findWithSwimLane(cacheKey,swimlane);
 		paras.put("config", config);
 		return paras;
 	}
 
-	@RequestMapping(value = "/cache/config/validate_port", method = RequestMethod.GET, produces = "application/json; charset=utf-8")
+	@RequestMapping(value = "/cache/config/validate_port")
 	@ResponseBody
-	public Object manualAdd(@RequestParam("ip") String ip,
-			@RequestParam("port") String port) {
+	public Map<String, Object> manualAdd(@RequestParam("ip") String ip,
+										 @RequestParam("port") String port) {
 		subside = "config";
 		Map<String, Object> paras = super.createViewMap();
 		boolean flag = true;
 		MemcachedClient client = null;
 		try {
 			client = new MemcachedClient(AddrUtil.getAddresses(ip + ":" + port));
-			logger.info("Try to test MemcachedClient with Address" + ip + ":"
-					+ port);
-			OperationFuture<Boolean> result = client.set("connect-test-key1",
-					20, "connect-test-value1");
+			OperationFuture<Boolean> result = client.set("connect-test-key1", 20, "connect-test-value1");
 			result.get(1000, TimeUnit.MILLISECONDS);
-		} catch (InterruptedException e) {
+		} catch (Throwable e) {
 			flag = false;
-			logger.info("Get memcached Connection with InterruptedException");
-		} catch (TimeoutException e) {
-			flag = false;
-			logger.info("Get memcached Connection with TimeoutException");
-		} catch (ExecutionException e) {
-			flag = false;
-			logger.info("Get memcached Connection with ExecutionException");
-		} catch (Exception e) {
-			flag = false;
-			logger.info("IOException while test MemcachedClient Connection.");
 		} finally {
 			if (client != null) {
 				client.shutdown();
-				logger.info("MemcachedClient with Address" + ip + ":" + port
-						+ "stoped");
 			}
 		}
 		paras.put("flag", flag);
 		return paras;
 	}
 
-	@RequestMapping(value = "/cache/config/findAll", method = RequestMethod.GET, produces = "application/json; charset=utf-8")
+	@RequestMapping(value = "/cache/config/findAll")
 	@ResponseBody
-	public Object configSearch(HttpServletRequest request,
-			HttpServletResponse response) {
+	public Object configSearch() {
 		subside = "config";
 		Map<String, Object> paras = super.createViewMap();
 
@@ -167,10 +147,10 @@ public class CacheManagerController extends AbstractCacheController {
 
 	@RequestMapping(value = "/cache/config/update", method = RequestMethod.POST)
 	public void configUpdate(@RequestParam("key") String cacheKey,
-			@RequestParam("clientClazz") String clientClazz,
-			@RequestParam("servers") String servers,
-			@RequestParam("transcoderClazz") String transcoderClazz,
-			HttpServletResponse response) {
+							 @RequestParam("clientClazz") String clientClazz,
+							 @RequestParam("servers") String servers,
+							 @RequestParam("swimlane") String swimlane,
+							 @RequestParam("transcoderClazz") String transcoderClazz) {
 		subside = "config";
 		CacheConfiguration newConfig = new CacheConfiguration();
 
@@ -178,12 +158,12 @@ public class CacheManagerController extends AbstractCacheController {
 		newConfig.setClientClazz(clientClazz);
 		newConfig.setServers(servers);
 		newConfig.setTranscoderClazz(transcoderClazz);
-
+		newConfig.setSwimlane(swimlane);
 		cacheConfigurationService.update(newConfig);
 
 	}
 
-	@RequestMapping(value = "/cache/config/updateServers", method = RequestMethod.POST, produces = "application/json; charset=utf-8")
+	@RequestMapping(value = "/cache/config/updateServers")
 	@ResponseBody
 	public Object configUpdateServers(@RequestParam("key") String cacheKey,
 			@RequestParam("newservers") String newservers,
@@ -214,17 +194,17 @@ public class CacheManagerController extends AbstractCacheController {
 		return paras;
 	}
 
-	@RequestMapping(value = "/cache/config/addServer", method = RequestMethod.POST, produces = "application/json; charset=utf-8")
+	@RequestMapping(value = "/cache/config/addServer")
 	@ResponseBody
 	public Object configAddServer(@RequestParam("key") String cacheKey,
-			@RequestParam("server") String server,
-			@RequestParam("oldservers") String oldservers,
-			HttpServletResponse response) {
+								  @RequestParam("server") String server,
+								  @RequestParam("swimlane") String swimlane,
+								  @RequestParam("oldservers") String oldservers) {
 		subside = "config";
 		Map<String, Object> paras = super.createViewMap();
 		boolean flag = false;
 		// 获取数据库中最新的 servers 信息 对比看是否有变化
-		CacheConfiguration oldConfig = cacheConfigurationService.find(cacheKey);
+		CacheConfiguration oldConfig = cacheConfigurationService.findWithSwimLane(cacheKey,swimlane);
 		if ((oldservers != null && oldservers.equals(oldConfig.getServers()))
 				|| ("".equals(oldservers) && oldConfig.getServers() == null)) {
 			List<String> serverList;
@@ -233,112 +213,84 @@ public class CacheManagerController extends AbstractCacheController {
 			} else {
 				serverList = new ArrayList<String>(oldConfig.getServerList());
 			}
-
 			serverList.add(server);
 			oldConfig.setServerList(serverList);
 			oldConfig.setAddTime(System.currentTimeMillis());
 			cacheConfigurationService.update(oldConfig);
 			try {
-				serverService.insert(server, null, null,0,null);
-				serverClusterService.insert(server, cacheKey);
-				ServerStatsDataStorage.REFRESH = true;
+				serverService.insert(server, null, null, 0, null);
 			} catch (DuplicateKeyException e) {
 				// do nothing
+			} finally {
+				serverClusterService.insert(server, cacheKey);
+				ServerStatsDataStorage.REFRESH = true;
 			}
 			flag = true;
 		} else {
 			// 数据库信息有变化 不执行更新
-
 		}
 		paras.put("flag", flag);
 		return paras;
 	}
 
-	@RequestMapping(value = "/cache/config/deleteServer", method = RequestMethod.POST, produces = "application/json; charset=utf-8")
+	@RequestMapping(value = "/cache/config/deleteServer")
 	@ResponseBody
-	public Object configReduceServer(@RequestParam("key") String cacheKey,
-			@RequestParam("server") String server,
-			@RequestParam("oldservers") String oldservers,
-			HttpServletResponse response) {
+	public Map<String, Object> configReduceServer(@RequestParam("key") String cacheKey,
+									 @RequestParam("server") String server,
+									 @RequestParam("swimlane") String swimlane,
+									 @RequestParam("oldservers") String oldservers) {
 		subside = "config";
 		Map<String, Object> paras = super.createViewMap();
 		boolean flag = false;
 		// 获取数据库中最新的 servers 信息 对比看是否有变化
-		CacheConfiguration oldConfig = cacheConfigurationService.find(cacheKey);
+		CacheConfiguration oldConfig = cacheConfigurationService.findWithSwimLane(cacheKey,swimlane);
 		if (oldservers != null && oldservers.equals(oldConfig.getServers())) {
-			
-			//判断是否需要关闭该sever 对应的 memcached 实例
-			if(requireCacheClose(server,cacheKey)){
-				
-				Server stemp = serverService.findByAddress(server);
-				
-				//判断  是docker中实例  还是手动起的
-				if (stemp.getInstanceId() != null) {
-					// 对 docker 中的实例 删除
-					flag = true;
-					String str = RequestUtil.sendPost(
-							"http://10.3.21.21:8080/api/v1/instances/app/"
-									+ stemp.getAppId() + "/shutdown",
-									"{\"instances\":[\"" + stemp.getInstanceId()
-									+ "\"]}");
-					Map json = (Map) JSON.parse(str);
-					Long operationId = (Long) json.get("operationId");
-					operationStatus.put(operationId.toString()+"server", server);
-					operationStatus.put(operationId.toString(), cacheKey);
-					operationStatus.put("status" + operationId, "100");
-					operateShutDown(operationId.toString(), stemp.getAppId(),
-							stemp.getInstanceId());
-					paras.put("operationId", operationId);
-					
-				} else {
-					// 老版本 手动起的实例    这里跟 不需要关闭服务端   直接从集群配置中删除该实例ip  步骤是一样的
-					deleteServerFromCache(server, cacheKey);
-				}
-				
-			}else{
-				//不需要关闭服务端   直接从集群配置中删除该实例ip
-				deleteServerFromCache(server, cacheKey);
-			}
 
-		} else {
-			// 数据库信息有变化 不执行更新
+			//判断是否需要关闭该sever 对应的 memcached 实例
+			if (requireCacheClose(server, cacheKey)) {
+
+				Server stemp = serverService.findByAddress(server);
+				if (stemp.getInstanceId() != null) {
+					// TODO
+					flag = true;
+				} else {
+					deleteServerFromCache(server, cacheKey,swimlane);
+				}
+			} else {
+				deleteServerFromCache(server, cacheKey,swimlane);
+			}
 		}
 		paras.put("flag", flag);
 		return paras;
 	}
 
-	@RequestMapping(value = "/cache/config/create", method = RequestMethod.POST, produces = "application/json; charset=utf-8")
+	@RequestMapping(value = "/cache/config/create")
 	@ResponseBody
-	public Object configCreate(@RequestParam("key") String cacheKey,
-			@RequestParam("clientClazz") String clientClazz,
-			@RequestParam("servers") String servers,
-			@RequestParam("transcoderClazz") String transcoderClazz,
-			HttpServletResponse response) {
+	public Map<String, Object> configCreate(@RequestBody ConfigurationParams configurationParams) {
 		subside = "config";
 		Map<String, Object> paras = super.createViewMap();
 		boolean flag = true;
 		CacheConfiguration newConfig = new CacheConfiguration();
-
-		// 非法输入 在ehcache 中   transcoderClazz servers 可以为空   
-		if (StringUtil.isBlank(cacheKey) || StringUtil.isBlank(clientClazz)) {
+		if (StringUtil.isBlank(configurationParams.getCacheKey()) || StringUtil.isBlank(configurationParams.getClientClazz())) {
 			flag = false;
 		} else {
-			newConfig.setCacheKey(cacheKey);
-			newConfig.setClientClazz(clientClazz);
-			if("".equals(servers))
-				servers = null;
-			newConfig.setServers(servers);
-			newConfig.setTranscoderClazz(transcoderClazz);
+			newConfig.setCacheKey(configurationParams.getCacheKey());
+			newConfig.setSwimlane(configurationParams.getSwimlane());
+			newConfig.setClientClazz(configurationParams.getClientClazz());
+			newConfig.setServers(configurationParams.getServers());
+			newConfig.setTranscoderClazz(configurationParams.getTranscoderClazz());
 			try {
 				cacheConfigurationService.create(newConfig);
 			} catch (DuplicatedIdentityException e) {
 				flag = false;
 			}
-			if(flag && cacheKey.contains("memcached") && servers!=null){
-				for(String server : newConfig.getServerList()){
-					try{
-						serverService.insert(server, null, null,0,null);
-						serverClusterService.insert(server, cacheKey);
+			if (flag && configurationParams.getCacheKey().contains("memcached")
+					&& configurationParams.getServers() != null
+					&& StringUtil.isBlank(configurationParams.getSwimlane())) {
+				for (String server : newConfig.getServerList()) {
+					try {
+						serverService.insert(server, null, null, 0, null);
+						serverClusterService.insert(server, configurationParams.getCacheKey());
 					} catch (DuplicateKeyException e) {
 					}
 				}
@@ -349,283 +301,40 @@ public class CacheManagerController extends AbstractCacheController {
 		return paras;
 	}
 
-	@RequestMapping(value = "/cache/config/delete", method = RequestMethod.POST)
-	public void configDelete(@RequestParam("key") String cacheKey,
-			HttpServletResponse response) {
+	@RequestMapping(value = "/cache/config/delete")
+	@ResponseBody
+	public Boolean configDelete(@RequestBody ConfigurationParams configurationParams) {
 		subside = "config";
-
-		CacheConfiguration newConfig = new CacheConfiguration();
-		newConfig.setCacheKey(cacheKey);
-
-		cacheConfigurationService.delete(cacheKey);
-		//TODO   delete some info on servers and server_cluster
-
+		cacheConfigurationService.deleteWithSwimLane(configurationParams.getCacheKey(),configurationParams.getSwimlane());
+		return Boolean.TRUE;
 	}
 
-	@RequestMapping(value = "/cache/config/clear", method = RequestMethod.POST)
+	@RequestMapping(value = "/cache/config/clear")
+	@ResponseBody
 	public void configClear(@RequestParam("cacheKey") String cacheKey,
-			@RequestParam("ipKey") String ipKey, HttpServletResponse response) {
+							@RequestParam("ipKey") String ipKey) {
 		subside = "config";
-
 		CacheConfiguration newConfig = new CacheConfiguration();
 		newConfig.setCacheKey(cacheKey);
-
 		cacheConfigurationService.clearByKey(cacheKey, ipKey);
-
 	}
 
-	@RequestMapping(value = "/cache/config/baseInfo", method = RequestMethod.GET, produces = "application/json; charset=utf-8")
-	@ResponseBody
-	public Object configInfo(HttpServletResponse response) {
-		String[] impl = { "com.dianping.cache.memcached.MemcachedClientImpl",
-				"com.dianping.cache.ehcache.EhcacheClientImpl" };
-		String[] coder = { "com.dianping.cache.memcached.HessianTranscoder",
-				"com.dianping.cache.memcached.KvdbTranscoder" };
-		Map<String, Object> p = new HashMap<String, Object>();
-		p.put("impl", impl);
-		p.put("coder", coder);
-
-		ServiceLoader<StoreClient> loader = ServiceLoader
-				.load(StoreClient.class);
-		for (StoreClient implClass : loader) {
-			System.out.println(implClass.getClass().toString());
-		}
-		// 转换成json格式
-		return p;
-
-	}
-
-	@RequestMapping(value = "/cache/config/scale", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	@ResponseBody
-	public Object scale(@RequestParam("app_id") String app_id,
-			@RequestParam("cacheKey") String cacheKey) {
-		String str = RequestUtil.sendPost("http://10.3.21.21:8080/api/v1/apps/"
-				+ app_id + "/scale", "{\"instanceCount\" : 1}");
-		Map json = (Map) JSON.parse(str);
-		Long operationId = (Long) json.get("operationId");
-		operationStatus.put(operationId.toString(), cacheKey);
-		operationStatus.put("status" + operationId, "100");
-		operate(app_id, operationId.toString());// 处理
-		Map<String, Object> paras = super.createViewMap();
-		paras.put("operationId", operationId.longValue());
-		return paras;
-	}
-
-
-	private void operateShutDown(final String operationId, final String appId,
-			final String instanceId) {
-		Runnable runnable = new Runnable() {
-
-			@Override
-			public void run() {
-				while (true) {
-
-					String str = RequestUtil.sendGet(
-							"http://10.3.21.21:8080/api/v1/operations/"
-									+ operationId, null);
-					Map json = (Map) JSON.parse(str);
-					long paasOperationStatus = (Long) json.get("operationStatus");
-					if (paasOperationStatus == 200) {
-						operationStatus.put("status" + operationId, "200");
-						String result = RequestUtil.sendPost(
-								"http://10.3.21.21:8080/api/v1/instances/app/"
-										+ appId + "/delete",
-								"{\"instances\":[\"" + instanceId + "\"]}");
-						
-						
-						Map jsonresult = (Map) JSON.parse(result);
-						
-						Long reduceOperationId = (Long) jsonresult.get("operationId");
-						operationStatus.put("status" + reduceOperationId, "100");
-						
-						//传递 server  cacheKey 至 reduceOperationId
-						String cacheKey = operationStatus.get(operationId);
-						operationStatus.put(reduceOperationId.toString(), cacheKey);
-						String server = operationStatus.get(operationId+"server");
-						operationStatus.put(reduceOperationId.toString()+"server", server);
-						
-						operateReduce(reduceOperationId.toString());// 轮训处理
-						break;
-					} else if (paasOperationStatus == 100) {// doing
-						operationStatus.put("status" + operationId, "100");
-					} else {// failed
-						operationStatus.put("status" + operationId, "110");
-						break;
-					}
-
-					try {
-						Thread.sleep(1000);
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					}
-
-				}
-			}
-
-		};
-		Thread t = new Thread(runnable);
-		t.start();
-	}
-
-	private void operateReduce(final String operationId) {
-		Runnable runnable = new Runnable() {
-
-			@Override
-			public void run() {
-				while (true) {
-
-					String str = RequestUtil.sendGet(
-							"http://10.3.21.21:8080/api/v1/operations/"
-									+ operationId, null);
-					Map json = (Map) JSON.parse(str);
-					long paasOperationStatus = (Long) json
-							.get("operationStatus");
-					if (paasOperationStatus == 200) {
-						operationStatus.put("status" + operationId, "200");
-						
-						String server = operationStatus.get(operationId+"server");
-						String cacheKey = operationStatus.get(operationId);
-						deleteServerFromCache(server,cacheKey);
-						
-						break;
-					} else if (paasOperationStatus == 100) {// doing
-						operationStatus.put("status" + operationId, "100");
-					} else {// failed
-						operationStatus.put("status" + operationId, "110");
-						break;
-					}
-
-					try {
-						Thread.sleep(1000);
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					}
-
-				}
-			}
-
-		};
-		Thread t = new Thread(runnable);
-		t.start();
-	}
-
-	private void operate(final String appId, final String operationId) {
-
-		Runnable runnable = new Runnable() {
-			@Override
-			public void run() {
-
-				while (true) {
-
-					String str = RequestUtil.sendGet(
-							"http://10.3.21.21:8080/api/v1/operations/"
-									+ operationId, null);
-					Map json = (Map) JSON.parse(str);
-					long paasOperationStatus = (Long) json
-							.get("operationStatus");
-					if (paasOperationStatus == 200) {
-
-						String log = (String) json.get("log");
-						try {
-							Document document = DocumentHelper.parseText(log);
-							Element root = document.getRootElement();
-							Element detail = root.element("host-operation");
-							Attribute ipattribute = detail
-									.attribute("instance-ip");
-							String ipvalue = ipattribute.getText();
-							Attribute portattribute = detail.attribute("port");
-							String portvalue = portattribute.getText();// 该值是 80
-							Attribute idattribute = detail
-									.attribute("instance-id");
-							String instanceId = idattribute.getText();
-
-							CacheConfiguration config = cacheConfigurationService
-									.find(operationStatus.get(operationId));
-							if (config != null) {
-								List<String> serverList;
-								if (config.getServers() == null) {
-									serverList = new ArrayList<String>();
-								} else {
-									serverList = new ArrayList<String>(config.getServerList());
-								}
-								serverList.add(ipvalue + ":11211");
-								config.setServerList(serverList);
-								cacheConfigurationService.update(config);
-
-								try {
-									serverService.insert(ipvalue + ":11211",
-											appId, instanceId,0,null);
-								} catch (DuplicateKeyException e) {
-									// do nothing
-								}
-
-								operationStatus.put("status" + operationId,
-										"200");
-								operationStatus
-										.put("ip" + operationId, ipvalue);
-								operationStatus.put("port" + operationId,
-										"11211");
-							} else {
-								// TODO config == null
-							}
-
-							break;
-						} catch (DocumentException e) {
-							// 根据 operationId 销毁实例
-							logger.error("DocumentException cann't parse the PAAS returned log !");
-						}
-
-					} else if (paasOperationStatus == 100) {// doing
-						operationStatus.put("status" + operationId, "100");
-					} else {// failed
-						operationStatus.put("status" + operationId, "110");
-						break;
-					}
-
-					try {
-						Thread.sleep(1000);
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					}
-
-				}
-			}
-
-		};
-
-		Thread t = new Thread(runnable);
-		t.start();
-	}
-
-	@RequestMapping(value = "/cache/config/operateResult", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	@ResponseBody
-	public Object operateResult(@RequestParam("operationId") String operationId) {
-		Map<String, Object> paras = super.createViewMap();
-		paras.put("status", operationStatus.get("status" + operationId));
-		paras.put("ip", operationStatus.get("ip" + operationId));
-		paras.put("port", operationStatus.get("port" + operationId));
-		return paras;
-	}
-
-
-
-	@RequestMapping(value = "/cache/key", method = RequestMethod.GET)
+	@RequestMapping(value = "/cache/key")
 	public ModelAndView viewCacheKey() {
 		subside = "key";
 		return new ModelAndView("cache/key", createViewMap());
 	}
 
-	@RequestMapping(value = "/cache/key/search", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "/cache/key/search")
 	@ResponseBody
-	public Object keySearch(@RequestParam("category") String category,
-			@RequestParam("cacheType") String cacheType,
-			@RequestParam("pageId") int pageId, HttpServletResponse response) {
+	public Map<String, Object> keySearch(@RequestParam("category") String category,
+							@RequestParam("cacheType") String cacheType,
+							@RequestParam("pageId") int pageId) {
 		subside = "key";
 
 		PageModel pageModel = new PageModel();
 		pageModel.setPage(pageId);
 		pageModel.setPageSize(20);
-		// 设置搜索条件
 		CacheKeyConfigSearchCondition condition = new CacheKeyConfigSearchCondition();
 		String _category = null;
 		String _cacheType = null;
@@ -635,28 +344,22 @@ public class CacheManagerController extends AbstractCacheController {
 		if (StringUtils.isNotBlank(cacheType)) {
 			_cacheType = cacheType;
 		}
-
 		condition.setCacheType(_cacheType);
 		condition.setCategory(_category);
-
-		// 数据库检索
-		PageModel result = cacheKeyConfigurationService.paginate(pageModel,
-				condition);
+		PageModel result = cacheKeyConfigurationService.paginate(pageModel,condition);
 		List<?> recodes = result.getRecords();
 		Map<String, Object> paras = super.createViewMap();
 		paras.put("entitys", recodes);
 		paras.put("page", result.getPage());
 		paras.put("totalpage", result.getPageCount());
 		return paras;
-
 	}
 
-	@RequestMapping(value = "/cache/key/findAllCategory", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "/cache/key/findAllCategory")
 	@ResponseBody
-	public Object findAllCategory() {
+	public Map<String, Object> findAllCategory() {
 
-		List<CacheKeyConfiguration> result = cacheKeyConfigurationService
-				.findAll();
+		List<CacheKeyConfiguration> result = cacheKeyConfigurationService.findAll();
 		Set<String> categorySet = new HashSet<String>();
 		Set<String> cacheTypeSet = new HashSet<String>();
 		for (CacheKeyConfiguration item : result) {
@@ -666,12 +369,10 @@ public class CacheManagerController extends AbstractCacheController {
 		Map<String, Object> paras = super.createViewMap();
 		paras.put("cacheTypeSet", cacheTypeSet);
 		paras.put("categorySet", categorySet);
-
 		return paras;
-
 	}
 
-	@RequestMapping(value = "/cache/key/findByCategory", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "/cache/key/findByCategory")
 	@ResponseBody
 	public Object findByCategory(@RequestParam("category") String category) {
 		if (category == null) {
@@ -682,40 +383,21 @@ public class CacheManagerController extends AbstractCacheController {
 		return result;
 	}
 
-	@RequestMapping(value = "/cache/key/create", method = RequestMethod.POST)
-	public void creatCacheKey(@RequestParam("category") String category,
-			@RequestParam("cacheType") String cacheType,
-			@RequestParam("duration") String duration,
-			@RequestParam("indexTemplate") String indexTemplate,
-			@RequestParam("indexDesc") String indexDesc,
-			@RequestParam("version") String version,
-			@RequestParam("hot") String hot,
-			@RequestParam("sync2Dnet") String sync2Dnet,
-			@RequestParam("extension") String extension,
-			HttpServletResponse response) {
+	@RequestMapping(value = "/cache/key/create")
+	@ResponseBody
+	public void creatCacheKey(@RequestBody CategoryParams categoryParams) {
 
 		subside = "key";
-
-		if ("".equals(hot)) {
-			hot = "false";
-		}
-		if ("".equals(sync2Dnet)) {
-			sync2Dnet = "false";
-		}
-		if("".equals(extension)){
-			extension = null;
-		}
 		CacheKeyConfiguration newCacheKey = new CacheKeyConfiguration();
-		newCacheKey.setCategory(category);
-		newCacheKey.setCacheType(cacheType);
-		newCacheKey.setDuration(duration);
-		newCacheKey.setHot(Boolean.parseBoolean(hot));
-		newCacheKey.setIndexTemplate(indexTemplate);
-		newCacheKey.setIndexDesc(indexDesc);
-		newCacheKey.setSync2Dnet(Boolean.parseBoolean(sync2Dnet));
+		newCacheKey.setCategory(categoryParams.getCategory());
+		newCacheKey.setCacheType(categoryParams.getCacheType());
+		newCacheKey.setDuration(categoryParams.getDuration());
+		newCacheKey.setHot(categoryParams.isHot());
+		newCacheKey.setIndexTemplate(categoryParams.getIndexTemplate());
+		newCacheKey.setIndexDesc(categoryParams.getIndexDesc());
+		newCacheKey.setSync2Dnet(categoryParams.isSync2Dnet());
 		newCacheKey.setVersion(0);
-		newCacheKey.setExtension(extension);
-
+		newCacheKey.setExtension(categoryParams.getExtension());
 		try {
 			cacheKeyConfigurationService.create(newCacheKey);
 		} catch (DuplicatedIdentityException e) {
@@ -723,73 +405,53 @@ public class CacheManagerController extends AbstractCacheController {
 
 	}
 
-	@RequestMapping(value = "/cache/key/update", method = RequestMethod.POST)
-	public void updateCacheKey(@RequestParam("category") String category,
-			@RequestParam("cacheType") String cacheType,
-			@RequestParam("duration") String duration,
-			@RequestParam("indexTemplate") String indexTemplate,
-			@RequestParam("indexDesc") String indexDesc,
-			@RequestParam("version") String version,
-			@RequestParam("hot") String hot,
-			@RequestParam("sync2Dnet") String sync2Dnet,
-			@RequestParam("extension") String extension,
-			HttpServletResponse response) {
-
-		subside = "key";
-
-		CacheKeyConfiguration newCacheKey = new CacheKeyConfiguration();
-		newCacheKey.setCategory(category);
-		newCacheKey.setCacheType(cacheType);
-		newCacheKey.setDuration(duration);
-		newCacheKey.setHot(Boolean.parseBoolean(hot));
-		newCacheKey.setIndexTemplate(indexTemplate);
-		newCacheKey.setIndexDesc(indexDesc);
-		newCacheKey.setSync2Dnet(Boolean.parseBoolean(sync2Dnet));
-		newCacheKey.setVersion(0);
-		newCacheKey.setExtension(extension);
-		// update
-		cacheKeyConfigurationService.update(newCacheKey);
-
-	}
-
-	@RequestMapping(value = "/cache/key/delete", method = RequestMethod.POST)
-	public void deleteCacheKeyByCategory(
-			@RequestParam("category") String category,
-			HttpServletResponse response) {
-
-		subside = "key";
-		cacheKeyConfigurationService.delete(category);
-
-	}
-
-	@RequestMapping(value = "/cache/key/clear", method = RequestMethod.POST)
-	public void clearCacheKeyByCategory(
-			@RequestParam("category") String category,
-			HttpServletResponse response) {
-
-		subside = "key";
-		// 清除缓存并没有真正的清除该缓存的category，而是增加了version的值。
-		cacheConfigurationService.clearByCategory(category);
-
-	}
-
-	@RequestMapping(value = "/cache/key/applist", method = RequestMethod.POST)
+	@RequestMapping(value = "/cache/key/update")
 	@ResponseBody
-	public List<CategoryToApp> getAppList(@RequestParam("category")String category) {
+	public void updateCacheKey(@RequestBody CategoryParams categoryParams) {
+
 		subside = "key";
-		List<CategoryToApp> applist = categoryToAppService.findByCategory(category);
-		return applist;
+		CacheKeyConfiguration newCacheKey = new CacheKeyConfiguration();
+		newCacheKey.setCategory(categoryParams.getCategory());
+		newCacheKey.setCacheType(categoryParams.getCacheType());
+		newCacheKey.setDuration(categoryParams.getDuration());
+		newCacheKey.setHot(categoryParams.isHot());
+		newCacheKey.setIndexTemplate(categoryParams.getIndexTemplate());
+		newCacheKey.setIndexDesc(categoryParams.getIndexDesc());
+		newCacheKey.setSync2Dnet(categoryParams.isSync2Dnet());
+		newCacheKey.setVersion(categoryParams.getVersion());
+		newCacheKey.setExtension(categoryParams.getExtension());
+		cacheKeyConfigurationService.update(newCacheKey);
+	}
+
+	@RequestMapping(value = "/cache/key/delete")
+	@ResponseBody
+	public void deleteCacheKeyByCategory(@RequestBody CategoryParams categoryParams) {
+		subside = "key";
+		cacheKeyConfigurationService.delete(categoryParams.getCategory());
+	}
+
+	@RequestMapping(value = "/cache/key/clear")
+	@ResponseBody
+	public void clearCacheKeyByCategory(@RequestBody CategoryParams categoryParams) {
+		subside = "key";
+		cacheConfigurationService.clearByCategory(categoryParams.getCategory());
+	}
+
+	@RequestMapping(value = "/cache/key/applist")
+	@ResponseBody
+	public List<CategoryToApp> getAppList(@RequestBody CategoryParams categoryParams) {
+		subside = "key";
+		return categoryToAppService.findByCategory(categoryParams.getCategory());
 	}
 	
-	@RequestMapping(value = "/cache/operator", method = RequestMethod.GET)
-	public ModelAndView viewCacheOperator(HttpServletRequest request) {
-
+	@RequestMapping(value = "/cache/operator")
+	@ResponseBody
+	public ModelAndView viewCacheOperator() {
 		subside = "operator";
 		return new ModelAndView("cache/operator", createViewMap());
-
 	}
 
-	@RequestMapping(value = "/cache/operator/search", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "/cache/operator/search")
 	@ResponseBody
 	public Object operatorSearch(@RequestParam("operator") String operator,
 			@RequestParam("content") String content,
@@ -978,8 +640,8 @@ public class CacheManagerController extends AbstractCacheController {
 		return !hasServer;
 	}
 	
-	private void deleteServerFromCache(String server,String cacheKey){
-		CacheConfiguration config = cacheConfigurationService.find(cacheKey);
+	private void deleteServerFromCache(String server,String cacheKey,String swimlane){
+		CacheConfiguration config = cacheConfigurationService.findWithSwimLane(cacheKey,swimlane);
 		List<String> serverList = new ArrayList<String>(config.getServerList());
 		server = server.trim();
 		serverList.remove(server);

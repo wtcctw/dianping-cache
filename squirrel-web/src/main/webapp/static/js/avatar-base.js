@@ -1,8 +1,8 @@
 //var module = angular.module('SwallowModule', ['ngResource','isteven-multi-select']);
 //Your app's root module...
 var module = angular.module('CacheModule', ['ngResource', 'ngDialog'], function($httpProvider) {
-  // Use x-www-form-urlencoded Content-Type
-  $httpProvider.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded;charset=utf-8';
+  // **Use x-www-form-urlencoded Content-Type
+  //$httpProvider.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded;charset=utf-8';
 
   /**
    * The workhorse; converts an object to x-www-form-urlencoded serialization.
@@ -40,15 +40,15 @@ var module = angular.module('CacheModule', ['ngResource', 'ngDialog'], function(
     return query.length ? query.substr(0, query.length - 1) : query;
   };
 
-  // Override $http service's default transformRequest
-  $httpProvider.defaults.transformRequest = [function(data) {
-    return angular.isObject(data) && String(data) !== '[object File]' ? param(data) : data;
-  }];
+  //** Override $http service's default transformRequest
+ // $httpProvider.defaults.transformRequest = [function(data) {
+   //return angular.isObject(data) && String(data) !== '[object File]' ? param(data) : data;
+  //}];
 });
 
 module.config(function($locationProvider, $resourceProvider) {
 	// configure html5 to get links working on jsfiddle
-	$locationProvider.html5Mode(true);
+	//$locationProvider.html5Mode(true);
 });
 
 module.filter('strreplace', function() {
@@ -91,7 +91,7 @@ module.filter('split',function(){
 	};
 });
 module.config(function($locationProvider, $resourceProvider) {
-	// configure html5 to get links working on jsfiddle
+	//** configure html5 to get links working on jsfiddle
 	$locationProvider.html5Mode(true);
 });
 

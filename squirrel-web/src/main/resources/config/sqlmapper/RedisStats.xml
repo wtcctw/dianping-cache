@@ -10,31 +10,40 @@
 		<result column="serverId" property="serverId"/>
 		<result column="memory_used" property="memory_used"/>
 		<result column="curr_time" property="curr_time"/>
-		<result column="total_commands" property="total_commands"/>
 		<result column="total_connections" property="total_connections"/>
+		<result column="connected_clients" property="connected_clients"/>
+		<result column="qps" property="qps"/>
+		<result column="input_kbps" property="input_kbps"/>
+		<result column="output_kbps" property="output_kbps"/>
+		<result column="used_cpu_sys" property="used_cpu_sys"/>
+		<result column="used_cpu_user" property="used_cpu_user"/>
+		<result column="used_cpu_sys_children" property="used_cpu_sys_children"/>
+		<result column="used_cpu_user_children" property="used_cpu_user_children"/>
 	</resultMap>
 
 	<insert id="insert" parameterType="RedisStats">
-		INSERT INTO redis_stats(serverId,curr_time, memory_used,total_commands,total_connections)
-		VALUES(#{serverId},#{curr_time}, #{memory_used},#{total_commands},#{total_connections})
+		INSERT INTO redis_stats(serverId,curr_time, memory_used,total_connections,connected_clients,
+				qps,input_kbps,output_kbps,used_cpu_sys,used_cpu_user,used_cpu_sys_children,used_cpu_user_children)
+		VALUES(#{serverId},#{curr_time}, #{memory_used},#{total_connections},#{connected_clients},
+			  #{qps},#{input_kbps},#{output_kbps},#{used_cpu_sys},#{used_cpu_user},#{used_cpu_sys_children},#{used_cpu_user_children})
 	</insert>
 	
 	
 	<select id="findByServer" resultMap="RedisStatsResult" parameterType="String">
-   		SELECT id, serverId, curr_time,memory_used,total_commands,total_connections
+   		SELECT *
    		FROM redis_stats
    		WHERE serverId = select id from servers where address = #{server}
    		ORDER BY id DESC
 	</select>
 	
 	<select id="findAll" resultMap="RedisStatsResult">
-		SELECT id, serverId, curr_time,memory_used, total_commands, total_connections
+		SELECT *
    		FROM redis_stats
    		ORDER BY id DESC
 	</select>
 
 	<select id="findLast" resultMap="RedisStatsResult" >
-		SELECT id, serverId,curr_time, memory_used, total_commands, total_connections
+		SELECT *
    		FROM redis_stats
    		WHERE serverId = select id from servers where address = #{server}
    		ORDER BY id DESC
@@ -43,9 +52,9 @@
 	
 	<select id="findByServerWithInterval" resultMap="RedisStatsResult" parameterType="map">
 		<![CDATA[
-		SELECT r.id,serverId,curr_time, memory_used, total_commands, total_connections
-   		FROM redis_stats AS  r  JOIN servers AS s ON  r.serverId = s.id
-   		WHERE r.curr_time >= #{start} AND r.curr_time <= #{end} AND  s.address = #{address}
+		SELECT *
+   		FROM redis_stats 
+   		WHERE curr_time >= #{start} AND curr_time <= #{end} AND serverId = (select id from servers  where address = #{address}) 
    		ORDER BY curr_time ASC 
 		 ]]>
 	</select>

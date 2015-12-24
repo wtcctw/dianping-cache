@@ -5,13 +5,15 @@ module.controller('ConfigNewController', [
 		'$timeout',
 		function($scope, $http,$timeout) {
 			
-			$scope.mCacheKey = "";
-			$scope.mClientClazz = "";
-			$scope.mServers = "";
-			$scope.servers = [];
-			
-			$scope.mTranscoderClazz = "";
-			
+			$scope.mCacheKey;
+			$scope.mClientClazz;
+			$scope.mServers;
+			$scope.mSwimLane;
+			$scope.servers;
+			$scope.mTranscoderClazz;
+			$scope.configurationParams;
+
+
 			
 			$scope.ip = "";
 			$scope.port = "11211";
@@ -98,7 +100,7 @@ module.controller('ConfigNewController', [
 						$('#modal-wizard2').modal('hide');
 					},3000);
 				});
-			};
+			}
 			
 			$scope.validate = function(address){
 				var add = address.split(":");
@@ -111,7 +113,7 @@ module.controller('ConfigNewController', [
 					var flag = response.flag;
 					return flag;
 				});
-			};
+			}
 			
 			$scope.reset = function(){
 				$scope.mCacheKey = "";
@@ -119,19 +121,24 @@ module.controller('ConfigNewController', [
 				$scope.mServers = "";
 				$scope.servers = [];
 				$scope.mTranscoderClazz = "";
-			};
+			}
+			$scope.wrapperParams = function(){
+				$scope.configurationParams = {};
+				$scope.configurationParams.cacheKey = $scope.mCacheKey;
+				$scope.configurationParams.clientClazz =  $scope.mClientClazz;
+				$scope.configurationParams.servers = $scope.mServers;
+				$scope.configurationParams.swimlane = $scope.mSwimLane;
+				$scope.configurationParams.transcoderClazz = $scope.mTranscoderClazz;
+			}
 
-			$scope.creatNew = function(myForm) {
+			$scope.creatNew = function() {
 				$scope.process = true;
 				$scope.success = false;
 				$scope.fail = false;
+				$scope.wrapperParams();
 				$('#modal-wizard3').modal('show');
-				$http.post(window.contextPath + '/cache/config/create', {
-					"key" : $scope.mCacheKey,
-					"clientClazz" : $scope.mClientClazz,
-					"servers" : $scope.mServers,
-					"transcoderClazz" : $scope.mTranscoderClazz
-				}).success(function(response) {
+				$http.post(window.contextPath + '/cache/config/create', $scope.configurationParams
+				).success(function(response) {
 					var flag = response.flag;
 					if(flag == true){
 						$scope.message3="新建配置成功";
@@ -144,13 +151,13 @@ module.controller('ConfigNewController', [
 						$scope.fail = true;
 					}
 					
-				}).error(function(response){
+				}).error(function(){
 					$scope.message3="新建配置失败";
 					$scope.process = false;
 					$scope.success = false;
 					$scope.fail = true;
 				});
-			};
+			}
 			
 			$scope.deleteServer = function(info){
 				$scope.servers.splice($.inArray(info,$scope.servers),1);
@@ -161,7 +168,7 @@ module.controller('ConfigNewController', [
 					}
 					$scope.mServers += $scope.servers[i]; 
 				}
-			};
+			}
 			
 			
 			
@@ -174,14 +181,20 @@ module.controller('ConfigNewController', [
 			
 			$scope.addRedisServer = function(){
 				$scope.serverTable.push($scope.redisServerIp + ":" + $scope.redisServerPort);
-			};
-			
-			
+			}
+
+
 			$scope.implItems = ["com.dianping.cache.memcached.MemcachedClientImpl",
-			                    "com.dianping.cache.ehcache.EhcacheClientImpl"];
-			
+				"com.dianping.cache.redis.RedisClientImpl",
+				"com.dianping.cache.danga.DangaClientImpl",
+				"com.dianping.cache.dcache.DCacheClientImpl",
+				"com.dianping.cache.ehcache.EhcacheClientImpl"];
+
 			$scope.coderItems = ["com.dianping.cache.memcached.HessianTranscoder",
-			     				"com.dianping.cache.memcached.KvdbTranscoder"];
+				"com.dianping.cache.redis.RedisTranscoder",
+				"com.dianping.cache.danga.DangaTranscoder",
+				"com.dianping.cache.dcache.HessianTranscoder",
+				"com.dianping.cache.memcached.KvdbTranscoder"];
 			
 			$scope.openModalForCreat = function(){
 				$http.get(window.contextPath + '/cache/config/baseInfo', {
@@ -191,13 +204,13 @@ module.controller('ConfigNewController', [
 					$scope.implItems = response.impl;
 					$scope.coderItems = response.coder;
 				});
-			};
+			}
 			
 			$scope.initarray = function(){
 				$scope.redisServer.push([1,2]);
 				$scope.redisServer.push([2,2]);
 				$scope.redisServer.push([3,2]);
-			};
+			}
 			$scope.initarray();
 			
 		} ]);

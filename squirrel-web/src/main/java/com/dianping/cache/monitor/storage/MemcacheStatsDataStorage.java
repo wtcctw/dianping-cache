@@ -1,19 +1,14 @@
 package com.dianping.cache.monitor.storage;
 
-import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.net.SocketAddress;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
-import javax.annotation.Resource;
-
+import com.dianping.cache.alarm.memcache.MemcacheAlarmer;
 import net.rubyeye.xmemcached.MemcachedClient;
-import net.rubyeye.xmemcached.exception.MemcachedException;
 
 import com.dianping.cache.entity.MemcacheStats;
 import com.dianping.cache.entity.Server;
@@ -24,7 +19,7 @@ import com.dianping.combiz.spring.context.SpringLocator;
 
 public class MemcacheStatsDataStorage extends AbstractStatsDataStorage{
 	
-	public static boolean START_MS = false;
+	public static boolean START_MS = true;
 	
 	private static final int DEFAULT_PORT = 11211;
 
@@ -34,8 +29,11 @@ public class MemcacheStatsDataStorage extends AbstractStatsDataStorage{
 	
 	private ExecutorService pool;
 
+	private MemcacheAlarmer memcacheAlarmer;
+
 	
 	public MemcacheStatsDataStorage(){
+		logger.info("start to store Memcached stats .");
 		init();
 		scheduled.scheduleWithFixedDelay(new Runnable(){
 
@@ -148,16 +146,8 @@ public class MemcacheStatsDataStorage extends AbstractStatsDataStorage{
 				 //insert
 				 memcacheStatsService.insert(msData);
 				 
-			} catch (IOException e) {
-				logger.error("Connect " + server.getAddress() +" with IOException ! when storage statsdata");
-			} catch (MemcachedException e) {
-				logger.error("Connect " + server.getAddress() +" with MemcachedException !when storage statsdata");
-			} catch (InterruptedException e) {
-				logger.error("Connect " + server.getAddress() +" with InterruptedException !when storage statsdata");
-			} catch (TimeoutException e) {
-				logger.error("Connect " + server.getAddress() +" with TimeoutException !when storage statsdata");
-			} catch (RuntimeException e){
-				logger.error("RuntimeException"+e);
+			}catch (Exception e){
+				logger.error("Stored Memcached stats encountered Exception : "+e);
 			}
 		}
 		public Server getServer() {

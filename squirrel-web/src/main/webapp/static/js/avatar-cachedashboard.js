@@ -5,7 +5,7 @@ module.controller('ClusterDashBoardController', [ '$scope', '$http',
 
 			$scope.transport = function(cacheKey) {
 				window.localStorage.cacheKey = cacheKey;
-			};
+			}
 
 			$scope.initDashBoard = function() {
 				$http.get(window.contextPath + '/monitor/dashboardinfo', {
@@ -22,6 +22,8 @@ module.controller('ClusterDashBoardController', [ '$scope', '$http',
 
 				});
 
-			};
+			}
+		
 			$scope.initDashBoard();
 		} ]);
+

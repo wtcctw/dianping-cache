@@ -38,6 +38,8 @@ public interface CacheConfigurationService {
 	List<CacheConfiguration> findAll();
 	
 	CacheConfiguration find(String key);
+
+	CacheConfiguration findWithSwimLane(String key,String swimlane);
 	
 	/**
 	 * 批量清除，仅清除Java端
@@ -80,6 +82,8 @@ public interface CacheConfigurationService {
 	CacheConfiguration update(CacheConfiguration config);
 	
 	void delete(String key);
+
+	void deleteWithSwimLane(String key,String swimlane);
 	
 	void incVersion(String category);
 	

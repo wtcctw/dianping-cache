@@ -12,6 +12,16 @@ public class CacheConfigurationRemoveDTO extends AbstractDTO{
 
     private String servers;
 
+	public String getSwimlane() {
+		return swimlane;
+	}
+
+	public void setSwimlane(String swimlane) {
+		this.swimlane = swimlane;
+	}
+
+	private String swimlane = "";
+
     private String transcoderClazz;
     
     private long addTime = System.currentTimeMillis();

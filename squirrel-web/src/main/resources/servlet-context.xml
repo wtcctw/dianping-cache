@@ -25,7 +25,7 @@
 			</bean>
 		</property>
 	</bean>
-	<context:component-scan base-package="com.dianping.cache.controller"></context:component-scan>
+	<context:component-scan base-package="com.dianping.cache"></context:component-scan>
 	<mvc:annotation-driven/>
 
 
@@ -59,6 +59,7 @@
 			<map>
 				<entry key="cache/*" value="layout/layoutcache.htm" />
 				<entry key="monitor/*" value="layout/layoutcache.htm" />
+				<entry key="alarm/*" value="layout/layoutcache.htm" />
 				<entry key="*" value="layout/layout.htm" />
 			</map>
 		</property>

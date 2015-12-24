@@ -58,8 +58,22 @@
 				</a></li> -->
 				
 			</ul></li>
+			<li class="#if($side == 'monitor') open #end">
+				<a href="#" class="dropdown-toggle"> <i class="menu-icon  fa fa-tachometer bigger-130"></i> <span
+					class="menu-text">告警</span> <b class="arrow fa fa-angle-down"></b>
+			</a>
+				<ul class="submenu" style="display: block;">
+
+					<li class="#if($subside == 'mdashboard') active #end"><a
+							href="${rc.contextPath}/setting/alarmrecord"> <i
+							class="icon-globe"></i> 告警记录
+					</a></li>
+					<li class="#if($subside == 'rdashboard') active #end"><a
+							href="${rc.contextPath}/setting/alarmrule"> <i
+							class="icon-globe"></i> 告警规则配置
+					</a></li>
+				</ul></li>
 	</ul>
-	<!-- /.nav-list -->
 
 	<div class="sidebar-collapse sidebar-toggle" id="sidebar-collapse">
 		<i class="ace-icon fa fa-angle-double-left" data-icon1="ace-icon fa fa-angle-double-left"

@@ -49,6 +49,11 @@
         <level value="INFO"/>
         <appender-ref  ref="monitorAppender"/>
     </logger>
+
+	<logger name="com.dianping.cache.scale1" additivity="false">
+		<level value="INFO"/>
+		<appender-ref  ref="scaleAppender"/>
+	</logger>
     
 	<logger name="com.dianping.avatar" additivity="false">
 		<appender-ref ref="avatarAppender" />

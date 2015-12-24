@@ -11,7 +11,7 @@ import com.dianping.squirrel.client.StoreKey;
 import com.dianping.squirrel.common.exception.StoreException;
 import com.dianping.squirrel.common.util.PathUtils;
 
-@Service(url = "com.dianping.cache.service.CacheTestService")
+
 public class CacheTestServiceImpl implements CacheTestService {
 
 	@Resource

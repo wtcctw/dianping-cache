@@ -18,6 +18,7 @@ package com.dianping.remote.cache.dto;
 import java.util.Arrays;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.apache.commons.lang.StringUtils;
 
 /**
@@ -26,6 +27,7 @@ import org.apache.commons.lang.StringUtils;
  * @author danson.liu
  * 
  */
+@JsonIgnoreProperties({"swimlane"})
 public class CacheConfigurationDTO extends AbstractDTO {
 
     private static final long serialVersionUID = -4167929878555896829L;
@@ -41,8 +43,10 @@ public class CacheConfigurationDTO extends AbstractDTO {
 
     private String servers;
 
+    private String swimlane;
+
     private String transcoderClazz;
-    
+
     private long addTime = System.currentTimeMillis();
     
     // For compatibility reason, reserve the two fields
@@ -120,5 +124,12 @@ public class CacheConfigurationDTO extends AbstractDTO {
     public void setDetail(CacheConfigDetailDTO detail) {
         this.detail = detail;
     }
-    
+
+    public String getSwimlane() {
+        return swimlane;
+    }
+
+    public void setSwimlane(String swimlane) {
+        this.swimlane = swimlane;
+    }
 }

@@ -16,86 +16,68 @@ module.factory('Paginator',function() {
 				});
 
 module.controller('ConfigController', [
-        '$rootScope',
-		'$scope',
-		'$http',
-		'Paginator','ngDialog',
-		function($rootScope,$scope, $http, Paginator,ngDialog) {
-			var fetchFunction = function(callback) {
-				$http.get(window.contextPath + $scope.suburl, {
-					params : {
-					}
-				}).success(callback);
-			};
-			
-			$scope.mCacheKey = "";
-			$scope.mClientClazz = "";
-			$scope.mServers = "";
-			$scope.mTranscoderClazz = "";
-			$scope.suburl = "/cache/config/findAll";
-			$scope.query = function() {
+    '$rootScope',
+    '$scope',
+    '$http',
+    'Paginator', 'ngDialog',
+    function ($rootScope, $scope, $http, Paginator, ngDialog) {
+        var fetchFunction = function (callback) {
+            $http.get(window.contextPath + $scope.suburl, {
+                params: {}
+            }).success(callback);
+        };
 
-				$scope.searchPaginator = Paginator(fetchFunction);
-			};
-			
-			$scope.setModalInput = function(key,clientClazz,servers,transcoderClazz){
-				$scope.mCacheKey = key;
-				$scope.mClientClazz = clientClazz;
-				$scope.mServers = servers;
-				$scope.mTranscoderClazz = transcoderClazz;
-			};
-			
-			$scope.transportToEdit = function(cacheKey, clientClazz, servers, transcoderClazz){
-				window.localStorage.cacheKey = cacheKey;
-				window.localStorage.clientClazz = clientClazz;
-				window.localStorage.servers = servers;
-				window.localStorage.transcoderClazz = transcoderClazz;
-			};
-			
-			$scope.refreshpage = function(myForm){
-				
-	        	$('#myModal').modal('hide');
-	        	
-		        $http.post(window.contextPath + '/cache/config/update',
-		        		{"key":$scope.mCacheKey,"clientClazz":$scope.mClientClazz,
-		        		"servers":$scope.mServers,"transcoderClazz":$scope.mTranscoderClazz}).success(function(response) {
-						$scope.searchPaginator = Paginator(fetchFunction);
-		        });
-	        	
-	        };
-			
-			$scope.configEdit = function(key,clientClazz,servers,transcoderClazz){
-				
-				$http.get(window.contextPath + '/cache/config/edit',
-		        	{"key":key,"clientClazz":clientClazz,
-	        		"servers":servers,"transcoderClazz":transcoderClazz});
-				
-			};
-			
-			$scope.creatNew = function(myForm){
+        $scope.mCacheKey;
+        $scope.mClientClazz;
+        $scope.mServers;
+        $scope.mTranscoderClazz;
+        $scope.mSwimLane;
+        $scope.configurationParams;
+        $scope.suburl = "/cache/config/findAll";
+        $scope.query = function () {
+            $scope.searchPaginator = Paginator(fetchFunction);
+        }
 
-				$('#myModal2').modal('hide');
-				
-				$http.post(window.contextPath + '/cache/config/create',
-	        		{"key":$scope.mCacheKey,"clientClazz":$scope.mClientClazz,
-	        		"servers":$scope.mServers,"transcoderClazz":$scope.mTranscoderClazz}).success(function(response) {
-					$scope.searchPaginator = Paginator(fetchFunction);
-	        	});
-			};
-			
-			$rootScope.deleteConfig = function(key){
-				$http.post(window.contextPath + '/cache/config/delete',
-	        			{"key":key}).success(function(response) {
-					$scope.searchPaginator = Paginator(fetchFunction);
-	        	});
-				return true;
-			};
-			
-			$scope.dialog = function(key) {
-				
-				$rootScope.mCacheKey = key;
-				ngDialog.open({
-							template : '\
+        $scope.setModalInput = function (key, clientClazz, servers, transcoderClazz) {
+            $scope.mCacheKey = key;
+            $scope.mClientClazz = clientClazz;
+            $scope.mServers = servers;
+            $scope.mTranscoderClazz = transcoderClazz;
+        }
+
+        $scope.wrapperParams = function(){
+            $scope.configurationParams = {};
+            $scope.configurationParams.cacheKey = $scope.mCacheKey;
+            $scope.configurationParams.clientClazz =  $scope.mClientClazz;
+            $scope.configurationParams.servers = $scope.mServers;
+            $scope.configurationParams.swimlane = $scope.mSwimLane;
+            $scope.configurationParams.transcoderClazz = $scope.mTranscoderClazz;
+        }
+        $scope.transportToEdit = function (cacheKey, clientClazz, swimlane, servers, transcoderClazz) {
+            window.localStorage.cacheKey = cacheKey;
+            window.localStorage.clientClazz = clientClazz;
+            window.localStorage.swimlane = swimlane;
+            window.localStorage.servers = servers;
+            window.localStorage.transcoderClazz = transcoderClazz;
+        }
+
+        $rootScope.deleteConfig = function (key, swimlane) {
+            $scope.mCacheKey = key;
+            $scope.mSwimlane  = swimlane;
+            $scope.wrapperParams();
+            $http.post(window.contextPath + '/cache/config/delete',$scope.configurationParams
+            ).success(function () {
+                $scope.searchPaginator = Paginator(fetchFunction);
+            });
+            return true;
+        }
+
+        $scope.dialog = function (key, swimlane) {
+
+            $rootScope.mCacheKey = key;
+            $rootScope.mSwimLane = swimlane;
+            ngDialog.open({
+                template: '\
 							<div class="widget-box">\
 							<div class="widget-header">\
 								<h4 class="widget-title">确认删除</h4>\
@@ -106,44 +88,29 @@ module.controller('ConfigController', [
 								</div>\
 								<div class="modal-footer">\
 									<button type="button" class="btn btn-default" ng-click="closeThisDialog()">取消</button>\
-									<button type="button" class="btn btn-primary" ng-click="deleteConfig(mCacheKey)&&closeThisDialog()">确定</button>\
+									<button type="button" class="btn btn-primary" ng-click="deleteConfig(mCacheKey,mSwimLane)&&closeThisDialog()">确定</button>\
 								</div>\
 							</div>\
 						</div>',
-						plain : true,
-						className : 'ngdialog-theme-default'
-				});
-			};
-			
-			$scope.ipKey="";
-			$scope.clearConfig = function(myForm3){
-				$('#configModal3').modal('hide');
-				$scope.ipKey = $("#ipKey").val().replace(/\,/g,"@|$");
-				$http.post(window.contextPath + '/cache/config/clear',
-	        			{"cacheKey":$scope.mCacheKey,"ipKey":$scope.ipKey}).success(function(response) {
-					$scope.searchPaginator = Paginator(fetchFunction);
-	        	});
-				return true;
-			};
+                plain: true,
+                className: 'ngdialog-theme-default'
+            });
+        };
 
-			
-			$scope.implItems = ["com.dianping.cache.memcached.MemcachedClientImpl",
-			                    "com.dianping.cache.redis.RedisClusterClientImpl",
-			                    "com.dianping.cache.dcache.DCacheClientImpl",
-			                    "com.dianping.cache.ehcache.EhcacheClientImpl"];
-			
-			$scope.coderItems = ["com.dianping.cache.memcached.HessianTranscoder",
-			     				"com.dianping.cache.memcached.KvdbTranscoder"];
-			
-			$scope.openModalForCreat = function(){
-				$http.get(window.contextPath + '/cache/config/baseInfo', {
-					params : {
-					}
-				}).success(function(response) {
-					$scope.implItems = response.impl;
-					$scope.coderItems = response.coder;
-				});
-			};
-			
-			$scope.query();
-		} ]);
+        $scope.ipKey = "";
+        $scope.clearConfig = function () {
+            $('#configModal3').modal('hide');
+            $scope.ipKey = $("#ipKey").val().replace(/\,/g, "@|$");
+            $http.get(window.contextPath + '/cache/config/clear', {
+                    params: {
+                        cacheKey: $scope.mCacheKey,
+                        ipKey: $scope.ipKey
+                    }
+                }
+            ).success(function () {
+                $scope.searchPaginator = Paginator(fetchFunction);
+            });
+            return true;
+        }
+        $scope.query();
+    }]);

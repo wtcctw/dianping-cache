@@ -417,11 +417,11 @@ public class RedisUtil {
     }
 
     public static void destroy(String appId, String address) {
-        autoScale.scaleDown(AppId.valueOf(appId), address);
+        autoScale.scaleDown(address);
     }
 
     public static void des(String instanceId) {
-        autoScale.destroyByInstanceId(instanceId);
+        //autoScale.destroyByInstanceId(instanceId);
     }
 
     private static String[] splitClusterInfo(String str) {

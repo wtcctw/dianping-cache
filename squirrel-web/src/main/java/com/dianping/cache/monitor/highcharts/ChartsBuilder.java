@@ -27,13 +27,13 @@ public class ChartsBuilder {
 			@Override
 			public  Number[] extract(MemcachedStatsData value){
 				return value.getSetsDatas();
-			}
+			};
 		})));
 		result.add(build0("Get/s",startTime,getData(data,new AbstractExtractData<MemcachedStatsData>(){
 			@Override
 			public  Number[] extract(MemcachedStatsData value){
 				return value.getGetsDatas();
-			}
+			};
 		})));
 //		result.add(build0("Get_miss/s",startTime,getData(data,new AbstractExtractData<MemcachedStatsData>(){
 //			@Override
@@ -51,31 +51,31 @@ public class ChartsBuilder {
 			@Override
 			public  Number[] extract(MemcachedStatsData value){
 				return value.getHitRate();
-			}
+			};
 		})));
 		result.add(build0("Write_bytes/s",startTime,getData(data,new AbstractExtractData<MemcachedStatsData>(){
 			@Override
 			public  Number[] extract(MemcachedStatsData value){
 				return value.getWritesDatas();
-			}
+			};
 		})));
 		result.add(build0("Read_bytes/s",startTime,getData(data,new AbstractExtractData<MemcachedStatsData>(){
 			@Override
 			public  Number[] extract(MemcachedStatsData value){
 				return value.getReadsDatas();
-			}
+			};
 		})));
 		result.add(build0("Eviction/s",startTime,getData(data,new AbstractExtractData<MemcachedStatsData>(){
 			@Override
 			public  Number[] extract(MemcachedStatsData value){
 				return value.getEvictionsDatas();
-			}
+			};
 		})));
 		result.add(build0("Curr_connection/s",startTime,getData(data,new AbstractExtractData<MemcachedStatsData>(){
 			@Override
 			public  Number[] extract(MemcachedStatsData value){
 				return value.getConnDatas();
-			}
+			};
 		})));
 		return result;
 	}
@@ -92,31 +92,31 @@ public class ChartsBuilder {
 			@Override
 			public  Number[] extract(ServerStatsData value){
 				return value.getNet_in();
-			}
+			};
 		})));
 		result.add(build0("Net_out/s",startTime,getData(data,new AbstractExtractData<ServerStatsData>(){
 			@Override
 			public  Number[] extract(ServerStatsData value){
 				return value.getNet_out();
-			}
+			};
 		})));
 		result.add(build0("Load/s",startTime,getData(data,new AbstractExtractData<ServerStatsData>(){
 			@Override
 			public  Number[] extract(ServerStatsData value){
 				return value.getProcess_load();
-			}
+			};
 		})));
 		result.add(build0("Retransmission/s",startTime,getData(data,new AbstractExtractData<ServerStatsData>(){
 			@Override
 			public  Number[] extract(ServerStatsData value){
 				return value.getRetransmission();
-			}
+			};
 		})));
 		result.add(build0("Icmp_loss/s",startTime,getData(data,new AbstractExtractData<ServerStatsData>(){
 			@Override
 			public  Number[] extract(ServerStatsData value){
 				return value.getIcmp_loss();
-			}
+			};
 		})));
 		return result;
 	}
@@ -126,7 +126,11 @@ public class ChartsBuilder {
 		long startTime = data.getStartTime();
 		result.add(build1("Used_Memory",startTime,data.getUsed_memory()));
 		result.add(build1("total_connections_received",startTime,data.getTotal_connections()));
-		result.add(build1("total_commands_processed",startTime,data.getTotal_commands()));
+		result.add(build1("connected_clients",startTime,data.getConnected_clients()));
+		result.add(build1("input_kbps",startTime,data.getInput_kbps()));
+		result.add(build1("output_kbps",startTime,data.getOutput_kbps()));
+		result.add(build1("used_cpu_sys",startTime,data.getUsed_cpu_sys()));
+		result.add(build1("used_cpu_user",startTime,data.getUsed_cpu_user()));
 		return result;
 	}
 	
@@ -162,15 +166,13 @@ public class ChartsBuilder {
 		series[0] = new Series();
 		series[0].setData(data);
 		series[0].setName("RedisServer");
-		
 		PlotOption plotOption = new PlotOption();
 		PlotOptionSeries pos = new PlotOptionSeries();
 
 		pos.setPointStart(startTime*1000);
 		pos.setPointInterval(30000L);
 		plotOption.setSeries(pos);
-
-
+		
 		charts.setTitle(title);
 		charts.setyAxisTitle("");
 		charts.setPlotOption(plotOption);

@@ -5,7 +5,7 @@ import java.util.List;
 import com.dianping.cache.entity.CategoryToApp;
 
 public interface CategoryToAppDao {
-	void insert(CategoryToApp cta);
+	int insert(CategoryToApp cta);
 	void deleteAll();
 	List<CategoryToApp> findByCategory(String category);
 }
