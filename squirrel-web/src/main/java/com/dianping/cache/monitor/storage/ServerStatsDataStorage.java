@@ -10,7 +10,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import org.codehaus.jackson.map.ObjectMapper;
-import org.mortbay.util.ajax.JSON;
 
 import com.dianping.cache.entity.Server;
 import com.dianping.cache.entity.ServerStats;

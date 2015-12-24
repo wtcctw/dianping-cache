@@ -21,10 +21,10 @@ import com.dianping.squirrel.client.core.StoreCallback;
 public class DefaultStoreClientTest extends TestCase {
     
     private static final String[] CATEGORIES = {
-            "mymemcache", "mydcache", "myredis", "myehcache"
+            "mymemcache", "mydcache", "myredis", "myehcache", "mydanga"
     };
     
-    static String CATEGORY = "myehcache";
+    static String CATEGORY = "danga";
     
     private static final String VALUE = "dp@123456";
     
