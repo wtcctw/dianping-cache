@@ -4,7 +4,6 @@ import com.dianping.cache.alarm.alarmconfig.AlarmConfigService;
 import com.dianping.cache.alarm.controller.dto.AlarmConfigDto;
 import com.dianping.cache.alarm.controller.mapper.AlarmConfigMapper;
 import com.dianping.cache.alarm.entity.AlarmConfig;
-import com.dianping.cache.alarm.entity.MemcacheAlarmConfig;
 import com.dianping.cache.controller.AbstractSidebarController;
 import com.dianping.cache.controller.RedisDashBoardUtil;
 import com.dianping.cache.entity.CacheConfiguration;
@@ -12,7 +11,10 @@ import com.dianping.cache.monitor.statsdata.RedisClusterData;
 import com.dianping.cache.service.CacheConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
@@ -75,9 +77,9 @@ public class AlarmConfigController extends AbstractSidebarController {
     @Autowired
     private CacheConfigurationService cacheConfigurationService;
 
-    @RequestMapping(value = "/setting/alarmrule/query/memcacheclusters", method = RequestMethod.GET, produces = "applications/json; charset=utf-8")
+    @RequestMapping(value = "/setting/alarmrule/query/memcacheclusters", method = RequestMethod.GET)
     @ResponseBody
-    public Object findMemcacheClusters(HttpServletRequest request, HttpServletResponse response) {
+    public Object findMemcacheClusters() {
         List<String> clusterNames = new ArrayList<String>();
         List<CacheConfiguration> configList = cacheConfigurationService.findAll();
 
@@ -90,9 +92,9 @@ public class AlarmConfigController extends AbstractSidebarController {
         return clusterNames;
     }
 
-    @RequestMapping(value = "/setting/alarmrule/query/redisclusters", method = RequestMethod.GET, produces = "applications/json; charset=utf-8")
+    @RequestMapping(value = "/setting/alarmrule/query/redisclusters", method = RequestMethod.GET)
     @ResponseBody
-    public Object findRedisClusters(HttpServletRequest request, HttpServletResponse response) {
+    public List<String> findRedisClusters() {
         List<String> clusterNames = new ArrayList<String>();
         List<RedisClusterData> redisClusterDatas = RedisDashBoardUtil.getClusterData();
 

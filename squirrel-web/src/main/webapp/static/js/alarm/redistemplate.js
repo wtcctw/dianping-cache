@@ -90,12 +90,7 @@ module
         '$interval',
         function ($rootScope, $scope, $http, Paginator, ngDialog, $interval) {
 
-            $scope.clusterTypes=["Memcache","Redis"];
-            $scope.memcacheAlarmTypes = ["宕机","内存","QPS","连接数"];
-            $scope.redisAlarmTypes = ["内存"];
-            $scope.thresholdTypes = ["上阈值","下阈值"];
-            $scope.memcacheClusters;
-            $scope.redisCluters;
+            $scope.redisClusters;
 
 
             var fetchFunction = function (offset, limit, callback) {
@@ -108,7 +103,7 @@ module
                     params: $scope.searchEntity
                 }).success(callback);
             };
-            $scope.suburl = "/setting/alarmrule/list";
+            $scope.suburl = "/setting/redistemplate/list";
             $scope.pageSize = 30000;
             $scope.queryCount = 0;
 
@@ -123,7 +118,7 @@ module
                 console.log($scope.alarmConfigEntity);
                 $http
                     .post(
-                    window.contextPath + '/setting/alarmrule/create',
+                    window.contextPath + '/setting/redistemplate/create',
                     $scope.alarmConfigEntity
                 )
                     .success(
@@ -143,16 +138,9 @@ module
 
             $scope.setModalInput = function (index) {
                 $scope.alarmConfigEntity.id = $scope.searchPaginator.currentPageItems[index].id;
-                $scope.alarmConfigEntity.clusterType = $scope.searchPaginator.currentPageItems[index].clusterType;
                 $scope.alarmConfigEntity.clusterName = $scope.searchPaginator.currentPageItems[index].clusterName;
-                $scope.alarmConfigEntity.alarmType = $scope.searchPaginator.currentPageItems[index].alarmType;
-                $scope.alarmConfigEntity.alarmRule = $scope.searchPaginator.currentPageItems[index].alarmRule;
-                $scope.alarmConfigEntity.threshold = $scope.searchPaginator.currentPageItems[index].threshold;
-                $scope.alarmConfigEntity.receiver = $scope.searchPaginator.currentPageItems[index].receiver;
-                $scope.alarmConfigEntity.mailMode = $scope.searchPaginator.currentPageItems[index].mailMode;
-                $scope.alarmConfigEntity.smsMode = $scope.searchPaginator.currentPageItems[index].smsMode;
-                $scope.alarmConfigEntity.weixinMode = $scope.searchPaginator.currentPageItems[index].weixinMode;
-                $scope.alarmConfigEntity.toBusiness = $scope.searchPaginator.currentPageItems[index].toBusiness;
+                $scope.alarmConfigEntity.isDown = $scope.searchPaginator.currentPageItems[index].isDown;
+                $scope.alarmConfigEntity.memThreshold = $scope.searchPaginator.currentPageItems[index].memThreshold;
                 $scope.alarmConfigEntity.isUpdate = true;
             }
 
@@ -160,7 +148,7 @@ module
                 console.log(cid);
                 $http
                     .get(
-                    window.contextPath + "/setting/alarmrule/remove",
+                    window.contextPath + "/setting/redistemplate/remove",
                     {
                         params: {
                             id: cid
@@ -210,22 +198,7 @@ module
             $http(
                 {
                     method:"GET",
-                    url:window.contextPath + '/setting/alarmrule/query/memcacheclusters'
-                }
-            ).success(
-                function(datas,status,headers,config){
-                    $scope.memcacheClusters = datas;
-                }
-            ).error(
-                function(datas,status,headers,config){
-                    console.log("memcacheclusters读取错误")
-                }
-            );
-
-            $http(
-                {
-                    method:"GET",
-                    url:window.contextPath + '/setting/alarmrule/query/redisclusters'
+                    url:window.contextPath + '/setting/redistemplate/query/redisclusters'
                 }
             ).success(
                 function(datas,status,headers,config){

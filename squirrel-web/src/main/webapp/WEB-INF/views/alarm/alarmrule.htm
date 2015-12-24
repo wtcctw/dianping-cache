@@ -1,4 +1,4 @@
-<div class="main-content" id="MemcacheController" ng-controller="AlarmRuleController">
+<div class="main-content" id="AlarmRuleController" ng-controller="AlarmRuleController">
     <div class="main-content-inner">
         <div class="breadcrumbs" id="breadcrumbs">
             <script type="text/javascript"
@@ -11,6 +11,14 @@
             </script>
             <ul class="breadcrumb">
                 <li class="active">告警管理</li>
+                <li class="#if($subside == 'rdashboard') active #end"><a
+                        href="${rc.contextPath}/setting/memcachetemplate"> <i
+                        class="icon-globe"></i>添加Memcache告警模板
+                </a></li>
+                <li class="#if($subside == 'rdashboard') active #end"><a
+                        href="${rc.contextPath}/setting/redistemplate"> <i
+                        class="icon-globe"></i>添加Redis告警模板
+                </a></li>
             </ul>
         </div>
 

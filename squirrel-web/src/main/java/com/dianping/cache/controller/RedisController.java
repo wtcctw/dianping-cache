@@ -1,32 +1,26 @@
 package com.dianping.cache.controller;
 
-import java.util.*;
-import java.util.concurrent.TimeUnit;
-
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import com.dianping.cache.alarm.controller.dto.RedisAlarmConfigDto;
-import com.dianping.cache.alarm.controller.mapper.RedisAlarmConfigMapper;
-import com.dianping.cache.alarm.entity.RedisAlarmConfig;
 import com.dianping.cache.controller.dto.RedisScaleParams;
-import com.dianping.cache.scale1.cluster.redis.RedisManager;
-import com.dianping.cache.scale1.cluster.redis.RedisScaler;
-import com.dianping.cache.scale1.exceptions.ScaleException;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.ModelAndView;
-
 import com.dianping.cache.entity.RedisStats;
 import com.dianping.cache.monitor.highcharts.ChartsBuilder;
 import com.dianping.cache.monitor.highcharts.HighChartsWrapper;
 import com.dianping.cache.monitor.statsdata.RedisClusterData;
 import com.dianping.cache.monitor.statsdata.RedisStatsData;
-import com.dianping.cache.service.CacheConfigurationService;
+import com.dianping.cache.scale1.cluster.redis.RedisManager;
+import com.dianping.cache.scale1.cluster.redis.RedisScaler;
+import com.dianping.cache.scale1.exceptions.ScaleException;
 import com.dianping.cache.service.RedisStatsService;
-import com.dianping.cache.service.ServerService;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.ModelAndView;
+
+import javax.annotation.Resource;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 
 @Controller

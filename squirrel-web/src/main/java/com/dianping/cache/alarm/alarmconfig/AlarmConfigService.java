@@ -1,7 +1,6 @@
 package com.dianping.cache.alarm.alarmconfig;
 
 import com.dianping.cache.alarm.entity.AlarmConfig;
-import com.dianping.cache.alarm.entity.MemcacheAlarmConfig;
 
 import java.util.List;
 
@@ -15,9 +14,11 @@ public interface AlarmConfigService {
 
     int deleteById(int id);
 
-    AlarmConfig findByClusterTypeAndName(String clusterType, String clusterName);
+    AlarmConfig findByClusterTypeAndNameAndAlarmType(String clusterType, String clusterName, String alarmType);
 
     AlarmConfig findById(int id);
 
     List<AlarmConfig> findByPage(int offset, int limit);
+
+    List<AlarmConfig> findAll();
 }

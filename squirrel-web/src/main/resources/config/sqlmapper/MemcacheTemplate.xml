@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.dianping.cache.alarm.dao.MemcacheAlarmTemplateDao">
+
+    <resultMap id="MemcacheTemplateResult" type="MemcacheTemplate">
+        <result column="id" property="id"/>
+        <result column="clusterName" property="clusterName"/>
+        <result column="isDown" property="isDown"/>
+        <result column="memThreshold" property="memThreshold"/>
+        <result column="qpsThreshold" property="qpsThreshold"/>
+        <result column="connThreshold" property="connThreshold"/>
+        <result column="createTime" property="createTime"/>
+        <result column="updateTime" property="updateTime"/>
+    </resultMap>
+
+    <insert id="insert" parameterType="MemcacheTemplate">
+        INSERT INTO memcache_alarmTemplate(id,clusterName,isDown,memThreshold,qpsThreshold,connThreshold,createTime, updateTime)
+        VALUES(#{id},#{clusterName},#{isDown},#{memThreshold},#{qpsThreshold},#{connThreshold},#{createTime},#{updateTime})
+    </insert>
+
+    <update id="update" parameterType="MemcacheTemplate">
+        UPDATE memcache_alarmTemplate
+        SET clusterName=#{clusterName},isDown=#{isDown},memThreshold=#{memThreshold},qpsThreshold=#{qpsThreshold},connThreshold=#{connThreshold}，createTime=#{createTime},updateTime=#{updateTime}
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteById" parameterType="int">
+        DELETE FROM memcache_alarmTemplate
+        WHERE id = #{id}
+    </delete>
+
+
+    <select id="findById" resultMap="MemcacheTemplateResult" parameterType="int">
+        SELECT id,clusterName,isDown,memThreshold,qpsThreshold,connThreshold,createTime, updateTime
+        FROM memcache_alarmTemplate
+        WHERE id = #{id}
+        ORDER BY id ASC
+    </select>
+
+    <select id="findAlarmTemplateByClusterName" resultMap="MemcacheTemplateResult" parameterType="String">
+        SELECT id,clusterName,isDown,memThreshold,qpsThreshold,connThreshold,createTime, updateTime
+        FROM memcache_alarmTemplate
+        WHERE clusterName = #{clusterName}
+        ORDER BY id ASC
+    </select>
+
+    <select id="findAll" resultMap="MemcacheTemplateResult">
+        SELECT id,clusterName,isDown,memThreshold,qpsThreshold,connThreshold,createTime, updateTime
+        FROM memcache_alarmTemplate
+        ORDER BY id ASC
+    </select>
+
+</mapper>

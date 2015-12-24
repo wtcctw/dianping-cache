@@ -32,8 +32,8 @@ public class AlarmConfigServiceImpl implements AlarmConfigService {
     }
 
     @Override
-    public AlarmConfig findByClusterTypeAndName(String clusterType, String clusterName) {
-        return alarmConfigDao.findByClusterTypeAndName(clusterType, clusterName);
+    public AlarmConfig findByClusterTypeAndNameAndAlarmType(String clusterType, String clusterName, String alarmType) {
+        return alarmConfigDao.findByClusterTypeAndNameAndAlarmType(clusterType, clusterName, alarmType);
     }
 
     @Override
@@ -46,4 +46,11 @@ public class AlarmConfigServiceImpl implements AlarmConfigService {
     public List<AlarmConfig> findByPage(int offset, int limit) {
         return alarmConfigDao.findByPage(offset,limit);
     }
+
+    @Override
+    public List<AlarmConfig> findAll() {
+        return alarmConfigDao.findAll();
+    }
+
+
 }

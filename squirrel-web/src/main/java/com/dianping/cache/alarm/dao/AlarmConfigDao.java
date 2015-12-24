@@ -2,7 +2,6 @@ package com.dianping.cache.alarm.dao;
 
 import com.dianping.avatar.dao.GenericDao;
 import com.dianping.cache.alarm.entity.AlarmConfig;
-import com.dianping.cache.alarm.entity.MemcacheAlarmConfig;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,7 +35,7 @@ public interface AlarmConfigDao extends GenericDao {
      * @param clusterType,clusterName
      * @return
      */
-    AlarmConfig findByClusterTypeAndName(@Param("clusterType") String clusterType, @Param("clusterName") String clusterName);
+    AlarmConfig findByClusterTypeAndNameAndAlarmType(@Param("clusterType") String clusterType, @Param("clusterName") String clusterName, @Param("alarmType") String alarmType);
 
     /**
      * @param id
@@ -50,5 +49,11 @@ public interface AlarmConfigDao extends GenericDao {
      */
     List<AlarmConfig> findByPage(@Param("offset") int offset, @Param("limit") int limit);
 
+
+    /**
+     * @param
+     * @return
+     */
+    List<AlarmConfig> findAll();
 
 }

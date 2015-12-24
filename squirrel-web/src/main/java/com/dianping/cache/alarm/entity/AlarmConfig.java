@@ -33,6 +33,41 @@ public class AlarmConfig {
 
     private Date updateTime;
 
+    public AlarmConfig(){
+
+    }
+
+    public AlarmConfig(String clusterType, String clusterName, String alarmType){
+
+        this.setId(0);
+
+        this.setClusterType(clusterType)
+                .setClusterName(clusterName)
+                .setAlarmType(alarmType)
+                .setAlarmRule("上阈值");
+        if("Memcache".equals(clusterType)){
+            if("内存".equals(alarmType)){
+                this.threshold = 95;
+            }else if("QPS".equals(alarmType)){
+                this.threshold = 80000;
+            }else if("连接数".equals(alarmType)){
+                this.threshold = 28000;
+            }
+        }else if("Redis".equals(clusterType)){
+            if("内存".equals(alarmType)){
+                this.threshold = 80;
+            }
+        }
+        this.setReceiver("shiyun.lv,xiaoxiong.dai")
+                .setMailMode(true)
+                .setSmsMode(false)
+                .setWeixinMode(true)
+                .setToBusiness(false)
+                .setCreateTime(new Date())
+                .setUpdateTime(new Date());
+
+    }
+
     public int getId() {
         return id;
     }

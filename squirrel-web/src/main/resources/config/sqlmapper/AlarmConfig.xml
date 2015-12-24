@@ -37,10 +37,10 @@
         WHERE id = #{id}
     </delete>
 
-    <select id="findByClusterTypeAndName" resultMap="AlarmConfigResult" parameterType="map">
+    <select id="findByClusterTypeAndNameAndAlarmType" resultMap="AlarmConfigResult" parameterType="map">
         SELECT id,clusterType,clusterName, alarmType, alarmRule, threshold,receiver,mailMode,smsMode,weixinMode,toBusiness,createTime, updateTime
         FROM alarm_config
-        WHERE clusterType= #{clusterType} AND clusterName=#{clusterName}
+        WHERE clusterType= #{clusterType} AND clusterName=#{clusterName} and alarmType = #{alarmType}
         ORDER BY id ASC
     </select>
 
@@ -56,6 +56,12 @@
         FROM alarm_config
         ORDER BY id ASC
         LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+    <select id="findAll" resultMap="AlarmConfigResult">
+        SELECT id,clusterType,clusterName, alarmType, alarmRule, threshold,receiver,mailMode,smsMode,weixinMode,toBusiness,createTime, updateTime
+        FROM alarm_config
+        ORDER BY id ASC
     </select>
 
 </mapper>

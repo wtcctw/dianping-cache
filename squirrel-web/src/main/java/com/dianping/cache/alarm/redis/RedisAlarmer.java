@@ -62,10 +62,11 @@ public class RedisAlarmer extends AbstractRedisAlarmer {
 
 
         for (RedisClusterData item : redisClusterDatas) {
-            AlarmConfig alarmConfig = alarmConfigService.findByClusterTypeAndName(ALARMTYPE, item.getClusterName());
+            AlarmConfig alarmConfig = alarmConfigService.findByClusterTypeAndNameAndAlarmType(ALARMTYPE, item.getClusterName(),"内存");
 
             if(null == alarmConfig){
-                continue;
+                alarmConfig = new AlarmConfig("Redis",item.getClusterName(),"内存");
+                alarmConfigService.insert(alarmConfig);
             }
 
             if (item.getUsed()> alarmConfig.getThreshold()) {
