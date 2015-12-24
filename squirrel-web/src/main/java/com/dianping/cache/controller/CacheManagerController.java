@@ -444,7 +444,6 @@ public class CacheManagerController extends AbstractCacheController {
 	}
 	
 	@RequestMapping(value = "/cache/operator")
-	@ResponseBody
 	public ModelAndView viewCacheOperator() {
 		subside = "operator";
 		return new ModelAndView("cache/operator", createViewMap());

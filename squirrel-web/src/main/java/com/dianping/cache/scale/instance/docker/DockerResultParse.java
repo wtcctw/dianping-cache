@@ -1,4 +1,4 @@
-package com.dianping.cache.scale1.instance.docker;
+package com.dianping.cache.scale.instance.docker;
 import java.util.Iterator;
 
 import org.codehaus.jackson.map.ObjectMapper;
@@ -10,8 +10,8 @@ import org.dom4j.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.dianping.cache.scale1.instance.Instance;
-import com.dianping.cache.scale1.instance.Result;
+import com.dianping.cache.scale.instance.Instance;
+import com.dianping.cache.scale.instance.Result;
 
 public class DockerResultParse {
 	

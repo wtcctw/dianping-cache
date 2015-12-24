@@ -1,18 +1,16 @@
 package com.dianping.cache.monitor.storage;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-import com.dianping.cache.scale1.cluster.redis.*;
+import com.dianping.cache.scale.cluster.redis.*;
 import redis.clients.jedis.Jedis;
 
 import com.dianping.cache.entity.RedisStats;
 import com.dianping.cache.entity.Server;
-import com.dianping.cache.scale.impl.RedisConnectionFactory;
 import com.dianping.cache.service.RedisStatsService;
 import com.dianping.cache.service.ServerService;
 import com.dianping.combiz.spring.context.SpringLocator;
@@ -74,7 +72,8 @@ public class RedisStatsDataStorage extends AbstractStatsDataStorage{
 				try {
 
 					if (cluster == null) {
-						Jedis jedis = RedisConnectionFactory.getConnection(server.getAddress());
+						String[] iport = server.getAddress().split(":");
+						Jedis jedis = new Jedis(iport[0],iport.length > 1 ? Integer.parseInt(iport[1]) : 6379);
 						Map<String,String> data = parseRedisInfo(jedis.info());
 
 						RedisStats stat = processStats(data);

@@ -1,4 +1,4 @@
-package com.dianping.cache.scale1.cluster.redis;
+package com.dianping.cache.scale.cluster.redis;
 
 public class RedisInfo {
 

@@ -1,9 +1,9 @@
-package com.dianping.cache.scale;
+package com.dianping.cache.scale.cluster;
 
 import java.util.List;
 
 public interface Cluster<T extends Node> {
 
-    List<T> getNodes();
+    public List<T> getNodes();
     
 }

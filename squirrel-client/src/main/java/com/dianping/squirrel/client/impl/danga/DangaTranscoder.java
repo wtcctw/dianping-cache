@@ -33,15 +33,15 @@ public class DangaTranscoder extends AbstractTransCoder {
 	private Serializer hessianSerializer = SerializerFactory
 			.getSerializer("hessian");
 
-	private String EVENT_NAME_REQUEST_SIZE = "Squirrel.memcached.writeSize";
+	private String EVENT_NAME_REQUEST_SIZE = "Squirrel.memcached.danga.writeSize";
 
-	private String EVENT_NAME_RESPONSE_SIZE = "Squirrel.memcached.readSize";
+	private String EVENT_NAME_RESPONSE_SIZE = "Squirrel.memcached.danga.readSize";
 
 	private static final String EVENT_NAME_ENCODE_TIME = "encode";
 
 	private static final String EVENT_NAME_DECODE_TIME = "decode";
 
-	private String CACHE_TYPE = "memcached";
+	private String CACHE_TYPE = "memcached.danga";
 	
 	private static final long timeMin = ConfigManagerLoader.getConfigManager().getIntValue(
 			"avatar-cache.memcached.monitor.transcoder.time.min", 50) * 1000000;
@@ -49,7 +49,7 @@ public class DangaTranscoder extends AbstractTransCoder {
 	private void setCacheType(String cacheType) {
 		CACHE_TYPE = cacheType;
 		if (CACHE_TYPE == null)
-			CACHE_TYPE = "memcached";
+			CACHE_TYPE = "memcached.danga";
 		EVENT_NAME_RESPONSE_SIZE = "Squirrel." + cacheType + ".readSize";
 		EVENT_NAME_REQUEST_SIZE = "Squirrel." + cacheType + ".writeSize";
 	}

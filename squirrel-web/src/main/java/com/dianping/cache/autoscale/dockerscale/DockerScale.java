@@ -1,9 +1,6 @@
 package com.dianping.cache.autoscale.dockerscale;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
@@ -82,7 +79,7 @@ public class DockerScale implements AutoScale{
 	}
 	
 	private void destroy(final String appid,final String... instances) {
-		
+
 		Runnable runnable = new Runnable(){
 
 			@Override
@@ -105,7 +102,7 @@ public class DockerScale implements AutoScale{
 				}
 				// send shutdown request
 				String opIdStr = RequestUtil.sendPost(requestUrl, paras);
-				
+
 				int operationid = -1;
 				try {
 					OperationId opid = objectMapper.readValue(opIdStr, OperationId.class);
@@ -148,7 +145,7 @@ public class DockerScale implements AutoScale{
 									logger.error("Delete instances error,need to remove instance manal !" + e);
 								}
 							}
-							
+
 						} else if (result.getOperationStatus() == 500) {
 							logger.error("ShutDown instances " + paras
 									+ "  failed,need to remove instance manal !");
@@ -159,9 +156,9 @@ public class DockerScale implements AutoScale{
 								+ e);
 					}
 				}
-				
+
 			}
-			
+
 		};
 		Thread t = new Thread(runnable);
 		t.start();
@@ -200,7 +197,7 @@ public class DockerScale implements AutoScale{
 	public static void main(String[] arges){
 		List<String> des = new ArrayList<String>();
 		String[] arr = new String[]{
-				"c72e7326bfb78742d39fb1add52ad7c128f5e1e4b8f4c04fc7f78fa5486d9eda"
+				"44c57724d0ba5c558c55cadde45ec03c2b85fb1e6072ff7a186f60f5cd08f6b4"
 		};
 //		des = Arrays.asList(arr);
 //		for(String str : des){
@@ -208,7 +205,7 @@ public class DockerScale implements AutoScale{
 //		}
 	
 		String OPERATION_RESULT_URL = "http://10.3.21.21:8080/api/v1/operations/";
-		String resultstr = RequestUtil.sendGet(OPERATION_RESULT_URL + 311, null);
+		String resultstr = RequestUtil.sendGet(OPERATION_RESULT_URL + 675, null);
 		Result result = new Result();
 		DockerResultParse.parse(result,resultstr);
 		System.out.println(result.getInstances().size());
@@ -216,7 +213,7 @@ public class DockerScale implements AutoScale{
 			System.out.println(ins.getIp() +"  --   " + ins.getAgentip());
 			//if(des.contains(ins.getIp())){
 				//System.out.println(ins.getInstanceid());
-				//destroyStatic("redis10",ins.getInstanceid());
+				destroyStatic("redis10",ins.getInstanceid());
 			//}
 		}
 	}

@@ -1,4 +1,4 @@
-package com.dianping.cache.scale1.instance;
+package com.dianping.cache.scale.instance;
 
 public class Instance {
 	

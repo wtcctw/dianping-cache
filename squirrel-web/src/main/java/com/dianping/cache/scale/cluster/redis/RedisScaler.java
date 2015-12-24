@@ -1,6 +1,5 @@
-package com.dianping.cache.scale1.cluster.redis;
+package com.dianping.cache.scale.cluster.redis;
 
-import java.awt.image.LookupOp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -8,11 +7,11 @@ import com.dianping.cache.support.spring.SpringLocator;
 
 import com.dianping.cache.entity.CacheConfiguration;
 import com.dianping.cache.entity.Server;
-import com.dianping.cache.scale1.exceptions.ScaleException;
-import com.dianping.cache.scale1.instance.AppId;
-import com.dianping.cache.scale1.instance.Apply;
-import com.dianping.cache.scale1.instance.Result;
-import com.dianping.cache.scale1.instance.docker.DockerApply;
+import com.dianping.cache.scale.exceptions.ScaleException;
+import com.dianping.cache.scale.instance.AppId;
+import com.dianping.cache.scale.instance.Apply;
+import com.dianping.cache.scale.instance.Result;
+import com.dianping.cache.scale.instance.docker.DockerApply;
 import com.dianping.cache.service.CacheConfigurationService;
 import com.dianping.cache.service.ServerService;
 import com.dianping.cache.util.ParseServersUtil;
@@ -78,7 +77,6 @@ public class RedisScaler {
 					Thread.sleep(100);
 					result = autoApply.getValue(operateid);
 				} catch (InterruptedException e) {
-					// if node is already scaled , it has type -2 ,need manual detroy it
 					throw new ScaleException(e.toString());
 				}
 			}
@@ -86,6 +84,12 @@ public class RedisScaler {
 				tmp.add(result);
 				slave = loadSlave(server,tmp);
 				if(slave != null){
+					try {
+						Thread.sleep(5000);
+					} catch (InterruptedException e) {
+						logger.error("wait for redis process  start error!",e);
+						throw new ScaleException(e.toString());
+					}
 					String slaveAddress = slave.getInstances().get(0).getIp() + ":" + slave.getAppId().getPort();
 					RedisManager.addSlaveToMaster(masterAddress, slaveAddress);
 					afterJoinCLuster(cluster, slaveAddress);
@@ -121,7 +125,7 @@ public class RedisScaler {
 			// container instance
 			String appId = server.getAppId();
 			Apply apply = new DockerApply();
-			apply.destroy(appId,address);
+			apply.destroy(appId,instanceId);
 		}else{
 			// none container
 			serverService.delete(address);
@@ -132,8 +136,24 @@ public class RedisScaler {
 		Server server = serverService.findByAddress(address);
 		server.setType(1);
 		serverService.update(server);
-		//ServerClusterService serverClusterService = SpringLocator.getBean("serverClusterService");
-		//serverClusterService.insert(address, cluster);
+		CacheConfiguration config = cacheConfigurationService.find(cluster);
+		String servers = config.getServers();
+		address = address.trim();
+		if(cluster.contains("redis")){
+			config.setAddTime(System.currentTimeMillis());
+			List<String> serverlist = ParseServersUtil.parseRedisServers(servers);
+			String urlHead = "redis-cluster://";
+			String urlTail = servers.substring(servers.indexOf("?"));
+			serverlist.add(address);
+			String newServers = "";
+			for(String str : serverlist){
+				newServers = newServers + str + ",";
+			}
+			newServers = newServers.substring(0,newServers.length()-1);//delete last ","
+			newServers = urlHead + newServers + urlTail;
+			config.setServers(newServers);
+			cacheConfigurationService.update(config);
+		}
 	}
 	
 	private static void deleteServerInCluster(String cluster,String server){
@@ -155,7 +175,7 @@ public class RedisScaler {
 			serverlist.remove(server);
 			String newServers = "";
 			for(String str : serverlist){
-				newServers = newServers + str + ";";
+				newServers = newServers + str + ",";
 			}
 			newServers = newServers.substring(0,newServers.length()-1);//delete last ";"
 			newServers = urlHead + newServers + urlTail;
