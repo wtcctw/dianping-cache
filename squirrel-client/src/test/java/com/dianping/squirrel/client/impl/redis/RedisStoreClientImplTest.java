@@ -310,7 +310,7 @@ public class RedisStoreClientImplTest {
     @Test
     public void testSets() {
         RedisStoreClient redisClient = (RedisStoreClient) StoreClientFactory.getStoreClient(STORE_TYPE);
-        StoreKey key = new StoreKey("oPpmGuided", "set");
+        StoreKey key = new StoreKey(CATEGORY, "set");
         redisClient.delete(key);
         Object value = redisClient.scard(key);
         assertEquals(value, 0L);
@@ -328,6 +328,12 @@ public class RedisStoreClientImplTest {
         assertEquals(value, Boolean.TRUE);
         value = redisClient.smembers(key);
         assertEquals(((Set)value).size(), 2);
+        value = redisClient.srandmember(key);
+        assertNotNull(value);
+        value = redisClient.spop(key);
+        assertNotNull(value);
+        value = redisClient.scard(key);
+        assertEquals(value, 1L);
     }
     
     @Test
@@ -385,4 +391,62 @@ public class RedisStoreClientImplTest {
         fail("Not yet implemented");
     }
 
+    @Test
+    public void testZSet() throws Exception {
+        RedisStoreClient client = (RedisStoreClient) StoreClientFactory.getStoreClientByCategory(CATEGORY);
+        StoreKey key = new StoreKey(CATEGORY, "zset");
+        client.delete(key);
+        Object result = client.zadd(key, 0.1d, "aaaaa");
+        assertEquals(result, 1L);
+        result = client.zadd(key, 0.2d, "bbbbb");
+        assertEquals(result, 1L);
+        result = client.zadd(key, 0.3d, "ccccc");
+        assertEquals(result, 1L);
+        result = client.zadd(key, 0.31d, "ccccc");
+        assertEquals(result, 0L);
+        result = client.zcard(key);
+        assertEquals(result, 3L);
+        result = client.zcount(key, 0.0d, 0.5d);
+        assertEquals(result, 3L);
+        result = client.zcount(key, 0.1d, 0.3d);
+        assertEquals(result, 2L);
+        result = client.zincrby(key, 0.01d, "bbbbb");
+        assertEquals((Double)result, 0.21d, 0.00001);
+        result = client.zscore(key, "bbbbb");
+        assertEquals((Double)result, 0.21d, 0.00001);
+        result = client.zrank(key, "aaaaa");
+        assertEquals(result, 0L);
+        result = client.zrank(key, "ccccc");
+        assertEquals(result, 2L);
+        result = client.zrevrank(key, "ccccc");
+        assertEquals(result, 0L);
+        result = client.zrank(key, "ddddd");
+        assertEquals(result, null);
+        result = client.zrem(key, "bbbbb", "ddddd");
+        assertEquals(result, 1L);
+        result = client.zrange(key, 0, -1);
+        assertEquals(((Set)result).size(), 2);
+        assertEquals(((Set)result).iterator().next(), "aaaaa");
+        result = client.zrangeByScore(key, 0.3d, 0.5d);
+        assertEquals(((Set)result).size(), 1);
+        assertEquals(((Set)result).iterator().next(), "ccccc");
+        result = client.zrangeByScore(key, 0.1d, 0.3d, 0, 1);
+        assertEquals(((Set)result).size(), 1);
+        assertEquals(((Set)result).iterator().next(), "aaaaa");
+        result = client.zrangeByScore(key, 0.1d, 0.3d, 1, 1);
+        assertEquals(((Set)result).size(), 0);
+        //
+        result = client.zrevrange(key, 0, -1);
+        assertEquals(((Set)result).size(), 2);
+        assertEquals(((Set)result).iterator().next(), "ccccc");
+        result = client.zrevrangeByScore(key, 0.3d, 0.5d);
+        assertEquals(((Set)result).size(), 1);
+        assertEquals(((Set)result).iterator().next(), "ccccc");
+        result = client.zrevrangeByScore(key, 0.1d, 0.3d, 0, 1);
+        assertEquals(((Set)result).size(), 1);
+        assertEquals(((Set)result).iterator().next(), "aaaaa");
+        result = client.zrangeByScore(key, 0.1d, 0.3d, 1, 1);
+        assertEquals(((Set)result).size(), 0);
+    }
+    
 }

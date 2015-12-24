@@ -51,7 +51,7 @@ public class StoreCategoryConfigManagerTest {
     }
     
     @Test
-    public void testCategoryConfigListener() {
+    public void testCategoryConfigListener() throws Throwable {
         final CountDownLatch latch = new CountDownLatch(1);
         final ResultHolder<StoreCategoryConfig> holder = new ResultHolder<StoreCategoryConfig>();
         
@@ -59,13 +59,13 @@ public class StoreCategoryConfigManagerTest {
             
             @Override
             public void configRemoved(StoreCategoryConfig categoryConfig) {
-                holder.result = categoryConfig;
+                holder.setResult(categoryConfig);
                 latch.countDown();
             }
             
             @Override
             public void configChanged(StoreCategoryConfig categoryConfig) {
-                holder.result = categoryConfig;
+                holder.setResult(categoryConfig);
                 latch.countDown();
             }
         });
@@ -78,9 +78,9 @@ public class StoreCategoryConfigManagerTest {
         
         try {
             latch.await(100, TimeUnit.SECONDS);
-            assertNotNull(holder.result);
-            System.out.println(holder.result);
-            assertEquals("hahaha", holder.result.getIndexDesc());
+            assertNotNull(holder.get());
+            System.out.println(holder.get());
+            assertEquals("hahaha", holder.get().getIndexDesc());
         } catch (Exception e) {
             assertTrue(false);
         }

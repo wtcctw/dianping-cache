@@ -36,7 +36,7 @@ public class StoreClientConfigManagerTest {
     }
     
     @Test
-    public void testClientConfigChange() throws Exception {
+    public void testClientConfigChange() throws Throwable {
         final String cluster = "redis-hua";
         final CountDownLatch latch = new CountDownLatch(1);
         final ResultHolder<RedisClientConfig> holder = new ResultHolder<RedisClientConfig>();
@@ -45,7 +45,7 @@ public class StoreClientConfigManagerTest {
             @Override
             public void configChanged(StoreClientConfig config) {
                 System.out.println(config);
-                holder.result = (RedisClientConfig)config;
+                holder.setResult((RedisClientConfig)config);
                 latch.countDown();
             }
         });
@@ -64,8 +64,8 @@ public class StoreClientConfigManagerTest {
         
         try {
             latch.await(100, TimeUnit.SECONDS);
-            assertNotNull(holder.result);
-            assertEquals(1, holder.result.getMaxRedirects());
+            assertNotNull(holder.get());
+            assertEquals(1, holder.get().getMaxRedirects());
         } catch (Exception e) {
             assertTrue(false);
         }

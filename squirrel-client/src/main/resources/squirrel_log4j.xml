@@ -25,5 +25,10 @@
 		<appender-ref ref="ConsoleAppender" />
 	</logger>
 
+	<logger name="redis.clients.jedis" additivity="true">
+		<appender-ref ref="FileAppender" />
+		<appender-ref ref="ConsoleAppender" />
+	</logger>
+
 </log4j:configuration>
 

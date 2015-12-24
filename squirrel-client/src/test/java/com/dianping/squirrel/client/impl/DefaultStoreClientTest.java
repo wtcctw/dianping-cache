@@ -24,7 +24,7 @@ public class DefaultStoreClientTest extends TestCase {
             "mymemcache", "mydcache", "myredis", "myehcache"
     };
     
-    static String CATEGORY = "myredis";
+    static String CATEGORY = "myehcache";
     
     private static final String VALUE = "dp@123456";
     
@@ -145,7 +145,7 @@ public class DefaultStoreClientTest extends TestCase {
     }
 
     @Test
-    public void testAsyncGetStoreKeyStoreCallbackOfT() throws Exception {
+    public void testAsyncGetStoreKeyStoreCallbackOfT() throws Throwable {
         StoreClient client = StoreClientFactory.getStoreClient();
         StoreKey key = new StoreKey(CATEGORY, "test");
         Object result = client.set(key, BEAN);
@@ -156,23 +156,23 @@ public class DefaultStoreClientTest extends TestCase {
 
             @Override
             public void onSuccess(Bean result) {
-                holder.result = result;
+                holder.setResult(result);
                 latch.countDown();
             }
 
             @Override
             public void onFailure(Throwable e) {
-                holder.exception = e;
+                holder.setException(e);
                 latch.countDown();
             }
             
         });
         latch.await(1000, TimeUnit.MILLISECONDS);
-        assertEquals(BEAN, holder.result);
+        assertEquals(BEAN, holder.get());
     }
 
     @Test
-    public void testAsyncSetStoreKeyObjectStoreCallbackOfBoolean() throws Exception {
+    public void testAsyncSetStoreKeyObjectStoreCallbackOfBoolean() throws Throwable {
         StoreClient client = StoreClientFactory.getStoreClient();
         StoreKey key = new StoreKey(CATEGORY, "test");
         client.delete(key);
@@ -183,26 +183,26 @@ public class DefaultStoreClientTest extends TestCase {
 
             @Override
             public void onSuccess(Boolean result) {
-                holder.result = result;
+                holder.setResult(result);
                 latch.countDown();
             }
 
             @Override
             public void onFailure(Throwable e) {
-                holder.exception = e;
+                holder.setException(e);
                 latch.countDown();
             }
             
         });
         assertNull(result);
         latch.await(1000, TimeUnit.MILLISECONDS);
-        assertEquals(Boolean.TRUE, holder.result);
+        assertEquals(Boolean.TRUE, holder.get());
         Bean bean2 = client.get(key);
         assertEquals(bean, bean2);
     }
 
     @Test
-    public void testAsyncAddStoreKeyObjectStoreCallbackOfBoolean() throws Exception {
+    public void testAsyncAddStoreKeyObjectStoreCallbackOfBoolean() throws Throwable {
         StoreClient client = StoreClientFactory.getStoreClient();
         StoreKey key = new StoreKey(CATEGORY, "test");
         client.delete(key);
@@ -213,26 +213,26 @@ public class DefaultStoreClientTest extends TestCase {
 
             @Override
             public void onSuccess(Boolean result) {
-                holder.result = result;
+                holder.setResult(result);
                 latch.countDown();
             }
 
             @Override
             public void onFailure(Throwable e) {
-                holder.exception = e;
+                holder.setException(e);
                 latch.countDown();
             }
             
         });
         assertNull(result);
         latch.await(1000, TimeUnit.MILLISECONDS);
-        assertEquals(Boolean.TRUE, holder.result);
+        assertEquals(Boolean.TRUE, holder.get());
         result = client.add(key, BEAN);
         assertEquals(Boolean.FALSE, result);
     }
 
     @Test
-    public void testAsyncDeleteStoreKeyStoreCallbackOfBoolean() throws Exception {
+    public void testAsyncDeleteStoreKeyStoreCallbackOfBoolean() throws Throwable {
         StoreClient client = StoreClientFactory.getStoreClient();
         StoreKey key = new StoreKey(CATEGORY, "test");
         Bean bean = new Bean(53559777, "dianping");
@@ -243,13 +243,13 @@ public class DefaultStoreClientTest extends TestCase {
 
             @Override
             public void onSuccess(Boolean result) {
-                holder.result = result;
+                holder.setResult(result);
                 latch.countDown();
             }
 
             @Override
             public void onFailure(Throwable e) {
-                holder.exception = e;
+                holder.setException(e);
                 latch.countDown();
                 e.printStackTrace();
             }
@@ -257,7 +257,7 @@ public class DefaultStoreClientTest extends TestCase {
         });
         assertNull(result);
         latch.await(1000, TimeUnit.MILLISECONDS);
-        assertEquals(Boolean.TRUE, holder.result);
+        assertEquals(Boolean.TRUE, holder.get());
         result = client.delete(key);
         assertEquals(Boolean.FALSE, result);
     }
@@ -311,7 +311,7 @@ public class DefaultStoreClientTest extends TestCase {
     }
 
     @Test
-    public void testAsyncMultiGet() throws Exception {
+    public void testAsyncMultiGet() throws Throwable {
         StoreClient client = StoreClientFactory.getStoreClient();
         StoreKey key1 = new StoreKey(CATEGORY, "key1");
         StoreKey key2 = new StoreKey(CATEGORY, "key2");
@@ -337,31 +337,83 @@ public class DefaultStoreClientTest extends TestCase {
 
             @Override
             public void onSuccess(Map<StoreKey, Bean> result) {
-                holder.result = result;
+                holder.setResult(result);
                 latch.countDown();
             }
 
             @Override
             public void onFailure(Throwable e) {
-                holder.exception = e;
+                holder.setException(e);
                 latch.countDown();
             }
             
         });
-        latch.await(1000, TimeUnit.MILLISECONDS);
-        assertEquals(4, ((Map)holder.result).size());
-        assertNull(((Map)holder.result).get(key6));
-        assertEquals(new Bean(4, "value4"), ((Map)holder.result).get(key4));
+        latch.await(60, TimeUnit.SECONDS);
+        assertEquals(4, holder.get().size());
+        assertNull(holder.get().get(key6));
+        assertEquals(new Bean(4, "value4"), holder.get().get(key4));
     }
 
     @Test
     public void testMultiSet() {
         StoreClient client = StoreClientFactory.getStoreClient();
+        client.delete(new StoreKey(CATEGORY, "key3"));
+        List<StoreKey> keys = new ArrayList<StoreKey>(5);
+        keys.add(new StoreKey(CATEGORY, "key1"));
+        keys.add(new StoreKey(CATEGORY, "key2"));
+        keys.add(new StoreKey(CATEGORY, "key3"));
+        keys.add(new StoreKey(CATEGORY, "key4"));
+        keys.add(new StoreKey(CATEGORY, "key5"));
+        List<Bean> values = new ArrayList<Bean>(5);
+        values.add(new Bean(1, "value1"));
+        values.add(new Bean(2, "value2"));
+        values.add(new Bean(3, "value3"));
+        values.add(new Bean(4, "value4"));
+        values.add(new Bean(5, "value5"));
+        Object result = client.multiSet(keys, values);
+        assertEquals(result, true);
+        result = client.get(new StoreKey(CATEGORY, "key3"));
+        assertEquals(result, new Bean(3, "value3"));
     }
 
     @Test
-    public void testAsyncMultiSet() {
+    public void testAsyncMultiSet() throws Throwable {
         StoreClient client = StoreClientFactory.getStoreClient();
+        client.delete(new StoreKey(CATEGORY, "key3"));
+        List<StoreKey> keys = new ArrayList<StoreKey>(5);
+        keys.add(new StoreKey(CATEGORY, "key1"));
+        keys.add(new StoreKey(CATEGORY, "key2"));
+        keys.add(new StoreKey(CATEGORY, "key3"));
+        keys.add(new StoreKey(CATEGORY, "key4"));
+        keys.add(new StoreKey(CATEGORY, "key5"));
+        List<Bean> values = new ArrayList<Bean>(5);
+        values.add(new Bean(1, "value1"));
+        values.add(new Bean(2, "value2"));
+        values.add(new Bean(3, "value3"));
+        values.add(new Bean(4, "value4"));
+        values.add(new Bean(5, "value5"));
+        
+        final CountDownLatch latch = new CountDownLatch(1);
+        final ResultHolder<Boolean> holder = new ResultHolder<Boolean>();
+        client.asyncMultiSet(keys, values, new StoreCallback<Boolean>() {
+
+            @Override
+            public void onSuccess(Boolean result) {
+                holder.setResult(result);
+                latch.countDown();
+            }
+
+            @Override
+            public void onFailure(Throwable e) {
+                holder.setException(e);
+                latch.countDown();
+            }
+            
+        });
+        latch.await(600, TimeUnit.SECONDS);
+        assertEquals(Boolean.TRUE, holder.get());
+        Object result = client.get(new StoreKey(CATEGORY, "key3"));
+        assertEquals(result, new Bean(3, "value3"));
     }
 
 }
