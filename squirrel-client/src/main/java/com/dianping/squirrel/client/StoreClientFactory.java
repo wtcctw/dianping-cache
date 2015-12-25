@@ -47,19 +47,25 @@ public class StoreClientFactory {
 		return storeClient;
 	}
 	
-	public static StoreClient getStoreClient(String storeType) {
+	/**
+	 * @deprecated use getStoreClientByCategory instead
+	 * 
+	 * @param storeType
+	 * @return
+	 */
+	public static <T extends StoreClient> T getStoreClient(String storeType) {
         checkNotNull(storeType, "store type is null");
         StoreClient storeClient = clientConfigManager.findCacheClient(storeType);
-        return storeClient;
+        return (T)storeClient;
     }
 	
-	public static StoreClient getStoreClientByCategory(String category) {
+	public static <T extends StoreClient> T getStoreClientByCategory(String category) {
         checkNotNull(category, "store category is null");
         StoreCategoryConfig categoryConfig = categoryConfigManager.findCacheKeyType(category);
         checkNotNull(categoryConfig, "%s's category config is null", category);
         checkNotNull(categoryConfig.getCacheType(), "%s's category store type is null", category);
         StoreClient storeClient = clientConfigManager.findCacheClient(categoryConfig.getCacheType());
-        return storeClient;
+        return (T)storeClient;
     }
 	
 	private static void loadStoreClients() {

@@ -2,6 +2,7 @@ package com.dianping.cache.monitor;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -35,7 +36,7 @@ public class TaskManager implements ServiceListener {
     
     private ScheduledThreadPoolExecutor monitorThreadPool;
     
-    private ConcurrentMap<String, List<String>> serverClustersMap = new ConcurrentHashMap<String, List<String>>();
+    private ConcurrentMap<String, Set<String>> serverClustersMap = new ConcurrentHashMap<String, Set<String>>();
     
     private ConcurrentMap<String, CacheConfiguration> clusterConfigMap = new ConcurrentHashMap<String, CacheConfiguration>();
     
@@ -142,26 +143,43 @@ public class TaskManager implements ServiceListener {
     }
     
     private void addServerToCluster(String server, String cluster) {
-        List<String> clusters = serverClustersMap.get(server);
+        Set<String> clusters = serverClustersMap.get(server);
         if(clusters == null) {
-            clusters = new ArrayList<String>();
+            clusters = new HashSet<String>();
             serverClustersMap.put(server, clusters);
         }
         if(!clusters.contains(server)) {
-            clusters.add(cluster);
+            if(clusters.add(cluster)) {
+                logger.info("added server " + server + " to cluster " + cluster);
+            }
+            logger.info("server " + server + " is now in clusters: " + listToString(clusters));
         }
         if(!serverTaskMap.containsKey(server)) {
             TaskRunner taskRunner = new TaskRunner(server);
-            serverTaskMap.put(server, taskRunner);
+            TaskRunner prevTask = serverTaskMap.put(server, taskRunner);
+            logger.info("generated server task: " + server);
+            if(prevTask != null) {
+                prevTask.setStop();
+                logger.info("stopped previous server task: " + server);
+            }
             ScheduledFuture future = monitorThreadPool.scheduleWithFixedDelay(taskRunner, monitorInterval, monitorInterval, TimeUnit.MILLISECONDS);
-            serverFutureMap.put(server, future);
+            ScheduledFuture prevFuture = serverFutureMap.put(server, future);
+            logger.info("generated server task future: " + server);
+            if(prevFuture != null) {
+                if(prevFuture.cancel(false)) {
+                    logger.info("cancelled previous server task future: " + server);
+                }
+            }
         }
     }
 
     private void removeServerFromCluster(String server, String cluster) {
-        List<String> clusters = serverClustersMap.get(server);
+        Set<String> clusters = serverClustersMap.get(server);
         if(clusters != null) {
-            clusters.remove(server);
+            if(clusters.remove(server)) {
+                logger.info("removed server " + server + " from cluster " + cluster);
+            }
+            logger.info("server " + server + " is now in clusters: " + listToString(clusters));
             if(clusters.isEmpty()) {
                 serverClustersMap.remove(server);
             }
@@ -170,10 +188,13 @@ public class TaskManager implements ServiceListener {
             TaskRunner task = serverTaskMap.remove(server);
             if(task != null) {
                 task.setStop();
+                logger.info("stopped server task: " + server);
             }
             ScheduledFuture future = serverFutureMap.remove(server);
             if(future != null) {
-                future.cancel(false);
+                if(future.cancel(false)) {
+                    logger.info("cancelled server task future: " + server);
+                }
             }
         }
     }
@@ -182,8 +203,7 @@ public class TaskManager implements ServiceListener {
         String service = cacheConfig.getCacheKey();
         if(service == null) 
             return false;
-        return !(service.equals("web") || service.startsWith("dcache") ||
-                service.equals("kvdb") || service.startsWith("redis"));
+        return service.startsWith("memcache");
     }
     
     @Override
@@ -192,7 +212,7 @@ public class TaskManager implements ServiceListener {
             CacheConfiguration oldCacheConfig = clusterConfigMap.put(cacheConfig.getCacheKey(), cacheConfig);
             _serviceChanged(cacheConfig, oldCacheConfig);
         } else {
-            logger.info("service is not monitorable: " + cacheConfig);
+            logger.info("service is not monitorable: " + cacheConfig.getCacheKey());
         }
     }
     
@@ -206,6 +226,7 @@ public class TaskManager implements ServiceListener {
     public void serviceChanged(CacheConfiguration cacheConfig) {
         if(isMonitorable(cacheConfig)) {
             CacheConfiguration oldCacheConfig = clusterConfigMap.put(cacheConfig.getCacheKey(), cacheConfig);
+            logger.info("service changed, old: " + oldCacheConfig + ", new: " + cacheConfig);
             _serviceChanged(cacheConfig, oldCacheConfig);
         } else {
             logger.info("service is not monitorable: " + cacheConfig);
@@ -217,12 +238,14 @@ public class TaskManager implements ServiceListener {
         List<String> newServerList = newCacheConfig == null ? null : newCacheConfig.getServerList();
         if(newServerList != null) {
             Collection<String> addedServers = CollectionUtils.subtract(newServerList, oldServerList);
+            logger.info(newCacheConfig.getCacheKey() + " added servers: " + listToString(addedServers));
             for(String server : addedServers) {
                 addServerToCluster(server, newCacheConfig.getCacheKey());
             }
         }
         if(oldServerList != null) {
             Collection<String> removedServers = CollectionUtils.subtract(oldServerList, newServerList);
+            logger.info(newCacheConfig.getCacheKey() + " removed servers: " + listToString(removedServers));
             for(String server : removedServers) {
                 removeServerFromCluster(server, newCacheConfig.getCacheKey());
             }
@@ -237,12 +260,12 @@ public class TaskManager implements ServiceListener {
         return server == null ? null : serverTaskMap.get(server);
     }
     
-    public List<String> getClusters(String server) {
+    public Set<String> getClusters(String server) {
         return serverClustersMap.get(server);
     }
     
     public void offline(String server) {
-        List<String> clusters = serverClustersMap.get(server);
+        Set<String> clusters = serverClustersMap.get(server);
         if(clusters != null) {
             for(String cluster : clusters) {
                 CacheConfiguration cacheConfig = clusterConfigMap.get(cluster);
@@ -282,6 +305,16 @@ public class TaskManager implements ServiceListener {
 
     public void online(String server) {
         logger.info("online server " + server + ", operation not supported");
+    }
+    
+    private static String listToString(Collection<String> stringList) {
+        if(stringList == null || stringList.size() == 0)
+            return "";
+        StringBuilder buf = new StringBuilder();
+        for(String str : stringList) {
+            buf.append(str).append(',');
+        }
+        return buf.substring(0, buf.length()-1);
     }
     
 }

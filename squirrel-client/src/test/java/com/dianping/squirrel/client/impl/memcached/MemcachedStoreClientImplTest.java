@@ -160,7 +160,7 @@ public class MemcachedStoreClientImplTest {
     }
 
     @Test
-    public void testAsyncGetStoreKeyStoreCallbackOfT() throws Exception {
+    public void testAsyncGetStoreKeyStoreCallbackOfT() throws Throwable {
         MemcachedStoreClient client = (MemcachedStoreClient) StoreClientFactory.getStoreClient(STORE_TYPE);
         StoreKey key = new StoreKey(CATEGORY, "test");
         Object result = client.set(key, BEAN);
@@ -171,23 +171,23 @@ public class MemcachedStoreClientImplTest {
 
             @Override
             public void onSuccess(Bean result) {
-                holder.result = result;
+                holder.setResult(result);
                 latch.countDown();
             }
 
             @Override
             public void onFailure(Throwable e) {
-                holder.exception = e;
+                holder.setException(e);
                 latch.countDown();
             }
             
         });
         latch.await(1000, TimeUnit.MILLISECONDS);
-        assertEquals(BEAN, holder.result);
+        assertEquals(BEAN, holder.get());
     }
 
     @Test
-    public void testAsyncSetStoreKeyObjectStoreCallbackOfBoolean() throws Exception {
+    public void testAsyncSetStoreKeyObjectStoreCallbackOfBoolean() throws Throwable {
         MemcachedStoreClient client = (MemcachedStoreClient) StoreClientFactory.getStoreClient(STORE_TYPE);
         StoreKey key = new StoreKey(CATEGORY, "test");
         client.delete(key);
@@ -198,26 +198,26 @@ public class MemcachedStoreClientImplTest {
 
             @Override
             public void onSuccess(Boolean result) {
-                holder.result = result;
+                holder.setResult(result);
                 latch.countDown();
             }
 
             @Override
             public void onFailure(Throwable e) {
-                holder.exception = e;
+                holder.setException(e);
                 latch.countDown();
             }
             
         });
         assertNull(result);
         latch.await(1000, TimeUnit.MILLISECONDS);
-        assertEquals(Boolean.TRUE, holder.result);
+        assertEquals(Boolean.TRUE, holder.get());
         Bean bean2 = client.get(key);
         assertEquals(bean, bean2);
     }
 
     @Test
-    public void testAsyncAddStoreKeyObjectStoreCallbackOfBoolean() throws Exception {
+    public void testAsyncAddStoreKeyObjectStoreCallbackOfBoolean() throws Throwable {
         MemcachedStoreClient client = (MemcachedStoreClient) StoreClientFactory.getStoreClient(STORE_TYPE);
         StoreKey key = new StoreKey(CATEGORY, "test");
         client.delete(key);
@@ -228,26 +228,26 @@ public class MemcachedStoreClientImplTest {
 
             @Override
             public void onSuccess(Boolean result) {
-                holder.result = result;
+                holder.setResult(result);
                 latch.countDown();
             }
 
             @Override
             public void onFailure(Throwable e) {
-                holder.exception = e;
+                holder.setException(e);
                 latch.countDown();
             }
             
         });
         assertNull(result);
         latch.await(1000, TimeUnit.MILLISECONDS);
-        assertEquals(Boolean.TRUE, holder.result);
+        assertEquals(Boolean.TRUE, holder.get());
         result = client.add(key, BEAN);
         assertEquals(Boolean.FALSE, result);
     }
 
     @Test
-    public void testAsyncDeleteStoreKeyStoreCallbackOfBoolean() throws Exception {
+    public void testAsyncDeleteStoreKeyStoreCallbackOfBoolean() throws Throwable {
         MemcachedStoreClient client = (MemcachedStoreClient) StoreClientFactory.getStoreClient(STORE_TYPE);
         StoreKey key = new StoreKey(CATEGORY, "test");
         Bean bean = new Bean(53559777, "dianping");
@@ -258,13 +258,13 @@ public class MemcachedStoreClientImplTest {
 
             @Override
             public void onSuccess(Boolean result) {
-                holder.result = result;
+                holder.setResult(result);
                 latch.countDown();
             }
 
             @Override
             public void onFailure(Throwable e) {
-                holder.exception = e;
+                holder.setException(e);
                 latch.countDown();
                 e.printStackTrace();
             }
@@ -272,7 +272,7 @@ public class MemcachedStoreClientImplTest {
         });
         assertNull(result);
         latch.await(1000, TimeUnit.MILLISECONDS);
-        assertEquals(Boolean.TRUE, holder.result);
+        assertEquals(Boolean.TRUE, holder.get());
         result = client.delete(key);
         assertEquals(Boolean.FALSE, result);
     }
@@ -326,7 +326,7 @@ public class MemcachedStoreClientImplTest {
     }
 
     @Test
-    public void testAsyncMultiGet() throws Exception {
+    public void testAsyncMultiGet() throws Throwable {
         MemcachedStoreClient client = (MemcachedStoreClient) StoreClientFactory.getStoreClient(STORE_TYPE);
         StoreKey key1 = new StoreKey(CATEGORY, "key1");
         StoreKey key2 = new StoreKey(CATEGORY, "key2");
@@ -352,21 +352,21 @@ public class MemcachedStoreClientImplTest {
 
             @Override
             public void onSuccess(Map<StoreKey, Bean> result) {
-                holder.result = result;
+                holder.setResult(result);
                 latch.countDown();
             }
 
             @Override
             public void onFailure(Throwable e) {
-                holder.exception = e;
+                holder.setException(e);
                 latch.countDown();
             }
             
         });
         latch.await(1000, TimeUnit.MILLISECONDS);
-        assertEquals(4, ((Map)holder.result).size());
-        assertNull(((Map)holder.result).get(key6));
-        assertEquals(new Bean(4, "value4"), ((Map)holder.result).get(key4));
+        assertEquals(4, holder.get().size());
+        assertNull(holder.get().get(key6));
+        assertEquals(new Bean(4, "value4"), holder.get().get(key4));
     }
 
     @Test

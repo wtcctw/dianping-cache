@@ -10,6 +10,8 @@ import com.dianping.squirrel.common.exception.StoreInitializeException;
 
 public class RedisClientConfig implements StoreClientConfig {
     
+    public static RedisClientConfig config;
+
     private String clientClazz;
     
     private List<String> serverList = new ArrayList<String>();

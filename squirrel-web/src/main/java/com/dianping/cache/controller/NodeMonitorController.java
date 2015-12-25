@@ -1,12 +1,8 @@
 package com.dianping.cache.controller;
 
-import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.dianping.cache.autoscale.AppId;
-import com.dianping.cache.autoscale.AutoScale;
-import com.dianping.cache.autoscale.dockerscale.DockerScale;
 import com.dianping.cache.entity.CacheConfiguration;
 import com.dianping.cache.entity.Server;
 import com.dianping.cache.entity.ServerCluster;
@@ -82,7 +78,7 @@ public class NodeMonitorController  extends AbstractSidebarController{
 			serverlist.remove(server);
 			String newServers = "";
 			for(String str : serverlist){
-				newServers = newServers + str + ";";
+				newServers = newServers + str + ",";
 			}
 			newServers = newServers.substring(0,newServers.length()-1);//delete last ";"
 			newServers = urlHead + newServers + urlTail;

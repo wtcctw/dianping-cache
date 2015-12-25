@@ -4,13 +4,14 @@ import com.dianping.cache.alarm.AlarmType;
 import com.dianping.cache.alarm.alarmconfig.AlarmConfigService;
 import com.dianping.cache.alarm.alarmtemplate.RedisAlarmTemplateService;
 import com.dianping.cache.alarm.dao.AlarmRecordDao;
-import com.dianping.cache.alarm.entity.*;
+import com.dianping.cache.alarm.entity.AlarmConfig;
+import com.dianping.cache.alarm.entity.AlarmDetail;
+import com.dianping.cache.alarm.entity.AlarmRecord;
+import com.dianping.cache.alarm.entity.RedisTemplate;
 import com.dianping.cache.alarm.event.EventFactory;
 import com.dianping.cache.alarm.event.EventType;
-
 import com.dianping.cache.alarm.report.EventReporter;
 import com.dianping.cache.controller.RedisDashBoardUtil;
-;
 import com.dianping.cache.monitor.statsdata.RedisClusterData;
 import net.rubyeye.xmemcached.exception.MemcachedException;
 import org.springframework.beans.factory.annotation.Autowired;
