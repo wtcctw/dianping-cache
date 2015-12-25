@@ -20,6 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import redis.clients.jedis.JedisCallback;
+import redis.clients.jedis.JedisCluster;
 import redis.clients.jedis.exceptions.JedisConnectionException;
 
 import com.dianping.cat.Cat;
@@ -1626,6 +1627,11 @@ public class RedisStoreClientImpl extends AbstractStoreClient implements RedisSt
     public String locate(String finalKey) {
         checkNotNull(finalKey, "final key is null");
         return clientManager.getClient().getClusterNode(finalKey);
+    }
+
+    @Override
+    public JedisCluster getJedisClient() {
+        return clientManager.getClient();
     }
 
 }
