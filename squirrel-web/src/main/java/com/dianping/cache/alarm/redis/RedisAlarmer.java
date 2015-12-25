@@ -2,6 +2,7 @@ package com.dianping.cache.alarm.redis;
 
 import com.dianping.cache.alarm.AlarmType;
 import com.dianping.cache.alarm.alarmconfig.AlarmConfigService;
+import com.dianping.cache.alarm.alarmtemplate.RedisAlarmTemplateService;
 import com.dianping.cache.alarm.dao.AlarmRecordDao;
 import com.dianping.cache.alarm.entity.*;
 import com.dianping.cache.alarm.event.EventFactory;
@@ -45,6 +46,9 @@ public class RedisAlarmer extends AbstractRedisAlarmer {
     @Autowired
     AlarmConfigService alarmConfigService;
 
+    @Autowired
+    RedisAlarmTemplateService redisAlarmTemplateService;
+
 
     @Override
     public void doAlarm() throws InterruptedException, MemcachedException, IOException, TimeoutException {
@@ -62,18 +66,23 @@ public class RedisAlarmer extends AbstractRedisAlarmer {
 
 
         for (RedisClusterData item : redisClusterDatas) {
-            AlarmConfig alarmConfig = alarmConfigService.findByClusterTypeAndNameAndAlarmType(ALARMTYPE, item.getClusterName(),"内存");
+            AlarmConfig alarmConfig = alarmConfigService.findByClusterTypeAndName(ALARMTYPE, item.getClusterName());
 
             if(null == alarmConfig){
-                alarmConfig = new AlarmConfig("Redis",item.getClusterName(),"内存");
+                alarmConfig = new AlarmConfig("Redis",item.getClusterName());
                 alarmConfigService.insert(alarmConfig);
             }
 
-            if (item.getUsed()> alarmConfig.getThreshold()) {
+            RedisTemplate redisTemplate = redisAlarmTemplateService.findAlarmTemplateByTemplateName(alarmConfig.getAlarmTemplate());
+
+            if (item.getUsed()> redisTemplate.getMemThreshold()) {
                 AlarmDetail alarmDetail = new AlarmDetail(alarmConfig);
                 isReport = true;
                 alarmDetail.setAlarmTitle(MEMUSAGE_TOO_HIGH)
                         .setAlarmDetail(item.getClusterName() + ":" + MEMUSAGE_TOO_HIGH + ";使用率为" + item.getUsed())
+                        .setMailMode(redisTemplate.isMailMode())
+                        .setSmsMode(redisTemplate.isSmsMode())
+                        .setWeixinMode(redisTemplate.isWeixinMode())
                         .setCreateTime(new Date());
 
                 AlarmRecord alarmRecord = new AlarmRecord();

@@ -9,26 +9,21 @@
         <result column="id" property="id"/>
         <result column="clusterType" property="clusterType"/>
         <result column="clusterName" property="clusterName"/>
-        <result column="alarmType" property="alarmType"/>
-        <result column="alarmRule" property="alarmRule"/>
-        <result column="threshold" property="threshold"/>
+        <result column="alarmTemplate" property="alarmTemplate"/>
         <result column="receiver" property="receiver"/>
-        <result column="mailMode" property="mailMode"/>
-        <result column="smsMode" property="smsMode"/>
-        <result column="weixinMode" property="weixinMode"/>
         <result column="toBusiness" property="toBusiness"/>
         <result column="createTime" property="createTime"/>
         <result column="updateTime" property="updateTime"/>
     </resultMap>
 
     <insert id="insert" parameterType="AlarmConfig">
-        INSERT INTO alarm_config(id,clusterType,clusterName, alarmType, alarmRule, threshold,receiver,mailMode,smsMode,weixinMode,toBusiness,createTime, updateTime)
-        VALUES(#{id}, #{clusterType},#{clusterName}, #{alarmType}, #{alarmRule},#{threshold},#{receiver},#{mailMode},#{smsMode},#{weixinMode},#{toBusiness},#{createTime},#{updateTime})
+        INSERT INTO alarm_config(id,clusterType,clusterName,alarmTemplate,receiver,toBusiness,createTime, updateTime)
+        VALUES(#{id}, #{clusterType},#{clusterName}, #{alarmTemplate},#{receiver},#{toBusiness},#{createTime},#{updateTime})
     </insert>
 
     <update id="update" parameterType="AlarmConfig">
         UPDATE alarm_config
-        SET clusterType=#{clusterType},clusterName=#{clusterName}, alarmType=#{alarmType}, alarmRule=#{alarmRule},threshold=#{threshold},receiver=#{receiver},mailMode=#{mailMode},smsMode=#{smsMode},weixinMode=#{weixinMode},toBusiness=#{toBusiness},createTime=#{createTime},updateTime=#{updateTime}
+        SET clusterType=#{clusterType},clusterName=#{clusterName},alarmTemplate=#{alarmTemplate},receiver=#{receiver},toBusiness=#{toBusiness},createTime=#{createTime},updateTime=#{updateTime}
         WHERE id = #{id}
     </update>
 
@@ -37,29 +32,29 @@
         WHERE id = #{id}
     </delete>
 
-    <select id="findByClusterTypeAndNameAndAlarmType" resultMap="AlarmConfigResult" parameterType="map">
-        SELECT id,clusterType,clusterName, alarmType, alarmRule, threshold,receiver,mailMode,smsMode,weixinMode,toBusiness,createTime, updateTime
+    <select id="findByClusterTypeAndName" resultMap="AlarmConfigResult" parameterType="map">
+        SELECT id,clusterType,clusterName,alarmTemplate,receiver,toBusiness,createTime, updateTime
         FROM alarm_config
-        WHERE clusterType= #{clusterType} AND clusterName=#{clusterName} and alarmType = #{alarmType}
+        WHERE clusterType= #{clusterType} AND clusterName=#{clusterName}
         ORDER BY id ASC
     </select>
 
     <select id="findById" resultMap="AlarmConfigResult" parameterType="int">
-        SELECT id,clusterType,clusterName, alarmType, alarmRule, threshold,receiver,mailMode,smsMode,weixinMode,toBusiness,createTime, updateTime
+        SELECT id,clusterType,clusterName,alarmTemplate,receiver,toBusiness,createTime, updateTime
         FROM alarm_config
         WHERE id = #{id}
         ORDER BY id ASC
     </select>
 
     <select id="findByPage" resultMap="AlarmConfigResult" parameterType="map">
-        SELECT id,clusterType,clusterName, alarmType, alarmRule, threshold,receiver,mailMode,smsMode,weixinMode,toBusiness,createTime, updateTime
+        SELECT id,clusterType,clusterName,alarmTemplate,receiver,toBusiness,createTime, updateTime
         FROM alarm_config
         ORDER BY id ASC
         LIMIT #{limit} OFFSET #{offset}
     </select>
 
     <select id="findAll" resultMap="AlarmConfigResult">
-        SELECT id,clusterType,clusterName, alarmType, alarmRule, threshold,receiver,mailMode,smsMode,weixinMode,toBusiness,createTime, updateTime
+        SELECT id,clusterType,clusterName,alarmTemplate,receiver,toBusiness,createTime, updateTime
         FROM alarm_config
         ORDER BY id ASC
     </select>

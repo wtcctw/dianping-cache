@@ -1,5 +1,9 @@
 package com.dianping.cache.alarm.entity;
 
+import com.dianping.cache.alarm.alarmtemplate.MemcacheAlarmTemplateService;
+import com.dianping.cache.alarm.alarmtemplate.RedisAlarmTemplateService;
+import org.springframework.beans.factory.annotation.Autowired;
+
 import java.util.Date;
 
 /**
@@ -13,19 +17,9 @@ public class AlarmConfig {
 
     private String clusterName;
 
-    private String alarmType;
-
-    private String alarmRule;
-
-    private int threshold;
+    private String alarmTemplate;
 
     private String receiver;
-
-    private boolean mailMode;
-
-    private boolean smsMode;
-
-    private boolean weixinMode;
 
     private boolean toBusiness;
 
@@ -33,35 +27,28 @@ public class AlarmConfig {
 
     private Date updateTime;
 
+    @Autowired
+    MemcacheAlarmTemplateService memcacheAlarmTemplateService;
+
+    @Autowired
+    RedisAlarmTemplateService redisAlarmTemplateService;
+
     public AlarmConfig(){
 
     }
 
-    public AlarmConfig(String clusterType, String clusterName, String alarmType){
+    public AlarmConfig(String clusterType, String clusterName){
 
         this.setId(0);
 
         this.setClusterType(clusterType)
-                .setClusterName(clusterName)
-                .setAlarmType(alarmType)
-                .setAlarmRule("上阈值");
+                .setClusterName(clusterName);
         if("Memcache".equals(clusterType)){
-            if("内存".equals(alarmType)){
-                this.threshold = 95;
-            }else if("QPS".equals(alarmType)){
-                this.threshold = 80000;
-            }else if("连接数".equals(alarmType)){
-                this.threshold = 28000;
-            }
+            this.setAlarmTemplate("Default");
         }else if("Redis".equals(clusterType)){
-            if("内存".equals(alarmType)){
-                this.threshold = 80;
-            }
+            this.setAlarmTemplate("Default");
         }
         this.setReceiver("shiyun.lv,xiaoxiong.dai")
-                .setMailMode(true)
-                .setSmsMode(false)
-                .setWeixinMode(true)
                 .setToBusiness(false)
                 .setCreateTime(new Date())
                 .setUpdateTime(new Date());
@@ -95,31 +82,12 @@ public class AlarmConfig {
         return this;
     }
 
-    public String getAlarmType() {
-        return alarmType;
+    public String getAlarmTemplate() {
+        return alarmTemplate;
     }
 
-    public AlarmConfig setAlarmType(String alarmType) {
-        this.alarmType = alarmType;
-        return this;
-    }
-
-    public String getAlarmRule() {
-        return alarmRule;
-    }
-
-    public AlarmConfig setAlarmRule(String alarmRule) {
-        this.alarmRule = alarmRule;
-        return this;
-    }
-
-    public int getThreshold() {
-        return threshold;
-    }
-
-    public AlarmConfig setThreshold(int threshold) {
-        this.threshold = threshold;
-        return this;
+    public void setAlarmTemplate(String alarmTemplate) {
+        this.alarmTemplate = alarmTemplate;
     }
 
     public String getReceiver() {
@@ -128,33 +96,6 @@ public class AlarmConfig {
 
     public AlarmConfig setReceiver(String receiver) {
         this.receiver = receiver;
-        return this;
-    }
-
-    public boolean isMailMode() {
-        return mailMode;
-    }
-
-    public AlarmConfig setMailMode(boolean mailMode) {
-        this.mailMode = mailMode;
-        return this;
-    }
-
-    public boolean isSmsMode() {
-        return smsMode;
-    }
-
-    public AlarmConfig setSmsMode(boolean smsMode) {
-        this.smsMode = smsMode;
-        return this;
-    }
-
-    public boolean isWeixinMode() {
-        return weixinMode;
-    }
-
-    public AlarmConfig setWeixinMode(boolean weixinMode) {
-        this.weixinMode = weixinMode;
         return this;
     }
 

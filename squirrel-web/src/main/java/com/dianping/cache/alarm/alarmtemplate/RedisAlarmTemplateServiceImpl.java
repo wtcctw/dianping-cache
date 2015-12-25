@@ -37,7 +37,7 @@ public class RedisAlarmTemplateServiceImpl implements RedisAlarmTemplateService 
     }
 
     @Override
-    public RedisTemplate findAlarmTemplateByClusterName(String templateName) {
+    public RedisTemplate findAlarmTemplateByTemplateName(String templateName) {
         return redisAlarmTemplateDao.findAlarmTemplateByTemplateName(templateName);
     }
 

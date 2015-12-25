@@ -14,7 +14,7 @@ public interface AlarmConfigService {
 
     int deleteById(int id);
 
-    AlarmConfig findByClusterTypeAndNameAndAlarmType(String clusterType, String clusterName, String alarmType);
+    AlarmConfig findByClusterTypeAndName(String clusterType, String clusterName);
 
     AlarmConfig findById(int id);
 

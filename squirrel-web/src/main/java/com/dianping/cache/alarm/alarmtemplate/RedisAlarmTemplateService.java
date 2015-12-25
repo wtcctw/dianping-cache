@@ -17,7 +17,7 @@ public interface RedisAlarmTemplateService {
 
     RedisTemplate findById(int id);
 
-    RedisTemplate findAlarmTemplateByClusterName(String clusterName);
+    RedisTemplate findAlarmTemplateByTemplateName(String templateName);
 
     int deleteById(int id);
 

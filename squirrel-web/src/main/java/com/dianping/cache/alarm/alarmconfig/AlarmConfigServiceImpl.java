@@ -32,8 +32,8 @@ public class AlarmConfigServiceImpl implements AlarmConfigService {
     }
 
     @Override
-    public AlarmConfig findByClusterTypeAndNameAndAlarmType(String clusterType, String clusterName, String alarmType) {
-        return alarmConfigDao.findByClusterTypeAndNameAndAlarmType(clusterType, clusterName, alarmType);
+    public AlarmConfig findByClusterTypeAndName(String clusterType, String clusterName) {
+        return alarmConfigDao.findByClusterTypeAndName(clusterType, clusterName);
     }
 
     @Override

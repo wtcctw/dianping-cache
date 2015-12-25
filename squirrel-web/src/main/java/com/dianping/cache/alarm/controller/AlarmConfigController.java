@@ -1,9 +1,13 @@
 package com.dianping.cache.alarm.controller;
 
 import com.dianping.cache.alarm.alarmconfig.AlarmConfigService;
+import com.dianping.cache.alarm.alarmtemplate.MemcacheAlarmTemplateService;
+import com.dianping.cache.alarm.alarmtemplate.RedisAlarmTemplateService;
 import com.dianping.cache.alarm.controller.dto.AlarmConfigDto;
 import com.dianping.cache.alarm.controller.mapper.AlarmConfigMapper;
 import com.dianping.cache.alarm.entity.AlarmConfig;
+import com.dianping.cache.alarm.entity.MemcacheTemplate;
+import com.dianping.cache.alarm.entity.RedisTemplate;
 import com.dianping.cache.controller.AbstractSidebarController;
 import com.dianping.cache.controller.RedisDashBoardUtil;
 import com.dianping.cache.entity.CacheConfiguration;
@@ -29,6 +33,12 @@ public class AlarmConfigController extends AbstractSidebarController {
 
     @Autowired
     private AlarmConfigService alarmConfigService;
+
+    @Autowired
+    private MemcacheAlarmTemplateService memcacheAlarmTemplateService;
+
+    @Autowired
+    private RedisAlarmTemplateService redisAlarmTemplateService;
 
     @RequestMapping(value = "/setting/alarmrule")
     public ModelAndView topicSetting(HttpServletRequest request, HttpServletResponse response) {
@@ -105,6 +115,32 @@ public class AlarmConfigController extends AbstractSidebarController {
         return clusterNames;
     }
 
+    @RequestMapping(value = "/setting/alarmrule/query/memcachetemplates", method = RequestMethod.GET)
+    @ResponseBody
+    public List<String> findMemcacheTemplates() {
+        List<String> templateNames = new ArrayList<String>();
+        List<MemcacheTemplate> memcacheTemplates = memcacheAlarmTemplateService.findAll();
+
+        for (MemcacheTemplate memcacheTemplate : memcacheTemplates) {
+            templateNames.add(memcacheTemplate.getTemplateName());
+        }
+
+        return templateNames;
+    }
+
+
+    @RequestMapping(value = "/setting/alarmrule/query/redistemplates", method = RequestMethod.GET)
+    @ResponseBody
+    public List<String> findRedisTemplates() {
+        List<String> templateNames = new ArrayList<String>();
+        List<RedisTemplate> redisTemplates = redisAlarmTemplateService.findAll();
+
+        for (RedisTemplate redisTemplate : redisTemplates) {
+            templateNames.add(redisTemplate.getTemplateName());
+        }
+
+        return templateNames;
+    }
 
     @Override
     protected String getSide() {

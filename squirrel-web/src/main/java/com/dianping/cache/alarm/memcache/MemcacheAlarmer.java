@@ -1,11 +1,13 @@
 package com.dianping.cache.alarm.memcache;
 
 import com.dianping.cache.alarm.alarmconfig.AlarmConfigService;
+import com.dianping.cache.alarm.alarmtemplate.MemcacheAlarmTemplateService;
 import com.dianping.cache.alarm.entity.AlarmConfig;
 import com.dianping.cache.alarm.AlarmType;
 import com.dianping.cache.alarm.dao.AlarmRecordDao;
 import com.dianping.cache.alarm.entity.AlarmDetail;
 import com.dianping.cache.alarm.entity.AlarmRecord;
+import com.dianping.cache.alarm.entity.MemcacheTemplate;
 import com.dianping.cache.alarm.event.EventFactory;
 import com.dianping.cache.alarm.event.EventType;
 import com.dianping.cache.alarm.report.EventReporter;
@@ -62,6 +64,9 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
     @Autowired
     AlarmConfigService alarmConfigService;
 
+    @Autowired
+    MemcacheAlarmTemplateService memcacheAlarmTemplateService;
+
     @Override
     public void doAlarm() throws InterruptedException, MemcachedException, IOException, TimeoutException {
         doCheck();
@@ -117,18 +122,16 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
             eventReporter.report(memcacheEvent);
 
         }
-
     }
 
     AlarmDetail isDownAlarm(CacheConfiguration item, Map<String, Map<String, Object>> currentServerStats, MemcacheEvent memcacheEvent) throws InterruptedException, IOException, MemcachedException, TimeoutException {
 
-        AlarmConfig alarmConfig = alarmConfigService.findByClusterTypeAndNameAndAlarmType(ALARMTYPE, item.getCacheKey(), "宕机");
+        AlarmConfig alarmConfig = alarmConfigService.findByClusterTypeAndName(ALARMTYPE, item.getCacheKey());
 
         if (null == alarmConfig) {
-            alarmConfig = new AlarmConfig("Memcache", item.getCacheKey(), "宕机");
+            alarmConfig = new AlarmConfig("Memcache", item.getCacheKey());
             alarmConfigService.insert(alarmConfig);
         }
-
 
         List<String> serverList = item.getServerList();
 
@@ -144,9 +147,14 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
             } catch (Exception e) {
                 AlarmDetail alarmDetail = new AlarmDetail(alarmConfig);
 
+                MemcacheTemplate memcacheTemplate = memcacheAlarmTemplateService.findAlarmTemplateByTemplateName(alarmDetail.getAlarmTemplate());
+
                 alarmDetail.setClusterName(item.getCacheKey());
                 alarmDetail.setAlarmTitle(CLUSTER_DOWN)
                         .setAlarmDetail(item.getCacheKey() + ":" + CLUSTER_DOWN + ";机器信息为" + server)
+                        .setMailMode(memcacheTemplate.isMailMode())
+                        .setSmsMode(memcacheTemplate.isSmsMode())
+                        .setWeixinMode(memcacheTemplate.isWeixinMode())
                         .setCreateTime(new Date());
 
 
@@ -169,13 +177,13 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
 
     AlarmDetail isMemAlarm(CacheConfiguration item, Map<String, Map<String, Object>> currentServerStats, MemcacheEvent memcacheEvent) throws InterruptedException {
 
-        AlarmConfig alarmConfig = alarmConfigService.findByClusterTypeAndNameAndAlarmType(ALARMTYPE, item.getCacheKey(), "内存");
+        AlarmConfig alarmConfig = alarmConfigService.findByClusterTypeAndName(ALARMTYPE, item.getCacheKey());
 
         if (null == alarmConfig) {
-            alarmConfig = new AlarmConfig("Memcache", item.getCacheKey(), "内存");
+            alarmConfig = new AlarmConfig("Memcache", item.getCacheKey());
             alarmConfigService.insert(alarmConfig);
         }
-
+        MemcacheTemplate memcacheTemplate = memcacheAlarmTemplateService.findAlarmTemplateByTemplateName(alarmConfig.getAlarmTemplate());
 
         List<String> serverList = item.getServerList();
 
@@ -203,11 +211,14 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
             usage = (float) memused / mem;
         }
 
-        if (usage * 100 > alarmConfig.getThreshold()) {
+        if (usage * 100 > memcacheTemplate.getMemThreshold()) {
             AlarmDetail alarmDetail = new AlarmDetail(alarmConfig);
 
             alarmDetail.setAlarmTitle(MEMUSAGE_TOO_HIGH)
                     .setAlarmDetail(item.getCacheKey() + ":" + MEMUSAGE_TOO_HIGH + ";IP为" + ips + ";使用率为" + usage)
+                    .setMailMode(memcacheTemplate.isMailMode())
+                    .setSmsMode(memcacheTemplate.isSmsMode())
+                    .setWeixinMode(memcacheTemplate.isWeixinMode())
                     .setCreateTime(new Date());
 
             AlarmRecord alarmRecord = new AlarmRecord();
@@ -227,12 +238,14 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
 
     AlarmDetail isQpsAlarm(CacheConfiguration item, Map<String, Map<String, Object>> currentServerStats, MemcacheEvent memcacheEvent) throws InterruptedException {
 
-        AlarmConfig alarmConfig = alarmConfigService.findByClusterTypeAndNameAndAlarmType(ALARMTYPE, item.getCacheKey(), "QPS");
+        AlarmConfig alarmConfig = alarmConfigService.findByClusterTypeAndName(ALARMTYPE, item.getCacheKey());
 
         if (null == alarmConfig) {
-            alarmConfig = new AlarmConfig("Memcache", item.getCacheKey(), "QPS");
+            alarmConfig = new AlarmConfig("Memcache", item.getCacheKey());
             alarmConfigService.insert(alarmConfig);
         }
+
+        MemcacheTemplate memcacheTemplate = memcacheAlarmTemplateService.findAlarmTemplateByTemplateName(alarmConfig.getAlarmTemplate());
 
         List<String> serverList = item.getServerList();
 
@@ -250,11 +263,14 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
             }
         }
 
-        if (qps > alarmConfig.getThreshold()) {
+        if (qps > memcacheTemplate.getQpsThreshold()) {
             AlarmDetail alarmDetail = new AlarmDetail(alarmConfig);
 
             alarmDetail.setAlarmTitle(QPS_TOO_HIGH)
                     .setAlarmDetail(item.getCacheKey() + ":" + QPS_TOO_HIGH + ";IP为" + ips + ";QPS为" + qps)
+                    .setMailMode(memcacheTemplate.isMailMode())
+                    .setSmsMode(memcacheTemplate.isSmsMode())
+                    .setWeixinMode(memcacheTemplate.isWeixinMode())
                     .setCreateTime(new Date());
 
             AlarmRecord alarmRecord = new AlarmRecord();
@@ -276,12 +292,14 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
 
     AlarmDetail isConnAlarm(CacheConfiguration item, Map<String, Map<String, Object>> currentServerStats, MemcacheEvent memcacheEvent) throws InterruptedException {
 
-        AlarmConfig alarmConfig = alarmConfigService.findByClusterTypeAndNameAndAlarmType(ALARMTYPE, item.getCacheKey(), "连接数");
+        AlarmConfig alarmConfig = alarmConfigService.findByClusterTypeAndName(ALARMTYPE, item.getCacheKey());
 
         if (null == alarmConfig) {
-            alarmConfig = new AlarmConfig("Memcache", item.getCacheKey(), "连接数");
+            alarmConfig = new AlarmConfig("Memcache", item.getCacheKey());
             alarmConfigService.insert(alarmConfig);
         }
+
+        MemcacheTemplate memcacheTemplate = memcacheAlarmTemplateService.findAlarmTemplateByTemplateName(alarmConfig.getAlarmTemplate());
 
         List<String> serverList = item.getServerList();
 
@@ -301,11 +319,14 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
             }
         }
 
-        if (conn > alarmConfig.getThreshold()) {
+        if (conn > memcacheTemplate.getConnThreshold()) {
             AlarmDetail alarmDetail = new AlarmDetail(alarmConfig);
 
             alarmDetail.setAlarmTitle(CONN_TOO_HIGH)
                     .setAlarmDetail(item.getCacheKey() + ":" + CONN_TOO_HIGH + ";IP为" + ips + ";连接数为" + conn)
+                    .setMailMode(memcacheTemplate.isMailMode())
+                    .setSmsMode(memcacheTemplate.isSmsMode())
+                    .setWeixinMode(memcacheTemplate.isWeixinMode())
                     .setCreateTime(new Date());
 
             AlarmRecord alarmRecord = new AlarmRecord();

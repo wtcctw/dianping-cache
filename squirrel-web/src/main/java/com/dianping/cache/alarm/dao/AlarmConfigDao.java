@@ -35,7 +35,7 @@ public interface AlarmConfigDao extends GenericDao {
      * @param clusterType,clusterName
      * @return
      */
-    AlarmConfig findByClusterTypeAndNameAndAlarmType(@Param("clusterType") String clusterType, @Param("clusterName") String clusterName, @Param("alarmType") String alarmType);
+    AlarmConfig findByClusterTypeAndName(@Param("clusterType") String clusterType, @Param("clusterName") String clusterName);
 
     /**
      * @param id

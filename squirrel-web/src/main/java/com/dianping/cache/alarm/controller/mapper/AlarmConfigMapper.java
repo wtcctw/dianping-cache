@@ -2,7 +2,6 @@ package com.dianping.cache.alarm.controller.mapper;
 
 import com.dianping.cache.alarm.controller.dto.AlarmConfigDto;
 import com.dianping.cache.alarm.entity.AlarmConfig;
-import com.dianping.cache.alarm.entity.AlarmConfig;
 
 /**
  * Created by lvshiyun on 15/12/6.
@@ -17,13 +16,8 @@ public class AlarmConfigMapper {
         }
         alarmConfig.setClusterType(alarmConfigDto.getClusterType());
         alarmConfig.setClusterName(alarmConfigDto.getClusterName());
-        alarmConfig.setAlarmType(alarmConfigDto.getAlarmType());
-        alarmConfig.setAlarmRule(alarmConfigDto.getAlarmRule());
-        alarmConfig.setThreshold(alarmConfigDto.getThreshold());
+        alarmConfig.setAlarmTemplate(alarmConfigDto.getAlarmTemplate());
         alarmConfig.setReceiver(alarmConfigDto.getReceiver());
-        alarmConfig.setMailMode(alarmConfigDto.isMailMode());
-        alarmConfig.setSmsMode(alarmConfigDto.isSmsMode());
-        alarmConfig.setWeixinMode(alarmConfigDto.isWeixinMode());
         alarmConfig.setToBusiness(alarmConfigDto.isToBusiness());
         alarmConfig.setCreateTime(alarmConfigDto.getCreateTime());
         alarmConfig.setUpdateTime(alarmConfigDto.getUpdateTime());
