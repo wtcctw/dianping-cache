@@ -7,21 +7,24 @@
 
     <resultMap id="RedisTemplateResult" type="RedisTemplate">
         <result column="id" property="id"/>
-        <result column="clusterName" property="clusterName"/>
+        <result column="templateName" property="templateName"/>
         <result column="isDown" property="isDown"/>
         <result column="memThreshold" property="memThreshold"/>
+        <result column="mailMode" property="mailMode"/>
+        <result column="smsMode" property="smsMode"/>
+        <result column="weixinMode" property="weixinMode"/>
         <result column="createTime" property="createTime"/>
         <result column="updateTime" property="updateTime"/>
     </resultMap>
 
     <insert id="insert" parameterType="RedisTemplate">
-        INSERT INTO redis_alarmTemplate(id,clusterName,isDown,memThreshold,createTime, updateTime)
-        VALUES(#{id},#{clusterName},#{isDown},#{memThreshold},#{createTime},#{updateTime})
+        INSERT INTO redis_alarmTemplate(id,templateName,isDown,memThreshold,mailMode,smsMode,weixinMode,createTime, updateTime)
+        VALUES(#{id},#{templateName},#{isDown},#{memThreshold},#{mailMode},#{smsMode},#{weixinMode},#{createTime},#{updateTime})
     </insert>
 
     <update id="update" parameterType="RedisTemplate">
         UPDATE redis_alarmTemplate
-        SET clusterName=#{clusterName},isDown=#{isDown},memThreshold=#{memThreshold},createTime=#{createTime},updateTime=#{updateTime}
+        SET templateName=#{templateName},isDown=#{isDown},memThreshold=#{memThreshold},mailMode=#{mailMode},smsMode=#{smsMode},weixinMode=#{weixinMode},createTime=#{createTime},updateTime=#{updateTime}
         WHERE id = #{id}
     </update>
 
@@ -32,21 +35,21 @@
 
 
     <select id="findById" resultMap="RedisTemplateResult" parameterType="int">
-        SELECT id,clusterName,isDown,memThreshold,createTime, updateTime
+        SELECT id,templateName,isDown,memThreshold,mailMode,smsMode,weixinMode,createTime, updateTime
         FROM redis_alarmTemplate
         WHERE id = #{id}
         ORDER BY id ASC
     </select>
 
-    <select id="findAlarmTemplateByClusterName" resultMap="RedisTemplateResult" parameterType="String">
-        SELECT id,clusterName,isDown,memThreshold,createTime, updateTime
+    <select id="findAlarmTemplateByTemplateName" resultMap="RedisTemplateResult" parameterType="String">
+        SELECT id,templateName,isDown,memThreshold,mailMode,smsMode,weixinMode,createTime, updateTime
         FROM redis_alarmTemplate
-        WHERE clusterName = #{clusterName}
+        WHERE templateName = #{templateName}
         ORDER BY id ASC
     </select>
 
     <select id="findAll" resultMap="RedisTemplateResult">
-        SELECT id,clusterName,isDown,memThreshold,createTime, updateTime
+        SELECT id,templateName,isDown,memThreshold,mailMode,smsMode,weixinMode,createTime, updateTime
         FROM redis_alarmTemplate
         ORDER BY id ASC
     </select>

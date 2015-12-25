@@ -3,12 +3,14 @@ package com.dianping.cache.alarm.alarmtemplate;
 import com.dianping.cache.alarm.dao.RedisAlarmTemplateDao;
 import com.dianping.cache.alarm.entity.RedisTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 /**
  * Created by lvshiyun on 15/12/24.
  */
+@Service
 public class RedisAlarmTemplateServiceImpl implements RedisAlarmTemplateService {
 
     @Autowired
@@ -35,8 +37,8 @@ public class RedisAlarmTemplateServiceImpl implements RedisAlarmTemplateService 
     }
 
     @Override
-    public RedisTemplate findAlarmTemplateByClusterName(String clusterName) {
-        return redisAlarmTemplateDao.findAlarmTemplateByClusterName(clusterName);
+    public RedisTemplate findAlarmTemplateByClusterName(String templateName) {
+        return redisAlarmTemplateDao.findAlarmTemplateByTemplateName(templateName);
     }
 
     @Override

@@ -37,10 +37,10 @@ public interface RedisAlarmTemplateDao extends GenericDao {
     RedisTemplate findById(int id);
 
     /**
-     * @param clusterName
+     * @param templateName
      * @return
      */
-    RedisTemplate findAlarmTemplateByClusterName(String clusterName);
+    RedisTemplate findAlarmTemplateByTemplateName(String templateName);
     
     /**
      * @param

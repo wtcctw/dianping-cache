@@ -9,7 +9,13 @@ public class AlarmConfigTemplate {
 
     int id = -1;
 
-    String clusterName;
+    String templateName;
+
+    boolean mailMode;
+
+    boolean smsMode;
+
+    boolean weixinMode;
 
     Date createTime;
 
@@ -24,16 +30,42 @@ public class AlarmConfigTemplate {
         return this;
     }
 
-
-    public String getClusterName() {
-        return clusterName;
+    public String getTemplateName() {
+        return templateName;
     }
 
-    public AlarmConfigTemplate setClusterName(String clusterName) {
-        this.clusterName = clusterName;
+    public AlarmConfigTemplate setTemplateName(String templateName) {
+        this.templateName = templateName;
         return this;
     }
 
+    public boolean isMailMode() {
+        return mailMode;
+    }
+
+    public AlarmConfigTemplate setMailMode(boolean mailMode) {
+        this.mailMode = mailMode;
+        return this;
+    }
+
+    public boolean isSmsMode() {
+        return smsMode;
+    }
+
+    public AlarmConfigTemplate setSmsMode(boolean smsMode) {
+        this.smsMode = smsMode;
+        return this;
+    }
+
+    public boolean isWeixinMode() {
+        return weixinMode;
+    }
+
+    public AlarmConfigTemplate setWeixinMode(boolean weixinMode) {
+        this.weixinMode = weixinMode;
+        return this;
+    }
+    
     public Date getCreateTime() {
         return createTime;
     }

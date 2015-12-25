@@ -80,7 +80,7 @@ module
 
 module
     .controller(
-    'AlarmRuleController',
+    'RedisTemplateController',
     [
         '$rootScope',
         '$scope',
@@ -138,7 +138,10 @@ module
 
             $scope.setModalInput = function (index) {
                 $scope.alarmConfigEntity.id = $scope.searchPaginator.currentPageItems[index].id;
-                $scope.alarmConfigEntity.clusterName = $scope.searchPaginator.currentPageItems[index].clusterName;
+                $scope.alarmConfigEntity.templateName = $scope.searchPaginator.currentPageItems[index].templateName;
+                $scope.alarmConfigEntity.mailMode = $scope.searchPaginator.currentPageItems[index].mailMode;
+                $scope.alarmConfigEntity.smsMode = $scope.searchPaginator.currentPageItems[index].smsMode;
+                $scope.alarmConfigEntity.weixinMode = $scope.searchPaginator.currentPageItems[index].weixinMode;
                 $scope.alarmConfigEntity.isDown = $scope.searchPaginator.currentPageItems[index].isDown;
                 $scope.alarmConfigEntity.memThreshold = $scope.searchPaginator.currentPageItems[index].memThreshold;
                 $scope.alarmConfigEntity.isUpdate = true;
@@ -194,21 +197,6 @@ module
 
             $scope.query();
             $scope.clearModal();
-
-            $http(
-                {
-                    method:"GET",
-                    url:window.contextPath + '/setting/redistemplate/query/redisclusters'
-                }
-            ).success(
-                function(datas,status,headers,config){
-                    $scope.redisClusters = datas;
-                }
-            ).error(
-                function(datas,status,headers,config){
-                    console.log("redisclusters读取错误")
-                }
-            );
 
         }
     ]

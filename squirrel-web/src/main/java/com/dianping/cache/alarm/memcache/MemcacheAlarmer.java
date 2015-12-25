@@ -122,10 +122,10 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
 
     AlarmDetail isDownAlarm(CacheConfiguration item, Map<String, Map<String, Object>> currentServerStats, MemcacheEvent memcacheEvent) throws InterruptedException, IOException, MemcachedException, TimeoutException {
 
-        AlarmConfig alarmConfig = alarmConfigService.findByClusterTypeAndNameAndAlarmType(ALARMTYPE, item.getCacheKey(),"宕机");
+        AlarmConfig alarmConfig = alarmConfigService.findByClusterTypeAndNameAndAlarmType(ALARMTYPE, item.getCacheKey(), "宕机");
 
-        if(null == alarmConfig){
-            alarmConfig = new AlarmConfig("Memcache",item.getCacheKey(),"宕机");
+        if (null == alarmConfig) {
+            alarmConfig = new AlarmConfig("Memcache", item.getCacheKey(), "宕机");
             alarmConfigService.insert(alarmConfig);
         }
 
@@ -169,10 +169,10 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
 
     AlarmDetail isMemAlarm(CacheConfiguration item, Map<String, Map<String, Object>> currentServerStats, MemcacheEvent memcacheEvent) throws InterruptedException {
 
-        AlarmConfig alarmConfig = alarmConfigService.findByClusterTypeAndNameAndAlarmType(ALARMTYPE, item.getCacheKey(),"内存");
+        AlarmConfig alarmConfig = alarmConfigService.findByClusterTypeAndNameAndAlarmType(ALARMTYPE, item.getCacheKey(), "内存");
 
         if (null == alarmConfig) {
-            alarmConfig = new AlarmConfig("Memcache",item.getCacheKey(),"内存");
+            alarmConfig = new AlarmConfig("Memcache", item.getCacheKey(), "内存");
             alarmConfigService.insert(alarmConfig);
         }
 
@@ -227,10 +227,10 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
 
     AlarmDetail isQpsAlarm(CacheConfiguration item, Map<String, Map<String, Object>> currentServerStats, MemcacheEvent memcacheEvent) throws InterruptedException {
 
-        AlarmConfig alarmConfig = alarmConfigService.findByClusterTypeAndNameAndAlarmType(ALARMTYPE, item.getCacheKey(),"QPS");
+        AlarmConfig alarmConfig = alarmConfigService.findByClusterTypeAndNameAndAlarmType(ALARMTYPE, item.getCacheKey(), "QPS");
 
         if (null == alarmConfig) {
-            alarmConfig = new AlarmConfig("Memcache",item.getCacheKey(),"QPS");
+            alarmConfig = new AlarmConfig("Memcache", item.getCacheKey(), "QPS");
             alarmConfigService.insert(alarmConfig);
         }
 
@@ -276,10 +276,10 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
 
     AlarmDetail isConnAlarm(CacheConfiguration item, Map<String, Map<String, Object>> currentServerStats, MemcacheEvent memcacheEvent) throws InterruptedException {
 
-        AlarmConfig alarmConfig = alarmConfigService.findByClusterTypeAndNameAndAlarmType(ALARMTYPE, item.getCacheKey(),"连接数");
+        AlarmConfig alarmConfig = alarmConfigService.findByClusterTypeAndNameAndAlarmType(ALARMTYPE, item.getCacheKey(), "连接数");
 
         if (null == alarmConfig) {
-            alarmConfig = new AlarmConfig("Memcache",item.getCacheKey(),"连接数");
+            alarmConfig = new AlarmConfig("Memcache", item.getCacheKey(), "连接数");
             alarmConfigService.insert(alarmConfig);
         }
 

@@ -16,7 +16,11 @@ public class RedisTemplateMapper {
         if(-1 != redisTemplateDto.getId()){
             redisTemplate.setId(redisTemplateDto.getId());
         }
-        redisTemplate.setClusterName(redisTemplateDto.getClusterName());
+        redisTemplate
+                .setTemplateName(redisTemplateDto.getTemplateName())
+                .setMailMode(redisTemplateDto.isMailMode())
+                .setSmsMode(redisTemplateDto.isSmsMode())
+                .setWeixinMode(redisTemplateDto.isWeixinMode());
         redisTemplate.setIsDown(redisTemplateDto.isDown())
                 .setMemThreshold(redisTemplateDto.getMemThreshold())
                 .setCreateTime(redisTemplateDto.getCreateTime())

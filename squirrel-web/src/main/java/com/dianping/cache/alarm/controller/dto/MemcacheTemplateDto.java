@@ -9,7 +9,13 @@ public class MemcacheTemplateDto {
 
     private int id;
 
-    private String clusterName;
+    private String templateName;
+
+    private boolean mailMode;
+
+    private boolean smsMode;
+
+    private boolean weixinMode;
 
     private boolean isDown;
 
@@ -33,12 +39,36 @@ public class MemcacheTemplateDto {
         this.id = id;
     }
 
-    public String getClusterName() {
-        return clusterName;
+    public String getTemplateName() {
+        return templateName;
     }
 
-    public void setClusterName(String clusterName) {
-        this.clusterName = clusterName;
+    public void setTemplateName(String templateName) {
+        this.templateName = templateName;
+    }
+
+    public boolean isMailMode() {
+        return mailMode;
+    }
+
+    public void setMailMode(boolean mailMode) {
+        this.mailMode = mailMode;
+    }
+
+    public boolean isSmsMode() {
+        return smsMode;
+    }
+
+    public void setSmsMode(boolean smsMode) {
+        this.smsMode = smsMode;
+    }
+
+    public boolean isWeixinMode() {
+        return weixinMode;
+    }
+
+    public void setWeixinMode(boolean weixinMode) {
+        this.weixinMode = weixinMode;
     }
 
     public boolean isDown() {

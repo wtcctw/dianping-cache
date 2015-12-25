@@ -5,8 +5,6 @@ import com.dianping.cache.alarm.controller.dto.RedisTemplateDto;
 import com.dianping.cache.alarm.controller.mapper.RedisTemplateMapper;
 import com.dianping.cache.alarm.entity.RedisTemplate;
 import com.dianping.cache.controller.AbstractSidebarController;
-import com.dianping.cache.controller.RedisDashBoardUtil;
-import com.dianping.cache.monitor.statsdata.RedisClusterData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -15,7 +13,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
-import java.util.*;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by lvshiyun on 15/12/6.
@@ -37,6 +38,19 @@ public class RedisAlarmTemplateController extends AbstractSidebarController {
     @ResponseBody
     public Object redistemplateList() {
         List<RedisTemplate> redisTemplates = redistemplateService.findAll();
+        if(0==redisTemplates.size()){
+            RedisTemplate redisTemplate = new RedisTemplate();
+            redisTemplate
+                    .setId(0)
+                    .setTemplateName("Default");
+            redisTemplate.setIsDown(true)
+                    .setMemThreshold(80)
+                    .setCreateTime(new Date())
+                    .setUpdateTime(new Date());
+            redistemplateService.insert(redisTemplate);
+            redisTemplates = redistemplateService.findAll();
+        }
+
         Map<String, Object> result = new HashMap<String, Object>();
         result.put("size", redisTemplates.size());
         result.put("entities", redisTemplates);
@@ -51,9 +65,8 @@ public class RedisAlarmTemplateController extends AbstractSidebarController {
 
         if (redisTemplateDto.isUpdate()) {
             RedisTemplate redisTemplate = redistemplateService.findById(redisTemplateDto.getId());
-            ;
 
-            result = redistemplateService.update(RedisTemplateMapper.convertToRedisTemplate(redisTemplateDto));
+            result = redistemplateService.update(redisTemplate);
         } else {
             redisTemplateDto.setCreateTime(new Date());
 
@@ -71,22 +84,10 @@ public class RedisAlarmTemplateController extends AbstractSidebarController {
         return result;
     }
 
-    @RequestMapping(value = "/setting/redistemplate/query/redisclusters", method = RequestMethod.GET)
-    @ResponseBody
-    public List<String> findRedisClusters() {
-        List<String> clusterNames = new ArrayList<String>();
-        List<RedisClusterData> redisClusterDatas = RedisDashBoardUtil.getClusterData();
-
-        for (RedisClusterData redisClusterData : redisClusterDatas) {
-            clusterNames.add(redisClusterData.getClusterName());
-        }
-
-        return clusterNames;
-    }
 
     @Override
     protected String getSide() {
-        return "alarm";
+        return "redis";
     }
 
     @Override

@@ -17,7 +17,11 @@ public class MemcacheTemplateMapper {
         if (-1 != memcacheTemplateDto.getId()) {
             memcacheTemplate.setId(memcacheTemplateDto.getId());
         }
-        memcacheTemplate.setClusterName(memcacheTemplateDto.getClusterName());
+        memcacheTemplate
+                .setTemplateName(memcacheTemplateDto.getTemplateName())
+                .setMailMode(memcacheTemplateDto.isMailMode())
+                .setSmsMode(memcacheTemplateDto.isSmsMode())
+                .setWeixinMode(memcacheTemplateDto.isWeixinMode());
         memcacheTemplate.setIsDown(memcacheTemplateDto.isDown())
                 .setMemThreshold(memcacheTemplateDto.getMemThreshold())
                 .setQpsThreshold(memcacheTemplateDto.getQpsThreshold())

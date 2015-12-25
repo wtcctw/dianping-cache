@@ -7,23 +7,26 @@
 
     <resultMap id="MemcacheTemplateResult" type="MemcacheTemplate">
         <result column="id" property="id"/>
-        <result column="clusterName" property="clusterName"/>
+        <result column="templateName" property="templateName"/>
         <result column="isDown" property="isDown"/>
         <result column="memThreshold" property="memThreshold"/>
         <result column="qpsThreshold" property="qpsThreshold"/>
         <result column="connThreshold" property="connThreshold"/>
+        <result column="mailMode" property="mailMode"/>
+        <result column="smsMode" property="smsMode"/>
+        <result column="weixinMode" property="weixinMode"/>
         <result column="createTime" property="createTime"/>
         <result column="updateTime" property="updateTime"/>
     </resultMap>
 
     <insert id="insert" parameterType="MemcacheTemplate">
-        INSERT INTO memcache_alarmTemplate(id,clusterName,isDown,memThreshold,qpsThreshold,connThreshold,createTime, updateTime)
-        VALUES(#{id},#{clusterName},#{isDown},#{memThreshold},#{qpsThreshold},#{connThreshold},#{createTime},#{updateTime})
+        INSERT INTO memcache_alarmTemplate(id,templateName,isDown,memThreshold,qpsThreshold,connThreshold,mailMode,smsMode,weixinMode,createTime, updateTime)
+        VALUES(#{id},#{templateName},#{isDown},#{memThreshold},#{qpsThreshold},#{connThreshold},#{mailMode},#{smsMode},#{weixinMode},#{createTime},#{updateTime})
     </insert>
 
     <update id="update" parameterType="MemcacheTemplate">
         UPDATE memcache_alarmTemplate
-        SET clusterName=#{clusterName},isDown=#{isDown},memThreshold=#{memThreshold},qpsThreshold=#{qpsThreshold},connThreshold=#{connThreshold}，createTime=#{createTime},updateTime=#{updateTime}
+        SET templateName=#{templateName},isDown=#{isDown},memThreshold=#{memThreshold},qpsThreshold=#{qpsThreshold},connThreshold=#{connThreshold},mailMode=#{mailMode},smsMode=#{smsMode},weixinMode=#{weixinMode},createTime=#{createTime},updateTime=#{updateTime}
         WHERE id = #{id}
     </update>
 
@@ -34,21 +37,21 @@
 
 
     <select id="findById" resultMap="MemcacheTemplateResult" parameterType="int">
-        SELECT id,clusterName,isDown,memThreshold,qpsThreshold,connThreshold,createTime, updateTime
+        SELECT id,templateName,isDown,memThreshold,qpsThreshold,connThreshold,mailMode,smsMode,weixinMode,createTime, updateTime
         FROM memcache_alarmTemplate
         WHERE id = #{id}
         ORDER BY id ASC
     </select>
 
-    <select id="findAlarmTemplateByClusterName" resultMap="MemcacheTemplateResult" parameterType="String">
-        SELECT id,clusterName,isDown,memThreshold,qpsThreshold,connThreshold,createTime, updateTime
+    <select id="findAlarmTemplateByTemplateName" resultMap="MemcacheTemplateResult" parameterType="String">
+        SELECT id,templateName,isDown,memThreshold,qpsThreshold,connThreshold,mailMode,smsMode,weixinMode,createTime, updateTime
         FROM memcache_alarmTemplate
-        WHERE clusterName = #{clusterName}
+        WHERE templateName = #{templateName}
         ORDER BY id ASC
     </select>
 
     <select id="findAll" resultMap="MemcacheTemplateResult">
-        SELECT id,clusterName,isDown,memThreshold,qpsThreshold,connThreshold,createTime, updateTime
+        SELECT id,templateName,isDown,memThreshold,qpsThreshold,connThreshold,mailMode,smsMode,weixinMode,createTime, updateTime
         FROM memcache_alarmTemplate
         ORDER BY id ASC
     </select>

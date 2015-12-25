@@ -17,7 +17,7 @@ public interface MemcacheAlarmTemplateService {
 
     MemcacheTemplate findById(int id);
 
-    MemcacheTemplate findAlarmTemplateByClusterName(String clusterName);
+    MemcacheTemplate findAlarmTemplateByTemplateName(String clusterName);
 
     int deleteById(int id);
 

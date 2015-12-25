@@ -37,10 +37,10 @@ public interface MemcacheAlarmTemplateDao extends GenericDao {
     MemcacheTemplate findById(int id);
 
     /**
-     * @param clusterName
+     * @param templateName
      * @return
      */
-    MemcacheTemplate findAlarmTemplateByClusterName(String clusterName);
+    MemcacheTemplate findAlarmTemplateByTemplateName(String templateName);
 
     /**
      * @param

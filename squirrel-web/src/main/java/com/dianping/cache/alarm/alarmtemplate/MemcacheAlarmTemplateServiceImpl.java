@@ -3,12 +3,14 @@ package com.dianping.cache.alarm.alarmtemplate;
 import com.dianping.cache.alarm.dao.MemcacheAlarmTemplateDao;
 import com.dianping.cache.alarm.entity.MemcacheTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 /**
  * Created by lvshiyun on 15/12/24.
  */
+@Service
 public class MemcacheAlarmTemplateServiceImpl implements MemcacheAlarmTemplateService {
 
     @Autowired
@@ -36,8 +38,8 @@ public class MemcacheAlarmTemplateServiceImpl implements MemcacheAlarmTemplateSe
     }
 
     @Override
-    public MemcacheTemplate findAlarmTemplateByClusterName(String clusterName) {
-        return memcacheAlarmTemplateDao.findAlarmTemplateByClusterName(clusterName);
+    public MemcacheTemplate findAlarmTemplateByTemplateName(String templateName) {
+        return memcacheAlarmTemplateDao.findAlarmTemplateByTemplateName(templateName);
     }
 
     @Override
