@@ -50,7 +50,6 @@ public class RedisAlarmer extends AbstractRedisAlarmer {
     @Autowired
     RedisAlarmTemplateService redisAlarmTemplateService;
 
-
     @Override
     public void doAlarm() throws InterruptedException, MemcachedException, IOException, TimeoutException {
         doCheck();

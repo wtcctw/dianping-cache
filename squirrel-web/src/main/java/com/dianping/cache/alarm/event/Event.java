@@ -7,6 +7,7 @@ import com.dianping.ba.es.qyweixin.adapter.api.exception.QyWeixinAdaperException
 import com.dianping.ba.es.qyweixin.adapter.api.service.MessageService;
 import com.dianping.cache.alarm.AlarmType;
 import com.dianping.cache.alarm.entity.AlarmDetail;
+import com.dianping.cache.alarm.event.alarmDelayCache.EventCache;
 import com.dianping.cache.alarm.receiver.ReceiverService;
 import com.dianping.cache.config.ConfigChangeListener;
 import com.dianping.cache.config.ConfigManager;
@@ -119,9 +120,9 @@ public abstract class Event {
     public void sendMessage(AlarmDetail alarmDetail) throws InterruptedException, URISyntaxException, DocumentException {
         logger.info("[sendMessage] AlarmType {}", alarmType);
 
-
-//        notify(AlarmDetail.getAlarmTitle(), AlarmDetail.toString(),AlarmDetail.getReceiver());
-        notify(alarmDetail);
+        if (isAlarm(alarmDetail)) {
+            notify(alarmDetail);
+        }
     }
 
     //    public void notify(String title, String message, String receiver) {
@@ -137,15 +138,15 @@ public abstract class Event {
 
         if (enableNotify) {
             if (alarmDetail.isMailMode()) {
-                notifyEmail(title, message, receiver,domain,sendToBusiness);
+                notifyEmail(title, message, receiver, domain, sendToBusiness);
             }
 //            notifySms(message, receiver);
 //            if (isProductEnv()) {
             if (alarmDetail.isSmsMode()) {
-                notifySms(message, receiver,domain,sendToBusiness);
+                notifySms(message, receiver, domain, sendToBusiness);
             }
             if (alarmDetail.isWeixinMode()) {
-                notifyWeixin(message, receiver,domain,sendToBusiness);
+                notifyWeixin(message, receiver, domain, sendToBusiness);
             }
 //            }
         }
@@ -163,7 +164,7 @@ public abstract class Event {
         subPair.put("title", title);
         subPair.put("body", message);
 
-        List<String> emailList = receiverService.getMailReceiver(receiver, domain,sendToBusiness);
+        List<String> emailList = receiverService.getMailReceiver(receiver, domain, sendToBusiness);
 
         boolean result = mailService.send(emailType, emailList, subPair, "");
 
@@ -177,7 +178,7 @@ public abstract class Event {
         Map<String, String> subPair = new HashMap<String, String>();
         subPair.put("body", message);
 //        String[] mobiles = smsList.split(",");
-        List<String> mobiles = receiverService.getSmsReceiver(receiver, domain,sendToBusiness);
+        List<String> mobiles = receiverService.getSmsReceiver(receiver, domain, sendToBusiness);
 
         boolean success = true;
         for (String mobile : mobiles) {
@@ -197,7 +198,7 @@ public abstract class Event {
         text.setContent(message);
         List<String> users = new ArrayList<String>();
 //        users.addAll(CollectionUtils.toList(weixinList, ","));
-        users.addAll(receiverService.getWeiXinReceiver(receiver, domain,sendToBusiness));
+        users.addAll(receiverService.getWeiXinReceiver(receiver, domain, sendToBusiness));
         MessageDto messageDto = new MessageDto();
         messageDto.setAgentid(weixinType);
         messageDto.setMediaDto(text);
@@ -210,20 +211,13 @@ public abstract class Event {
         }
     }
 
-    public boolean nofitySmsTest(String message) {
-        Map<String, String> subPair = new HashMap<String, String>();
-        subPair.put("body", message);
-        String smsList = "17802118895";
-        String[] mobiles = smsList.split(",");
-        boolean success = true;
-        for (String mobile : mobiles) {
-            String smsparam = "mobile=" + mobile + "&body=" + message;
-            String result = RequestUtil.sendGet("http://web.paas.dp/sms/send", smsparam);
-            if (!result.contains("200")) {
-                success = false;
-                logger.warn("failed to send sms, content: " + message + ",error code: " + result);
-            }
-        }
-        return success;
+
+    private boolean isAlarm(AlarmDetail alarmDetail) {
+
+        EventCache eventCache = EventCache.getInstance();
+
+        eventCache.put(alarmDetail);
+
+        return eventCache.check(alarmDetail);
     }
 }
