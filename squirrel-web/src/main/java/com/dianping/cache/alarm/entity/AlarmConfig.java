@@ -86,7 +86,7 @@ public class AlarmConfig {
         return alarmTemplate;
     }
 
-    public void setAlarmTemplate(String alarmTemplate) {
+    public AlarmConfig setAlarmTemplate(String alarmTemplate) {
         this.alarmTemplate = alarmTemplate;
     }
 
