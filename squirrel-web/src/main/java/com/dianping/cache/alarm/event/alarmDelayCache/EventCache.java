@@ -22,6 +22,8 @@ public class EventCache {
     public synchronized void put(AlarmDetail alarmDetail) {
         DelayItem delayItem = new DelayItem(alarmDetail);
 
+        flush();
+
         if (null == eventCache.get(delayItem.getDetail())) {
             delayItem.setCount(1);
             delayItem.setTimeStamp(new Date());

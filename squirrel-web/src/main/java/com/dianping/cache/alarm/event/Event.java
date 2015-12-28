@@ -21,7 +21,9 @@ import org.dom4j.DocumentException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.net.InetAddress;
 import java.net.URISyntaxException;
+import java.net.UnknownHostException;
 import java.util.*;
 
 /**
@@ -120,9 +122,25 @@ public abstract class Event {
     public void sendMessage(AlarmDetail alarmDetail) throws InterruptedException, URISyntaxException, DocumentException {
         logger.info("[sendMessage] AlarmType {}", alarmType);
 
-        if (isAlarm(alarmDetail)) {
-            notify(alarmDetail);
+        InetAddress inetAddress = null;
+
+        try {
+            inetAddress = inetAddress.getLocalHost();
+
+            String localip = inetAddress.getHostAddress();
+            //线上、beta环境机器
+            if ("10.1.14.104".equals(localip)||"192.168.227.113".equals(localip)) {
+
+                if (isAlarm(alarmDetail)) {
+                    notify(alarmDetail);
+                }
+            }
+
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
         }
+
+
     }
 
     //    public void notify(String title, String message, String receiver) {
