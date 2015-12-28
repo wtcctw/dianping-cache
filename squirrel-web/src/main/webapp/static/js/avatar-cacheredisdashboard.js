@@ -1,5 +1,5 @@
 module.controller('ClusterDashBoardController', [ '$scope', '$http',
-		'$timeout', function($scope, $http,$timeout) {
+		'$timeout', function($scope, $http) {
 
         $scope.redisdata = [];
         $scope.redisScaleParams = {};

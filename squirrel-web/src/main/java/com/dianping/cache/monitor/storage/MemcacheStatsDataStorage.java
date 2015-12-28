@@ -8,6 +8,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import com.dianping.cache.alarm.memcache.MemcacheAlarmer;
+import com.dianping.cache.support.spring.SpringLocator;
 import net.rubyeye.xmemcached.MemcachedClient;
 
 import com.dianping.cache.entity.MemcacheStats;
@@ -15,7 +16,6 @@ import com.dianping.cache.entity.Server;
 import com.dianping.cache.monitor.MemcachedClientFactory;
 import com.dianping.cache.service.MemcacheStatsService;
 import com.dianping.cache.service.ServerService;
-import com.dianping.combiz.spring.context.SpringLocator;
 
 public class MemcacheStatsDataStorage extends AbstractStatsDataStorage{
 	

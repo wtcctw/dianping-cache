@@ -6,15 +6,16 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import com.dianping.cache.entity.CacheConfiguration;
+import com.dianping.cache.entity.ReshardRecord;
 import org.apache.log4j.Logger;
-
 import redis.clients.jedis.Jedis;
+import redis.clients.jedis.Pipeline;
 import redis.clients.jedis.exceptions.JedisClusterException;
-
 import com.dianping.cache.service.CacheConfigurationService;
 import com.dianping.cache.support.spring.SpringLocator;
 import com.dianping.cache.util.ParseServersUtil;
 import redis.clients.jedis.exceptions.JedisConnectionException;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 public class RedisManager {
 	
@@ -25,6 +26,8 @@ public class RedisManager {
 	public static final String SLOT_MIGRATING_IDENTIFIER = "-->--";
 	public static final long CLUSTER_SLEEP_INTERVAL = 50;
 	public static final int CLUSTER_DEFAULT_TIMEOUT = 300;
+	public static final int CLUSTER_MIGRATE_NUM = 100;
+	public static final int DEFAULT_CHECKPORT_TIMEOUT = 60000;
 	public static final int CLUSTER_DEFAULT_DB = 0;
 	public static final String UNIX_LINE_SEPARATOR = "\n";
 	public static final String WINDOWS_LINE_SEPARATOR = "\r\n";
@@ -49,12 +52,12 @@ public class RedisManager {
 		refreshCache(cluster);
 	}
 
-	public static void addSlaveToMaster(String master, String slave) {
+	public static boolean addSlaveToMaster(String master, String slave) {
 		try {
 			RedisServer m = new RedisServer(master);
 			RedisServer s = new RedisServer(slave);
-			if(!checkPort(s,60000)){
-				return;
+			if (!checkPort(s)) {
+				return false;
 			}
 			String masterNodeId = getNodeId(m);
 			Jedis mJedis = new Jedis(m.getIp(), m.getPort());
@@ -65,11 +68,89 @@ public class RedisManager {
 			sJedis.close();
 		} catch (Exception e) {
 			logger.error("Add slave to " + master + " error ! Please check : "
-					+ slave + "\n" + e);
-		} finally {
+					+ slave + "\n",e);
+			return false;
 		}
+		return true;
 	}
-	private static boolean checkPort(RedisServer redisServer,long timeout) throws InterruptedException {
+
+	public static void reshard(ReshardPlan reshardPlan){
+		if(checkClusterStatus(reshardPlan)){
+			return;
+		}
+		String cluster = reshardPlan.getCluster();
+		List<ReshardRecord> reshardRecordList = reshardPlan.getReshardRecordList();
+		for(ReshardRecord reshardRecord : reshardRecordList){
+			while(true){
+				refreshCache(cluster);
+				RedisCluster redisCluster = clusterCache.get(cluster);
+				RedisServer src = redisCluster.getServer(reshardRecord.getSrcNode());
+				RedisServer des = redisCluster.getServer(reshardRecord.getDesNode());
+				if(reshardRecord.getSlotMigrating() > -1){
+					//wait for migrating done
+				}else{
+					if(reshardRecord.getSlotsDone() < reshardRecord.getSlotsToMigrate()){
+						int slot = src.getSlotList().get(0);
+						migrate(src,des,slot);
+					}else{
+						break;
+					}
+				}
+			}
+		}
+
+	}
+
+	private static void migrate(RedisServer src,RedisServer des,int slot){
+		Jedis srcNode = new Jedis(src.getIp(),src.getPort());
+		String srcNodeId = src.getId();
+		Pipeline pipeline = srcNode.pipelined();
+		Jedis destNode = new Jedis(src.getIp(),src.getPort());
+		String destNodeId = des.getId();
+
+		/** migrate every slot from src node to dest node */
+		destNode.clusterSetSlotImporting(slot, srcNodeId);
+		srcNode.clusterSetSlotMigrating(slot, destNodeId);
+		while (true) {
+			try {
+				List<String> keysInSlot = srcNode.clusterGetKeysInSlot(slot,CLUSTER_MIGRATE_NUM);
+				if (keysInSlot == null || keysInSlot.isEmpty()) {
+                    break;
+                }
+				for (String key : keysInSlot) {
+                    pipeline.migrate(des.getIp(),des.getPort(), key,
+                            CLUSTER_DEFAULT_DB,CLUSTER_DEFAULT_TIMEOUT);
+                }
+				pipeline.sync();
+			} catch (Throwable e) {
+				//// FIXME: 15/12/28
+				srcNode.clusterSetSlotStable(slot);
+				destNode.clusterSetSlotStable(slot);
+				logger.warn("Migrate process may be down,Set Slot Stable .",e);
+			}
+		}
+		/** wait for slots migration done */
+		waitForMigrationDone(src);
+		waitForMigrationDone(des);
+		notifyAllNode(slot,destNodeId,des);
+	}
+
+	private static boolean checkClusterStatus(ReshardPlan reshardPlan){
+		String cluster = reshardPlan.getCluster();
+		RedisCluster redisCluster = clusterCache.get(cluster);
+		List<ReshardRecord> reshardRecordList = reshardPlan.getReshardRecordList();
+		for(ReshardRecord reshardRecord : reshardRecordList){
+			RedisServer src = redisCluster.getServer(reshardRecord.getSrcNode());
+			RedisServer des = redisCluster.getServer(reshardRecord.getDesNode());
+			//TODO
+		}
+		return true;
+	}
+	private static boolean checkPort(RedisServer redisServer){
+		return checkPort(redisServer, DEFAULT_CHECKPORT_TIMEOUT);
+	}
+
+	private static boolean checkPort(RedisServer redisServer,long timeout){
 		Jedis jedis = new Jedis(redisServer.getIp(),redisServer.getPort());
 		JedisConnectionException ex = null;
 		long wait = 0;
@@ -80,7 +161,12 @@ public class RedisManager {
 					return true;
 				}
 			}catch (JedisConnectionException e){
-				Thread.sleep(1000);
+				try {
+					Thread.sleep(1000);
+				} catch (InterruptedException e1) {
+					logger.error("Wait for redis reponse interrupted",e1);
+					return false;
+				}
 				wait += 1000;
 				ex = e;
 			}
@@ -98,13 +184,11 @@ public class RedisManager {
 		Jedis deleteNode = new Jedis(nodeToDelete.getIp(),nodeToDelete.getPort());
 		String deleteNodeId = nodeToDelete.getId();
 		List<RedisServer> allNodesOfCluster = rc.getAllAliveServer();
-
 		// check if the node to delete is a master
 		boolean isMaster = false;
 		if (nodeToDelete.isMaster()) {
 			isMaster = true;
 		}
-
 		// the node to delete is slave
 		if (!isMaster) {
 			for (RedisServer node : allNodesOfCluster) {
@@ -125,35 +209,36 @@ public class RedisManager {
 		return false;// master
 	}
 
-	public static boolean joinCluster(RedisCluster cluster, RedisServer server ) {
-			RedisServer rsInCluster = cluster.getAllAliveServer().get(0);
-	        Jedis clusterJedis = new Jedis(rsInCluster.getIp(), rsInCluster.getPort());
-	        clusterJedis.clusterMeet(server.getIp(), server.getPort());
-
-	        List<RedisServer> clusterNodes = cluster.getAllAliveServer();
-
-	        boolean joinOk = false;
-	        long sleepTime = 0;
-	        while (!joinOk && sleepTime < CLUSTER_DEFAULT_TIMEOUT) {
-	            joinOk = true;
-	            for (RedisServer rs : clusterNodes) {
-	                if (!isNodeKnown(rs, server)) {
-	                    joinOk = false;
-	                    break;
-	                }
-	            }
-	            if (joinOk) {
-	                break;
-	            }
-	            try {
-	                TimeUnit.MILLISECONDS.sleep(CLUSTER_SLEEP_INTERVAL);
-	            } catch (InterruptedException e) {
-	                throw new JedisClusterException("joinCluster timeout.", e);
-	            }
-	            sleepTime += CLUSTER_SLEEP_INTERVAL;
-	        }
-	        clusterJedis.close();
-	        return joinOk;
+	public static boolean joinCluster(RedisCluster cluster, RedisServer server) {
+		if(!checkPort(server)){
+			return false;
+		}
+		RedisServer rsInCluster = cluster.getAllAliveServer().get(0);
+		Jedis clusterJedis = new Jedis(rsInCluster.getIp(), rsInCluster.getPort());
+		clusterJedis.clusterMeet(server.getIp(), server.getPort());
+		List<RedisServer> clusterNodes = cluster.getAllAliveServer();
+		boolean joinOk = false;
+		long sleepTime = 0;
+		while (!joinOk && sleepTime < CLUSTER_DEFAULT_TIMEOUT) {
+			joinOk = true;
+			for (RedisServer rs : clusterNodes) {
+				if (!isNodeKnown(rs, server)) {
+					joinOk = false;
+					break;
+				}
+			}
+			if (joinOk) {
+				break;
+			}
+			try {
+				TimeUnit.MILLISECONDS.sleep(CLUSTER_SLEEP_INTERVAL);
+			} catch (InterruptedException e) {
+				throw new JedisClusterException("joinCluster timeout.", e);
+			}
+			sleepTime += CLUSTER_SLEEP_INTERVAL;
+		}
+		clusterJedis.close();
+		return joinOk;
 	}
 
 	public static String getNodeId(RedisServer server) {
@@ -257,6 +342,42 @@ public class RedisManager {
         }
     }
 
+	private static void waitForMigrationDone(final RedisServer server) {
+		checkNotNull(server, "nodesInfo is null.");
+
+		Jedis node = new Jedis(server.getIp(),server.getPort());
+		String[] clusterNodesInfo;
+
+		boolean isOk = false;
+		while (!isOk) {
+			clusterNodesInfo = node.clusterNodes().split(UNIX_LINE_SEPARATOR);
+			isOk = true;
+			for (String infoLine: clusterNodesInfo) {
+				if (infoLine.contains(SLOT_IN_TRANSITION_IDENTIFIER)) {
+					isOk = false;
+					break;
+				}
+			}
+			if (isOk) {
+				break;
+			}
+			try {
+				TimeUnit.MILLISECONDS.sleep(CLUSTER_SLEEP_INTERVAL);
+			} catch (InterruptedException e) {
+				throw new JedisClusterException("waitForMigrationDone", e);
+			}
+		}
+	}
+
+
+	private static void notifyAllNode(int slot,String destNodeId,RedisServer redisServer){
+		List<RedisServer> servers = getAllNodesOfCluster(redisServer);
+		for(RedisServer server : servers){
+			Jedis jedis = new Jedis(server.getIp(),server.getPort());
+			jedis.clusterSetSlotNode(slot,destNodeId);
+			jedis.close();
+		}
+	}
 	private static void refreshCache(){
 		scheduler.scheduleAtFixedRate(new Runnable() {
 			@Override

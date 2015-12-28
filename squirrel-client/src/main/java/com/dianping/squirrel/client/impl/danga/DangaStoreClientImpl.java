@@ -6,8 +6,11 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Future;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeoutException;
 
+import com.dianping.squirrel.client.core.StoreFuture;
+import com.sun.org.apache.xpath.internal.operations.Bool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,78 +40,11 @@ public class DangaStoreClientImpl extends AbstractStoreClient implements DangaSt
 	private DangaClientConfig config;
 	
 	private volatile DangaClientManager clientManager;
-	
 
-	
-	@Override
-	public <T> Future<T> asyncGet(StoreKey key) throws StoreException {
-		throw new UnsupportedOperationException(
-				"Danga memcached client  does not support async operations");
-	}
-
-	@Override
-	public Future<Boolean> asyncSet(StoreKey key, Object value)
-			throws StoreException {
-		throw new UnsupportedOperationException(
-				"Danga memcached client  does not support async operations");
-	}
-
-	@Override
-	public Future<Boolean> asyncAdd(StoreKey key, Object value)
-			throws StoreException {
-		throw new UnsupportedOperationException(
-				"Danga memcached client  does not support async operations");
-	}
-
-	@Override
-	public Future<Boolean> asyncDelete(StoreKey key) throws StoreException {
-		throw new UnsupportedOperationException(
-				"Danga memcached client  does not support async operations");
-	}
-
-	@Override
-	public <T> Void asyncGet(StoreKey key, StoreCallback<T> callback) {
-		throw new UnsupportedOperationException(
-				"Danga memcached client  does not support async operations");
-	}
-
-	@Override
-	public Void asyncSet(StoreKey key, Object value,
-			StoreCallback<Boolean> callback) {
-		throw new UnsupportedOperationException(
-				"Danga memcached client  does not support async operations");
-	}
-
-	@Override
-	public Void asyncAdd(StoreKey key, Object value,
-			StoreCallback<Boolean> callback) {
-		throw new UnsupportedOperationException(
-				"Danga memcached client  does not support async operations");
-	}
-
-	@Override
-	public Void asyncDelete(StoreKey key, StoreCallback<Boolean> callback) {
-		throw new UnsupportedOperationException(
-				"Danga memcached client  does not support async operations");
-	}
-
-	@Override
-	public <T> Void asyncMultiGet(List<StoreKey> keys,
-			StoreCallback<Map<StoreKey, T>> callback) {
-		throw new UnsupportedOperationException(
-				"Danga memcached client  does not support async operations");
-	}
-
-	@Override
-	public <T> Void asyncMultiSet(List<StoreKey> keys, List<T> values,
-			StoreCallback<Boolean> callback) {
-		throw new UnsupportedOperationException(
-				"Danga memcached client  does not support async operations");
-	}
 
 	@Override
 	public String getScheme() {
-		return "memcached";
+		return "danga";
 	}
 
 	@Override
@@ -174,7 +110,7 @@ public class DangaStoreClientImpl extends AbstractStoreClient implements DangaSt
 	}
 	
 	private Object doGet(String key, String category) throws Exception {
-		Object result = null;
+		Object result;
 		MemCachedClient client = getReadClient();
 		result = client.get(key);
 		return result;
@@ -210,61 +146,97 @@ public class DangaStoreClientImpl extends AbstractStoreClient implements DangaSt
 	}
 
 	@Override
-	protected <T> Future<T> doAsyncGet(StoreCategoryConfig categoryConfig,
-			String finalKey) throws Exception {
-		throw new UnsupportedOperationException(
-				"Danga memcached client  does not support async operations");
+	protected <T> Future<T> doAsyncGet(final StoreCategoryConfig categoryConfig,
+									   final String key) throws Exception {
+		return new DangaAsyncCommand<T>(){
+			@Override
+			public T excute() throws Throwable {
+				return doGet(categoryConfig,key);
+			}
+		}.run(key);
 	}
 
 	@Override
-	protected Future<Boolean> doAsyncSet(StoreCategoryConfig categoryConfig,
-			String finalKey, Object value) throws Exception {
-		throw new UnsupportedOperationException(
-				"Danga memcached client  does not support async operations");
+	protected Future<Boolean> doAsyncSet(final StoreCategoryConfig categoryConfig,
+			final String finalKey, final Object value) throws Exception {
+		return new DangaAsyncCommand<Boolean>(){
+			@Override
+			public Boolean excute() throws Throwable {
+				return doSet(categoryConfig,finalKey,value);
+			}
+		}.run(finalKey);
 	}
 
 	@Override
-	protected Future<Boolean> doAsyncAdd(StoreCategoryConfig categoryConfig,
-			String finalKey, Object value) throws Exception {
-		throw new UnsupportedOperationException(
-				"Danga memcached client  does not support async operations");
+	protected Future<Boolean> doAsyncAdd(final StoreCategoryConfig categoryConfig,
+			final String finalKey,final Object value) throws Exception {
+		return new DangaAsyncCommand<Boolean>(){
+			@Override
+			public Boolean excute() throws Throwable {
+				return doAdd(categoryConfig,finalKey,value);
+			}
+		}.run(finalKey);
 	}
 
 	@Override
-	protected Future<Boolean> doAsyncDelete(StoreCategoryConfig categoryConfig,
-			String finalKey) throws Exception {
-		throw new UnsupportedOperationException(
-				"Danga memcached client  does not support async operations");
+	protected Future<Boolean> doAsyncDelete(final StoreCategoryConfig categoryConfig,
+											final String finalKey) throws Exception {
+		return new DangaAsyncCommand<Boolean>(){
+			@Override
+			public Boolean excute() throws Throwable {
+				return doDelete(categoryConfig,finalKey);
+			}
+		}.run(finalKey);
 	}
 
 	@Override
-	protected <T> Void doAsyncGet(StoreCategoryConfig categoryConfig,
-			String finalKey, StoreCallback<T> callback) throws Exception {
-		throw new UnsupportedOperationException(
-				"Danga memcached client  does not support async operations");
+	protected <T> Void doAsyncGet(final StoreCategoryConfig categoryConfig,
+								  final String finalKey,StoreCallback<T> callback) throws Exception {
+		new DangaAsyncCommand<T>(){
+			@Override
+			public T excute() throws Throwable {
+				return doGet(categoryConfig,finalKey);
+			}
+		}.run(callback);
+		return null;
 	}
 
 	@Override
-	protected Void doAsyncSet(StoreCategoryConfig categoryConfig,
-			String finalKey, Object value, StoreCallback<Boolean> callback)
+	protected Void doAsyncSet(final StoreCategoryConfig categoryConfig,
+							  final String finalKey, final Object value, StoreCallback<Boolean> callback)
 			throws Exception {
-		throw new UnsupportedOperationException(
-				"Danga memcached client  does not support async operations");
+		new DangaAsyncCommand<Boolean>(){
+			@Override
+			public Boolean excute() throws Throwable {
+				return doSet(categoryConfig,finalKey,value);
+			}
+		}.run(callback);
+		return null;
 	}
 
 	@Override
-	protected Void doAsyncAdd(StoreCategoryConfig categoryConfig,
-			String finalKey, Object value, StoreCallback<Boolean> callback)
+	protected Void doAsyncAdd(final StoreCategoryConfig categoryConfig,
+							  final String finalKey, final Object value, StoreCallback<Boolean> callback)
 			throws Exception {
-		throw new UnsupportedOperationException(
-				"Danga memcached client  does not support async operations");
+		new DangaAsyncCommand<Boolean>(){
+			@Override
+			public Boolean excute() throws Throwable {
+				return doAdd(categoryConfig,finalKey,value);
+			}
+		}.run(callback);
+		return null;
 	}
 
 	@Override
-	protected Void doAsyncDelete(StoreCategoryConfig categoryConfig,
-			String finalKey, StoreCallback<Boolean> callback) throws Exception {
-		throw new UnsupportedOperationException(
-				"Danga memcached client  does not support async operations");
+	protected Void doAsyncDelete(final StoreCategoryConfig categoryConfig,
+								 final String finalKey, StoreCallback<Boolean> callback) throws Exception {
+		new DangaAsyncCommand<Boolean>(){
+			@Override
+			public Boolean excute() throws Throwable {
+				return doDelete(categoryConfig,finalKey);
+			}
+		}.run(callback);
+		return null;
 	}
 
 	@Override
@@ -299,11 +271,16 @@ public class DangaStoreClientImpl extends AbstractStoreClient implements DangaSt
 	}
 
 	@Override
-	protected <T> Void doAsyncMultiGet(StoreCategoryConfig categoryConfig,
-			List<String> finalKeyList, StoreCallback<Map<String, T>> callback)
+	protected <T> Void doAsyncMultiGet(final StoreCategoryConfig categoryConfig,
+									   final List<String> finalKeyList, StoreCallback<Map<String, T>> callback)
 			throws Exception {
-		throw new UnsupportedOperationException(
-				"Danga memcached client  does not support async operations");
+		new DangaAsyncCommand<Map<String, T>>(){
+			@Override
+			public Map<String, T> excute() throws Throwable {
+				return doMultiGet(categoryConfig,finalKeyList);
+			}
+		}.run(callback);
+		return null;
 	}
 
 	@Override
@@ -380,5 +357,46 @@ public class DangaStoreClientImpl extends AbstractStoreClient implements DangaSt
         checkNotNull(categoryConfig, "%s's category config is null", key.getCategory());
         final String finalKey = categoryConfig.getKey(key.getParams());
 		return getReadClient().cas(finalKey, value, casId);
+	}
+
+	public ThreadPoolExecutor getThreadPool() {
+		return clientManager.getThreadPool();
+	}
+
+	class DangaAsyncCommand<T>{
+
+		public T excute() throws Throwable{
+			return null;
+		}
+
+		public  StoreFuture<T> run(String key){
+			final StoreFuture<T> future = new StoreFuture<T>(key);
+			getThreadPool().submit(new Runnable() {
+				@Override
+				public void run() {
+					try {
+						T t = excute();
+						future.onSuccess(t);
+					} catch (Throwable e){
+						future.onFailure(e);
+					}
+				}
+			});
+			return future;
+		}
+
+		public void run(final StoreCallback<T> callback){
+			getThreadPool().submit(new Runnable() {
+				@Override
+				public void run() {
+					try {
+						T t = excute();
+						callback.onSuccess(t);
+					} catch (Throwable e){
+						callback.onFailure(e);
+					}
+				}
+			});
+		}
 	}
 }

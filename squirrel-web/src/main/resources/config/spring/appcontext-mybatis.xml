@@ -86,11 +86,9 @@
 		<property name="mapperInterface" value="com.dianping.cache.alarm.dao.AlarmRecordDao"/>
 		<property name="sqlSessionFactory" ref="sqlSessionFactory"/>
 	</bean>
-
 	<bean id="alarmConfigDao" class="org.mybatis.spring.mapper.MapperFactoryBean">
 		<property name="mapperInterface" value="com.dianping.cache.alarm.dao.AlarmConfigDao"/>
 		<property name="sqlSessionFactory" ref="sqlSessionFactory"/>
 	</bean>
-
 
 </beans>
