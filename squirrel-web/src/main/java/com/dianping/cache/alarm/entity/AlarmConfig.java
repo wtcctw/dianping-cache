@@ -88,6 +88,7 @@ public class AlarmConfig {
 
     public AlarmConfig setAlarmTemplate(String alarmTemplate) {
         this.alarmTemplate = alarmTemplate;
+        return this;
     }
 
     public String getReceiver() {
