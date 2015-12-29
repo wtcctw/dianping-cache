@@ -1,21 +1,24 @@
 package com.dianping.squirrel.client.impl.redis;
 
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import redis.clients.jedis.HostAndPort;
+import redis.clients.jedis.JedisCluster;
+
+import com.dianping.squirrel.client.util.ParamHelper;
 import com.dianping.squirrel.common.config.ConfigChangeListener;
 import com.dianping.squirrel.common.config.ConfigManager;
 import com.dianping.squirrel.common.config.ConfigManagerLoader;
-
-import redis.clients.jedis.HostAndPort;
-import redis.clients.jedis.JedisCluster;
+import com.dianping.squirrel.common.util.NamedThreadFactory;
 
 public class RedisClientManager {
 
@@ -65,6 +68,8 @@ public class RedisClientManager {
     
     private volatile JedisCluster client;
     
+    private ThreadPoolExecutor executor;
+    
     private RedisClientManager() {
         init();
     }
@@ -90,10 +95,23 @@ public class RedisClientManager {
     
     private synchronized void renewClient() {
         JedisCluster oldClient = client;
-        JedisCluster newClient = createClient();
+        ThreadPoolExecutor oldExecutor = executor;
+        ThreadPoolExecutor newExecutor = createExecutor();
+        JedisCluster newClient = createClient(newExecutor);
         if(newClient != null) {
+            executor = newExecutor;
             client = newClient;
             logger.info("renewed redis cluster client: " + connString);
+            if(oldExecutor != null) {
+                oldExecutor.shutdown();
+                try {
+                    if(!oldExecutor.awaitTermination(5, TimeUnit.SECONDS)) {
+                        oldExecutor.shutdownNow();
+                    }
+                } catch (Exception e) {
+                    logger.error("failed to shutdown redis executor", e);
+                }
+            }
             if(oldClient != null) {
                 oldClient.close();
             }
@@ -109,7 +127,7 @@ public class RedisClientManager {
 
                 @Override
                 public void onChange(String key, String value) {
-                    if(KEY_REDIS_CONN_PARAMS.equals(key)) {
+                    if(key != null && key.endsWith(KEY_REDIS_CONN_PARAMS)) {
                         logger.info("redis connection params changed: " + value);
                         connString = value;
                         parseConnString();
@@ -125,53 +143,29 @@ public class RedisClientManager {
     
     private void parseConnString() {
         if(connString != null) {
-            Map<String, String> keyValue = new HashMap<String, String>(); 
-            String[] pairs = connString.split("&");
-            for(String pair : pairs) {
-                String kv[] = pair.split("=");
-                if(kv.length == 2) {
-                    String k = kv[0].trim();
-                    String v = kv[1].trim();
-                    if(k.length() > 0 && v.length() >0) {
-                        keyValue.put(k, v);
-                    }
-                }
-            }
-            if(keyValue.size() > 0) {
-                connTimeout = getIntegerParam(keyValue, KEY_CONN_TIMEOUT, connTimeout);
-                readTimeout = getIntegerParam(keyValue, KEY_READ_TIMEOUT, readTimeout);
-                maxRedirects = getIntegerParam(keyValue, KEY_MAX_REDIRECTS, maxRedirects);
-                poolMaxTotal = getIntegerParam(keyValue, KEY_POOL_MAXTOTAL, poolMaxTotal);
-                poolMaxIdle = getIntegerParam(keyValue, KEY_POOL_MAXIDLE, poolMaxIdle);
-                poolWaitMillis = getIntegerParam(keyValue, KEY_POOL_WAITMILLIS, poolWaitMillis);
-                asyncCoreSize = getIntegerParam(keyValue, KEY_ASYNC_CORESIZE, asyncCoreSize);
-                asyncMaxSize = getIntegerParam(keyValue, KEY_ASYNC_MAXSIZE, asyncMaxSize);
-                asyncQueueSize = getIntegerParam(keyValue, KEY_ASYNC_QUEUESIZE, asyncQueueSize);
-                clusterUpdateInterval = getIntegerParam(keyValue, KEY_CLUSTER_UPDATE_INTERVAL, clusterUpdateInterval);
-            }
+            ParamHelper helper = new ParamHelper(connString);
+            connTimeout = helper.getInteger(KEY_CONN_TIMEOUT, connTimeout);
+            readTimeout = helper.getInteger(KEY_READ_TIMEOUT, readTimeout);
+            maxRedirects = helper.getInteger(KEY_MAX_REDIRECTS, maxRedirects);
+            poolMaxTotal = helper.getInteger(KEY_POOL_MAXTOTAL, poolMaxTotal);
+            poolMaxIdle = helper.getInteger(KEY_POOL_MAXIDLE, poolMaxIdle);
+            poolWaitMillis = helper.getInteger(KEY_POOL_WAITMILLIS, poolWaitMillis);
+            asyncCoreSize = helper.getInteger(KEY_ASYNC_CORESIZE, asyncCoreSize);
+            asyncMaxSize = helper.getInteger(KEY_ASYNC_MAXSIZE, asyncMaxSize);
+            asyncQueueSize = helper.getInteger(KEY_ASYNC_QUEUESIZE, asyncQueueSize);
+            clusterUpdateInterval = helper.getInteger(KEY_CLUSTER_UPDATE_INTERVAL, clusterUpdateInterval);
         }
     }
 
-    private int getIntegerParam(Map<String, String> props, String key, int defaultValue) {
-        String value = props.get(key);
-        if(value != null) {
-            try {
-                return Integer.valueOf(value);
-            } catch(Exception e) {
-                return defaultValue;
-            }
-        } else {
-            return defaultValue;
-        }
-    }
-
-    public JedisCluster createClient() {
+    public JedisCluster createClient(ThreadPoolExecutor executor) {
         JedisCluster client = new JedisCluster(
                 getClusterNodes(clientConfig.getServerList()),
                 connTimeout, 
                 readTimeout, 
                 maxRedirects, 
-                getPoolConfig(clientConfig));
+                getPoolConfig(clientConfig),
+                executor,
+                clusterUpdateInterval);
         return client;
     }
 
@@ -218,6 +212,13 @@ public class RedisClientManager {
         // 设置检测线程每次检测的对象数
         conf.setNumTestsPerEvictionRun(-1);
         return conf;
+    }
+    
+    private ThreadPoolExecutor createExecutor() {
+        return new ThreadPoolExecutor(asyncCoreSize, asyncMaxSize, 30L, TimeUnit.SECONDS, 
+                new ArrayBlockingQueue(asyncQueueSize), 
+                new NamedThreadFactory("squirrel-redis", true),
+                new ThreadPoolExecutor.CallerRunsPolicy());
     }
     
 }
