@@ -11,6 +11,8 @@ public class RedisTemplate extends AlarmConfigTemplate {
 
     private int memThreshold;
 
+    private int qpsThreshold;
+
     public boolean isDown() {
         return isDown;
     }
@@ -26,6 +28,15 @@ public class RedisTemplate extends AlarmConfigTemplate {
 
     public RedisTemplate setMemThreshold(int memThreshold) {
         this.memThreshold = memThreshold;
+        return this;
+    }
+
+    public int getQpsThreshold() {
+        return qpsThreshold;
+    }
+
+    public RedisTemplate setQpsThreshold(int qpsThreshold) {
+        this.qpsThreshold = qpsThreshold;
         return this;
     }
 }

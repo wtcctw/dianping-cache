@@ -1,10 +1,10 @@
 package com.dianping.cache.alarm.memcache;
 
+import com.dianping.cache.alarm.AlarmType;
 import com.dianping.cache.alarm.alarmconfig.AlarmConfigService;
 import com.dianping.cache.alarm.alarmtemplate.MemcacheAlarmTemplateService;
-import com.dianping.cache.alarm.entity.AlarmConfig;
-import com.dianping.cache.alarm.AlarmType;
 import com.dianping.cache.alarm.dao.AlarmRecordDao;
+import com.dianping.cache.alarm.entity.AlarmConfig;
 import com.dianping.cache.alarm.entity.AlarmDetail;
 import com.dianping.cache.alarm.entity.AlarmRecord;
 import com.dianping.cache.alarm.entity.MemcacheTemplate;
@@ -94,25 +94,28 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
             //遍历所有的集群  对于集群名称为memcached的进行检查并放入告警队列
             if (item.getCacheKey().contains("memcached")
                     && !"memcached-leo".equals(item.getCacheKey())) {
-                AlarmDetail downAlarm = isDownAlarm(item, currentServerStats, memcacheEvent);
-                if (null != downAlarm) {
+                boolean downAlarm = isDownAlarm(item, currentServerStats, memcacheEvent);
+                if (downAlarm) {
                     isReport = true;
                 }
 
-                AlarmDetail memAlarm = isMemAlarm(item, currentServerStats, memcacheEvent);
-                if (null != memAlarm) {
+                boolean memAlarm = isMemAlarm(item, currentServerStats, memcacheEvent);
+                if (memAlarm) {
                     isReport = true;
                 }
 
-                AlarmDetail qpsAlarm = isQpsAlarm(item, currentServerStats, memcacheEvent);
-                if (null != qpsAlarm) {
+                boolean qpsAlarm = isQpsAlarm(item, currentServerStats, memcacheEvent);
+                if (qpsAlarm) {
                     isReport = true;
                 }
 
-                AlarmConfig connAlarm = isConnAlarm(item, currentServerStats, memcacheEvent);
-                if (null != connAlarm) {
+                boolean connAlarm = isConnAlarm(item, currentServerStats, memcacheEvent);
+                if (connAlarm) {
                     isReport = true;
                 }
+
+                boolean history = isHistoryAlarm(item, currentServerStats, memcacheEvent);
+
             }
         }
 
@@ -124,7 +127,9 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
         }
     }
 
-    AlarmDetail isDownAlarm(CacheConfiguration item, Map<String, Map<String, Object>> currentServerStats, MemcacheEvent memcacheEvent) throws InterruptedException, IOException, MemcachedException, TimeoutException {
+    boolean isDownAlarm(CacheConfiguration item, Map<String, Map<String, Object>> currentServerStats, MemcacheEvent memcacheEvent) throws InterruptedException, IOException, MemcachedException, TimeoutException {
+
+        boolean flag = false;
 
         AlarmConfig alarmConfig = alarmConfigService.findByClusterTypeAndName(ALARMTYPE, item.getCacheKey());
 
@@ -145,6 +150,7 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
             try {
                 stats = mc.stats(new InetSocketAddress(ip, port), 1000);
             } catch (Exception e) {
+                flag = true;
                 AlarmDetail alarmDetail = new AlarmDetail(alarmConfig);
 
                 MemcacheTemplate memcacheTemplate = memcacheAlarmTemplateService.findAlarmTemplateByTemplateName(alarmDetail.getAlarmTemplate());
@@ -161,21 +167,23 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
                 AlarmRecord alarmRecord = new AlarmRecord();
                 alarmRecord.setAlarmType(AlarmType.MEMCACHE_CLUSTER_DOWN.getNumber())
                         .setAlarmTitle(CLUSTER_DOWN)
-                        .setAlarmDetail(item.getCacheKey() + ":" + CLUSTER_DOWN + ";机器信息为" + server)
+                        .setClusterName(item.getCacheKey())
+                        .setIp(ip)
                         .setCreateTime(new Date());
 
                 alarmRecordDao.insert(alarmRecord);
 
                 memcacheEvent.put(alarmDetail);
-                return alarmDetail;
             }
         }
 
-        return null;
+        return flag;
     }
 
 
-    AlarmDetail isMemAlarm(CacheConfiguration item, Map<String, Map<String, Object>> currentServerStats, MemcacheEvent memcacheEvent) throws InterruptedException {
+    boolean isMemAlarm(CacheConfiguration item, Map<String, Map<String, Object>> currentServerStats, MemcacheEvent memcacheEvent) throws InterruptedException {
+
+        boolean flag = false;
 
         AlarmConfig alarmConfig = alarmConfigService.findByClusterTypeAndName(ALARMTYPE, item.getCacheKey());
 
@@ -184,6 +192,11 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
             alarmConfigService.insert(alarmConfig);
         }
         MemcacheTemplate memcacheTemplate = memcacheAlarmTemplateService.findAlarmTemplateByTemplateName(alarmConfig.getAlarmTemplate());
+
+        if (null == memcacheTemplate) {
+            logger.info(item.getCacheKey() + "not config template");
+            memcacheTemplate = memcacheAlarmTemplateService.findAlarmTemplateByTemplateName("Default");
+        }
 
         List<String> serverList = item.getServerList();
 
@@ -191,52 +204,62 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
         long memused = 0;
         float usage = 0;
 
-        String ips = "";
+        String ip = "";
 
         for (String server : serverList) {
-            ips += server + ",";
+            ip = server;
             if (0 != currentServerStats.size()) {
-                Long tmp = (Long) currentServerStats.get(server).get("max_memory");
-                if (null != tmp) {
-                    mem += tmp;
-                }
+                if (null != currentServerStats.get(server)) {
+                    Long tmp = (Long) currentServerStats.get(server).get("max_memory");
+                    if (null != tmp) {
+                        mem = tmp;
+                    }
 
-                tmp = (Long) currentServerStats.get(server).get("used_memory");
-                if (null != tmp) {
-                    memused += tmp;
+                    tmp = (Long) currentServerStats.get(server).get("used_memory");
+                    if (null != tmp) {
+                        memused = tmp;
+                    }
+                } else {
+                    continue;
                 }
             }
+
+
+            if (0 != mem) {
+                usage = (float) memused / mem;
+            }
+
+            if (usage * 100 > memcacheTemplate.getMemThreshold()) {
+                flag = true;
+                AlarmDetail alarmDetail = new AlarmDetail(alarmConfig);
+
+                alarmDetail.setAlarmTitle(MEMUSAGE_TOO_HIGH)
+                        .setAlarmDetail(item.getCacheKey() + ":" + MEMUSAGE_TOO_HIGH + ";IP为" + ip + ";使用率为" + usage)
+                        .setMailMode(memcacheTemplate.isMailMode())
+                        .setSmsMode(memcacheTemplate.isSmsMode())
+                        .setWeixinMode(memcacheTemplate.isWeixinMode())
+                        .setCreateTime(new Date());
+
+                AlarmRecord alarmRecord = new AlarmRecord();
+                alarmRecord.setAlarmType(AlarmType.MEMCACHE_MEMUSAGE_TOO_HIGH.getNumber())
+                        .setAlarmTitle(MEMUSAGE_TOO_HIGH)
+                        .setClusterName(item.getCacheKey())
+                        .setIp(ip)
+                        .setValue(usage * 100)
+                        .setCreateTime(new Date());
+
+                alarmRecordDao.insert(alarmRecord);
+
+                memcacheEvent.put(alarmDetail);
+            }
         }
-        if (0 != mem) {
-            usage = (float) memused / mem;
-        }
 
-        if (usage * 100 > memcacheTemplate.getMemThreshold()) {
-            AlarmDetail alarmDetail = new AlarmDetail(alarmConfig);
-
-            alarmDetail.setAlarmTitle(MEMUSAGE_TOO_HIGH)
-                    .setAlarmDetail(item.getCacheKey() + ":" + MEMUSAGE_TOO_HIGH + ";IP为" + ips + ";使用率为" + usage)
-                    .setMailMode(memcacheTemplate.isMailMode())
-                    .setSmsMode(memcacheTemplate.isSmsMode())
-                    .setWeixinMode(memcacheTemplate.isWeixinMode())
-                    .setCreateTime(new Date());
-
-            AlarmRecord alarmRecord = new AlarmRecord();
-            alarmRecord.setAlarmType(AlarmType.MEMCACHE_MEMUSAGE_TOO_HIGH.getNumber())
-                    .setAlarmTitle(MEMUSAGE_TOO_HIGH)
-                    .setAlarmDetail(item.getCacheKey() + ":" + MEMUSAGE_TOO_HIGH + ";IP为" + ips + ";使用率为" + usage)
-                    .setCreateTime(new Date());
-
-            alarmRecordDao.insert(alarmRecord);
-
-            memcacheEvent.put(alarmDetail);
-            return alarmDetail;
-        }
-
-        return null;
+        return flag;
     }
 
-    AlarmDetail isQpsAlarm(CacheConfiguration item, Map<String, Map<String, Object>> currentServerStats, MemcacheEvent memcacheEvent) throws InterruptedException {
+    boolean isQpsAlarm(CacheConfiguration item, Map<String, Map<String, Object>> currentServerStats, MemcacheEvent memcacheEvent) throws InterruptedException {
+
+        boolean flag = false;
 
         AlarmConfig alarmConfig = alarmConfigService.findByClusterTypeAndName(ALARMTYPE, item.getCacheKey());
 
@@ -246,51 +269,66 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
         }
 
         MemcacheTemplate memcacheTemplate = memcacheAlarmTemplateService.findAlarmTemplateByTemplateName(alarmConfig.getAlarmTemplate());
+
+        if (null == memcacheTemplate) {
+            logger.info(item.getCacheKey() + "not config template");
+            memcacheTemplate = memcacheAlarmTemplateService.findAlarmTemplateByTemplateName("Default");
+        }
 
         List<String> serverList = item.getServerList();
 
         long qps = 0;
 
-        String ips = "";
+        String ip = "";
 
         for (String server : serverList) {
-            ips += server + ",";
+            ip = server;
             if (0 != currentServerStats.size()) {
-                Long tmp = (Long) currentServerStats.get(server).get("QPS");
-                if (null != tmp) {
-                    qps += tmp;
+                if (null != currentServerStats.get(server)) {
+                    Long tmp = (Long) currentServerStats.get(server).get("QPS");
+                    if (null != tmp) {
+                        qps = tmp;
+                    }
+                } else {
+                    continue;
                 }
+            }
+
+
+            if (qps > memcacheTemplate.getQpsThreshold()) {
+                flag = true;
+                AlarmDetail alarmDetail = new AlarmDetail(alarmConfig);
+
+                alarmDetail.setAlarmTitle(QPS_TOO_HIGH)
+                        .setAlarmDetail(item.getCacheKey() + ":" + QPS_TOO_HIGH + ";IP为" + ip + ";QPS为" + qps)
+                        .setMailMode(memcacheTemplate.isMailMode())
+                        .setSmsMode(memcacheTemplate.isSmsMode())
+                        .setWeixinMode(memcacheTemplate.isWeixinMode())
+                        .setCreateTime(new Date());
+
+                AlarmRecord alarmRecord = new AlarmRecord();
+                alarmRecord.setAlarmType(AlarmType.MEMCACHE_QPS_TOO_HIGH.getNumber())
+                        .setAlarmTitle(QPS_TOO_HIGH)
+                        .setClusterName(item.getCacheKey())
+                        .setIp(ip)
+                        .setValue(qps)
+                        .setCreateTime(new Date());
+
+                alarmRecordDao.insert(alarmRecord);
+
+
+                memcacheEvent.put(alarmDetail);
             }
         }
 
-        if (qps > memcacheTemplate.getQpsThreshold()) {
-            AlarmDetail alarmDetail = new AlarmDetail(alarmConfig);
-
-            alarmDetail.setAlarmTitle(QPS_TOO_HIGH)
-                    .setAlarmDetail(item.getCacheKey() + ":" + QPS_TOO_HIGH + ";IP为" + ips + ";QPS为" + qps)
-                    .setMailMode(memcacheTemplate.isMailMode())
-                    .setSmsMode(memcacheTemplate.isSmsMode())
-                    .setWeixinMode(memcacheTemplate.isWeixinMode())
-                    .setCreateTime(new Date());
-
-            AlarmRecord alarmRecord = new AlarmRecord();
-            alarmRecord.setAlarmType(AlarmType.MEMCACHE_QPS_TOO_HIGH.getNumber())
-                    .setAlarmTitle(QPS_TOO_HIGH)
-                    .setAlarmDetail(item.getCacheKey() + ":" + QPS_TOO_HIGH + ";IP为" + ips + ";QPS为" + qps)
-                    .setCreateTime(new Date());
-
-            alarmRecordDao.insert(alarmRecord);
-
-
-            memcacheEvent.put(alarmDetail);
-            return alarmDetail;
-        }
-
-        return null;
+        return flag;
 
     }
 
-    AlarmDetail isConnAlarm(CacheConfiguration item, Map<String, Map<String, Object>> currentServerStats, MemcacheEvent memcacheEvent) throws InterruptedException {
+    boolean isConnAlarm(CacheConfiguration
+                                item, Map<String, Map<String, Object>> currentServerStats, MemcacheEvent memcacheEvent) throws
+            InterruptedException {
+        boolean flag = false;
 
         AlarmConfig alarmConfig = alarmConfigService.findByClusterTypeAndName(ALARMTYPE, item.getCacheKey());
 
@@ -301,50 +339,73 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
 
         MemcacheTemplate memcacheTemplate = memcacheAlarmTemplateService.findAlarmTemplateByTemplateName(alarmConfig.getAlarmTemplate());
 
+        if (null == memcacheTemplate) {
+            logger.info(item.getCacheKey() + "not config template");
+            memcacheTemplate = memcacheAlarmTemplateService.findAlarmTemplateByTemplateName("Default");
+        }
+
         List<String> serverList = item.getServerList();
 
         int conn = 0;
 
-        String ips = "";
+        String ip = "";
 
         for (String server : serverList) {
 
-            ips += server + ",";
+            ip = server;
 
             if (0 != currentServerStats.size()) {
-                Integer tmp = (Integer) currentServerStats.get(server).get("curr_conn");
-                if (null != tmp) {
-                    conn += tmp;
+                if (null != currentServerStats.get(server)) {
+                    Integer tmp = (Integer) currentServerStats.get(server).get("curr_conn");
+                    if (null != tmp) {
+                        conn = tmp;
+                    }
+                } else {
+                    continue;
                 }
+            }
+
+
+            if (conn > memcacheTemplate.getConnThreshold()) {
+                flag = true;
+                AlarmDetail alarmDetail = new AlarmDetail(alarmConfig);
+
+                alarmDetail.setAlarmTitle(CONN_TOO_HIGH)
+                        .setAlarmDetail(item.getCacheKey() + ":" + CONN_TOO_HIGH + ";IP为" + ip + ";连接数为" + conn)
+                        .setMailMode(memcacheTemplate.isMailMode())
+                        .setSmsMode(memcacheTemplate.isSmsMode())
+                        .setWeixinMode(memcacheTemplate.isWeixinMode())
+                        .setCreateTime(new Date());
+
+                AlarmRecord alarmRecord = new AlarmRecord();
+                alarmRecord.setAlarmType(AlarmType.MEMCACHE_CONN_TOO_HIGH.getNumber())
+                        .setAlarmTitle(CONN_TOO_HIGH)
+                        .setClusterName(item.getCacheKey())
+                        .setIp(ip)
+                        .setValue(conn)
+                        .setCreateTime(new Date());
+
+                alarmRecordDao.insert(alarmRecord);
+
+                memcacheEvent.put(alarmDetail);
             }
         }
 
-        if (conn > memcacheTemplate.getConnThreshold()) {
-            AlarmDetail alarmDetail = new AlarmDetail(alarmConfig);
-
-            alarmDetail.setAlarmTitle(CONN_TOO_HIGH)
-                    .setAlarmDetail(item.getCacheKey() + ":" + CONN_TOO_HIGH + ";IP为" + ips + ";连接数为" + conn)
-                    .setMailMode(memcacheTemplate.isMailMode())
-                    .setSmsMode(memcacheTemplate.isSmsMode())
-                    .setWeixinMode(memcacheTemplate.isWeixinMode())
-                    .setCreateTime(new Date());
-
-            AlarmRecord alarmRecord = new AlarmRecord();
-            alarmRecord.setAlarmType(AlarmType.MEMCACHE_CONN_TOO_HIGH.getNumber())
-                    .setAlarmTitle(CONN_TOO_HIGH)
-                    .setAlarmDetail(item.getCacheKey() + ":" + CONN_TOO_HIGH + ";IP为" + ips + ";连接数为" + conn)
-                    .setCreateTime(new Date());
-
-            alarmRecordDao.insert(alarmRecord);
-
-            memcacheEvent.put(alarmDetail);
-            return alarmDetail;
-        }
-
-        return null;
+        return flag;
     }
 
-    public CacheConfigurationService getCacheConfigurationService() {
+    boolean isHistoryAlarm(CacheConfiguration item, Map<String, Map<String, Object>> currentServerStats, MemcacheEvent memcacheEvent) throws InterruptedException, IOException, MemcachedException, TimeoutException {
+
+        boolean flag = false;
+
+
+
+
+        return flag;
+    }
+
+
+        public CacheConfigurationService getCacheConfigurationService() {
         return cacheConfigurationService;
     }
 

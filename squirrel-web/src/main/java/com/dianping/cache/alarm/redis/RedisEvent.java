@@ -1,7 +1,6 @@
 package com.dianping.cache.alarm.redis;
 
 
-import com.dianping.cache.alarm.entity.AlarmConfig;
 import com.dianping.cache.alarm.entity.AlarmDetail;
 import com.dianping.cache.alarm.event.Event;
 import com.dianping.cache.alarm.receiver.ReceiverService;
@@ -39,7 +38,11 @@ public class RedisEvent extends Event {
     public void alarm() throws InterruptedException, URISyntaxException, DocumentException {
 
         while (!AlarmConfigQueue.isEmpty()){
-            sendMessage(AlarmConfigQueue.take());
+            logger.info("redis alarm()"+ this.getClass().getSimpleName());
+            AlarmDetail alarmDetail = AlarmConfigQueue.take();
+            if (null != alarmDetail) {
+                sendMessage(alarmDetail);
+            }
         }
     }
 

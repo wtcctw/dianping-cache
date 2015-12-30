@@ -14,4 +14,6 @@ public interface AlarmRecordService {
     List<AlarmRecord>findByPage(int offset, int limit);
 
     List<AlarmRecord>findByType(int type);
+
+    List<AlarmRecord>search(String sql);
 }

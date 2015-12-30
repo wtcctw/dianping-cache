@@ -1,6 +1,5 @@
 package com.dianping.cache.alarm.receiver;
 
-
 import com.dianping.ba.hris.md.api.dto.EmployeeDto;
 import com.dianping.ba.hris.md.api.service.EmployeeService;
 import com.dianping.cache.alarm.utils.DateUtil;
@@ -16,6 +15,8 @@ import org.dom4j.Attribute;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.DocumentHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -31,6 +32,8 @@ import java.util.List;
 @Component("receiverService")
 public class ReceiverServiceImpl implements ReceiverService {
 
+    protected final Logger logger = LoggerFactory.getLogger(getClass());
+
     @Autowired
     private EmployeeService employeeService;
 
@@ -41,16 +44,20 @@ public class ReceiverServiceImpl implements ReceiverService {
             defalutReceiver = getDefaultReceiver(domain);
         }
 
-
         List<String> adReceiverList = CollectionUtils.toList(smsReceiver, ",");
-        if (null != defalutReceiver) {
+        if ((null != defalutReceiver)&&sendToBusiness) {
             adReceiverList.addAll(defalutReceiver);
         }
         List<String> smsReceiverList = new ArrayList<String>();
 
         for (String receiver : adReceiverList) {
-            List<EmployeeDto> userDtoList = employeeService.queryEmployeeByKeyword(receiver);
-            smsReceiverList.add(userDtoList.get(0).getMobileNo());
+            try {
+                List<EmployeeDto> userDtoList = employeeService.queryEmployeeByKeyword(receiver);
+                smsReceiverList.add(userDtoList.get(0).getMobileNo());
+            } catch (Exception e) {
+                logger.error("sms receiver " + receiver + "not found" + e);
+            }
+
         }
 
 
@@ -65,17 +72,21 @@ public class ReceiverServiceImpl implements ReceiverService {
             defalutReceiver = getDefaultReceiver(domain);
         }
 
-
         List<String> adReceiverList = CollectionUtils.toList(weiXinReceiver, ",");
 
-        if (null != defalutReceiver) {
+        if ((null != defalutReceiver)&&sendToBusiness) {
             adReceiverList.addAll(defalutReceiver);
         }
         List<String> weiXinReceiverList = new ArrayList<String>();
 
         for (String receiver : adReceiverList) {
-            List<EmployeeDto> userDtoList = employeeService.queryEmployeeByKeyword(receiver);
-            weiXinReceiverList.add(userDtoList.get(0).getEmployeeId());
+            try {
+                List<EmployeeDto> userDtoList = employeeService.queryEmployeeByKeyword(receiver);
+                weiXinReceiverList.add(userDtoList.get(0).getEmployeeId());
+            } catch (Exception e) {
+                logger.error("weixin receiver " + receiver + "not found" + e);
+            }
+
         }
 
         return weiXinReceiverList;
@@ -89,17 +100,21 @@ public class ReceiverServiceImpl implements ReceiverService {
             defalutReceiver = getDefaultReceiver(domain);
         }
 
-
         List<String> adReceiverList = CollectionUtils.toList(mailReceiver, ",");
 
-        if (null != defalutReceiver) {
+        if ((null != defalutReceiver)&&sendToBusiness) {
             adReceiverList.addAll(defalutReceiver);
         }
         List<String> mailReceiverList = new ArrayList<String>();
 
         for (String receiver : adReceiverList) {
-            List<EmployeeDto> userDtoList = employeeService.queryEmployeeByKeyword(receiver);
-            mailReceiverList.add(userDtoList.get(0).getEmail());
+            try {
+                List<EmployeeDto> userDtoList = employeeService.queryEmployeeByKeyword(receiver);
+                mailReceiverList.add(userDtoList.get(0).getEmail());
+            } catch (Exception e) {
+                logger.error("mail receiver " + receiver + "not found" + e);
+            }
+
         }
 
         return mailReceiverList;
@@ -142,35 +157,40 @@ public class ReceiverServiceImpl implements ReceiverService {
         if (null == reportElement) {
             return null;
         }
-        org.dom4j.Element machineElement = reportElement.element("machine");
+        List<org.dom4j.Element> machineElement = reportElement.elements("machine");
         if (null == machineElement) {
             return null;
         }
-        List<org.dom4j.Element> elements = machineElement.elements();
-        if (null == elements) {
-            return null;
-        }
-
-        for (int i = 0; i < elements.size(); i++) {
-            org.dom4j.Element element = elements.get(i);
-
-            Attribute e = element.attribute("id");
-
-            projectList.add(e.getValue());
-        }
-
-        for (String project : projectList) {
-
-            CmdbResult<CmdbProject> result = CmdbManager.getProject(project);
-            if (null != result.cmdbResult) {
-                String receiver = result.cmdbResult.getRd_duty();
-                defaultReceiverList.add(receiver);
+        for (int i = 0; i < machineElement.size(); i++) {
+            List<org.dom4j.Element> elements = machineElement.get(i).elements();
+            if (null == elements) {
+                return null;
             }
 
+            for (int j = 0; j < elements.size(); j++) {
+                org.dom4j.Element element = elements.get(j);
 
+                Attribute e = element.attribute("id");
+
+                projectList.add(e.getValue());
+            }
+
+            for (String project : projectList) {
+
+                CmdbResult<CmdbProject> result = CmdbManager.getProject(project);
+                if (null != result.cmdbResult) {
+                    String receiver = result.cmdbResult.getRd_duty();
+                    if (!defaultReceiverList.contains(receiver)) {
+                        defaultReceiverList.add(receiver);
+                    }
+                }
+
+
+            }
         }
         return defaultReceiverList;
     }
+
 
     public EmployeeService getEmployeeService() {
         return employeeService;

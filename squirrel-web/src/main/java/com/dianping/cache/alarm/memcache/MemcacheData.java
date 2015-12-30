@@ -7,8 +7,6 @@ import com.dianping.cache.monitor.statsdata.MemcachedStatsData;
 import com.dianping.cache.service.CacheConfigurationService;
 import com.dianping.cache.service.MemcacheStatsService;
 import com.dianping.cache.service.ServerService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.HashMap;

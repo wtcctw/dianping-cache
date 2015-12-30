@@ -18,8 +18,8 @@ public class AlarmDetail extends AlarmConfig {
         this.setId(alarmConfig.getId())
                 .setClusterType(alarmConfig.getClusterType())
                 .setClusterName(alarmConfig.getClusterName())
-                .setReceiver(alarmConfig.getReceiver())
                 .setAlarmTemplate(alarmConfig.getAlarmTemplate())
+                .setReceiver(alarmConfig.getReceiver())
                 .setToBusiness(alarmConfig.isToBusiness())
                 .setCreateTime(alarmConfig.getCreateTime())
                 .setUpdateTime(alarmConfig.getUpdateTime());

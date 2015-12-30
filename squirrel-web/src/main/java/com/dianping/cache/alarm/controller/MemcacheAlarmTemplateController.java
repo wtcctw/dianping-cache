@@ -67,7 +67,7 @@ public class MemcacheAlarmTemplateController extends AbstractSidebarController {
         if (memcacheTemplateDto.isUpdate()) {
             MemcacheTemplate memcacheTemplate = memcachetemplateService.findById(memcacheTemplateDto.getId());
 
-            result = memcachetemplateService.update(memcacheTemplate);
+            result = memcachetemplateService.update(MemcacheTemplateMapper.convertToMemcacheTemplate(memcacheTemplateDto));
         } else {
             memcacheTemplateDto.setCreateTime(new Date());
 

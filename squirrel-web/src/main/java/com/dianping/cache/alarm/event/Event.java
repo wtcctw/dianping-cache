@@ -1,9 +1,6 @@
 package com.dianping.cache.alarm.event;
 
 
-import com.dianping.ba.es.qyweixin.adapter.api.dto.MessageDto;
-import com.dianping.ba.es.qyweixin.adapter.api.dto.media.TextDto;
-import com.dianping.ba.es.qyweixin.adapter.api.exception.QyWeixinAdaperException;
 import com.dianping.ba.es.qyweixin.adapter.api.service.MessageService;
 import com.dianping.cache.alarm.AlarmType;
 import com.dianping.cache.alarm.entity.AlarmDetail;
@@ -13,17 +10,15 @@ import com.dianping.cache.config.ConfigChangeListener;
 import com.dianping.cache.config.ConfigManager;
 import com.dianping.cache.config.ConfigManagerLoader;
 import com.dianping.cache.monitor.Constants;
+import com.dianping.cache.util.NetUtil;
 import com.dianping.cache.util.RequestUtil;
-import com.dianping.lion.Environment;
 import com.dianping.mailremote.remote.MailService;
 import com.dianping.pigeon.remoting.ServiceFactory;
 import org.dom4j.DocumentException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.net.InetAddress;
 import java.net.URISyntaxException;
-import java.net.UnknownHostException;
 import java.util.*;
 
 /**
@@ -31,6 +26,14 @@ import java.util.*;
  */
 public abstract class Event {
     protected static Logger logger = LoggerFactory.getLogger(Event.class);
+
+    private static final ArrayList<String> IPLIST = new ArrayList<String>(){{
+        add("10.3.8.62");//线上
+        add("10.2.8.147");//ppe
+        add("192.168.211.117");//beta
+        //add("10.128.120.31");//my host
+    }};
+
 
 
     private ConfigManager configManager = ConfigManagerLoader.getConfigManager();
@@ -122,22 +125,17 @@ public abstract class Event {
     public void sendMessage(AlarmDetail alarmDetail) throws InterruptedException, URISyntaxException, DocumentException {
         logger.info("[sendMessage] AlarmType {}", alarmType);
 
-        InetAddress inetAddress = null;
-
         try {
-            inetAddress = inetAddress.getLocalHost();
 
-            String localip = inetAddress.getHostAddress();
-            //线上、beta环境机器
-            if ("10.1.14.104".equals(localip)||"192.168.227.113".equals(localip)) {
+            if (isMaster()) {
 
                 if (isAlarm(alarmDetail)) {
                     notify(alarmDetail);
                 }
             }
 
-        } catch (UnknownHostException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            logger.error(this.getClass().getSimpleName() + e);
         }
 
 
@@ -170,26 +168,29 @@ public abstract class Event {
         }
     }
 
-    private boolean isProductEnv() {
-
-        return "product".equals(Environment.getEnv());
-
-    }
+//    private boolean isProductEnv() {
+//
+//        return "product".equals(Environment.getEnv());
+//
+//    }
 
     public boolean notifyEmail(String title, String message, String receiver, String domain, boolean sendToBusiness) throws InterruptedException, DocumentException, URISyntaxException {
 
-        Map<String, String> subPair = new HashMap<String, String>();
-        subPair.put("title", title);
-        subPair.put("body", message);
-
         List<String> emailList = receiverService.getMailReceiver(receiver, domain, sendToBusiness);
+        boolean success = true;
+        for (String email : emailList) {
+            String mailparam = "title=" + title + "&body=" + message + "&recipients=" + email;
 
-        boolean result = mailService.send(emailType, emailList, subPair, "");
+            String result = RequestUtil.sendGet("http://web.paas.dp/mail/send", mailparam);
 
-        if (!result) {
-            logger.warn("fail to send email, content:" + message);
+            if (!result.contains("true")) {
+                success = false;
+                logger.warn("failed to send mail, content:" + message + ",error code:" + result);
+            }
+
         }
-        return result;
+        return success;
+
     }
 
     public boolean notifySms(String message, String receiver, String domain, boolean sendToBusiness) throws DocumentException, InterruptedException, URISyntaxException {
@@ -201,6 +202,8 @@ public abstract class Event {
         boolean success = true;
         for (String mobile : mobiles) {
             String smsparam = "mobile=" + mobile + "&body=" + message;
+
+            logger.info("sendsms:" + smsparam);
             String result = RequestUtil.sendGet("http://web.paas.dp/sms/send", smsparam);
 
             if (!result.contains("200")) {
@@ -211,22 +214,24 @@ public abstract class Event {
         return success;
     }
 
-    public void notifyWeixin(String message, String receiver, String domain, boolean sendToBusiness) throws InterruptedException, DocumentException, URISyntaxException {
-        TextDto text = new TextDto();
-        text.setContent(message);
-        List<String> users = new ArrayList<String>();
-//        users.addAll(CollectionUtils.toList(weixinList, ","));
-        users.addAll(receiverService.getWeiXinReceiver(receiver, domain, sendToBusiness));
-        MessageDto messageDto = new MessageDto();
-        messageDto.setAgentid(weixinType);
-        messageDto.setMediaDto(text);
-        messageDto.setTouser(users);
-        messageDto.setSafe(0);
-        try {
-            weixinService.sendMessage(messageDto);
-        } catch (QyWeixinAdaperException e) {
-            logger.error("failed to send weixin, content: " + message, e);
+    public boolean notifyWeixin(String message, String receiver, String domain, boolean sendToBusiness) throws InterruptedException, DocumentException, URISyntaxException {
+
+        List<String> employeeIds = receiverService.getWeiXinReceiver(receiver, domain, sendToBusiness);
+
+        boolean success = true;
+
+        for (String employeeId : employeeIds) {
+            String wechatparam = "keyword=" + employeeId + "&title=" + message + "&content=" + message;
+
+            String result = RequestUtil.sendGet("http://web.paas.dp/wechat/send", wechatparam);
+
+            if (!result.contains("true")) {
+                success = false;
+                logger.warn("failed to send weixin, content:" + message + ",error code:" + result);
+            }
         }
+        return success;
+
     }
 
 
@@ -237,5 +242,21 @@ public abstract class Event {
         eventCache.put(alarmDetail);
 
         return eventCache.check(alarmDetail);
+    }
+
+
+    public boolean isMaster(){
+        boolean isMaster = false;
+        try {
+            List<String> ip= NetUtil.getAllLocalIp();
+            ip.retainAll(IPLIST);
+            if(ip.size() > 0)
+                isMaster = true;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return isMaster;
     }
 }

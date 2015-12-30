@@ -144,6 +144,7 @@ module
                 $scope.alarmConfigEntity.weixinMode = $scope.searchPaginator.currentPageItems[index].weixinMode;
                 $scope.alarmConfigEntity.isDown = $scope.searchPaginator.currentPageItems[index].isDown;
                 $scope.alarmConfigEntity.memThreshold = $scope.searchPaginator.currentPageItems[index].memThreshold;
+                $scope.alarmConfigEntity.qpsThreshold = $scope.searchPaginator.currentPageItems[index].qpsThreshold;
                 $scope.alarmConfigEntity.isUpdate = true;
             }
 

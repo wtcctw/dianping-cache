@@ -23,6 +23,7 @@ public class RedisTemplateMapper {
                 .setWeixinMode(redisTemplateDto.isWeixinMode());
         redisTemplate.setIsDown(redisTemplateDto.isDown())
                 .setMemThreshold(redisTemplateDto.getMemThreshold())
+                .setQpsThreshold(redisTemplateDto.getQpsThreshold())
                 .setCreateTime(redisTemplateDto.getCreateTime())
                 .setUpdateTime(new Date());
 

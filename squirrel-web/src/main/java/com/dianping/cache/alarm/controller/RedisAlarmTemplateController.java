@@ -45,6 +45,7 @@ public class RedisAlarmTemplateController extends AbstractSidebarController {
                     .setTemplateName("Default");
             redisTemplate.setIsDown(true)
                     .setMemThreshold(80)
+                    .setQpsThreshold(80000)
                     .setCreateTime(new Date())
                     .setUpdateTime(new Date());
             redistemplateService.insert(redisTemplate);
@@ -66,7 +67,7 @@ public class RedisAlarmTemplateController extends AbstractSidebarController {
         if (redisTemplateDto.isUpdate()) {
             RedisTemplate redisTemplate = redistemplateService.findById(redisTemplateDto.getId());
 
-            result = redistemplateService.update(redisTemplate);
+            result = redistemplateService.update(RedisTemplateMapper.convertToRedisTemplate(redisTemplateDto));
         } else {
             redisTemplateDto.setCreateTime(new Date());
 

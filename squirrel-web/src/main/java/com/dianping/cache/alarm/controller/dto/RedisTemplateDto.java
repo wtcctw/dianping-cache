@@ -21,6 +21,8 @@ public class RedisTemplateDto {
 
     private int memThreshold;
 
+    private int qpsThreshold;
+
     private boolean isUpdate;
 
     private Date createTime;
@@ -81,6 +83,14 @@ public class RedisTemplateDto {
 
     public void setMemThreshold(int memThreshold) {
         this.memThreshold = memThreshold;
+    }
+
+    public int getQpsThreshold() {
+        return qpsThreshold;
+    }
+
+    public void setQpsThreshold(int qpsThreshold) {
+        this.qpsThreshold = qpsThreshold;
     }
 
     public boolean isUpdate() {
