@@ -91,8 +91,8 @@ module
         function ($rootScope, $scope, $http, Paginator, ngDialog, $interval) {
 
             $scope.clusterTypes=["Memcache","Redis"];
-            $scope.memcacheAlarmTypes = ["宕机","内存","QPS","连接数"];
-            $scope.redisAlarmTypes = ["内存"];
+            $scope.memcacheAlarmTemplates;
+            $scope.redisAlarmTemplates;
             $scope.thresholdTypes = ["上阈值","下阈值"];
             $scope.memcacheClusters;
             $scope.redisCluters;
@@ -109,7 +109,7 @@ module
                 }).success(callback);
             };
             $scope.suburl = "/setting/alarmrule/list";
-            $scope.pageSize = 30;
+            $scope.pageSize = 30000;
             $scope.queryCount = 0;
 
             $scope.query = function () {
@@ -145,13 +145,9 @@ module
                 $scope.alarmConfigEntity.id = $scope.searchPaginator.currentPageItems[index].id;
                 $scope.alarmConfigEntity.clusterType = $scope.searchPaginator.currentPageItems[index].clusterType;
                 $scope.alarmConfigEntity.clusterName = $scope.searchPaginator.currentPageItems[index].clusterName;
-                $scope.alarmConfigEntity.alarmType = $scope.searchPaginator.currentPageItems[index].alarmType;
-                $scope.alarmConfigEntity.alarmRule = $scope.searchPaginator.currentPageItems[index].alarmRule;
-                $scope.alarmConfigEntity.threshold = $scope.searchPaginator.currentPageItems[index].threshold;
+                $scope.alarmConfigEntity.alarmTemplate = $scope.searchPaginator.currentPageItems[index].alarmTemplate;
                 $scope.alarmConfigEntity.receiver = $scope.searchPaginator.currentPageItems[index].receiver;
-                $scope.alarmConfigEntity.mailMode = $scope.searchPaginator.currentPageItems[index].mailMode;
-                $scope.alarmConfigEntity.smsMode = $scope.searchPaginator.currentPageItems[index].smsMode;
-                $scope.alarmConfigEntity.weixinMode = $scope.searchPaginator.currentPageItems[index].weixinMode;
+                $scope.alarmConfigEntity.toBusiness = $scope.searchPaginator.currentPageItems[index].toBusiness;
                 $scope.alarmConfigEntity.isUpdate = true;
             }
 
@@ -233,6 +229,36 @@ module
             ).error(
                 function(datas,status,headers,config){
                     console.log("redisclusters读取错误")
+                }
+            );
+
+            $http(
+                {
+                    method:"GET",
+                    url:window.contextPath + '/setting/alarmrule/query/memcachetemplates'
+                }
+            ).success(
+                function(datas,status,headers,config){
+                    $scope.memcacheAlarmTemplates = datas;
+                }
+            ).error(
+                function(datas,status,headers,config){
+                    console.log("memcacheAlarmTemplates")
+                }
+            );
+
+            $http(
+                {
+                    method:"GET",
+                    url:window.contextPath + '/setting/alarmrule/query/redistemplates'
+                }
+            ).success(
+                function(datas,status,headers,config){
+                    $scope.redisAlarmTemplates = datas;
+                }
+            ).error(
+                function(datas,status,headers,config){
+                    console.log("redisAlarmTemplates读取错误")
                 }
             );
 

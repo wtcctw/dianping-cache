@@ -1,8 +1,5 @@
 package com.dianping.cache.alarm.entity;
 
-import org.springframework.transaction.annotation.Transactional;
-
-import javax.annotation.Resource;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -23,7 +20,11 @@ public class AlarmRecord implements Serializable {
 
     private String alarmTitle;
 
-    private String alarmDetail;
+    private String clusterName;
+
+    private String ip;
+
+    private float val;
 
     private Date createTime;
 
@@ -62,12 +63,30 @@ public class AlarmRecord implements Serializable {
         return this;
     }
 
-    public String getAlarmDetail() {
-        return alarmDetail;
+    public String getClusterName() {
+        return clusterName;
     }
 
-    public AlarmRecord setAlarmDetail(String alarmDetail) {
-        this.alarmDetail = alarmDetail;
+    public AlarmRecord setClusterName(String clusterName) {
+        this.clusterName = clusterName;
+        return this;
+    }
+
+    public String getIp() {
+        return ip;
+    }
+
+    public AlarmRecord setIp(String ip) {
+        this.ip = ip;
+        return this;
+    }
+
+    public float getValue() {
+        return val;
+    }
+
+    public AlarmRecord setValue(float val) {
+        this.val = val;
         return this;
     }
 

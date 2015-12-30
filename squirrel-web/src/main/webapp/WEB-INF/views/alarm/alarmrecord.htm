@@ -15,47 +15,132 @@
         </ul>
     </div>
 
-        <!-- page-content -->
-        <div class="page-content">
-            <div>
-                <!--row  -->
-                <div class="row">
-                    <table
-                            class="table table-bordered table-striped table-condensed  table-hover">
-                        <tr>
-                            <th>序号</th>
-                            <th>标题</th>
-                            <th>内容</th>
-                            <th>时间</th>
-                        </tr>
-                        <tr ng-repeat="m in searchPaginator.currentPageItems">
-                            <td style="text-align: center">{{$index+1}}</td>
-                            <td style="text-align: center">{{m.alarmTitle}}</td>
-                            <td style="text-align: center" class="row-table-td">{{m.alarmDetail}}</td>
-                            <td style="text-align: center">{{m.createTime |
-                                date:'yyyy-MM-dd HH:mm:ss'}}</td>
-                        </tr>
-                    </table>
+    <!-- page-content -->
+    <div class="page-content">
 
-                    <ul style="margin-top: 20px;" class="pagination">
-                        <li><a href="" ng-click="searchPaginator.fetch(1)">首页</a></li>
-                        <li><a href="" ng-click="searchPaginator.previous()"
-                               ng-show="searchPaginator.hasPrevious()">上一页</a></li>
-                        <li ng-repeat="p in searchPaginator.pages"><a href=""
-                                                                      ng-click="searchPaginator.fetch(p)" ng-bind="p"></a></li>
-                        <li class="disabled"><a href="javascript:;">...</a></li>
+        <div class="row col-lg-12 col-sm-12">
+            <div class="row col-sm-6" style="margin-top:5px">
+                <div class="col-xs-4">
+                    <div class="input-group input-group-sm">
+                        <span
+                                class="input-group-addon"> 规则
+							</span>
+                        <input type="text" class="form-control"
+                              id="title"
+                               ng-model='title' required>
 
-                        <li><a href="" ng-click="searchPaginator.next()"
-                               ng-show="searchPaginator.hasNext()">下一页</a></li>
+                    </div>
+                </div>
 
-                        <li><a href=""
-                               ng-click="searchPaginator.fetch(searchPaginator.endPage)">末页</a></li>
-                    </ul>
+                <div class="col-xs-4">
+                    <div class="input-group input-group-sm">
+                        <span
+                                class="input-group-addon">集群
+
+							</span>
+                        <input type="text"
+                               class="form-control " id="clusterName" ng-model='clusterName' required>
+
+                    </div>
+                </div>
+
+                <div class="col-xs-4">
+                    <div class="input-group input-group-sm">
+                        <span
+                                class="input-group-addon">对象
+
+							</span>
+                        <input type="text"
+                               class="form-control " id="ip" ng-model='ip' required>
+
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="row col-sm-5" style="margin-top:5px">
+                <div class="col-xs-6">
+                    <div class="input-group input-group-sm">
+                        <span
+                                class="input-group-addon"> <i
+                                class="ace-icon fa fa-calendar"></i>
+							</span>
+                        <input type="text" placeholder="开始时间..." ng-model="startTime"
+                               id="starttime"
+                               class="form-control ">
+
+                    </div>
+                </div>
+
+                <div class="col-xs-6">
+                    <div class="input-group input-group-sm">
+                        	<span
+                                    class="input-group-addon"> <i
+                                    class="ace-icon fa fa-calendar"></i>
+
+							</span>
+                        <input type="text" placeholder="结束时间..."
+                               ng-model="endTime" id="stoptime"
+                               class="form-control">
+
+                    </div>
                 </div>
             </div>
 
-            <!--end page-header  -->
+            <div class="col-sm-1">
+                <button type="submit" class="btn btn-sm form-control"
+                        style="height: 30px;margin-top:5px;"
+                        id="summittime" ng-click="search()">查询
+                </button>
+            </div>
         </div>
-        <!-- end page-content -->
+
+
+        </br></br></br>
+
+        <div>
+            <!--row  -->
+            <div class="row col-lg-12 col-sm-12" style="margin-left:1px">
+                <table style="table-layout:fixed;"
+                       class="table table-bordered table-striped table-condensed  table-hover">
+                    <tr>
+                        <th style="text-align: center; width:20px">序号</th>
+                        <th style="text-align: center; width:120px">规则</th>
+                        <th style="text-align: center; width:80px">集群</th>
+                        <th style="text-align: center; width:80px">对象</th>
+                        <th style="text-align: center; width:80px">数值</th>
+                        <th style="text-align: center; width:80px">时间</th>
+                    </tr>
+                    <tr ng-repeat="m in searchPaginator.currentPageItems">
+                        <td style="text-align: center; width:20px">{{$index+1}}</td>
+                        <td style="text-align: center; width:120px">{{m.alarmTitle}}</td>
+                        <td style="text-align: center; width:80px">{{m.clusterName}}</td>
+                        <td style="text-align: center; width:80px">{{m.ip}}</td>
+                        <td style="text-align: center; width:80px">{{m.value}}</td>
+                        <td style="text-align: center; width:80px">{{m.createTime | date:'yyyy-MM-dd HH:mm:ss'}}</td>
+                    </tr>
+                </table>
+
+                <ul style="margin-top: 20px;" class="pagination">
+                    <li><a href="" ng-click="searchPaginator.fetch(1)">首页</a></li>
+                    <li><a href="" ng-click="searchPaginator.previous()"
+                           ng-show="searchPaginator.hasPrevious()">上一页</a></li>
+                    <li ng-repeat="p in searchPaginator.pages"><a href=""
+                                                                  ng-click="searchPaginator.fetch(p)" ng-bind="p"></a>
+                    </li>
+                    <li class="disabled"><a href="javascript:;">...</a></li>
+
+                    <li><a href="" ng-click="searchPaginator.next()"
+                           ng-show="searchPaginator.hasNext()">下一页</a></li>
+
+                    <li><a href=""
+                           ng-click="searchPaginator.fetch(searchPaginator.endPage)">末页</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <!--end page-header  -->
     </div>
+    <!-- end page-content -->
+</div>
 </div>

@@ -1,7 +1,5 @@
 package com.dianping.cache.alarm.controller.dto;
 
-import com.dianping.cache.alarm.lifecycle.Lifecycle;
-
 import java.util.List;
 
 /**

@@ -5,7 +5,7 @@ import java.util.Date;
 /**
  * Created by lvshiyun on 15/12/9.
  */
-public class AlarmSearchDto extends BaseQueryDto{
+public class AlarmSearchDto extends BaseQueryDto {
 
     private String receiver;
 

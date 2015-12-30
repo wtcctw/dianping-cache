@@ -10,9 +10,9 @@ import java.util.List;
  */
 public interface ReceiverService {
 
-    public List<String> getSmsReceiver(String smsReceiver,String domain) throws URISyntaxException, DocumentException, InterruptedException;
+    public List<String> getSmsReceiver(String smsReceiver, String domain, boolean sendToBusiness) throws URISyntaxException, DocumentException, InterruptedException;
 
-    public List<String> getWeiXinReceiver(String weiXinReceiver, String domain) throws InterruptedException, DocumentException, URISyntaxException;
+    public List<String> getWeiXinReceiver(String weiXinReceiver, String domain, boolean sendToBusiness) throws InterruptedException, DocumentException, URISyntaxException;
 
-    public List<String> getMailReceiver(String mailReceiver, String domain) throws InterruptedException, DocumentException, URISyntaxException;
+    public List<String> getMailReceiver(String mailReceiver, String domain, boolean sendToBusiness) throws InterruptedException, DocumentException, URISyntaxException;
 }

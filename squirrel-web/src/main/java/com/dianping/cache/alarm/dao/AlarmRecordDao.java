@@ -18,7 +18,7 @@ public interface AlarmRecordDao extends GenericDao{
      * @param record
      * @return
      */
-    boolean insert( AlarmRecord record);
+    boolean insert(AlarmRecord record);
 
     /**
      * retrieve all alarmRecords
@@ -32,13 +32,20 @@ public interface AlarmRecordDao extends GenericDao{
      * @param type
      * @return
      */
-    List<AlarmRecord> findByType( int type);
+    List<AlarmRecord> findByType(int type);
 
     /**
      * @param offset,limit
      * @return
      */
-    List<AlarmRecord>findByPage(@Param("offset")int offset, @Param("limit")int limit);
+    List<AlarmRecord>findByPage(@Param("offset") int offset, @Param("limit") int limit);
+
+
+    /**
+     * @param sql
+     * @return
+     */
+    List<AlarmRecord> search(@Param("paramSQL") String sql);
 
 
     public static class AlarmParam{

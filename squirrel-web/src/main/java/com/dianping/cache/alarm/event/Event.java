@@ -1,30 +1,23 @@
 package com.dianping.cache.alarm.event;
 
 
-import com.dianping.ba.es.qyweixin.adapter.api.dto.MessageDto;
-import com.dianping.ba.es.qyweixin.adapter.api.dto.media.TextDto;
-import com.dianping.ba.es.qyweixin.adapter.api.exception.QyWeixinAdaperException;
 import com.dianping.ba.es.qyweixin.adapter.api.service.MessageService;
-import com.dianping.cache.alarm.entity.AlarmDetail;
-import com.dianping.cache.alarm.entity.AlarmDetail;
 import com.dianping.cache.alarm.AlarmType;
+import com.dianping.cache.alarm.entity.AlarmDetail;
+import com.dianping.cache.alarm.event.alarmDelayCache.EventCache;
 import com.dianping.cache.alarm.receiver.ReceiverService;
-import com.dianping.cache.alarm.receiver.ReceiverServiceImpl;
 import com.dianping.cache.config.ConfigChangeListener;
 import com.dianping.cache.config.ConfigManager;
 import com.dianping.cache.config.ConfigManagerLoader;
 import com.dianping.cache.monitor.Constants;
-import com.dianping.cache.support.spring.SpringLocator;
+import com.dianping.cache.util.NetUtil;
 import com.dianping.cache.util.RequestUtil;
-import com.dianping.lion.Environment;
 import com.dianping.mailremote.remote.MailService;
 import com.dianping.pigeon.remoting.ServiceFactory;
 import org.dom4j.DocumentException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 
-import javax.sound.midi.Receiver;
 import java.net.URISyntaxException;
 import java.util.*;
 
@@ -33,6 +26,14 @@ import java.util.*;
  */
 public abstract class Event {
     protected static Logger logger = LoggerFactory.getLogger(Event.class);
+
+    private static final ArrayList<String> IPLIST = new ArrayList<String>(){{
+        add("10.3.8.62");//线上
+        add("10.2.8.147");//ppe
+        add("192.168.211.117");//beta
+        //add("10.128.120.31");//my host
+    }};
+
 
 
     private ConfigManager configManager = ConfigManagerLoader.getConfigManager();
@@ -124,9 +125,20 @@ public abstract class Event {
     public void sendMessage(AlarmDetail alarmDetail) throws InterruptedException, URISyntaxException, DocumentException {
         logger.info("[sendMessage] AlarmType {}", alarmType);
 
+        try {
 
-//        notify(AlarmDetail.getAlarmTitle(), AlarmDetail.toString(),AlarmDetail.getReceiver());
-        notify(alarmDetail);
+            if (isMaster()) {
+
+                if (isAlarm(alarmDetail)) {
+                    notify(alarmDetail);
+                }
+            }
+
+        } catch (Exception e) {
+            logger.error(this.getClass().getSimpleName() + e);
+        }
+
+
     }
 
     //    public void notify(String title, String message, String receiver) {
@@ -138,53 +150,60 @@ public abstract class Event {
 
         String receiver = alarmDetail.getReceiver();
 
+        boolean sendToBusiness = alarmDetail.isToBusiness();
+
         if (enableNotify) {
             if (alarmDetail.isMailMode()) {
-                notifyEmail(title, message, receiver,domain);
+                notifyEmail(title, message, receiver, domain, sendToBusiness);
             }
 //            notifySms(message, receiver);
 //            if (isProductEnv()) {
             if (alarmDetail.isSmsMode()) {
-                notifySms(message, receiver,domain);
+                notifySms(message, receiver, domain, sendToBusiness);
             }
             if (alarmDetail.isWeixinMode()) {
-                notifyWeixin(message, receiver,domain);
+                notifyWeixin(message, receiver, domain, sendToBusiness);
             }
 //            }
         }
     }
 
-    private boolean isProductEnv() {
+//    private boolean isProductEnv() {
+//
+//        return "product".equals(Environment.getEnv());
+//
+//    }
 
-        return "product".equals(Environment.getEnv());
+    public boolean notifyEmail(String title, String message, String receiver, String domain, boolean sendToBusiness) throws InterruptedException, DocumentException, URISyntaxException {
 
-    }
+        List<String> emailList = receiverService.getMailReceiver(receiver, domain, sendToBusiness);
+        boolean success = true;
+        for (String email : emailList) {
+            String mailparam = "title=" + title + "&body=" + message + "&recipients=" + email;
 
-    public boolean notifyEmail(String title, String message, String receiver, String domain) throws InterruptedException, DocumentException, URISyntaxException {
+            String result = RequestUtil.sendGet("http://web.paas.dp/mail/send", mailparam);
 
-        Map<String, String> subPair = new HashMap<String, String>();
-        subPair.put("title", title);
-        subPair.put("body", message);
+            if (!result.contains("true")) {
+                success = false;
+                logger.warn("failed to send mail, content:" + message + ",error code:" + result);
+            }
 
-        List<String> emailList = receiverService.getMailReceiver(receiver, domain);
-
-        boolean result = mailService.send(emailType, emailList, subPair, "");
-
-        if (!result) {
-            logger.warn("fail to send email, content:" + message);
         }
-        return result;
+        return success;
+
     }
 
-    public boolean notifySms(String message, String receiver, String domain) throws DocumentException, InterruptedException, URISyntaxException {
+    public boolean notifySms(String message, String receiver, String domain, boolean sendToBusiness) throws DocumentException, InterruptedException, URISyntaxException {
         Map<String, String> subPair = new HashMap<String, String>();
         subPair.put("body", message);
 //        String[] mobiles = smsList.split(",");
-        List<String> mobiles = receiverService.getSmsReceiver(receiver, domain);
+        List<String> mobiles = receiverService.getSmsReceiver(receiver, domain, sendToBusiness);
 
         boolean success = true;
         for (String mobile : mobiles) {
             String smsparam = "mobile=" + mobile + "&body=" + message;
+
+            logger.info("sendsms:" + smsparam);
             String result = RequestUtil.sendGet("http://web.paas.dp/sms/send", smsparam);
 
             if (!result.contains("200")) {
@@ -195,38 +214,49 @@ public abstract class Event {
         return success;
     }
 
-    public void notifyWeixin(String message, String receiver, String domain) throws InterruptedException, DocumentException, URISyntaxException {
-        TextDto text = new TextDto();
-        text.setContent(message);
-        List<String> users = new ArrayList<String>();
-//        users.addAll(CollectionUtils.toList(weixinList, ","));
-        users.addAll(receiverService.getWeiXinReceiver(receiver, domain));
-        MessageDto messageDto = new MessageDto();
-        messageDto.setAgentid(weixinType);
-        messageDto.setMediaDto(text);
-        messageDto.setTouser(users);
-        messageDto.setSafe(0);
-        try {
-            weixinService.sendMessage(messageDto);
-        } catch (QyWeixinAdaperException e) {
-            logger.error("failed to send weixin, content: " + message, e);
-        }
-    }
+    public boolean notifyWeixin(String message, String receiver, String domain, boolean sendToBusiness) throws InterruptedException, DocumentException, URISyntaxException {
 
-    public boolean nofitySmsTest(String message) {
-        Map<String, String> subPair = new HashMap<String, String>();
-        subPair.put("body", message);
-        String smsList = "17802118895";
-        String[] mobiles = smsList.split(",");
+        List<String> employeeIds = receiverService.getWeiXinReceiver(receiver, domain, sendToBusiness);
+
         boolean success = true;
-        for (String mobile : mobiles) {
-            String smsparam = "mobile=" + mobile + "&body=" + message;
-            String result = RequestUtil.sendGet("http://web.paas.dp/sms/send", smsparam);
-            if (!result.contains("200")) {
+
+        for (String employeeId : employeeIds) {
+            String wechatparam = "keyword=" + employeeId + "&title=" + message + "&content=" + message;
+
+            String result = RequestUtil.sendGet("http://web.paas.dp/wechat/send", wechatparam);
+
+            if (!result.contains("true")) {
                 success = false;
-                logger.warn("failed to send sms, content: " + message + ",error code: " + result);
+                logger.warn("failed to send weixin, content:" + message + ",error code:" + result);
             }
         }
         return success;
+
+    }
+
+
+    private boolean isAlarm(AlarmDetail alarmDetail) {
+
+        EventCache eventCache = EventCache.getInstance();
+
+        eventCache.put(alarmDetail);
+
+        return eventCache.check(alarmDetail);
+    }
+
+
+    public boolean isMaster(){
+        boolean isMaster = false;
+        try {
+            List<String> ip= NetUtil.getAllLocalIp();
+            ip.retainAll(IPLIST);
+            if(ip.size() > 0)
+                isMaster = true;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return isMaster;
     }
 }

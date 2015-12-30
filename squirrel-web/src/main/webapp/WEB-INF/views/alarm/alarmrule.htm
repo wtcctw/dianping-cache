@@ -1,4 +1,4 @@
-<div class="main-content" id="MemcacheController" ng-controller="AlarmRuleController">
+<div class="main-content" id="AlarmRuleController" ng-controller="AlarmRuleController">
     <div class="main-content-inner">
         <div class="breadcrumbs" id="breadcrumbs">
             <script type="text/javascript"
@@ -11,6 +11,14 @@
             </script>
             <ul class="breadcrumb">
                 <li class="active">告警管理</li>
+                <li class="#if($subside == 'rdashboard') active #end"><a
+                        href="${rc.contextPath}/setting/memcachetemplate"> <i
+                        class="icon-globe"></i>添加Memcache告警模板
+                </a></li>
+                <li class="#if($subside == 'rdashboard') active #end"><a
+                        href="${rc.contextPath}/setting/redistemplate"> <i
+                        class="icon-globe"></i>添加Redis告警模板
+                </a></li>
             </ul>
         </div>
 
@@ -24,10 +32,9 @@
                             <!--<td><input type="checkbox" id="check-all"></td>-->
                             <!--<th>告警集群类型</th>-->
                             <th>告警集群类型及名称</th>
-                            <th>告警类型</th>
-                            <th>规则类型及阈值</th>
+                            <th>模板名称</th>
                             <th>收件人</th>
-                            <th>告警方式</th>
+                            <th>是否发送业务线</th>
                             <th>操作
                                 <a class="breadcrumbs-btn" href="#myModal" ng-click="clearModal()" data-toggle="modal">
                                     <i class="ace-icon fa fa-plus green"></i>
@@ -38,21 +45,15 @@
                         <tbody>
                         <tr ng-repeat="e in searchPaginator.currentPageItems">
                             <!--<td style="text-align: center"><input type="checkbox" name="check-list" value="{{e.id}}"></td>-->
-                            <td style="text-align: center width:100px">{{e.clusterType}}:{{e.clusterName}}</td>
-                            <td style="text-align: center width:100px">{{e.alarmType}}</td>
-                            <td style="text-align: center width:100px">{{e.alarmRule}}:{{e.threshold}}</td>
-                            <td style="text-align: center width:100px">{{e.receiver}}</td>
-                            <td style="text-align: center width:100px">
+                            <td style="text-align: center">{{e.clusterType}}:{{e.clusterName}}</td>
+                            <td style="text-align: center">{{e.alarmTemplate}}</td>
+                            <td style="text-align: center">{{e.receiver}}</td>
+                            <td style="text-align: center">
                                 <span class="sticker">
-                                    <span class="label arrowed-in" ng-class="{'label-success':e.mailMode==true,'label-danger':e.mailMode==false}">
-                                        <i class="bigger-110" ng-class="{'ace-icon fa fa-check':e.mailMode==true,'ace-icon fa fa-times':e.mailMode==false}">邮件</i>
+                                    <span class="label arrowed-in" ng-class="{'label-success':e.toBusiness==true,'label-danger':e.toBusiness==false}">
+                                        <i class="bigger-110" ng-class="{'ace-icon fa fa-check':e.toBusiness==true,'ace-icon fa fa-times':e.toBusiness==false}">业务线</i>
                                     </span>
-                                    <span class="label arrowed-in" ng-class="{'label-success':e.smsMode==true,'label-danger':e.smsMode==false}">
-                                        <i class="bigger-110" ng-class="{'ace-icon fa fa-check':e.smsMode==true,'ace-icon fa fa-times':e.smsMode==false}">短信</i>
-                                    </span>
-                                    <span class="label arrowed-in" ng-class="{'label-success':e.weixinMode==true,'label-danger':e.weixinMode==false}">
-                                        <i class="bigger-110" ng-class="{'ace-icon fa fa-check':e.weixinMode==true,'ace-icon fa fa-times':e.weixinMode==false}">微信</i>
-                                    </span>
+
                                 </span>
                             </td>
 
@@ -115,55 +116,30 @@
                                 </div>
 
                                 <div class="col-xs-12 form-group" ng-switch-when="Memcache">
-                                    <label class="col-xs-3 control-label control-label no-padding-right">告警类型：</label>
+                                    <label class="col-xs-3 control-label control-label no-padding-right">告警模板：</label>
                                     <div class="col-xs-9">
-                                        <select class="col-xs-12" ng-model="alarmConfigEntity.alarmType"
-                                                name="type" ng-options="o as o for o in memcacheAlarmTypes" required>
+                                        <select class="col-xs-12" ng-model="alarmConfigEntity.alarmTemplate"
+                                                name="type" ng-options="o as o for o in memcacheAlarmTemplates" required>
                                         </select>
                                     </div>
                                 </div>
                                 <div class="col-xs-12 form-group" ng-switch-when="Redis">
-                                    <label class="col-xs-3 control-label control-label no-padding-right">告警类型：</label>
+                                    <label class="col-xs-3 control-label control-label no-padding-right">告警模板：</label>
                                     <div class="col-xs-9">
-                                        <select class="col-xs-12" ng-model="alarmConfigEntity.alarmType"
-                                                name="type" ng-options="o as o for o in redisAlarmTypes" required>
+                                        <select class="col-xs-12" ng-model="alarmConfigEntity.alarmTemplate"
+                                                name="type" ng-options="o as o for o in redisAlarmTemplates" required>
                                         </select>
                                     </div>
                                 </div>
 
-                                <div class="col-xs-12 form-group">
-                                    <label class="col-xs-3 control-label control-label no-padding-right">规则类型：</label>
-                                    <div class="col-xs-9">
-                                        <select class="col-xs-12" ng-model="alarmConfigEntity.alarmRule"
-                                                name="type" ng-options="o as o for o in thresholdTypes">
-                                        </select>
-                                    </div>
-                                </div>
 
-                                <div class="col-xs-12 form-group">
-                                    <label class="col-xs-3 control-label control-label no-padding-right">阈值：</label>
-                                    <div class="col-xs-9">
-                                        <input type="text" class="form-control"
-                                               ng-model="alarmConfigEntity.threshold" name="threshold">
-                                    </div>
-                                </div>
                                 <div class="col-xs-12 form-group">
                                     <label class="col-xs-3 control-label control-label no-padding-right">收件人：</label>
                                     <div class="col-xs-9">
 									<textarea class="form-control" rows="2" type="text"
                                               ng-model="alarmConfigEntity.receiver" name="receiver" required>
                                     </textarea>
-                                    </div>
-                                </div>
-                                <div class="col-xs-12 form-group">
-                                    <label class="col-xs-3 control-label control-label no-padding-right">告警方式：</label>
-                                    <div class="col-xs-9" style="font-size: 15px">
-                                        邮件：
-                                        <input type="checkbox"  ng-model="alarmConfigEntity.mailMode" name="mailMode">
-                                        &nbsp&nbsp短信：
-                                        <input type="checkbox"  ng-model="alarmConfigEntity.smsMode" name="smsMode">
-                                        &nbsp&nbsp微信：
-                                        <input type="checkbox"  ng-model="alarmConfigEntity.weixinMode" name="weixinMode">
+                                        是否发送业务线:<input type="checkbox"  ng-model="alarmConfigEntity.toBusiness" name="toBusiness">
                                     </div>
                                 </div>
                                 <div class="control-group" style="margin-top: 20px;text-align: center;">
@@ -216,7 +192,7 @@
                 "sScrollY": "400px",
                 "iDisplayLength": 50,
                 "aoColumns": [
-                    null, null, null, null, null,
+                    null, null, null, null,
                     {"bSortable": false}
                 ]
             });

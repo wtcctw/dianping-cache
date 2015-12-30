@@ -6,13 +6,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
-
 /**
  * Created by lvshiyun on 15/11/21.
  */
-public abstract class AbstractAlarmer extends AbstractLifeCycle implements AlarmerLifecycle{
+public abstract class AbstractAlarmer extends AbstractLifeCycle implements AlarmerLifecycle {
 
     protected final Logger logger = LoggerFactory.getLogger(getClass());
 

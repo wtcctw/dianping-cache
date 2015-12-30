@@ -24,9 +24,9 @@ public class AlarmerTaskManagerImpl extends AbstractLifeCycle implements Alarmer
 
     @Override
     protected void doInitialize() throws Exception {
-        executor = Executors.newFixedThreadPool(CommonUtils.DEFAULT_CPU_COUNT,
+        executor = Executors.newFixedThreadPool(CommonUtils.DEFAULT_CPU_COUNT*2,
                 ThreadFactoryUtils.getThreadFactory(EXECUTOR_FACTORY_NAME));
-        scheduled = Executors.newScheduledThreadPool(CommonUtils.DEFAULT_CPU_COUNT,
+        scheduled = Executors.newScheduledThreadPool(CommonUtils.DEFAULT_CPU_COUNT*2,
                 ThreadFactoryUtils.getThreadFactory(SCHEDULED_FACTORY_NAME));
 
     }

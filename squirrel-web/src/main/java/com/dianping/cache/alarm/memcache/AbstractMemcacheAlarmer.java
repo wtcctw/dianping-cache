@@ -2,7 +2,6 @@ package com.dianping.cache.alarm.memcache;
 
 import com.dianping.cache.alarm.AbstractAlarmer;
 import net.rubyeye.xmemcached.exception.MemcachedException;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
 import java.util.concurrent.ScheduledFuture;
@@ -51,14 +50,8 @@ public abstract class AbstractMemcacheAlarmer extends AbstractAlarmer {
             public void run() {
                 try {
                     doAlarm();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                } catch (TimeoutException e) {
-                    e.printStackTrace();
-                } catch (MemcachedException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
+                } catch (Throwable e) {
+                    logger.error("alarmerTaskManager scheduleAtFixedRate" + e);
                 }
             }
         }, getAlarmDelay(), getAlarmInterval(), TimeUnit.SECONDS);
