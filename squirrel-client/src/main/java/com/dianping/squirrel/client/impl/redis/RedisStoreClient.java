@@ -1,5 +1,7 @@
 package com.dianping.squirrel.client.impl.redis;
 
+import redis.clients.jedis.JedisCluster;
+
 import com.dianping.squirrel.client.StoreClient;
 import com.dianping.squirrel.client.StoreKey;
 import com.dianping.squirrel.client.core.Locatable;
@@ -28,5 +30,7 @@ public interface RedisStoreClient extends StoreClient, Locatable,
 	 * 		false if key does not exist or does not have an associated timeout.
 	 */
 	Boolean persist(StoreKey key);
+	
+	JedisCluster getJedisClient();
 
 }

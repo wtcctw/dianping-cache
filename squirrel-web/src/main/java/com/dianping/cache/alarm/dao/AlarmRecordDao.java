@@ -1,6 +1,5 @@
 package com.dianping.cache.alarm.dao;
 
-import com.dianping.avatar.dao.GenericDao;
 import com.dianping.cache.alarm.entity.AlarmRecord;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,13 +11,13 @@ import java.util.List;
  * Created by lvshiyun on 15/11/22.
  */
 @Transactional
-public interface AlarmRecordDao extends GenericDao{
+public interface AlarmRecordDao{
 
     /**
      * @param record
      * @return
      */
-    boolean insert( AlarmRecord record);
+    boolean insert(AlarmRecord record);
 
     /**
      * retrieve all alarmRecords
@@ -32,13 +31,20 @@ public interface AlarmRecordDao extends GenericDao{
      * @param type
      * @return
      */
-    List<AlarmRecord> findByType( int type);
+    List<AlarmRecord> findByType(int type);
 
     /**
      * @param offset,limit
      * @return
      */
-    List<AlarmRecord>findByPage(@Param("offset")int offset, @Param("limit")int limit);
+    List<AlarmRecord>findByPage(@Param("offset") int offset, @Param("limit") int limit);
+
+
+    /**
+     * @param sql
+     * @return
+     */
+    List<AlarmRecord> search(@Param("paramSQL") String sql);
 
 
     public static class AlarmParam{

@@ -9,30 +9,32 @@
         <result column="id" property="id"/>
         <result column="alarmType" property="alarmType"/>
         <result column="alarmTitle" property="alarmTitle"/>
-        <result column="alarmDetail" property="alarmDetail"/>
+        <result column="clusterName" property="clusterName"/>
+        <result column="ip" property="ip"/>
+        <result column="val" property="val"/>
         <result column="createTime" property="createTime"/>
     </resultMap>
 
     <insert id="insert" parameterType="AlarmRecord">
-        INSERT INTO alarm_records(id,alarmType, alarmTitle,alarmDetail,createTime)
-        VALUES(#{id},#{alarmType}, #{alarmTitle},#{alarmDetail},#{createTime})
+        INSERT INTO alarm_records(id,alarmType, alarmTitle,clusterName,ip,val,createTime)
+        VALUES(#{id},#{alarmType}, #{alarmTitle},#{clusterName},#{ip},#{val},#{createTime})
     </insert>
 
     <select id="findByType" resultMap="AlarmRecordsResult" parameterType="int">
-        SELECT id, alarmType, alarmTitle,alarmDetail,createTime
+        SELECT id, alarmType, alarmTitle,clusterName,ip,val,createTime
         FROM alarm_records
         WHERE alarmType = #{alarmType}
         ORDER BY id DESC
     </select>
 
     <select id="findAll" resultMap="AlarmRecordsResult">
-        SELECT id,alarmType, alarmTitle,alarmDetail,createTime
+        SELECT id,alarmType, alarmTitle,clusterName,ip,val,createTime
         FROM alarm_records
         ORDER BY id DESC
     </select>
 
     <select id="findByPage" resultMap="AlarmRecordsResult" parameterType="map">
-        SELECT id, alarmType, alarmTitle,alarmDetail,createTime
+        SELECT id, alarmType, alarmTitle,clusterName,ip,val,createTime
         FROM alarm_records
         ORDER BY id DESC
         LIMIT #{limit} OFFSET #{offset}
@@ -43,5 +45,9 @@
         DELETE FROM alarm_records
         WHERE alarmType= #{alarmType}
     </delete>
+
+    <select id="search" resultType="AlarmRecord">
+        ${paramSQL}
+    </select>
 
 </mapper>

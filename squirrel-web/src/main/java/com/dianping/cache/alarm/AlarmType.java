@@ -12,7 +12,11 @@ public enum AlarmType {
 
     MEMCACHE_CONN_TOO_HIGH(3),
 
-    REDIS_MEMUSAGE_TOO_HIGH(4);
+    REDIS_CLUSTER_DOWN(4),
+
+    REDIS_MEMUSAGE_TOO_HIGH(5),
+
+    REDIS_QPS_TOO_HIGH(6);
 
     private int number;
 

@@ -54,16 +54,18 @@ public class AlarmWorkerImpl extends AbstractLifeCycle implements AlarmerLifecyc
             Event event = null;
             try {
                 event = eventChannel.next();
-                logger.info("[start] {}.", event.toString());
-                alarmerTaskManager.submit(new AlarmTask(event));
+                logger.info(this.getClass().getSimpleName()+"[start Alarm] {}.", event.toString());
+                if (null != event) {
+                    alarmerTaskManager.submit(new AlarmTask(event));
+                }
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                logger.error(this.getClass().getSimpleName()+e);
                 try {
                     TimeUnit.SECONDS.sleep(200);
                 } catch (InterruptedException e1) {
-
+                    logger.error(this.getClass().getSimpleName()+e);
                 }
-                logger.error("[start] lost event {}.", event.toString());
+                logger.error(this.getClass().getSimpleName()+"[start Alarm] lost event {}.", event.toString());
             }
         }
 

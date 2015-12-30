@@ -99,17 +99,57 @@ module
                     params: $scope.searchEntity
                 }).success(callback);
             };
+
+            var searchFunction = function (offset, limit, callback){
+
+                $http.post(window.contextPath + '/setting/alarmrecord/search', $scope.searchRecordEntity).success(callback);
+            };
+
             $scope.suburl = "/setting/alarmrecord/list";
             $scope.pageSize = 30;
             $scope.queryCount = 0;
 
             $scope.query = function () {
+                $scope.searchRecordEntity = {};
                 $scope.searchPaginator = Paginator(
                     fetchFunction, $scope.pageSize
                 );
             }
-
             $scope.query();
+
+
+            $scope.search = function () {
+                if ($scope.queryCount != 0) {
+                    $scope.startTime = $("#starttime").val();
+                    $scope.endTime = $("#stoptime").val();
+                }
+                $scope.queryCount = $scope.queryCount + 1;
+
+
+                if ($scope.startTime != null && $scope.endTime != null) {
+
+                    startDate = new Date($scope.startTime);
+                    endDate = new Date($scope.endTime);
+                    if (endDate <= startDate) {
+                        alert("结束时间不能小于开始时间");
+                        return;
+                    }
+                }
+
+
+                $scope.searchRecordEntity.title = $scope.title;
+                $scope.searchRecordEntity.clusterName = $scope.clusterName;
+                $scope.searchRecordEntity.ip = $scope.ip;
+                $scope.searchRecordEntity.startDate = startDate;
+                $scope.searchRecordEntity.endDate = endDate;
+
+                $scope.searchPaginator = Paginator(
+                    searchFunction,
+                    $scope.pageSize
+                );
+            };
+
+
         }
     ]
 );

@@ -24,7 +24,7 @@ public class DefaultStoreClientTest extends TestCase {
             "mymemcache", "mydcache", "myredis", "myehcache", "mydanga"
     };
     
-    static String CATEGORY = "danga";
+    static String CATEGORY = "myredis";
     
     private static final String VALUE = "dp@123456";
     

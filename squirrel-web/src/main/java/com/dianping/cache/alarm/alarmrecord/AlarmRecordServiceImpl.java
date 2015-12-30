@@ -35,4 +35,9 @@ public class AlarmRecordServiceImpl implements AlarmRecordService {
     public List<AlarmRecord> findByType(int type) {
         return alarmRecordDao.findByType(type);
     }
+
+    @Override
+    public List<AlarmRecord> search(String sql) {
+        return alarmRecordDao.search(sql);
+    }
 }

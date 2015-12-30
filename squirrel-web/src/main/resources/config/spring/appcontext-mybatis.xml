@@ -91,4 +91,14 @@
 		<property name="sqlSessionFactory" ref="sqlSessionFactory"/>
 	</bean>
 
+	<bean id="memcacheAlarmTemplateDao" class="org.mybatis.spring.mapper.MapperFactoryBean">
+		<property name="mapperInterface" value="com.dianping.cache.alarm.dao.MemcacheAlarmTemplateDao"/>
+		<property name="sqlSessionFactory" ref="sqlSessionFactory"/>
+	</bean>
+
+	<bean id="redisAlarmTemplateDao" class="org.mybatis.spring.mapper.MapperFactoryBean">
+		<property name="mapperInterface" value="com.dianping.cache.alarm.dao.RedisAlarmTemplateDao"/>
+		<property name="sqlSessionFactory" ref="sqlSessionFactory"/>
+	</bean>
+
 </beans>

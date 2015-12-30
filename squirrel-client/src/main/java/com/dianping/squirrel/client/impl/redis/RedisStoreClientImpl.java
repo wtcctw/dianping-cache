@@ -14,13 +14,19 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import redis.clients.jedis.HostAndPort;
 import redis.clients.jedis.JedisCallback;
+import redis.clients.jedis.JedisCluster;
+import redis.clients.jedis.exceptions.JedisAskDataException;
 import redis.clients.jedis.exceptions.JedisConnectionException;
+import redis.clients.jedis.exceptions.JedisDataException;
+import redis.clients.jedis.exceptions.JedisMovedDataException;
 
 import com.dianping.cat.Cat;
 import com.dianping.cat.message.Message;
@@ -32,6 +38,8 @@ import com.dianping.squirrel.client.core.StoreCallback;
 import com.dianping.squirrel.client.core.StoreFuture;
 import com.dianping.squirrel.client.core.Transcoder;
 import com.dianping.squirrel.client.impl.AbstractStoreClient;
+import com.dianping.squirrel.client.impl.AbstractStoreClient.Command;
+import com.dianping.squirrel.client.monitor.KeyCountMonitor;
 import com.dianping.squirrel.client.monitor.StatusHolder;
 import com.dianping.squirrel.common.exception.StoreException;
 import com.dianping.squirrel.common.exception.StoreTimeoutException;
@@ -48,9 +56,8 @@ public class RedisStoreClientImpl extends AbstractStoreClient implements RedisSt
     
     private String eventType = "Squirrel.redis.server";
     
-    private AtomicInteger timeoutExp = new AtomicInteger(0);
-    private AtomicInteger connectExp = new AtomicInteger(0);
-    private AtomicInteger noconnExp = new AtomicInteger(0);
+    private AtomicInteger connError = new AtomicInteger(0);
+    private AtomicInteger dataError = new AtomicInteger(0);
 
     @Override
     public void setStoreType(String storeType) {
@@ -97,48 +104,116 @@ public class RedisStoreClientImpl extends AbstractStoreClient implements RedisSt
             Object result = command.execute();
             return (T) result;
         } catch (JedisConnectionException e) {
-            StoreException se = null;
-            if(e.getCause() instanceof SocketTimeoutException) {
-                Cat.getProducer().logEvent("Squirrel." + storeType, category + ":timeout");
-                if(e.getHost() != null) {
-                    Cat.getProducer().logEvent(eventType, e.getHost() + ":" + e.getPort() + ":timeout");
-                }
-                se = new StoreTimeoutException(e.getCause());
-                if(timeoutExp.incrementAndGet()%10 == 0) {
-                    logger.error(finalKey, e);
-                    Cat.getProducer().logError(se);
-                }
-            } else if(e.getCause() instanceof ConnectException) {
-                Cat.getProducer().logEvent("Squirrel." + storeType, category + ":connect");
-                if(e.getHost() != null) {
-                    Cat.getProducer().logEvent(eventType, e.getHost() + ":" + e.getPort() + ":connect");
-                }
-                se = new StoreException(e.getCause());
-                if(connectExp.incrementAndGet()%10 == 0) {
-                    logger.error(finalKey, e);
-                    Cat.getProducer().logError(se);
-                }
-            } else if(e.getCause() instanceof NoSuchElementException) {
-                Cat.getProducer().logEvent("Squirrel." + storeType, category + ":noconn");
-                if(e.getHost() != null) {
-                    Cat.getProducer().logEvent(eventType, e.getHost() + ":" + e.getPort() + ":noconn");
-                }
-                se = new StoreException(e.getCause());
-                if(noconnExp.incrementAndGet()%10 == 0) {
-                    logger.error(finalKey, e);
-                    Cat.getProducer().logError(se);
-                }
-            } else {
-                se = new StoreException(e);
-                logger.error(finalKey, e);
-                Cat.getProducer().logError(se);
+            StoreException se = logConnError(category, e);
+            if (t != null) {
+                t.setStatus(se);
             }
+            throw se;
+        } catch (JedisDataException e) {
+            StoreException se = logDataError(category, e);
             if (t != null) {
                 t.setStatus(se);
             }
             throw se;
         } catch (Throwable e) {
             logger.error(finalKey, e);
+            StoreException se = new StoreException(e);
+            Cat.getProducer().logError(se);
+            if (t != null) {
+                t.setStatus(se);
+            }
+            throw se;
+        } finally {
+            StatusHolder.flowOut(storeType, category, action);
+            if (t != null) {
+                t.complete();
+            }
+        }
+    }
+    
+    private StoreException logConnError(String category, JedisConnectionException e) {
+        StoreException se = null;
+        if(e.getCause() instanceof SocketTimeoutException) {
+            Cat.getProducer().logEvent("Squirrel." + storeType, category + ":timeout");
+            if(e.getHost() != null) {
+                Cat.getProducer().logEvent(eventType, e.getHost() + ":" + e.getPort() + ":timeout");
+            }
+            se = new StoreTimeoutException(e.getCause());
+        } else if(e.getCause() instanceof ConnectException) {
+            Cat.getProducer().logEvent("Squirrel." + storeType, category + ":connect");
+            if(e.getHost() != null) {
+                Cat.getProducer().logEvent(eventType, e.getHost() + ":" + e.getPort() + ":connect");
+            }
+            se = new StoreException(e.getCause());
+        } else if(e.getCause() instanceof NoSuchElementException) {
+            Cat.getProducer().logEvent("Squirrel." + storeType, category + ":noconn");
+            if(e.getHost() != null) {
+                Cat.getProducer().logEvent(eventType, e.getHost() + ":" + e.getPort() + ":noconn");
+            }
+            se = new StoreException(e.getCause());
+        } else {
+            se = new StoreException(e);
+        }
+        if(connError.getAndIncrement()%10 == 0) {
+            logger.error("", e);
+            Cat.getProducer().logError(se);
+        }
+        return se;
+    }
+    
+    private StoreException logDataError(String category, JedisDataException e) {
+        StoreException se = new StoreException(e);
+        if(e instanceof JedisAskDataException) {
+            HostAndPort target = ((JedisAskDataException)e).getTargetNode();
+            Cat.getProducer().logEvent("Squirrel." + storeType, category + ":ask");
+            if(target != null) {
+                Cat.getProducer().logEvent(eventType, target.getHost() + ":" + target.getPort() + ":ask");
+            }
+        } else if(e instanceof JedisMovedDataException) {
+            HostAndPort target = ((JedisAskDataException)e).getTargetNode();
+            Cat.getProducer().logEvent("Squirrel." + storeType, category + ":moved");
+            if(target != null) {
+                Cat.getProducer().logEvent(eventType, target.getHost() + ":" + target.getPort() + ":moved");
+            }
+        }
+        if(dataError.getAndIncrement()%10 == 0) {
+            logger.error("", e);
+            Cat.getProducer().logError(se);
+        }
+        return se;
+    }
+    
+    protected <T> T executeWithMonitor(Command command, StoreCategoryConfig categoryConfig, List<String> keys, String action) {
+        String storeType = categoryConfig.getCacheType();
+        String category = categoryConfig.getCategory();
+
+        Transaction t = null;
+        if (needMonitor(storeType)) {
+            t = Cat.getProducer().newTransaction("Squirrel." + storeType, category + ":" + action);
+            KeyCountMonitor.getInstance().logKeyCount(storeType, category, action, keys.size());
+            t.setStatus(Message.SUCCESS);
+        }
+        StatusHolder.flowIn(storeType, category, action);
+        long begin = System.nanoTime();
+        int second = (int) (begin / 1000000000 % 60) + 1;
+        try {
+            Cat.getProducer().logEvent("Squirrel." + storeType + ".qps", "S" + second);
+            Object result = command.execute();
+            return (T) result;
+        } catch (JedisConnectionException e) {
+            StoreException se = logConnError(category, e);
+            if (t != null) {
+                t.setStatus(se);
+            }
+            throw se;
+        } catch (JedisDataException e) {
+            StoreException se = logDataError(category, e);
+            if (t != null) {
+                t.setStatus(se);
+            }
+            throw se;
+        } catch (Throwable e) {
+            logger.error("", e);
             StoreException se = new StoreException(e);
             Cat.getProducer().logError(se);
             if (t != null) {
@@ -1626,6 +1701,11 @@ public class RedisStoreClientImpl extends AbstractStoreClient implements RedisSt
     public String locate(String finalKey) {
         checkNotNull(finalKey, "final key is null");
         return clientManager.getClient().getClusterNode(finalKey);
+    }
+
+    @Override
+    public JedisCluster getJedisClient() {
+        return clientManager.getClient();
     }
 
 }

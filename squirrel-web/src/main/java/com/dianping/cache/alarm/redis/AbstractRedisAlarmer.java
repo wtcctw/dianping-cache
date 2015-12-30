@@ -50,7 +50,13 @@ public abstract class AbstractRedisAlarmer extends AbstractAlarmer {
             public void run() {
                 try {
                     doAlarm();
-                } catch (Throwable e) {
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                } catch (TimeoutException e) {
+                    e.printStackTrace();
+                } catch (MemcachedException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
                     e.printStackTrace();
                 }
             }

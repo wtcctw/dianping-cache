@@ -388,11 +388,9 @@
 		</dependency>
 
 		<dependency>
-			<groupId>com.dianping</groupId>
-			<artifactId>ba-base-organizationalstructure-api</artifactId>
-			<version>0.0.25</version>
-			<type>jar</type>
-			<scope>compile</scope>
+			<groupId>com.dianping.ba</groupId>
+			<artifactId>masterdata-api</artifactId>
+			<version>0.1.7</version>
 		</dependency>
 	</dependencies>
 

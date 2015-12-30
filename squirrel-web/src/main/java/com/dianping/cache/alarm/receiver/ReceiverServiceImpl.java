@@ -1,7 +1,7 @@
 package com.dianping.cache.alarm.receiver;
 
-import com.dianping.ba.base.organizationalstructure.api.user.UserService;
-import com.dianping.ba.base.organizationalstructure.api.user.dto.UserDto;
+import com.dianping.ba.hris.md.api.dto.EmployeeDto;
+import com.dianping.ba.hris.md.api.service.EmployeeService;
 import com.dianping.cache.alarm.utils.DateUtil;
 import com.dianping.cache.util.CollectionUtils;
 import com.dianping.ops.cmdb.CmdbManager;
@@ -11,17 +11,19 @@ import com.dianping.ops.http.HttpConfig;
 import com.dianping.ops.http.HttpGetter;
 import com.dianping.ops.http.HttpResult;
 import org.apache.http.client.utils.URIBuilder;
-import org.dom4j.*;
+import org.dom4j.Attribute;
+import org.dom4j.Document;
+import org.dom4j.DocumentException;
+import org.dom4j.DocumentHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-
-import javax.xml.bind.Element;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -30,22 +32,32 @@ import java.util.List;
 @Component("receiverService")
 public class ReceiverServiceImpl implements ReceiverService {
 
+    protected final Logger logger = LoggerFactory.getLogger(getClass());
+
     @Autowired
-    private UserService userServiceReceiver;
+    private EmployeeService employeeService;
 
-    public List<String> getSmsReceiver(String smsReceiver, String domain) throws URISyntaxException, DocumentException, InterruptedException {
+    public List<String> getSmsReceiver(String smsReceiver, String domain, boolean sendToBusiness) throws URISyntaxException, DocumentException, InterruptedException {
 
-        List<String> defalutReceiver = getDefaultReceiver(domain);
+        List<String> defalutReceiver = null;
+        if (sendToBusiness) {
+            defalutReceiver = getDefaultReceiver(domain);
+        }
 
         List<String> adReceiverList = CollectionUtils.toList(smsReceiver, ",");
-        if (null != defalutReceiver) {
+        if ((null != defalutReceiver)&&sendToBusiness) {
             adReceiverList.addAll(defalutReceiver);
         }
         List<String> smsReceiverList = new ArrayList<String>();
 
         for (String receiver : adReceiverList) {
-            List<UserDto> userDtoList = userServiceReceiver.queryUserByKeyword(receiver);
-            smsReceiverList.add(userDtoList.get(0).getMobileNo());
+            try {
+                List<EmployeeDto> userDtoList = employeeService.queryEmployeeByKeyword(receiver);
+                smsReceiverList.add(userDtoList.get(0).getMobileNo());
+            } catch (Exception e) {
+                logger.error("sms receiver " + receiver + "not found" + e);
+            }
+
         }
 
 
@@ -53,40 +65,56 @@ public class ReceiverServiceImpl implements ReceiverService {
 
     }
 
-    public List<String> getWeiXinReceiver(String weiXinReceiver, String domain) throws InterruptedException, DocumentException, URISyntaxException {
+    public List<String> getWeiXinReceiver(String weiXinReceiver, String domain, boolean sendToBusiness) throws InterruptedException, DocumentException, URISyntaxException {
 
-        List<String> defalutReceiver = getDefaultReceiver(domain);
+        List<String> defalutReceiver = null;
+        if (sendToBusiness) {
+            defalutReceiver = getDefaultReceiver(domain);
+        }
 
         List<String> adReceiverList = CollectionUtils.toList(weiXinReceiver, ",");
 
-        if (null != defalutReceiver) {
+        if ((null != defalutReceiver)&&sendToBusiness) {
             adReceiverList.addAll(defalutReceiver);
         }
         List<String> weiXinReceiverList = new ArrayList<String>();
 
         for (String receiver : adReceiverList) {
-            List<UserDto> userDtoList = userServiceReceiver.queryUserByKeyword(receiver);
-            weiXinReceiverList.add(userDtoList.get(0).getSerialNumber());
+            try {
+                List<EmployeeDto> userDtoList = employeeService.queryEmployeeByKeyword(receiver);
+                weiXinReceiverList.add(userDtoList.get(0).getEmployeeId());
+            } catch (Exception e) {
+                logger.error("weixin receiver " + receiver + "not found" + e);
+            }
+
         }
 
         return weiXinReceiverList;
 
     }
 
-    public List<String> getMailReceiver(String mailReceiver, String domain) throws InterruptedException, DocumentException, URISyntaxException {
+    public List<String> getMailReceiver(String mailReceiver, String domain, boolean sendToBusiness) throws InterruptedException, DocumentException, URISyntaxException {
 
-        List<String> defalutReceiver = getDefaultReceiver(domain);
+        List<String> defalutReceiver = null;
+        if (sendToBusiness) {
+            defalutReceiver = getDefaultReceiver(domain);
+        }
 
         List<String> adReceiverList = CollectionUtils.toList(mailReceiver, ",");
 
-        if (null != defalutReceiver) {
+        if ((null != defalutReceiver)&&sendToBusiness) {
             adReceiverList.addAll(defalutReceiver);
         }
         List<String> mailReceiverList = new ArrayList<String>();
 
         for (String receiver : adReceiverList) {
-            List<UserDto> userDtoList = userServiceReceiver.queryUserByKeyword(receiver);
-            mailReceiverList.add(userDtoList.get(0).getEmail());
+            try {
+                List<EmployeeDto> userDtoList = employeeService.queryEmployeeByKeyword(receiver);
+                mailReceiverList.add(userDtoList.get(0).getEmail());
+            } catch (Exception e) {
+                logger.error("mail receiver " + receiver + "not found" + e);
+            }
+
         }
 
         return mailReceiverList;
@@ -129,42 +157,46 @@ public class ReceiverServiceImpl implements ReceiverService {
         if (null == reportElement) {
             return null;
         }
-        org.dom4j.Element machineElement = reportElement.element("machine");
+        List<org.dom4j.Element> machineElement = reportElement.elements("machine");
         if (null == machineElement) {
             return null;
         }
-        List<org.dom4j.Element> elements = machineElement.elements();
-        if (null == elements) {
-            return null;
-        }
-
-        for (int i = 0; i < elements.size(); i++) {
-            org.dom4j.Element element = elements.get(i);
-
-            Attribute e = element.attribute("id");
-
-            projectList.add(e.getValue());
-        }
-
-        for (String project : projectList) {
-
-            CmdbResult<CmdbProject> result = CmdbManager.getProject(project);
-            if (null != result.cmdbResult) {
-                String receiver = result.cmdbResult.getRd_duty();
-                defaultReceiverList.add(receiver);
+        for (int i = 0; i < machineElement.size(); i++) {
+            List<org.dom4j.Element> elements = machineElement.get(i).elements();
+            if (null == elements) {
+                return null;
             }
 
+            for (int j = 0; j < elements.size(); j++) {
+                org.dom4j.Element element = elements.get(j);
 
+                Attribute e = element.attribute("id");
+
+                projectList.add(e.getValue());
+            }
+
+            for (String project : projectList) {
+
+                CmdbResult<CmdbProject> result = CmdbManager.getProject(project);
+                if (null != result.cmdbResult) {
+                    String receiver = result.cmdbResult.getRd_duty();
+                    if (!defaultReceiverList.contains(receiver)) {
+                        defaultReceiverList.add(receiver);
+                    }
+                }
+
+
+            }
         }
         return defaultReceiverList;
     }
 
 
-    public UserService getUserServiceReceiver() {
-        return userServiceReceiver;
+    public EmployeeService getEmployeeService() {
+        return employeeService;
     }
 
-    public void setUserServiceReceiver(UserService userServiceReceiver) {
-        this.userServiceReceiver = userServiceReceiver;
+    public void setEmployeeService(EmployeeService employeeService) {
+        this.employeeService = employeeService;
     }
 }
