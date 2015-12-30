@@ -54,7 +54,7 @@ public class ReshardPlanTest {
 
     @Test
     public void testReshard(){
-        ReshardPlan reshardPlan = new ReshardPlan("redis-wh", desNodes, srcNodes, false);
+        ReshardPlan reshardPlan = new ReshardPlan("redis-test", srcNodes, desNodes, true);
         List<ReshardRecord> reshardRecordList = reshardPlan.getReshardRecordList();
         for (ReshardRecord reshardRecord : reshardRecordList) {
             System.out.println("From :" + reshardRecord.getSrcNode() + "-- > To :" + reshardRecord.getDesNode() + " slots : " + reshardRecord.getSlotsToMigrate());
