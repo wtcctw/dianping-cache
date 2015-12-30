@@ -1,6 +1,5 @@
 package com.dianping.cache.alarm.dao;
 
-import com.dianping.avatar.dao.GenericDao;
 import com.dianping.cache.alarm.entity.RedisTemplate;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -10,7 +9,7 @@ import java.util.List;
  * Created by lvshiyun on 15/12/6.
  */
 @Transactional
-public interface RedisAlarmTemplateDao extends GenericDao {
+public interface RedisAlarmTemplateDao{
 
     /**
      * @param redisTemplate

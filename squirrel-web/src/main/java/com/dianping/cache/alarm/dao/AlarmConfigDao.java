@@ -1,6 +1,5 @@
 package com.dianping.cache.alarm.dao;
 
-import com.dianping.avatar.dao.GenericDao;
 import com.dianping.cache.alarm.entity.AlarmConfig;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.transaction.annotation.Transactional;
@@ -11,7 +10,7 @@ import java.util.List;
  * Created by lvshiyun on 15/12/6.
  */
 @Transactional
-public interface AlarmConfigDao extends GenericDao {
+public interface AlarmConfigDao {
 
     /**
      * @param alarmConfig
