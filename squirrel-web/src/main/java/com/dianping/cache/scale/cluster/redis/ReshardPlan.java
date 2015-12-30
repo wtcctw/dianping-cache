@@ -5,10 +5,7 @@ import com.dianping.cache.scale.exceptions.ScaleException;
 import com.dianping.cache.service.ReshardRecordService;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by dp on 15/12/25.
@@ -19,18 +16,27 @@ public class ReshardPlan {
     //@Autowired
     private ReshardRecordService reshardRecordService;
 
+    private int id;
+
     private String cluster;
+
+    private int totalSlotsToMigrate;
+
+    private int slotsDone;
+
+    private int slotInMigrate;
 
     private List<String> srcNode;
 
     private List<String> desNode;
+
+    private int status;
 
     private boolean isAverage;
 
     private List<ReshardRecord> reshardRecordList;
 
     public ReshardPlan(){
-
     }
 
     public ReshardPlan(String cluster,List<String> srcNode,List<String> desNode,boolean isAverage){
@@ -73,19 +79,21 @@ public class ReshardPlan {
             if(need < 0){
                 continue;
             }
-            for(Map.Entry<String,Integer> srcServer : srcCapacity.entrySet()){
-                int slotToMigrate = 0;
-                int srcSlotsNum = srcServer.getValue();
+            for(RedisServer srcServer : srcNodeServer){
+                int slotToMigrate;
+                int srcSlotsNum = srcCapacity.get(srcServer.getAddress());
                 if((srcSlotsNum > baseLine)&& need > 0){
                     int spareSlot = srcSlotsNum - baseLine;
                     slotToMigrate = spareSlot - need > 0 ? need : spareSlot;
                     need -= slotToMigrate;
-                    srcServer.setValue(srcSlotsNum - slotToMigrate);
+                    srcCapacity.put(srcServer.getAddress(),srcSlotsNum - slotToMigrate);
+                    List<Integer> slotsToMigrateList = srcServer.getSlotList().subList(srcServer.getSlotSize()-srcSlotsNum,srcServer.getSlotSize() - (srcSlotsNum-slotToMigrate));
+                    String slotsToMigrateString = Slot.slotListToString(slotsToMigrateList);
                     ReshardRecord reshardRecord = new ReshardRecord();
                     reshardRecord.setCluster(cluster);
-                    reshardRecord.setSrcNode(srcServer.getKey());
+                    reshardRecord.setSrcNode(srcServer.getAddress());
                     reshardRecord.setDesNode(desServer.getAddress());
-                    reshardRecord.setSlotsToMigrate(slotToMigrate);
+                    reshardRecord.setSlotsToMigrate(slotsToMigrateString);
                     reshardRecord.setMigrateSwitch(false);
                     reshardRecord.setOrder(order++);
                     reshardRecords.add(reshardRecord);
@@ -102,7 +110,10 @@ public class ReshardPlan {
     private List<RedisServer> getServerInClusterCache(List<String> addressList){
         if(cluster == null)
             return null;
-        RedisCluster redisCluster = RedisManager.getRedisCluster(cluster);
+        RedisCluster redisCluster = RedisManager.refreshCache(cluster);
+        if(redisCluster == null){
+
+        }
         List<RedisServer> servers = new ArrayList<RedisServer>();
         for(String address : addressList){
             RedisServer server = redisCluster.getServer(address);
@@ -133,23 +144,19 @@ public class ReshardPlan {
         this.reshardRecordList = reshardRecordList;
     }
 
-    public static void main(String[] args) {
-         List<String> srcNodes = new ArrayList<String>(){{
-            add("127.0.0.1:7000");
-            add("127.0.0.1:7001");
-            add("127.0.0.1:7002");
-        }};
-         List<String> desNodes = new ArrayList<String>(){{
-            add("127.0.0.1:7003");
-            add("127.0.0.1:7004");
-        }};
-        RedisCluster redisCluster = new RedisCluster(srcNodes);
-        RedisManager.getClusterCache().put("redis-test", redisCluster);
-        ReshardPlan reshardPlan = new ReshardPlan("redis-test", srcNodes, desNodes, false);
-        List<ReshardRecord> reshardRecordList = reshardPlan.getReshardRecordList();
-        for (ReshardRecord reshardRecord : reshardRecordList) {
-            System.out.println("From :" + reshardRecord.getSrcNode() + "-- > To :" + reshardRecord.getDesNode() + " slots : " + reshardRecord.getSlotsToMigrate());
-        }
+    public int getStatus() {
+        return status;
     }
 
+    public void setStatus(int status) {
+        this.status = status;
+    }
+
+    public List<String> getSrcNode() {
+        return srcNode;
+    }
+
+    public List<String> getDesNode() {
+        return desNode;
+    }
 }

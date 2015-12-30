@@ -20,24 +20,47 @@ import static org.junit.Assert.*;
 public class ReshardPlanTest {
 
     private List<String> srcNodes = new ArrayList<String>(){{
-        add("127.0.0.1:7000");
-        add("127.0.0.1:7001");
-        add("127.0.0.1:7002");
+        add("192.168.211.63:7004");
     }};
     private List<String> desNodes = new ArrayList<String>(){{
-        add("127.0.0.1:7003");
-        add("127.0.0.1:7004");
+        add("192.168.211.63:7003");
     }};
 
 
     @Test
     public void testMakePlan() throws Exception {
-        RedisCluster redisCluster = new RedisCluster(srcNodes);
-        RedisManager.getClusterCache().put("redis-test", redisCluster);
-        ReshardPlan reshardPlan = new ReshardPlan("redis-test", srcNodes, desNodes, true);
+        ReshardPlan reshardPlan = new ReshardPlan("redis-wh", srcNodes, desNodes, false);
         List<ReshardRecord> reshardRecordList = reshardPlan.getReshardRecordList();
         for (ReshardRecord reshardRecord : reshardRecordList) {
             System.out.println("From :" + reshardRecord.getSrcNode() + "-- > To :" + reshardRecord.getDesNode() + " slots : " + reshardRecord.getSlotsToMigrate());
         }
+
+
+        System.out.println("Second----");
+        reshardPlan = new ReshardPlan("redis-wh", srcNodes, desNodes, true);
+        reshardRecordList = reshardPlan.getReshardRecordList();
+        for (ReshardRecord reshardRecord : reshardRecordList) {
+            System.out.println("From :" + reshardRecord.getSrcNode() + "-- > To :" + reshardRecord.getDesNode() + " slots : " + reshardRecord.getSlotsToMigrate());
+        }
+
+        System.out.println("Third----");
+        desNodes.add("127.0.0.1:7005");
+        reshardPlan = new ReshardPlan("redis-wh", srcNodes, desNodes, false);
+        reshardRecordList = reshardPlan.getReshardRecordList();
+        for (ReshardRecord reshardRecord : reshardRecordList) {
+            System.out.println("From :" + reshardRecord.getSrcNode() + "-- > To :" + reshardRecord.getDesNode() + " slots : " + reshardRecord.getSlotsToMigrate());
+        }
+    }
+
+    @Test
+    public void testReshard(){
+        ReshardPlan reshardPlan = new ReshardPlan("redis-wh", desNodes, srcNodes, false);
+        List<ReshardRecord> reshardRecordList = reshardPlan.getReshardRecordList();
+        for (ReshardRecord reshardRecord : reshardRecordList) {
+            System.out.println("From :" + reshardRecord.getSrcNode() + "-- > To :" + reshardRecord.getDesNode() + " slots : " + reshardRecord.getSlotsToMigrate());
+        }
+
+        System.out.println("Start to Migrate");
+        RedisManager.reshard(reshardPlan);
     }
 }

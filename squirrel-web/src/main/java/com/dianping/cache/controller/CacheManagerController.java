@@ -10,53 +10,37 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 
-import com.dianping.squirrel.client.StoreClient;
+import com.dianping.cache.controller.dto.CategoryParams;
+import com.dianping.cache.controller.dto.ConfigurationParams;
 import jodd.util.StringUtil;
 import net.spy.memcached.AddrUtil;
 import net.spy.memcached.MemcachedClient;
-import net.spy.memcached.MemcachedNode;
 import net.spy.memcached.internal.OperationFuture;
 
 import org.codehaus.plexus.util.StringUtils;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.dianping.avatar.cache.CacheKey;
-import com.dianping.avatar.cache.CacheService;
 import com.dianping.avatar.exception.DuplicatedIdentityException;
-import com.dianping.cache.controller.dto.CategoryParams;
-import com.dianping.cache.controller.dto.ConfigurationParams;
-import com.dianping.cache.core.CacheClient;
-import com.dianping.cache.entity.CacheConfiguration;
-import com.dianping.cache.entity.CacheKeyConfiguration;
-import com.dianping.cache.entity.CategoryToApp;
-import com.dianping.cache.entity.Server;
-import com.dianping.cache.exception.CacheException;
-import com.dianping.cache.memcached.MemcachedClientImpl;
+import com.dianping.cache.entity.*;
 import com.dianping.cache.monitor.storage.MemcacheStatsDataStorage;
 import com.dianping.cache.monitor.storage.ServerStatsDataStorage;
-import com.dianping.cache.service.CacheConfigurationService;
-import com.dianping.cache.service.CacheKeyConfigurationService;
-import com.dianping.cache.service.CategoryToAppService;
-import com.dianping.cache.service.OperationLogService;
-import com.dianping.cache.service.ServerClusterService;
-import com.dianping.cache.service.ServerService;
+import com.dianping.cache.service.*;
 import com.dianping.cache.service.condition.CacheKeyConfigSearchCondition;
 import com.dianping.cache.service.condition.OperationLogSearchCondition;
 import com.dianping.cache.util.NetUtil;
 import com.dianping.core.type.PageModel;
+import com.dianping.squirrel.client.StoreClient;
+import com.dianping.squirrel.client.StoreClientFactory;
+import com.dianping.squirrel.client.StoreKey;
+import com.dianping.squirrel.client.core.Locatable;
 
 @Controller
 public class CacheManagerController extends AbstractCacheController {
@@ -70,18 +54,17 @@ public class CacheManagerController extends AbstractCacheController {
     @Resource(name = "cacheKeyConfigurationService")
     private CacheKeyConfigurationService cacheKeyConfigurationService;
 
+    @Resource(name = "storeClient")
+    private StoreClient storeClient;
+
     @Resource(name = "serverService")
     private ServerService serverService;
-
-    @Resource(name="storeClient")
-    private StoreClient storeClient;
 
     @Resource(name = "serverClusterService")
     private ServerClusterService serverClusterService;
 
     @Resource(name = "categoryToAppService")
     private CategoryToAppService categoryToAppService;
-    private String subside = "config";
 
     @RequestMapping(value = "/cache/config")
     public ModelAndView viewCacheConfig() {
@@ -91,22 +74,26 @@ public class CacheManagerController extends AbstractCacheController {
 
     @RequestMapping(value = "/cache/config/edit")
     public ModelAndView viewCacheConfigEdit() {
+
         subside = "config";
         return new ModelAndView("cache/configedit", createViewMap());
     }
 
     @RequestMapping(value = "/cache/config/new")
     public ModelAndView viewCacheConfigNew() {
+
         subside = "config";
         return new ModelAndView("cache/confignew", createViewMap());
     }
 
+    // 根据集群名获取集群配置
     @RequestMapping(value = "/cache/config/find")
     @ResponseBody
-    public Map<String, Object> findByCacheKey(@RequestParam("cacheKey") String cacheKey, @RequestParam("swimlane") String swimlane) {
+    public Object findByCacheKey(@RequestParam("cacheKey") String cacheKey,@RequestParam("swimlane") String swimlane ) {
         subside = "config";
         Map<String, Object> paras = super.createViewMap();
-        CacheConfiguration config = cacheConfigurationService.findWithSwimLane(cacheKey, swimlane);
+
+        CacheConfiguration config = cacheConfigurationService.findWithSwimLane(cacheKey,swimlane);
         paras.put("config", config);
         return paras;
     }
@@ -136,23 +123,29 @@ public class CacheManagerController extends AbstractCacheController {
 
     @RequestMapping(value = "/cache/config/findAll")
     @ResponseBody
-    public Map<String, Object> configSearch() {
+    public Object configSearch() {
         subside = "config";
         Map<String, Object> paras = super.createViewMap();
+
         List<CacheConfiguration> config = cacheConfigurationService.findAll();
         paras.put("entitys", config);
         return paras;
     }
 
     @RequestMapping(value = "/cache/config/update", method = RequestMethod.POST)
-    public void configUpdate(@RequestBody ConfigurationParams configurationParams) {
+    public void configUpdate(@RequestParam("key") String cacheKey,
+                             @RequestParam("clientClazz") String clientClazz,
+                             @RequestParam("servers") String servers,
+                             @RequestParam("swimlane") String swimlane,
+                             @RequestParam("transcoderClazz") String transcoderClazz) {
         subside = "config";
         CacheConfiguration newConfig = new CacheConfiguration();
-        newConfig.setCacheKey(configurationParams.getCacheKey());
-        newConfig.setClientClazz(configurationParams.getClientClazz());
-        newConfig.setServers(configurationParams.getServers());
-        newConfig.setTranscoderClazz(configurationParams.getTranscoderClazz());
-        newConfig.setSwimlane(configurationParams.getSwimlane());
+
+        newConfig.setCacheKey(cacheKey);
+        newConfig.setClientClazz(clientClazz);
+        newConfig.setServers(servers);
+        newConfig.setTranscoderClazz(transcoderClazz);
+        newConfig.setSwimlane(swimlane);
         cacheConfigurationService.update(newConfig);
 
     }
@@ -161,7 +154,8 @@ public class CacheManagerController extends AbstractCacheController {
     @ResponseBody
     public Object configUpdateServers(@RequestParam("key") String cacheKey,
                                       @RequestParam("newservers") String newservers,
-                                      @RequestParam("oldservers") String oldservers) {
+                                      @RequestParam("oldservers") String oldservers,
+                                      HttpServletResponse response) {
         subside = "config";
         Map<String, Object> paras = super.createViewMap();
         boolean flag = false;
@@ -172,10 +166,11 @@ public class CacheManagerController extends AbstractCacheController {
 
             newConfig.setCacheKey(cacheKey);
             newConfig.setClientClazz(oldConfig.getClientClazz());
-            if ("".equals(newservers))
+            if("".equals(newservers))
                 newservers = null;
             newConfig.setServers(newservers);
             newConfig.setTranscoderClazz(oldConfig.getTranscoderClazz());
+
             cacheConfigurationService.update(newConfig);
             ServerStatsDataStorage.REFRESH = true;
             flag = true;
@@ -195,7 +190,8 @@ public class CacheManagerController extends AbstractCacheController {
         subside = "config";
         Map<String, Object> paras = super.createViewMap();
         boolean flag = false;
-        CacheConfiguration oldConfig = cacheConfigurationService.findWithSwimLane(cacheKey, swimlane);
+        // 获取数据库中最新的 servers 信息 对比看是否有变化
+        CacheConfiguration oldConfig = cacheConfigurationService.findWithSwimLane(cacheKey,swimlane);
         if ((oldservers != null && oldservers.equals(oldConfig.getServers()))
                 || ("".equals(oldservers) && oldConfig.getServers() == null)) {
             List<String> serverList;
@@ -204,20 +200,21 @@ public class CacheManagerController extends AbstractCacheController {
             } else {
                 serverList = new ArrayList<String>(oldConfig.getServerList());
             }
-            if(!serverList.contains(server)){
-                serverList.add(server);
-                oldConfig.setServerList(serverList);
-                oldConfig.setAddTime(System.currentTimeMillis());
-                cacheConfigurationService.update(oldConfig);
-                try {
-                    serverService.insert(server, null, null, 0, null);
-                } catch (DuplicateKeyException e) {
-                } finally {
-                    serverClusterService.insert(server, cacheKey);
-                    ServerStatsDataStorage.REFRESH = true;
-                }
-                flag = true;
+            serverList.add(server);
+            oldConfig.setServerList(serverList);
+            oldConfig.setAddTime(System.currentTimeMillis());
+            cacheConfigurationService.update(oldConfig);
+            try {
+                serverService.insert(server, null, null, 0, null);
+            } catch (DuplicateKeyException e) {
+                // do nothing
+            } finally {
+                serverClusterService.insert(server, cacheKey);
+                ServerStatsDataStorage.REFRESH = true;
             }
+            flag = true;
+        } else {
+            // 数据库信息有变化 不执行更新
         }
         paras.put("flag", flag);
         return paras;
@@ -233,7 +230,7 @@ public class CacheManagerController extends AbstractCacheController {
         Map<String, Object> paras = super.createViewMap();
         boolean flag = false;
         // 获取数据库中最新的 servers 信息 对比看是否有变化
-        CacheConfiguration oldConfig = cacheConfigurationService.findWithSwimLane(cacheKey, swimlane);
+        CacheConfiguration oldConfig = cacheConfigurationService.findWithSwimLane(cacheKey,swimlane);
         if (oldservers != null && oldservers.equals(oldConfig.getServers())) {
 
             //判断是否需要关闭该sever 对应的 memcached 实例
@@ -244,10 +241,10 @@ public class CacheManagerController extends AbstractCacheController {
                     // TODO
                     flag = true;
                 } else {
-                    deleteServerFromCache(server, cacheKey, swimlane);
+                    deleteServerFromCache(server, cacheKey,swimlane);
                 }
             } else {
-                deleteServerFromCache(server, cacheKey, swimlane);
+                deleteServerFromCache(server, cacheKey,swimlane);
             }
         }
         paras.put("flag", flag);
@@ -286,6 +283,7 @@ public class CacheManagerController extends AbstractCacheController {
                 }
             }
         }
+
         paras.put("flag", flag);
         return paras;
     }
@@ -294,7 +292,7 @@ public class CacheManagerController extends AbstractCacheController {
     @ResponseBody
     public Boolean configDelete(@RequestBody ConfigurationParams configurationParams) {
         subside = "config";
-        cacheConfigurationService.deleteWithSwimLane(configurationParams.getCacheKey(), configurationParams.getSwimlane());
+        cacheConfigurationService.deleteWithSwimLane(configurationParams.getCacheKey(),configurationParams.getSwimlane());
         return Boolean.TRUE;
     }
 
@@ -335,7 +333,7 @@ public class CacheManagerController extends AbstractCacheController {
         }
         condition.setCacheType(_cacheType);
         condition.setCategory(_category);
-        PageModel result = cacheKeyConfigurationService.paginate(pageModel, condition);
+        PageModel result = cacheKeyConfigurationService.paginate(pageModel,condition);
         List<?> recodes = result.getRecords();
         Map<String, Object> paras = super.createViewMap();
         paras.put("entitys", recodes);
@@ -391,6 +389,7 @@ public class CacheManagerController extends AbstractCacheController {
             cacheKeyConfigurationService.create(newCacheKey);
         } catch (DuplicatedIdentityException e) {
         }
+
     }
 
     @RequestMapping(value = "/cache/key/update")
@@ -497,16 +496,12 @@ public class CacheManagerController extends AbstractCacheController {
 
         CacheKeyConfiguration key = cacheKeyConfigurationService.find(finalKey.substring(0, finalKey.indexOf(".")));
         Map<String, Object> paras = super.createViewMap();
-        String category = finalKey.substring(0, finalKey.indexOf("."));
-        Object[] para = null;
-        CacheKey cacheKey = new CacheKey(category, para);
-        Object o = cacheService.get(cacheKey, finalKey);
+        Object o = storeClient.get(finalKey);
         paras.put("result", o);
-        CacheClient cc = cacheService.getCacheClient(key.getCacheType());
-        if (cc instanceof MemcachedClientImpl) {
-            MemcachedClient mcc = ((MemcachedClientImpl) cc).getReadClient();
-            MemcachedNode mn = mcc.getNodeLocator().getPrimary(finalKey);
-            paras.put("address", mn.getSocketAddress());
+        StoreClient cc = StoreClientFactory.getStoreClient(key.getCacheType());
+        if(cc instanceof Locatable){
+            String location = ((Locatable)cc).locate(finalKey);
+            paras.put("address", location);
         }
         return paras;
     }
@@ -517,17 +512,9 @@ public class CacheManagerController extends AbstractCacheController {
                               @RequestParam("value") String value,
                               @RequestParam("params") Object... params) {
 
-        CacheKey cacheKey = new CacheKey(category, params);
+        StoreKey storeKey = new StoreKey(category, params);
         boolean o = false;
-        try {
-            o = cacheService.set(cacheKey, value);
-        } catch (CacheException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (TimeoutException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+        o = storeClient.set(storeKey, value);
         return o;
     }
 
@@ -540,7 +527,7 @@ public class CacheManagerController extends AbstractCacheController {
                 List<String> serverList = item.getServerList();
                 for (String server : serverList) {
                     try {
-                        serverService.insert(server, null, null, 0, null);
+                        serverService.insert(server, null, null,0,null);
 
                     } catch (DuplicateKeyException e) {
                         // do nothing
@@ -552,7 +539,7 @@ public class CacheManagerController extends AbstractCacheController {
     }
 
     @RequestMapping(value = "/insertServerCluster", method = RequestMethod.GET)
-    public void serverCluster_(String server, String cluster) {
+    public void serverCluster_(String server,String cluster) {
         serverClusterService.insert(server, cluster);
     }
 
@@ -562,38 +549,38 @@ public class CacheManagerController extends AbstractCacheController {
     }
 
     @RequestMapping(value = "/deleteServerCluster", method = RequestMethod.GET)
-    public void deleteServerCluster_(String server, String cluster) {
+    public void deleteServerCluster_(String server,String cluster) {
         serverClusterService.delete(server, cluster);
     }
 
     @RequestMapping(value = "/start", method = RequestMethod.GET)
-    public void startStorage() {
+    public void startStorage(){
         MemcacheStatsDataStorage.START_MS = true;
         ServerStatsDataStorage.START_SS = true;
     }
 
     @RequestMapping(value = "/close", method = RequestMethod.GET)
-    public void closeStorage() {
+    public void closeStorage(){
         MemcacheStatsDataStorage.START_MS = false;
         ServerStatsDataStorage.START_SS = false;
     }
+
 
     @RequestMapping(value = "/cache/query/getip", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public Object ip() {
 
 
-        InetAddress ia = null;
+        InetAddress ia=null;
         String localip = "";
         try {
-            ia = InetAddress.getLocalHost();
-            localip = ia.getHostAddress();
+            ia=InetAddress.getLocalHost();
+            localip=ia.getHostAddress();
         } catch (Exception e) {
             e.printStackTrace();
         }
         return localip;
     }
-
     @RequestMapping(value = "/cache/query/getipNet", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public Object ipNet() {
@@ -605,6 +592,8 @@ public class CacheManagerController extends AbstractCacheController {
     protected String getSide() {
         return "cachemanager";
     }
+
+    private String subside = "config";
 
     @Override
     public String getSubSide() {
@@ -637,8 +626,8 @@ public class CacheManagerController extends AbstractCacheController {
         return !hasServer;
     }
 
-    private void deleteServerFromCache(String server, String cacheKey, String swimlane) {
-        CacheConfiguration config = cacheConfigurationService.findWithSwimLane(cacheKey, swimlane);
+    private void deleteServerFromCache(String server,String cacheKey,String swimlane){
+        CacheConfiguration config = cacheConfigurationService.findWithSwimLane(cacheKey,swimlane);
         List<String> serverList = new ArrayList<String>(config.getServerList());
         server = server.trim();
         serverList.remove(server);
@@ -648,7 +637,7 @@ public class CacheManagerController extends AbstractCacheController {
         // 删除 server cluster 关系表中对应项
         serverClusterService.delete(server, cacheKey);
         // 如果 对server  已经没有集群使用  删除servers 表中对应数据
-        if (requireCacheClose(server, cacheKey)) {
+        if(requireCacheClose(server,cacheKey)){
             serverService.delete(server);
             ServerStatsDataStorage.REFRESH = true;
         }

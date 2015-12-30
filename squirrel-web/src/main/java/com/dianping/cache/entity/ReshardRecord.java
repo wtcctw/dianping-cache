@@ -1,5 +1,7 @@
 package com.dianping.cache.entity;
 
+import com.dianping.cache.scale.cluster.redis.Slot;
+
 /**
  * Created by dp on 15/12/25.
  */
@@ -8,7 +10,7 @@ public class ReshardRecord {
     private String cluster;
     private String srcNode;
     private String desNode;
-    private int slotsToMigrate;
+    private String slotsToMigrate;
     private int slotsDone = 0;
     private int slotMigrating = -1;
     private int order;
@@ -46,11 +48,11 @@ public class ReshardRecord {
         this.desNode = desNode;
     }
 
-    public int getSlotsToMigrate() {
+    public String getSlotsToMigrate() {
         return slotsToMigrate;
     }
 
-    public void setSlotsToMigrate(int slotsToMigrate) {
+    public void setSlotsToMigrate(String slotsToMigrate) {
         this.slotsToMigrate = slotsToMigrate;
     }
 
@@ -84,5 +86,9 @@ public class ReshardRecord {
 
     public void setOrder(int order) {
         this.order = order;
+    }
+
+    public int getSlotsToMigrateCount() {
+        return Slot.slotStringToList(slotsToMigrate).size();
     }
 }

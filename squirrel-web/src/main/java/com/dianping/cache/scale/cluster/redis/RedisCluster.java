@@ -64,7 +64,7 @@ public class RedisCluster implements Cluster<RedisNode>{
 		return servers;
 	}
 	
-	private void loadClusterInfo() {
+	public void loadClusterInfo() {
 		if (serverList == null || serverList.size() == 0) {
 			throw new ScaleException("server list is empty");
 		}
@@ -85,7 +85,10 @@ public class RedisCluster implements Cluster<RedisNode>{
 				continue;
 			} finally{
 				if(jedis != null){
-					jedis.close();
+					try {
+						jedis.close();
+					} catch (Exception e) {
+					}
 				}
 			}
 		}
@@ -145,5 +148,13 @@ public class RedisCluster implements Cluster<RedisNode>{
 
 	public void setFailedServers(List<RedisServer> failedServers) {
 		this.failedServers = failedServers;
+	}
+
+	public boolean isMigrating(){
+		for (RedisNode redisNode : nodes){
+			if(redisNode.getMaster().getMigrating())
+				return true;
+		}
+		return false;
 	}
 }

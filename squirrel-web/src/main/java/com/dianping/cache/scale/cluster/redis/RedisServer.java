@@ -8,12 +8,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.apache.commons.lang.StringUtils;
-
 import redis.clients.jedis.Jedis;
-
 import com.dianping.cache.scale.cluster.Server;
+import redis.clients.jedis.JedisPool;
 
+@JsonIgnoreProperties({"slotList"})
 public class RedisServer extends Server {
 
     private String id;
@@ -31,6 +32,8 @@ public class RedisServer extends Server {
     private RedisInfo info;
 
     private boolean migrating;
+
+    private JedisPool jedisPool;
 
     public RedisServer(String address) {
         super(address);
@@ -210,6 +213,7 @@ public class RedisServer extends Server {
             info.setUsed_cpu_user(Double.parseDouble(redisInfoMap.get("used_cpu_user_children")));
             info.setUsed_cpu_user_children(Double.parseDouble(redisInfoMap.get("used_cpu_user_children")));
             this.migrating = redisInfoMap.get("migrate_cached_sockets").equals("1");
+
         } catch (Exception e) {
         } finally {
             jedis.close();
@@ -278,5 +282,15 @@ public class RedisServer extends Server {
 
     public void setMigrating(boolean migrating) {
         this.migrating = migrating;
+    }
+
+    public JedisPool getJedisPool() {
+        if(jedisPool == null)
+            synchronized (this){
+                if(jedisPool == null){
+                    jedisPool = new JedisPool(getIp(),getPort());
+                }
+            }
+        return jedisPool;
     }
 }
