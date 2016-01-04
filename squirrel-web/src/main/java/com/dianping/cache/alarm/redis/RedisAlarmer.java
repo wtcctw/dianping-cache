@@ -114,7 +114,7 @@ public class RedisAlarmer extends AbstractRedisAlarmer {
                     AlarmDetail alarmDetail = new AlarmDetail(alarmConfig);
                     isReport = true;
                     alarmDetail.setAlarmTitle(MEMUSAGE_TOO_HIGH)
-                            .setAlarmDetail("Master:" + node.getMaster().getIp() + ":" + MEMUSAGE_TOO_HIGH + ";使用率为" + node.getMaster().getInfo().getUsed())
+                            .setAlarmDetail(item.getClusterName()+":" + node.getMaster().getIp() + "," + MEMUSAGE_TOO_HIGH + ";使用率为" + node.getMaster().getInfo().getUsed())
                             .setMailMode(redisTemplate.isMailMode())
                             .setSmsMode(redisTemplate.isSmsMode())
                             .setWeixinMode(redisTemplate.isWeixinMode())
@@ -123,7 +123,7 @@ public class RedisAlarmer extends AbstractRedisAlarmer {
                     AlarmRecord alarmRecord = new AlarmRecord();
                     alarmRecord.setAlarmType(AlarmType.REDIS_MEMUSAGE_TOO_HIGH.getNumber())
                             .setAlarmTitle(MEMUSAGE_TOO_HIGH)
-                            .setClusterName(item.getClusterName() + ":Master")
+                            .setClusterName(item.getClusterName())
                             .setIp(node.getMaster().getIp())
                             .setValue(node.getMaster().getInfo().getUsed())
                             .setCreateTime(new Date());
@@ -167,7 +167,7 @@ public class RedisAlarmer extends AbstractRedisAlarmer {
                     AlarmDetail alarmDetail = new AlarmDetail(alarmConfig);
                     isReport = true;
                     alarmDetail.setAlarmTitle(QPS_TOO_HIGH)
-                            .setAlarmDetail("Master:" + node.getMaster().getIp() + ":" + QPS_TOO_HIGH + ";使用率为" + node.getMaster().getInfo().getQps())
+                            .setAlarmDetail(item.getClusterName()+":" + node.getMaster().getIp() + "," + QPS_TOO_HIGH + ";使用率为" + node.getMaster().getInfo().getQps())
                             .setMailMode(redisTemplate.isMailMode())
                             .setSmsMode(redisTemplate.isSmsMode())
                             .setWeixinMode(redisTemplate.isWeixinMode())
@@ -176,7 +176,7 @@ public class RedisAlarmer extends AbstractRedisAlarmer {
                     AlarmRecord alarmRecord = new AlarmRecord();
                     alarmRecord.setAlarmType(AlarmType.REDIS_QPS_TOO_HIGH.getNumber())
                             .setAlarmTitle(QPS_TOO_HIGH)
-                            .setClusterName(item.getClusterName() + ":Master")
+                            .setClusterName(item.getClusterName())
                             .setIp(node.getMaster().getIp())
                             .setValue(node.getMaster().getInfo().getQps())
                             .setCreateTime(new Date());
