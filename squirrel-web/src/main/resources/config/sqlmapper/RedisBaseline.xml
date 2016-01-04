@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.dianping.cache.alarm.dao.RedisBaselineDao">
+	
+	<resultMap id="RedisBaselineResult" type="RedisBaseline">
+		<result column="id" property="id"/>
+		<result column="baseline_name" property="baseline_name"/>
+		<result column="serverId" property="serverId"/>
+		<result column="memory_used" property="memory_used"/>
+		<result column="curr_time" property="curr_time"/>
+		<result column="total_connections" property="total_connections"/>
+		<result column="connected_clients" property="connected_clients"/>
+		<result column="qps" property="qps"/>
+		<result column="input_kbps" property="input_kbps"/>
+		<result column="output_kbps" property="output_kbps"/>
+		<result column="used_cpu_sys" property="used_cpu_sys"/>
+		<result column="used_cpu_user" property="used_cpu_user"/>
+		<result column="used_cpu_sys_children" property="used_cpu_sys_children"/>
+		<result column="used_cpu_user_children" property="used_cpu_user_children"/>
+		<result column="taskId" property="taskId"/>
+	</resultMap>
+
+	<insert id="insert" parameterType="RedisBaseline">
+		INSERT INTO redis_baseline(serverId,baseline_name,curr_time, memory_used,total_connections,connected_clients,
+				qps,input_kbps,output_kbps,used_cpu_sys,used_cpu_user,used_cpu_sys_children,used_cpu_user_children, taskId)
+		VALUES(#{serverId},#{baseline_name},#{curr_time}, #{memory_used},#{total_connections},#{connected_clients},
+			  #{qps},#{input_kbps},#{output_kbps},#{used_cpu_sys},#{used_cpu_user},#{used_cpu_sys_children},#{used_cpu_user_children},#{taskId})
+	</insert>
+	
+	
+	<select id="findByServer" resultMap="RedisBaselineResult" parameterType="String">
+   		SELECT *
+   		FROM redis_baseline
+   		WHERE serverId = select id from servers where address = #{server}
+   		ORDER BY id DESC
+	</select>
+	
+	<select id="findAll" resultMap="RedisBaselineResult">
+		SELECT *
+   		FROM redis_baseline
+   		ORDER BY id DESC
+	</select>
+
+	<select id="findLast" resultMap="RedisBaselineResult" >
+		SELECT *
+   		FROM redis_baseline
+   		WHERE serverId = select id from servers where address = #{server}
+   		ORDER BY id DESC
+   		limit 1
+	</select>	
+	
+	<select id="findByServerWithInterval" resultMap="RedisBaselineResult" parameterType="map">
+		<![CDATA[
+		SELECT *
+   		FROM redis_baseline
+   		WHERE curr_time >= #{start} AND curr_time <= #{end} AND serverId = (select id from servers  where address = #{address}) 
+   		ORDER BY curr_time ASC 
+		 ]]>
+	</select>
+	
+	<delete id="delete" parameterType="map">
+		DELETE FROM redis_baseline
+   		WHERE curr_time &lt;= #{timeBefore}
+	</delete>
+
+	<select id="search" resultType="RedisBaseline">
+		${paramSQL}
+	</select>
+	
+</mapper>

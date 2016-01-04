@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.dianping.cache.alarm.dao.BaselineComputeTaskDao">
+	
+	<resultMap id="BaselinecomputeTaskResult" type="BaselinecomputeTask">
+		<result column="id" property="id"/>
+		<result column="createTime" property="createTime"/>
+	</resultMap>
+
+	<insert id="insert" parameterType="BaselinecomputeTask">
+		INSERT INTO baselineComputeTask(createTime)
+		VALUES( #{createTime})
+	</insert>
+	
+	
+	<select id="getRecentTaskId" resultMap="BaselinecomputeTaskResult">
+   		SELECT id,createTime
+   		FROM baselineComputeTask
+   		ORDER BY createTime DESC
+   		LIMIT 1 OFFSET 0
+	</select>
+	
+
+</mapper>
