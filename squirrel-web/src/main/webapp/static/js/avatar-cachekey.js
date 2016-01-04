@@ -185,7 +185,7 @@ module.controller('KeyController', [
 	        	});
 			}
 			
-			$rootScope.deleteCacheKeyByCategory = function(category){
+			$rootScope.deleteCacheKeyByCategory = function(){
 				$scope.wrapperParams();
 				$http.post(window.contextPath + '/cache/key/delete',$scope.categoryParams
 				).success(function() {
@@ -195,7 +195,7 @@ module.controller('KeyController', [
 			}
 			
 			$scope.dialog = function(category) {
-				$rootScope.mCategory = category;
+				$scope.category1 = category;
 				ngDialog.open({
 							template : '\
 							<div class="widget-box">\
@@ -210,7 +210,7 @@ module.controller('KeyController', [
 								</div>\
 								<div class="modal-footer">\
 									<button type="button" class="btn btn-default" ng-click="closeThisDialog()">取消</button>\
-									<button type="button" class="btn btn-primary" ng-click="deleteCacheKeyByCategory(mCategory)&&closeThisDialog()">确定</button>\
+									<button type="button" class="btn btn-primary" ng-click="deleteCacheKeyByCategory()&&closeThisDialog()">确定</button>\
 								</div>\
 							</div>\
 						</div>',

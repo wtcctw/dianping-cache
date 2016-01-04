@@ -1,7 +1,7 @@
 package com.dianping.cache.scale.instance.docker;
 import java.util.Iterator;
 
-import org.codehaus.jackson.map.ObjectMapper;
+import com.dianping.squirrel.common.util.JsonUtils;
 import org.dom4j.Attribute;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
@@ -18,10 +18,9 @@ public class DockerResultParse {
 	private static Logger logger = LoggerFactory.getLogger(DockerResultParse.class);
 	
 	public static void parse(Result value,String response){
-		ObjectMapper objectMapper = new ObjectMapper();
 		OperateResult result = null;
 		try {
-			result = objectMapper.readValue(response, OperateResult.class); //parse json
+			result = JsonUtils.fromStr(response, OperateResult.class); //parse json
 			int status = result.getOperationStatus();
 			if((status == 200) || (status == 500)){// 500 中也可能有成功的实例
 				String xml = result.getLog();
@@ -41,7 +40,6 @@ public class DockerResultParse {
 		
 		for(Iterator<Element> iter = root.elementIterator("host-operation");iter.hasNext();){
 			Element hostElement = iter.next();
-			
 			Attribute statusAttribute = hostElement.attribute("status");
 			String status = statusAttribute.getText();
 			if("200".equals(status)){
@@ -59,11 +57,8 @@ public class DockerResultParse {
 	}
 	
 	static class OperateResult{
-		
 		private int operationStatus;
-		
 		private String msg;
-		
 		private String log;
 		
 		public int getOperationStatus() {

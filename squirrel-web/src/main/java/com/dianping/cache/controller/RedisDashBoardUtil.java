@@ -28,17 +28,14 @@ public class RedisDashBoardUtil {
             for (com.dianping.cache.scale.cluster.redis.RedisNode node : redisCluster.getNodes()) {
                 maxmemory += node.getMaster().getInfo().getMaxMemory();
                 usedmemory += node.getMaster().getInfo().getUsedMemory();
-                node.getMaster().setSlotList(null);
                 masterNum++;
                 ops += node.getMaster().getInfo().getQps();
                 if(node.getSlave() != null){
                     slaveNum++;
-                    node.getSlave().setSlotList(null);
                 }
                 if(node.getMaster().getMigrating()){
                     tmp.setMigrate(true);
                 }
-                //tmp.setMigrate(true);
             }
             tmp.setQps(ops);
             tmp.setMasterNum(masterNum);

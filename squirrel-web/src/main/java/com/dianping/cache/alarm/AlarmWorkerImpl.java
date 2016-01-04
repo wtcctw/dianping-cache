@@ -34,14 +34,14 @@ public class AlarmWorkerImpl extends AbstractLifeCycle implements AlarmerLifecyc
 
     @Override
     protected void doStart() throws Exception {
-        super.doStart();
-        alarmTaskThread = ThreadUtils.createThread(new Runnable() {
-            @Override
-            public void run() {
-                startAlarmer();
-            }
-        }, "AlarmWoker-Cache", true);
-        alarmTaskThread.start();
+//        super.doStart();
+//        alarmTaskThread = ThreadUtils.createThread(new Runnable() {
+//            @Override
+//            public void run() {
+//                //startAlarmer();
+//            }
+//        }, "AlarmWoker-Cache", true);
+//        //alarmTaskThread.start();
     }
 
     private boolean checkStop() {

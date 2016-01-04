@@ -4,9 +4,6 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
@@ -18,7 +15,6 @@ import com.dianping.cache.entity.ServerStats;
 import com.dianping.cache.monitor.highcharts.HighChartsWrapper;
 import com.dianping.cache.service.CacheConfigurationService;
 import com.dianping.cache.service.MemcacheStatsService;
-import com.dianping.cache.service.ServerClusterService;
 import com.dianping.cache.service.ServerService;
 import com.dianping.cache.service.ServerStatsService;
 import com.dianping.cache.monitor.highcharts.ChartsBuilder;
@@ -32,9 +28,6 @@ public class CacheMonitorController  extends AbstractSidebarController {
 	@Resource(name = "cacheConfigurationService")
 	private CacheConfigurationService cacheConfigurationService ;
 	
-	@Resource(name = "serverClusterService")
-	private ServerClusterService serverClusterService;
-	
 	@Resource(name = "memcacheStatsService")
 	private MemcacheStatsService memcacheStatsService;
 	
@@ -44,37 +37,37 @@ public class CacheMonitorController  extends AbstractSidebarController {
 	@Resource(name = "serverStatsService")
 	private ServerStatsService serverStatsService;
 	
-	@RequestMapping(value = "/monitor/cluster", method = RequestMethod.GET)
-	public ModelAndView viewCacheConfig(HttpServletRequest request, HttpServletResponse response){
+	@RequestMapping(value = "/monitor/cluster")
+	public ModelAndView viewCacheConfig(){
 		
 		subside = "mdashboard";
 		return new ModelAndView("monitor/cluster",createViewMap());
 	}
 	
-	@RequestMapping(value = "/monitor/dashboard", method = RequestMethod.GET)
-	public ModelAndView viewClusterDashBoard(HttpServletRequest request, HttpServletResponse response){
+	@RequestMapping(value = "/monitor/dashboard")
+	public ModelAndView viewClusterDashBoard(){
 		
 		subside = "dashboard";
 		return new ModelAndView("monitor/dashboard",createViewMap());
 	}
 	
 	
-	@RequestMapping(value = "/monitor/nodedashboard", method = RequestMethod.GET)
+	@RequestMapping(value = "/monitor/nodedashboard")
 	public ModelAndView viewServers() {
 
 		subside = "node";
-		return new ModelAndView("monitor/nodedashboard", createViewMap());
+		return new ModelAndView("monitor/nodedashboard");
 	}
 	
-	@RequestMapping(value = "/monitor/servers", method = RequestMethod.GET)
+	@RequestMapping(value = "/monitor/servers")
 	@ResponseBody
 	public List<Server> getServers(){
 		return serverService.findAll();
 	}
 	
-	@RequestMapping(value = "/monitor/dashboardinfo", method = RequestMethod.GET)
+	@RequestMapping(value = "/monitor/dashboardinfo")
 	@ResponseBody
-	public List<HashMap<String, Object>> dashBoard(HttpServletRequest request, HttpServletResponse response){
+	public List<HashMap<String, Object>> dashBoard(){
 		List<CacheConfiguration> configList = cacheConfigurationService.findAll();
 		List<HashMap<String, Object>> data = new ArrayList<HashMap<String,Object>>();
   
@@ -167,7 +160,7 @@ public class CacheMonitorController  extends AbstractSidebarController {
 	}
 	
 	
-	@RequestMapping(value = "/monitor/cluster/{cluster}", method = RequestMethod.GET)
+	@RequestMapping(value = "/monitor/cluster/{cluster}")
 	@ResponseBody
 	public List<HighChartsWrapper> getClusterStats(@PathVariable("cluster") String cluster,@RequestParam("endTime") long endTime){
 		
@@ -215,13 +208,14 @@ public class CacheMonitorController  extends AbstractSidebarController {
 	
 	private  Map<String,List<ServerStats>> getClusterServerStats2(String cluster,long endTime) {
 		//get all server in cluster
-		List<Server> sc = serverClusterService.findByCluster(cluster);
+		CacheConfiguration configuration = cacheConfigurationService.find(cluster);
+		List<String> servers = configuration.getServerList();
 		long start = (endTime - TimeUnit.MILLISECONDS.convert(60, TimeUnit.MINUTES))/1000;
 		long end = endTime/1000;
 		
 		Map<String,List<ServerStats>> result = new HashMap<String,List<ServerStats>>();
-		for(Server server : sc){
-			result.put(server.getAddress(),getServerStats(server.getAddress(),start,end));
+		for(String server : servers){
+			result.put(server,getServerStats(server,start,end));
 		}
 		return result;
 	}
@@ -236,14 +230,15 @@ public class CacheMonitorController  extends AbstractSidebarController {
 
 	private  Map<String,List<MemcacheStats>> getClusterServerStats(String cluster,long endTime) {
 		//get all server in cluster
-		List<Server> sc = serverClusterService.findByCluster(cluster);
+		CacheConfiguration configuration = cacheConfigurationService.find(cluster);
+		List<String> servers = configuration.getServerList();
 		
 		long start = (endTime - TimeUnit.MILLISECONDS.convert(60, TimeUnit.MINUTES))/1000;
 		long end = endTime/1000;
 		
 		Map<String,List<MemcacheStats>> result = new HashMap<String,List<MemcacheStats>>();
-		for(Server server : sc){
-			result.put(server.getAddress(),getMemcacheStats(server.getAddress(),start,end));
+		for(String server : servers){
+			result.put(server,getMemcacheStats(server,start,end));
 		}
 		return result;
 	}

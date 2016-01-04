@@ -7,13 +7,13 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import com.dianping.cache.scale.cluster.redis.*;
+import com.dianping.cache.support.spring.SpringLocator;
 import redis.clients.jedis.Jedis;
 
 import com.dianping.cache.entity.RedisStats;
 import com.dianping.cache.entity.Server;
 import com.dianping.cache.service.RedisStatsService;
 import com.dianping.cache.service.ServerService;
-import com.dianping.combiz.spring.context.SpringLocator;
 
 public class RedisStatsDataStorage extends AbstractStatsDataStorage{
 	
