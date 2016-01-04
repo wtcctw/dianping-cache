@@ -1,7 +1,6 @@
 package com.dianping.cache.alarm.memcache;
 
 import com.dianping.cache.alarm.AbstractAlarmer;
-import net.rubyeye.xmemcached.exception.MemcachedException;
 
 import java.io.IOException;
 import java.util.concurrent.ScheduledFuture;
@@ -42,7 +41,7 @@ public abstract class AbstractMemcacheAlarmer extends AbstractAlarmer {
 
     }
 
-    public abstract void doAlarm() throws InterruptedException, MemcachedException, IOException, TimeoutException;
+    public abstract void doAlarm() throws InterruptedException, IOException, TimeoutException;
 
     public void startAlarm() {
         future = alarmerTaskManager.scheduleAtFixedRate(new Runnable() {

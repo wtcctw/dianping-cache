@@ -10,13 +10,13 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+import com.dianping.cache.support.spring.SpringLocator;
+import com.dianping.squirrel.common.util.JsonUtils;
 import com.dianping.cache.entity.Server;
 import com.dianping.cache.entity.ServerStats;
 import com.dianping.cache.service.ServerService;
 import com.dianping.cache.service.ServerStatsService;
-import com.dianping.cache.support.spring.SpringLocator;
 import com.dianping.cache.util.RequestUtil;
-import com.dianping.squirrel.common.util.JsonUtils;
 
 public class ServerStatsDataStorage extends AbstractStatsDataStorage {
 	

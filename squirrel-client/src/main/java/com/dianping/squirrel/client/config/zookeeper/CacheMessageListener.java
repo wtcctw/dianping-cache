@@ -18,10 +18,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.dianping.cat.Cat;
-import com.dianping.remote.cache.util.SedesUtils;
 import com.dianping.squirrel.client.config.zookeeper.CacheEvent.CacheEventType;
 import com.dianping.squirrel.common.util.JsonUtils;
 import com.dianping.squirrel.common.util.PathUtils;
+import com.dianping.squirrel.common.util.SedesUtils;
 
 public class CacheMessageListener implements CuratorListener {
 

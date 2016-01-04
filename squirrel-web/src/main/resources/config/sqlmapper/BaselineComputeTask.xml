@@ -5,12 +5,12 @@
 
 <mapper namespace="com.dianping.cache.alarm.dao.BaselineComputeTaskDao">
 	
-	<resultMap id="BaselinecomputeTaskResult" type="BaselinecomputeTask">
+	<resultMap id="BaselinecomputeTaskResult" type="BaselineComputeTask">
 		<result column="id" property="id"/>
 		<result column="createTime" property="createTime"/>
 	</resultMap>
 
-	<insert id="insert" parameterType="BaselinecomputeTask">
+	<insert id="insert" parameterType="BaselineComputeTask">
 		INSERT INTO baselineComputeTask(createTime)
 		VALUES( #{createTime})
 	</insert>

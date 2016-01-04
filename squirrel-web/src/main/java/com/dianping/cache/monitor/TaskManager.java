@@ -139,7 +139,7 @@ public class TaskManager implements ServiceListener {
         if(monitorThreadPool != null) {
             monitorThreadPool.shutdownNow();
         }
-        MemcachedClientFactory.closeAll();
+        MemcachedClientFactory.getInstance().close();
     }
     
     private void addServerToCluster(String server, String cluster) {

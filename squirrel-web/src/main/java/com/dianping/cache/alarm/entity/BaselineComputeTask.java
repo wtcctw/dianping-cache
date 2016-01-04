@@ -5,7 +5,7 @@ import java.util.Date;
 /**
  * Created by lvshiyun on 16/1/4.
  */
-public class BaselinecomputeTask {
+public class BaselineComputeTask {
 
     int id;
 

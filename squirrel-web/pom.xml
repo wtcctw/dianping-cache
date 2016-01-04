@@ -337,11 +337,6 @@
 			<version>4.3.6</version>
 		</dependency>
 		<dependency>
-			<groupId>com.googlecode.xmemcached</groupId>
-			<artifactId>xmemcached</artifactId>
-			<scope>compile</scope>
-		</dependency>
-		<dependency>
 			<groupId>org.apache.velocity</groupId>
 			<artifactId>velocity</artifactId>
 			<version>1.6.2</version>
@@ -386,7 +381,6 @@
 			<artifactId>xmlsec</artifactId>
 			<version>1.4.0</version>
 		</dependency>
-
 		<dependency>
 			<groupId>com.dianping.ba</groupId>
 			<artifactId>masterdata-api</artifactId>

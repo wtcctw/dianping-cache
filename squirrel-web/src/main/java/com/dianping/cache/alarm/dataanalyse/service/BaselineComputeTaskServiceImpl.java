@@ -1,7 +1,7 @@
 package com.dianping.cache.alarm.dataanalyse.service;
 
 import com.dianping.cache.alarm.dao.BaselineComputeTaskDao;
-import com.dianping.cache.alarm.entity.BaselinecomputeTask;
+import com.dianping.cache.alarm.entity.BaselineComputeTask;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -16,12 +16,12 @@ public class BaselineComputeTaskServiceImpl implements BaselineComputeTaskServic
     BaselineComputeTaskDao baselineComputeTaskDao;
 
     @Override
-    public void insert(BaselinecomputeTask baselinecomputeTask) {
+    public void insert(BaselineComputeTask baselinecomputeTask) {
         baselineComputeTaskDao.insert(baselinecomputeTask);
     }
 
     @Override
-    public List<BaselinecomputeTask> getRecentTaskId() {
+    public List<BaselineComputeTask> getRecentTaskId() {
         return baselineComputeTaskDao.getRecentTaskId();
     }
 }

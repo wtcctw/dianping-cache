@@ -5,7 +5,6 @@ import com.dianping.cache.alarm.dataanalyse.mapper.RedisBaselineMapper;
 import com.dianping.cache.alarm.dataanalyse.service.BaselineComputeTaskService;
 import com.dianping.cache.alarm.dataanalyse.service.MemcacheBaselineService;
 import com.dianping.cache.alarm.dataanalyse.service.RedisBaselineService;
-import com.dianping.cache.alarm.entity.BaselinecomputeTask;
 import com.dianping.cache.alarm.entity.MemcacheBaseline;
 import com.dianping.cache.alarm.entity.RedisBaseline;
 import com.dianping.cache.entity.MemcacheStats;
@@ -48,7 +47,7 @@ public class BaselineComputeTask {
 
         try {
             Date now = new Date();
-            BaselinecomputeTask baselinecomputeTask = new BaselinecomputeTask();
+            com.dianping.cache.alarm.entity.BaselineComputeTask baselinecomputeTask = new com.dianping.cache.alarm.entity.BaselineComputeTask();
             baselinecomputeTask.setCreateTime(now);
 
             baselineComputeTaskService.insert(baselinecomputeTask);

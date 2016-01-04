@@ -3,7 +3,7 @@ package com.dianping.cache.scale.instance.docker;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.codehaus.jackson.map.ObjectMapper;
+import com.dianping.squirrel.common.util.JsonUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -65,7 +65,6 @@ public class DockerApply implements Apply{
 		for(Instance ins : value.getInstances()){
 			instances[index++] = ins.getInstanceId();
 		}
-		
 		destroy(value.getAppId().toString(),instances);
 	}
 	
@@ -85,7 +84,7 @@ public class DockerApply implements Apply{
 					if(value.getStatus() == 200){
 						logger.info("Apply instance success:");
 						for(Instance ins : value.getInstances()){
-							logger.info("instanceId : {} , ip : {}",ins.getInstanceId(),ins.getIp());
+							logger.info("instanceId : {} , ip : {}, agentIp : {}",new Object[]{ins.getInstanceId(),ins.getIp(),ins.getAgentIp()});
 
 							try {
 								serverService.insert(ins.getIp()+":"+ins.getAppId().getPort(),
@@ -119,42 +118,38 @@ public class DockerApply implements Apply{
 	
 	@Override
 	public void destroy(final String appId,final String... instances) {
-		
 		Runnable runnable = new Runnable(){
-
 			@Override
 			public void run() {
 				//update servers database ,set type = -1
 				for(String instance : instances){
 					serverService.setDeleteType(instance);
 				}
-
 				String requestUrl = DOCKER_SHUTDOWN_URL + appId + "/shutdown";
 				InstanceIdParam instanceIdParam = new InstanceIdParam();
 				instanceIdParam.setInstances(instances);
-				ObjectMapper objectMapper = new ObjectMapper();
 				String paras = null;
 				try {
-					paras = objectMapper.writeValueAsString(instanceIdParam);
+					paras = JsonUtils.toStr(instanceIdParam);
 				} catch (Exception e) {
 					logger.error("ShutDown docker container failed,caused by Convert instanceIdParam to json error : "
 							+ e);
 				}
 				// send shutdown request
 				String opIdStr = RequestUtil.sendPost(requestUrl, paras);
-				
 				int operationid = -1;
 				try {
-					OperationId opid = objectMapper.readValue(opIdStr, OperationId.class);
+					OperationId opid;
+					opid = JsonUtils.fromStr(opIdStr,OperationId.class);
 					operationid = opid.getOperationId();
 				} catch (Exception e) {
 					logger.error("ShutDown docker container failed,cause by Parse operationid with error !" + e);
 				}
 				while (true) {
 					String response = RequestUtil.sendGet(OPERATION_RESULT_URL + operationid, null);
-					OperateResult result = null;
+					OperateResult result;
 					try {
-						result = objectMapper.readValue(response, OperateResult.class); // parse json
+						result = JsonUtils.fromStr(response, OperateResult.class); // parse json
 						if (result.getOperationStatus() == 200) {
 							// shutdown success
 							logger.info("ShutDown instances " + paras + "  success,start to remove !");
@@ -163,7 +158,7 @@ public class DockerApply implements Apply{
 							String delIdStr = RequestUtil.sendPost(requestUrl, paras);
 							int delOperationId = -1;
 							try {
-								OperationId opid = objectMapper.readValue(delIdStr, OperationId.class);
+								OperationId opid = JsonUtils.fromStr(delIdStr, OperationId.class);
 								delOperationId = opid.getOperationId();
 							} catch (Exception e) {
 								logger.error("ShutDown docker container failed,cause by Parse operationid with error !" + e);
@@ -172,7 +167,7 @@ public class DockerApply implements Apply{
 							while(true){
 								response = RequestUtil.sendGet(OPERATION_RESULT_URL + delOperationId, null);
 								try{
-									result = objectMapper.readValue(response, OperateResult.class);
+									result = JsonUtils.fromStr(response, OperateResult.class);
 									if(result.getOperationStatus() == 200){
 										for(String instance : instances){
 											logger.info("Remove docker instances success ! appId : " + appId + " \n instancesId : " + instance);
@@ -200,9 +195,7 @@ public class DockerApply implements Apply{
 						break;
 					}
 				}
-				
 			}
-			
 		};
 		Thread t = new Thread(runnable);
 		t.start();
@@ -210,10 +203,9 @@ public class DockerApply implements Apply{
 	
 	private int sendScaleRequest(String appid,int instances){
 		String operationidStr = RequestUtil.sendPost(SCALE_URL + appid + "/scale", "{\"instanceCount\" : "+instances+"}");
-		ObjectMapper objectMapper = new ObjectMapper();
 		int operationid = -1;
 		try {
-			OperationId opid = objectMapper.readValue(operationidStr, OperationId.class);
+			OperationId opid = JsonUtils.fromStr(operationidStr, OperationId.class);
 			operationid = opid.getOperationId();
 		} catch (Exception e) {
 			logger.error("Parse operationid with error !" + e);

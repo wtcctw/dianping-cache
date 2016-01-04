@@ -4,8 +4,6 @@ import com.dianping.cache.alarm.AlarmType;
 import com.dianping.cache.alarm.alarmconfig.AlarmConfigService;
 import com.dianping.cache.alarm.alarmtemplate.MemcacheAlarmTemplateService;
 import com.dianping.cache.alarm.dao.AlarmRecordDao;
-import com.dianping.cache.alarm.dataanalyse.Baseline;
-import com.dianping.cache.alarm.dataanalyse.BaselineService;
 import com.dianping.cache.alarm.entity.AlarmConfig;
 import com.dianping.cache.alarm.entity.AlarmDetail;
 import com.dianping.cache.alarm.entity.AlarmRecord;
@@ -18,14 +16,13 @@ import com.dianping.cache.monitor.MemcachedClientFactory;
 import com.dianping.cache.service.CacheConfigurationService;
 import com.dianping.cache.service.MemcacheStatsService;
 import com.dianping.cache.service.ServerService;
-import net.rubyeye.xmemcached.MemcachedClient;
-import net.rubyeye.xmemcached.exception.MemcachedException;
+import net.spy.memcached.MemcachedClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -43,11 +40,7 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
     private static final String QPS_TOO_HIGH = "QPS过高";
     private static final String CONN_TOO_HIGH = "连接数过高";
 
-    private static final String EVICT_ABNORMAL = "连接数过高";
-
     private static final String ALARMTYPE = "Memcache";
-
-    private static final float FLU_RANGE = (float) 0.3;
 
     @Autowired
     private ServerService serverService;
@@ -73,15 +66,12 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
     @Autowired
     MemcacheAlarmTemplateService memcacheAlarmTemplateService;
 
-    @Autowired
-    BaselineService baselineService;
-
     @Override
-    public void doAlarm() throws InterruptedException, MemcachedException, IOException, TimeoutException {
+    public void doAlarm() throws InterruptedException, IOException, TimeoutException {
         doCheck();
     }
 
-    private void doCheck() throws InterruptedException, MemcachedException, IOException, TimeoutException {
+    private void doCheck() throws InterruptedException, IOException, TimeoutException {
 
         MemcacheEvent memcacheEvent = eventFactory.createMemcacheEvent();
 
@@ -98,6 +88,7 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
 
         boolean isReport = false;
 
+        List<AlarmType> types = new ArrayList<AlarmType>();
         for (CacheConfiguration item : configList) {
             //遍历所有的集群  对于集群名称为memcached的进行检查并放入告警队列
             if (item.getCacheKey().contains("memcached")
@@ -135,7 +126,7 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
         }
     }
 
-    boolean isDownAlarm(CacheConfiguration item, Map<String, Map<String, Object>> currentServerStats, MemcacheEvent memcacheEvent) throws InterruptedException, IOException, MemcachedException, TimeoutException {
+    boolean isDownAlarm(CacheConfiguration item, Map<String, Map<String, Object>> currentServerStats, MemcacheEvent memcacheEvent) throws InterruptedException, IOException, TimeoutException {
 
         boolean flag = false;
 
@@ -153,10 +144,10 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
             String ip = splitText[0];
             int port = Integer.parseInt(splitText[1]);
 
-            MemcachedClient mc = MemcachedClientFactory.getMemcachedClient(server);
+            MemcachedClient mc = MemcachedClientFactory.getInstance().getClient(server);
             Map<String, String> stats = null;
             try {
-                stats = mc.stats(new InetSocketAddress(ip, port), 1000);
+                stats = mc.getStats().get(new InetSocketAddress(ip, port));
             } catch (Exception e) {
                 flag = true;
                 AlarmDetail alarmDetail = new AlarmDetail(alarmConfig);
@@ -402,81 +393,18 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
         return flag;
     }
 
-    boolean isHistoryAlarm(CacheConfiguration item, Map<String, Map<String, Object>> currentServerStats, MemcacheEvent memcacheEvent) throws InterruptedException, IOException, MemcachedException, TimeoutException {
+    boolean isHistoryAlarm(CacheConfiguration item, Map<String, Map<String, Object>> currentServerStats, MemcacheEvent memcacheEvent) throws InterruptedException, IOException, TimeoutException {
 
         boolean flag = false;
 
-        List<String> serverList = item.getServerList();
 
-        for (String server : serverList) {
-
-            int evict = 0;
-            if (0 != currentServerStats.size()) {
-                if (null != currentServerStats.get(server)) {
-                    Integer tmp = (Integer) currentServerStats.get(server).get("evict");
-                    if (null != tmp) {
-                        evict = tmp;
-                    }
-                } else {
-                    continue;
-                }
-            }
-
-            Date date = new Date();
-
-            SimpleDateFormat df = new SimpleDateFormat("EEEE:HH:mm");
-
-            String now = df.format(date);
-
-            String name = "Memcache_" + item.getCacheKey() + "_" + server + "_evict_" + now;
-
-
-            Baseline baseline = baselineService.getBaseline(name);
-            if (null != baseline) {
-
-
-                float flu = (evict - baseline.getBaseValue()) / baseline.getBaseValue();
-
-                float flu_m = (baseline.getBaseValue() - evict) / baseline.getBaseValue();
-
-                String alarmDetailStr = "";
-                AlarmDetail alarmDetail = new AlarmDetail();
-
-                if (flu > FLU_RANGE) {
-                    flag = true;
-                    alarmDetailStr = "Memcache " + item.getCacheKey() + " " + server + "evict too high " + evict + "Time:" + date;
-                    alarmDetail.setAlarmDetail(alarmDetailStr);
-                } else if (flu_m > FLU_RANGE) {
-                    flag = true;
-                    alarmDetailStr = "Memcache " + item.getCacheKey() + " " + server + "evict too low " + evict + "Time:" + date;
-                    alarmDetail.setAlarmDetail(alarmDetailStr);
-                }
-                if (flag) {
-                    alarmDetail.setMailMode(false)
-                            .setSmsMode(false)
-                            .setWeixinMode(false)
-                            .setCreateTime(new Date());
-
-                    AlarmRecord alarmRecord = new AlarmRecord();
-                    alarmRecord.setAlarmTitle(EVICT_ABNORMAL)
-                            .setClusterName(item.getCacheKey())
-                            .setIp(server)
-                            .setValue(evict)
-                            .setCreateTime(new Date());
-
-                    alarmRecordDao.insert(alarmRecord);
-
-                    memcacheEvent.put(alarmDetail);
-                }
-            }
-        }
 
 
         return flag;
     }
 
 
-    public CacheConfigurationService getCacheConfigurationService() {
+        public CacheConfigurationService getCacheConfigurationService() {
         return cacheConfigurationService;
     }
 

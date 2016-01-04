@@ -5,13 +5,11 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import com.dianping.cache.support.spring.SpringLocator;
 import org.apache.curator.framework.CuratorFramework;
-import org.apache.curator.framework.CuratorFrameworkFactory;
-import org.apache.curator.retry.RetryNTimes;
 
 import com.dianping.cache.monitor.CuratorManager;
 import com.dianping.cache.service.CategoryToAppService;
-import com.dianping.combiz.spring.context.SpringLocator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,22 +35,6 @@ public class TimedRetriCategoryToApp {
             }
 
         }, 37, 24 * 60 * 60, TimeUnit.SECONDS);
-    }
-
-    public static void main(String[] ags) throws Exception {
-        CuratorFramework curatorClient = CuratorFrameworkFactory.newClient("10.1.107.245:2181", 60 * 1000, 30 * 1000,
-                new RetryNTimes(3, 1000));
-        curatorClient.start();
-        List<String> appnodes = curatorClient.getChildren().forPath("/dp/cache/runtime");
-        for (String node : appnodes) {
-            try {
-                byte[] catenodes = curatorClient.getData().forPath("/dp/cache/runtime/" + node + "/category");
-                System.out.println(node + "\n++++++++++++++" + new String(catenodes, "UTF-8"));
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-        curatorClient.close();
     }
 
     private void init() {

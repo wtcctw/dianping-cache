@@ -15,7 +15,6 @@ import com.dianping.cache.controller.RedisDashBoardUtil;
 import com.dianping.cache.monitor.statsdata.RedisClusterData;
 import com.dianping.cache.scale.cluster.redis.RedisNode;
 import com.dianping.cache.scale.cluster.redis.RedisServer;
-import net.rubyeye.xmemcached.exception.MemcachedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -53,7 +52,7 @@ public class RedisAlarmer extends AbstractRedisAlarmer {
     RedisAlarmTemplateService redisAlarmTemplateService;
 
     @Override
-    public void doAlarm() throws InterruptedException, MemcachedException, IOException, TimeoutException {
+    public void doAlarm() throws InterruptedException, IOException, TimeoutException {
         doCheck();
     }
 
