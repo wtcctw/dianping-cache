@@ -8,17 +8,23 @@ import java.util.Map;
  */
 public class BaselineDict {
 
-    Map<String, Baseline> baselineMap;
+    Map<String, Baseline> baselineMap = new HashMap<String, Baseline>();
+
+    private static final BaselineDict INSTANCE = new BaselineDict();
+
+    public static BaselineDict getInstance() {
+        return INSTANCE;
+    }
 
     public BaselineDict() {
         this.baselineMap = new HashMap<String, Baseline>();
     }
 
-    public Baseline getBaselineMap(String name) {
+    public Baseline getBaseline(String name) {
         return this.baselineMap.get(name);
     }
 
-    public void putBaselineMap(String name, Baseline baseline) {
+    public void putBaseline(String name, Baseline baseline) {
         this.baselineMap.put(name, baseline);
     }
 }

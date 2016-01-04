@@ -1,7 +1,6 @@
 package com.dianping.cache.alarm.dataanalyse;
 
 import java.util.Date;
-import java.util.Map;
 
 /**
  * Created by lvshiyun on 15/12/30.
@@ -16,7 +15,9 @@ public class Baseline {
 
     String category;
 
-    Map<Date,Integer> baseValue;
+    Date date;
+
+    int baseValue;
 
     public String getClusterType() {
         return clusterType;
@@ -50,11 +51,19 @@ public class Baseline {
         this.category = category;
     }
 
-    public Integer getBaseValue(Date date) {
-        return baseValue.get(date);
+    public Date getDate() {
+        return date;
     }
 
-    public void setBaseValue(Date date, Integer value) {
-        this.baseValue.put(date, value);
+    public void setDate(Date date) {
+        this.date = date;
+    }
+
+    public int getBaseValue() {
+        return baseValue;
+    }
+
+    public void setBaseValue(int baseValue) {
+        this.baseValue = baseValue;
     }
 }

@@ -108,6 +108,9 @@ public class RedisAlarmer extends AbstractRedisAlarmer {
 
                 //Mem
                 //Master
+                if(null ==node.getMaster()||null == node.getMaster().getInfo()){
+                    continue;
+                }
                 if (node.getMaster().getInfo().getUsed() > redisTemplate.getMemThreshold()) {
                     AlarmDetail alarmDetail = new AlarmDetail(alarmConfig);
                     isReport = true;
@@ -130,31 +133,37 @@ public class RedisAlarmer extends AbstractRedisAlarmer {
 
                     redisEvent.put(alarmDetail);
                 }
-                //Slave
-                if (node.getSlave().getInfo().getUsed() > redisTemplate.getMemThreshold()) {
-                    AlarmDetail alarmDetail = new AlarmDetail(alarmConfig);
-                    isReport = true;
-                    alarmDetail.setAlarmTitle(MEMUSAGE_TOO_HIGH)
-                            .setAlarmDetail("Slave:" + node.getSlave().getIp() + ":" + MEMUSAGE_TOO_HIGH + ";使用率为" + node.getSlave().getInfo().getUsed())
-                            .setMailMode(redisTemplate.isMailMode())
-                            .setSmsMode(redisTemplate.isSmsMode())
-                            .setWeixinMode(redisTemplate.isWeixinMode())
-                            .setCreateTime(new Date());
-
-                    AlarmRecord alarmRecord = new AlarmRecord();
-                    alarmRecord.setAlarmType(AlarmType.REDIS_MEMUSAGE_TOO_HIGH.getNumber())
-                            .setAlarmTitle(MEMUSAGE_TOO_HIGH)
-                            .setClusterName(item.getClusterName() + ":Slave")
-                            .setIp(node.getSlave().getIp())
-                            .setValue(node.getSlave().getInfo().getUsed())
-                            .setCreateTime(new Date());
-
-                    alarmRecordDao.insert(alarmRecord);
-
-                    redisEvent.put(alarmDetail);
-                }
+//                //Slave
+//                if(null ==node.getSlave()||null == node.getSlave().getInfo()){
+//                    continue;
+//                }
+//                if (node.getSlave().getInfo().getUsed() > redisTemplate.getMemThreshold()) {
+//                    AlarmDetail alarmDetail = new AlarmDetail(alarmConfig);
+//                    isReport = true;
+//                    alarmDetail.setAlarmTitle(MEMUSAGE_TOO_HIGH)
+//                            .setAlarmDetail("Slave:" + node.getSlave().getIp() + ":" + MEMUSAGE_TOO_HIGH + ";使用率为" + node.getSlave().getInfo().getUsed())
+//                            .setMailMode(redisTemplate.isMailMode())
+//                            .setSmsMode(redisTemplate.isSmsMode())
+//                            .setWeixinMode(redisTemplate.isWeixinMode())
+//                            .setCreateTime(new Date());
+//
+//                    AlarmRecord alarmRecord = new AlarmRecord();
+//                    alarmRecord.setAlarmType(AlarmType.REDIS_MEMUSAGE_TOO_HIGH.getNumber())
+//                            .setAlarmTitle(MEMUSAGE_TOO_HIGH)
+//                            .setClusterName(item.getClusterName() + ":Slave")
+//                            .setIp(node.getSlave().getIp())
+//                            .setValue(node.getSlave().getInfo().getUsed())
+//                            .setCreateTime(new Date());
+//
+//                    alarmRecordDao.insert(alarmRecord);
+//
+//                    redisEvent.put(alarmDetail);
+//                }
 
                 //QPS
+                if(null ==node.getMaster()||null == node.getMaster().getInfo()){
+                    continue;
+                }
                 if (node.getMaster().getInfo().getQps() > redisTemplate.getQpsThreshold()) {
                     AlarmDetail alarmDetail = new AlarmDetail(alarmConfig);
                     isReport = true;
@@ -177,29 +186,32 @@ public class RedisAlarmer extends AbstractRedisAlarmer {
 
                     redisEvent.put(alarmDetail);
                 }
-                //Slave
-                if (node.getSlave().getInfo().getQps() > redisTemplate.getQpsThreshold()) {
-                    AlarmDetail alarmDetail = new AlarmDetail(alarmConfig);
-                    isReport = true;
-                    alarmDetail.setAlarmTitle(QPS_TOO_HIGH)
-                            .setAlarmDetail("Slave:" + node.getSlave().getIp() + ":" + QPS_TOO_HIGH + ";使用率为" + node.getSlave().getInfo().getUsed())
-                            .setMailMode(redisTemplate.isMailMode())
-                            .setSmsMode(redisTemplate.isSmsMode())
-                            .setWeixinMode(redisTemplate.isWeixinMode())
-                            .setCreateTime(new Date());
-
-                    AlarmRecord alarmRecord = new AlarmRecord();
-                    alarmRecord.setAlarmType(AlarmType.REDIS_MEMUSAGE_TOO_HIGH.getNumber())
-                            .setAlarmTitle(MEMUSAGE_TOO_HIGH)
-                            .setClusterName(item.getClusterName() + ":Slave")
-                            .setIp(node.getSlave().getIp())
-                            .setValue(node.getSlave().getInfo().getQps())
-                            .setCreateTime(new Date());
-
-                    alarmRecordDao.insert(alarmRecord);
-
-                    redisEvent.put(alarmDetail);
-                }
+//                //Slave
+//                if(null ==node.getSlave()||null == node.getSlave().getInfo()){
+//                    continue;
+//                }
+//                if (node.getSlave().getInfo().getQps() > redisTemplate.getQpsThreshold()) {
+//                    AlarmDetail alarmDetail = new AlarmDetail(alarmConfig);
+//                    isReport = true;
+//                    alarmDetail.setAlarmTitle(QPS_TOO_HIGH)
+//                            .setAlarmDetail("Slave:" + node.getSlave().getIp() + ":" + QPS_TOO_HIGH + ";使用率为" + node.getSlave().getInfo().getUsed())
+//                            .setMailMode(redisTemplate.isMailMode())
+//                            .setSmsMode(redisTemplate.isSmsMode())
+//                            .setWeixinMode(redisTemplate.isWeixinMode())
+//                            .setCreateTime(new Date());
+//
+//                    AlarmRecord alarmRecord = new AlarmRecord();
+//                    alarmRecord.setAlarmType(AlarmType.REDIS_MEMUSAGE_TOO_HIGH.getNumber())
+//                            .setAlarmTitle(MEMUSAGE_TOO_HIGH)
+//                            .setClusterName(item.getClusterName() + ":Slave")
+//                            .setIp(node.getSlave().getIp())
+//                            .setValue(node.getSlave().getInfo().getQps())
+//                            .setCreateTime(new Date());
+//
+//                    alarmRecordDao.insert(alarmRecord);
+//
+//                    redisEvent.put(alarmDetail);
+//                }
             }
         }
 

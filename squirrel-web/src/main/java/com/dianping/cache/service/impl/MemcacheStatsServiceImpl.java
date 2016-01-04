@@ -1,10 +1,10 @@
 package com.dianping.cache.service.impl;
 
-import java.util.List;
-
 import com.dianping.cache.dao.MemcacheStatsDao;
 import com.dianping.cache.entity.MemcacheStats;
 import com.dianping.cache.service.MemcacheStatsService;
+
+import java.util.List;
 
 public class MemcacheStatsServiceImpl implements MemcacheStatsService{
 
@@ -42,5 +42,10 @@ public class MemcacheStatsServiceImpl implements MemcacheStatsService{
 	public void delete(long timeBefore) {
 		this.memcacheStatsDao.delete(timeBefore);
 	}
-	
+
+	@Override
+	public List<MemcacheStats> search(String sql) {
+		return memcacheStatsDao.search(sql);
+	}
+
 }

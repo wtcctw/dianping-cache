@@ -1,10 +1,10 @@
 package com.dianping.cache.service.impl;
 
-import java.util.List;
-
 import com.dianping.cache.dao.RedisStatsDao;
 import com.dianping.cache.entity.RedisStats;
 import com.dianping.cache.service.RedisStatsService;
+
+import java.util.List;
 
 public class RedisStatsServiceImpl implements RedisStatsService{
 	
@@ -33,6 +33,11 @@ public class RedisStatsServiceImpl implements RedisStatsService{
 	public void delete(long timeBefore) {
 		// TODO Auto-generated method stub
 		redisStatsDao.delete(timeBefore);
+	}
+
+	@Override
+	public List<RedisStats> search(String sql) {
+		return redisStatsDao.search(sql);
 	}
 
 	public RedisStatsDao getRedisStatsDao() {

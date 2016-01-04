@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.dianping.cache.alarm.dao.MemcacheBaselineDao">
+	
+	<resultMap id="MemcacheBaselineResult" type="MemcacheBaseline">
+		<result column="id" property="id"/>
+		<result column="baseline_name" property="baseline_name"/>
+		<result column="serverId" property="serverId"/>
+		<result column="uptime" property="uptime"/>
+		<result column="curr_time" property="curr_time"/>
+		<result column="total_conn" property="total_conn"/>
+		<result column="curr_conn" property="curr_conn"/>
+		<result column="curr_items" property="curr_items"/>
+		<result column="cmd_set" property="cmd_set"/>
+		<result column="get_hits" property="get_hits"/>
+		<result column="get_misses" property="get_misses"/>
+		<result column="bytes_read" property="bytes_read"/>
+		<result column="bytes_written" property="bytes_written"/>
+		<result column="delete_hits" property="delete_hits"/>
+		<result column="delete_misses" property="delete_misses"/>
+		<result column="evictions" property="evictions"/>
+		<result column="limit_maxbytes" property="limit_maxbytes"/>
+		<result column="bytes" property="bytes"/>
+		<result column="taskId" property="taskId"/>
+	</resultMap>
+
+	<insert id="insert" parameterType="MemcacheBaseline">
+		INSERT INTO memcache_baseline(baseline_name,serverId,uptime, curr_time, total_conn, curr_conn, curr_items, cmd_set, get_hits, get_misses,
+		 					bytes_read, bytes_written, delete_hits, delete_misses, evictions,limit_maxbytes, bytes, taskId)
+		VALUES( #{baseline_name},#{serverId},#{uptime}, #{curr_time}, #{total_conn}, #{curr_conn}, #{curr_items}, #{cmd_set}, #{get_hits}, #{get_misses},
+					#{bytes_read}, #{bytes_written}, #{delete_hits}, #{delete_misses}, #{evictions},#{limit_maxbytes},#{bytes},#{taskId})
+	</insert>
+	
+	
+	<select id="findByServer" resultMap="MemcacheBaselineResult" parameterType="String">
+   		SELECT id,baseline_name, serverId, uptime,curr_time, total_conn, curr_conn, curr_items, cmd_set, get_hits, get_misses,
+				 bytes_read, bytes_written, delete_hits, delete_misses, evictions,limit_maxbytes, bytes, taskId
+   		FROM memcache_baseline
+   		WHERE serverId = select id from servers where address = #{server}
+   		ORDER BY id DESC
+	</select>
+	
+	<select id="findAll" resultMap="MemcacheBaselineResult">
+		SELECT id,baseline_name, serverId, curr_time, total_conn, curr_conn, curr_items, cmd_set, get_hits, get_misses,
+				 bytes_read, bytes_written, delete_hits, delete_misses, evictions,limit_maxbytes, bytes, taskId
+   		FROM memcache_baseline
+   		ORDER BY id DESC
+	</select>
+
+	<select id="findLast" resultMap="MemcacheBaselineResult" >
+		SELECT id, baseline_name, serverId,uptime, curr_time, total_conn, curr_conn, curr_items, cmd_set, get_hits, get_misses,
+				 bytes_read, bytes_written, delete_hits, delete_misses, evictions,limit_maxbytes, bytes, taskId
+   		FROM memcache_baseline
+   		WHERE serverId = select id from servers where address = #{server}
+   		ORDER BY id DESC
+   		limit 1
+	</select>	
+	
+	<select id="findByServerWithInterval" resultMap="MemcacheBaselineResult" parameterType="map">
+		<![CDATA[
+		SELECT id, baseline_name, serverId,uptime, curr_time, total_conn, curr_conn, curr_items, cmd_set, get_hits, get_misses,
+				 bytes_read, bytes_written, delete_hits, delete_misses, evictions,limit_maxbytes, bytes, taskId
+   		FROM memcache_baseline
+   		WHERE curr_time >= #{start} AND curr_time <= #{end} AND serverId = (select id from servers  where address = #{address}) 
+   		ORDER BY curr_time ASC 
+		 ]]>
+	</select>
+	
+	<delete id="delete" parameterType="map">
+		DELETE FROM memcache_baseline
+   		WHERE curr_time &lt;= #{timeBefore}
+	</delete>
+
+
+	<select id="search" resultType="MemcacheBaseline">
+		${paramSQL}
+	</select>
+	
+</mapper>
