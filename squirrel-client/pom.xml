@@ -84,10 +84,6 @@
             <artifactId>jedis</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.googlecode.xmemcached</groupId>
-            <artifactId>xmemcached</artifactId>
-        </dependency>
-        <dependency>
             <groupId>com.danga</groupId>
             <artifactId>memcached</artifactId>
         </dependency>

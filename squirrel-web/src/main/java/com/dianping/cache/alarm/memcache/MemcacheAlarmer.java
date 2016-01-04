@@ -1,5 +1,18 @@
 package com.dianping.cache.alarm.memcache;
 
+import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.TimeoutException;
+
+import net.spy.memcached.MemcachedClient;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import com.dianping.cache.alarm.AlarmType;
 import com.dianping.cache.alarm.alarmconfig.AlarmConfigService;
 import com.dianping.cache.alarm.alarmtemplate.MemcacheAlarmTemplateService;
@@ -16,18 +29,6 @@ import com.dianping.cache.monitor.MemcachedClientFactory;
 import com.dianping.cache.service.CacheConfigurationService;
 import com.dianping.cache.service.MemcacheStatsService;
 import com.dianping.cache.service.ServerService;
-import net.rubyeye.xmemcached.MemcachedClient;
-import net.rubyeye.xmemcached.exception.MemcachedException;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import java.io.IOException;
-import java.net.InetSocketAddress;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.TimeoutException;
 
 /**
  * Created by lvshiyun on 15/11/21.
@@ -68,11 +69,11 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
     MemcacheAlarmTemplateService memcacheAlarmTemplateService;
 
     @Override
-    public void doAlarm() throws InterruptedException, MemcachedException, IOException, TimeoutException {
+    public void doAlarm() throws InterruptedException, IOException, TimeoutException {
         doCheck();
     }
 
-    private void doCheck() throws InterruptedException, MemcachedException, IOException, TimeoutException {
+    private void doCheck() throws InterruptedException, IOException, TimeoutException {
 
         MemcacheEvent memcacheEvent = eventFactory.createMemcacheEvent();
 
@@ -127,7 +128,7 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
         }
     }
 
-    boolean isDownAlarm(CacheConfiguration item, Map<String, Map<String, Object>> currentServerStats, MemcacheEvent memcacheEvent) throws InterruptedException, IOException, MemcachedException, TimeoutException {
+    boolean isDownAlarm(CacheConfiguration item, Map<String, Map<String, Object>> currentServerStats, MemcacheEvent memcacheEvent) throws InterruptedException, IOException, TimeoutException {
 
         boolean flag = false;
 
@@ -145,10 +146,10 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
             String ip = splitText[0];
             int port = Integer.parseInt(splitText[1]);
 
-            MemcachedClient mc = MemcachedClientFactory.getMemcachedClient(server);
+            MemcachedClient mc = MemcachedClientFactory.getInstance().getClient(server);
             Map<String, String> stats = null;
             try {
-                stats = mc.stats(new InetSocketAddress(ip, port), 1000);
+                stats = mc.getStats().get(new InetSocketAddress(ip, port));
             } catch (Exception e) {
                 flag = true;
                 AlarmDetail alarmDetail = new AlarmDetail(alarmConfig);
@@ -394,7 +395,7 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
         return flag;
     }
 
-    boolean isHistoryAlarm(CacheConfiguration item, Map<String, Map<String, Object>> currentServerStats, MemcacheEvent memcacheEvent) throws InterruptedException, IOException, MemcachedException, TimeoutException {
+    boolean isHistoryAlarm(CacheConfiguration item, Map<String, Map<String, Object>> currentServerStats, MemcacheEvent memcacheEvent) throws InterruptedException, IOException, TimeoutException {
 
         boolean flag = false;
 
