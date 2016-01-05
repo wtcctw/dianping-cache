@@ -17,6 +17,11 @@ public class MemcacheBaselineServiceImpl implements MemcacheBaselineService {
     MemcacheBaselineDao memcacheBaselineDao;
 
     @Override
+    public List<MemcacheBaseline> findAll() {
+        return memcacheBaselineDao.findAll();
+    }
+
+    @Override
     public List<MemcacheBaseline> findByServer(String server) {
         return memcacheBaselineDao.findByServer(server);
     }

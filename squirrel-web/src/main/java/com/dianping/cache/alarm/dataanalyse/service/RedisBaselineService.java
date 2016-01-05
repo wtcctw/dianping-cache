@@ -6,6 +6,9 @@ import com.dianping.cache.alarm.entity.RedisBaseline;
 import java.util.List;
 
 public interface RedisBaselineService {
+
+	List<RedisBaseline> findAll();
+
 	List<RedisBaseline> findByServer(String server);
 	
 	void insert(RedisBaseline stat);

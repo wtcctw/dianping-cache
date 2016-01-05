@@ -3,6 +3,8 @@ package com.dianping.cache.alarm.dataanalyse.mapper;
 import com.dianping.cache.alarm.entity.MemcacheBaseline;
 import com.dianping.cache.entity.MemcacheStats;
 
+import java.util.Date;
+
 /**
  * Created by lvshiyun on 16/1/4.
  */
@@ -27,7 +29,8 @@ public class MemcacheBaselineMapper {
                 .setEvictions(memcacheStats.getEvictions())
                 .setServerId(memcacheStats.getServerId())
                 .setUptime(memcacheStats.getUptime())
-                .setTotal_conn(memcacheStats.getTotal_conn());
+                .setTotal_conn(memcacheStats.getTotal_conn())
+                .setUpdateTime(new Date());
 
         return memcacheBaseline;
 

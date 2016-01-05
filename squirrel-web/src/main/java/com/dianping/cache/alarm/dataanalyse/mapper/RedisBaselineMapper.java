@@ -3,6 +3,8 @@ package com.dianping.cache.alarm.dataanalyse.mapper;
 import com.dianping.cache.alarm.entity.RedisBaseline;
 import com.dianping.cache.entity.RedisStats;
 
+import java.util.Date;
+
 /**
  * Created by lvshiyun on 16/1/4.
  */
@@ -22,7 +24,8 @@ public class RedisBaselineMapper {
                 .setUsed_cpu_sys(redisStats.getUsed_cpu_sys())
                 .setUsed_cpu_sys_children(redisStats.getUsed_cpu_sys_children())
                 .setUsed_cpu_user(redisStats.getUsed_cpu_user())
-                .setUsed_cpu_user_children(redisStats.getUsed_cpu_user_children());
+                .setUsed_cpu_user_children(redisStats.getUsed_cpu_user_children())
+                .setUpdateTime(new Date());
 
         return redisBaseline;
 

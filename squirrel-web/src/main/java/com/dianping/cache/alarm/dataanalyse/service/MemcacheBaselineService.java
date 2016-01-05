@@ -5,6 +5,8 @@ import com.dianping.cache.alarm.entity.MemcacheBaseline;
 import java.util.List;
 
 public interface MemcacheBaselineService {
+
+	List<MemcacheBaseline> findAll();
 	
 	List<MemcacheBaseline> findByServer(String server);
 	

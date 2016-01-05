@@ -16,6 +16,11 @@ public class RedisBaselineServiceImpl implements RedisBaselineService {
     RedisBaselineDao redisBaselineDao;
 
     @Override
+    public List<RedisBaseline> findAll() {
+        return redisBaselineDao.findAll();
+    }
+
+    @Override
     public List<RedisBaseline> findByServer(String server) {
         return redisBaselineDao.findByServer(server);
     }

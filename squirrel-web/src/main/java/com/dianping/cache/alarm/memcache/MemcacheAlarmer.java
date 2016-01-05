@@ -4,6 +4,7 @@ import com.dianping.cache.alarm.AlarmType;
 import com.dianping.cache.alarm.alarmconfig.AlarmConfigService;
 import com.dianping.cache.alarm.alarmtemplate.MemcacheAlarmTemplateService;
 import com.dianping.cache.alarm.dao.AlarmRecordDao;
+import com.dianping.cache.alarm.dataanalyse.baselineCache.BaselineCacheService;
 import com.dianping.cache.alarm.entity.AlarmConfig;
 import com.dianping.cache.alarm.entity.AlarmDetail;
 import com.dianping.cache.alarm.entity.AlarmRecord;
@@ -22,6 +23,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -39,6 +41,15 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
     private static final String MEMUSAGE_TOO_HIGH = "内存使用率过高";
     private static final String QPS_TOO_HIGH = "QPS过高";
     private static final String CONN_TOO_HIGH = "连接数过高";
+
+    private static final String SET_FLUC_TOO_MUCH = "set波动过大";
+    private static final String GET_FLUC_TOO_MUCH = "get波动过大";
+    private static final String WRITE_BYTES_FLUC_TOO_MUCH = "write_bytes波动过大";
+    private static final String READ_BYTES_FLUC_TOO_MUCH = "read_bytes波动过大";
+
+    private static final String EVICT_FLUC_TOO_MUCH = "evict波动过大";
+
+    private static final String HITRATE_FLUC_TOO_MUCH = "hitrate波动过大";
 
     private static final String ALARMTYPE = "Memcache";
 
@@ -65,6 +76,10 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
 
     @Autowired
     MemcacheAlarmTemplateService memcacheAlarmTemplateService;
+
+
+    @Autowired
+    BaselineCacheService baselineCacheService;
 
     @Override
     public void doAlarm() throws InterruptedException, IOException, TimeoutException {
@@ -113,7 +128,7 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
                     isReport = true;
                 }
 
-                boolean history = isHistoryAlarm(item, currentServerStats, memcacheEvent);
+//                boolean history = isHistoryAlarm(item, currentServerStats, memcacheEvent);
 
             }
         }
@@ -397,14 +412,219 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
 
         boolean flag = false;
 
+        AlarmConfig alarmConfig = alarmConfigService.findByClusterTypeAndName(ALARMTYPE, item.getCacheKey());
 
+        if (null == alarmConfig) {
+            alarmConfig = new AlarmConfig("Memcache", item.getCacheKey());
+            alarmConfigService.insert(alarmConfig);
+        }
+
+        MemcacheTemplate memcacheTemplate = memcacheAlarmTemplateService.findAlarmTemplateByTemplateName(alarmConfig.getAlarmTemplate());
+
+        if (null == memcacheTemplate) {
+            logger.info(item.getCacheKey() + "not config template");
+            memcacheTemplate = memcacheAlarmTemplateService.findAlarmTemplateByTemplateName("Default");
+        }
+
+        List<String> serverList = item.getServerList();
+
+        int set = 0;
+        int get = 0;
+        int write_bytes = 0;
+        int read_bytes = 0;
+
+        int evict = 0;
+        float hitrate = 0;
+
+        String ip = "";
+
+        for (String server : serverList) {
+
+            ip = server;
+
+            if (0 != currentServerStats.size()) {
+                if (null != currentServerStats.get(server)) {
+                    Integer settmp = (Integer)currentServerStats.get(server).get("set");
+                    Integer gettmp = (Integer)currentServerStats.get(server).get("get");
+                    Integer write_bytestmp = (Integer)currentServerStats.get(server).get("write_bytes");
+                    Integer read_bytestmp = (Integer)currentServerStats.get(server).get("read_bytes");
+
+                    Integer evicttmp = (Integer) currentServerStats.get(server).get("evict");
+                    Float hitratetmp = (Float) currentServerStats.get(server).get("hitrate");
+
+                    if ((null != evicttmp) && (null != hitratetmp)) {
+                        set = settmp;
+                        get = gettmp;
+                        write_bytes = write_bytestmp;
+                        read_bytes = read_bytestmp;
+
+                        evict = evicttmp;
+                        hitrate = hitratetmp;
+                    } else {
+                        continue;
+                    }
+                } else {
+                    continue;
+                }
+            }
+
+            SimpleDateFormat sdf = new SimpleDateFormat("EEEE:HH:mm");
+            Date nameDate = new Date();
+            String name = "Memcache_" + sdf.format(nameDate);
+
+
+            if (fluctTooMuch((double) set, (double) baselineCacheService.getMemcacheBaselineByName(name).getCmd_set())) {
+                flag = true;
+                AlarmDetail alarmDetail = new AlarmDetail(alarmConfig);
+
+                alarmDetail.setAlarmTitle(SET_FLUC_TOO_MUCH)
+                        .setAlarmDetail(item.getCacheKey() + ":" + SET_FLUC_TOO_MUCH + ";IP为" + ip)
+                        .setMailMode(memcacheTemplate.isMailMode())
+                        .setSmsMode(memcacheTemplate.isSmsMode())
+                        .setWeixinMode(memcacheTemplate.isWeixinMode())
+                        .setCreateTime(new Date());
+
+                AlarmRecord alarmRecord = new AlarmRecord();
+                alarmRecord.setAlarmTitle(SET_FLUC_TOO_MUCH)
+                        .setClusterName(item.getCacheKey())
+                        .setIp(ip)
+                        .setCreateTime(new Date());
+
+                alarmRecordDao.insert(alarmRecord);
+
+                memcacheEvent.put(alarmDetail);
+            }
+
+            if (fluctTooMuch((double) get, (double) baselineCacheService.getMemcacheBaselineByName(name).getGet_hits())) {
+                flag = true;
+                AlarmDetail alarmDetail = new AlarmDetail(alarmConfig);
+
+                alarmDetail.setAlarmTitle(GET_FLUC_TOO_MUCH)
+                        .setAlarmDetail(item.getCacheKey() + ":" + GET_FLUC_TOO_MUCH + ";IP为" + ip)
+                        .setMailMode(memcacheTemplate.isMailMode())
+                        .setSmsMode(memcacheTemplate.isSmsMode())
+                        .setWeixinMode(memcacheTemplate.isWeixinMode())
+                        .setCreateTime(new Date());
+
+                AlarmRecord alarmRecord = new AlarmRecord();
+                alarmRecord.setAlarmTitle(GET_FLUC_TOO_MUCH)
+                        .setClusterName(item.getCacheKey())
+                        .setIp(ip)
+                        .setCreateTime(new Date());
+
+                alarmRecordDao.insert(alarmRecord);
+
+                memcacheEvent.put(alarmDetail);
+            }
+
+            if (fluctTooMuch((double) write_bytes, (double) baselineCacheService.getMemcacheBaselineByName(name).getBytes_written())) {
+                flag = true;
+                AlarmDetail alarmDetail = new AlarmDetail(alarmConfig);
+
+                alarmDetail.setAlarmTitle(WRITE_BYTES_FLUC_TOO_MUCH)
+                        .setAlarmDetail(item.getCacheKey() + ":" + WRITE_BYTES_FLUC_TOO_MUCH + ";IP为" + ip)
+                        .setMailMode(memcacheTemplate.isMailMode())
+                        .setSmsMode(memcacheTemplate.isSmsMode())
+                        .setWeixinMode(memcacheTemplate.isWeixinMode())
+                        .setCreateTime(new Date());
+
+                AlarmRecord alarmRecord = new AlarmRecord();
+                alarmRecord.setAlarmTitle(WRITE_BYTES_FLUC_TOO_MUCH)
+                        .setClusterName(item.getCacheKey())
+                        .setIp(ip)
+                        .setCreateTime(new Date());
+
+                alarmRecordDao.insert(alarmRecord);
+
+                memcacheEvent.put(alarmDetail);
+            }
+
+            if (fluctTooMuch((double) read_bytes, (double) baselineCacheService.getMemcacheBaselineByName(name).getBytes_read())) {
+                flag = true;
+                AlarmDetail alarmDetail = new AlarmDetail(alarmConfig);
+
+                alarmDetail.setAlarmTitle(READ_BYTES_FLUC_TOO_MUCH)
+                        .setAlarmDetail(item.getCacheKey() + ":" + READ_BYTES_FLUC_TOO_MUCH + ";IP为" + ip)
+                        .setMailMode(memcacheTemplate.isMailMode())
+                        .setSmsMode(memcacheTemplate.isSmsMode())
+                        .setWeixinMode(memcacheTemplate.isWeixinMode())
+                        .setCreateTime(new Date());
+
+                AlarmRecord alarmRecord = new AlarmRecord();
+                alarmRecord.setAlarmTitle(READ_BYTES_FLUC_TOO_MUCH)
+                        .setClusterName(item.getCacheKey())
+                        .setIp(ip)
+                        .setCreateTime(new Date());
+
+                alarmRecordDao.insert(alarmRecord);
+
+                memcacheEvent.put(alarmDetail);
+            }
+
+
+            if (fluctTooMuch((double) evict, (double) baselineCacheService.getMemcacheBaselineByName(name).getEvictions())) {
+                flag = true;
+                AlarmDetail alarmDetail = new AlarmDetail(alarmConfig);
+
+                alarmDetail.setAlarmTitle(EVICT_FLUC_TOO_MUCH)
+                        .setAlarmDetail(item.getCacheKey() + ":" + EVICT_FLUC_TOO_MUCH + ";IP为" + ip)
+                        .setMailMode(memcacheTemplate.isMailMode())
+                        .setSmsMode(memcacheTemplate.isSmsMode())
+                        .setWeixinMode(memcacheTemplate.isWeixinMode())
+                        .setCreateTime(new Date());
+
+                AlarmRecord alarmRecord = new AlarmRecord();
+                alarmRecord.setAlarmTitle(EVICT_FLUC_TOO_MUCH)
+                        .setClusterName(item.getCacheKey())
+                        .setIp(ip)
+                        .setCreateTime(new Date());
+
+                alarmRecordDao.insert(alarmRecord);
+
+                memcacheEvent.put(alarmDetail);
+            }
+
+            double hitrate_base = (double) baselineCacheService.getMemcacheBaselineByName(name).getGet_hits() / (baselineCacheService.getMemcacheBaselineByName(name).getGet_hits() + baselineCacheService.getMemcacheBaselineByName(name).getDelete_hits());
+            if (fluctTooMuch((double) hitrate, hitrate_base)) {
+                flag = true;
+                AlarmDetail alarmDetail = new AlarmDetail(alarmConfig);
+
+                alarmDetail.setAlarmTitle(HITRATE_FLUC_TOO_MUCH)
+                        .setAlarmDetail(item.getCacheKey() + ":" + HITRATE_FLUC_TOO_MUCH + ";IP为" + ip)
+                        .setMailMode(memcacheTemplate.isMailMode())
+                        .setSmsMode(memcacheTemplate.isSmsMode())
+                        .setWeixinMode(memcacheTemplate.isWeixinMode())
+                        .setCreateTime(new Date());
+
+                AlarmRecord alarmRecord = new AlarmRecord();
+                alarmRecord.setAlarmTitle(HITRATE_FLUC_TOO_MUCH)
+                        .setClusterName(item.getCacheKey())
+                        .setIp(ip)
+                        .setCreateTime(new Date());
+
+                alarmRecordDao.insert(alarmRecord);
+
+                memcacheEvent.put(alarmDetail);
+            }
+
+        }
 
 
         return flag;
     }
 
+    private boolean fluctTooMuch(double v1, double v2) {
+        boolean result = false;
 
-        public CacheConfigurationService getCacheConfigurationService() {
+        if (Math.abs((v1 - v2)) / v2 > 0.5) {
+            result = true;
+        }
+
+        return result;
+    }
+
+
+    public CacheConfigurationService getCacheConfigurationService() {
         return cacheConfigurationService;
     }
 

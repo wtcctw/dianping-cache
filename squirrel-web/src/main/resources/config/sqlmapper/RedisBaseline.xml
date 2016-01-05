@@ -21,13 +21,14 @@
 		<result column="used_cpu_sys_children" property="used_cpu_sys_children"/>
 		<result column="used_cpu_user_children" property="used_cpu_user_children"/>
 		<result column="taskId" property="taskId"/>
+		<result column="updateTime" property="updateTime"/>
 	</resultMap>
 
 	<insert id="insert" parameterType="RedisBaseline">
 		INSERT INTO redis_baseline(serverId,baseline_name,curr_time, memory_used,total_connections,connected_clients,
-				qps,input_kbps,output_kbps,used_cpu_sys,used_cpu_user,used_cpu_sys_children,used_cpu_user_children, taskId)
+				qps,input_kbps,output_kbps,used_cpu_sys,used_cpu_user,used_cpu_sys_children,used_cpu_user_children, taskId, updateTime)
 		VALUES(#{serverId},#{baseline_name},#{curr_time}, #{memory_used},#{total_connections},#{connected_clients},
-			  #{qps},#{input_kbps},#{output_kbps},#{used_cpu_sys},#{used_cpu_user},#{used_cpu_sys_children},#{used_cpu_user_children},#{taskId})
+			  #{qps},#{input_kbps},#{output_kbps},#{used_cpu_sys},#{used_cpu_user},#{used_cpu_sys_children},#{used_cpu_user_children},#{taskId},#{updateTime})
 	</insert>
 	
 	

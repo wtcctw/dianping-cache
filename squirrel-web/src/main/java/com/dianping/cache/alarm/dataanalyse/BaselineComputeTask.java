@@ -1,5 +1,6 @@
 package com.dianping.cache.alarm.dataanalyse;
 
+import com.dianping.cache.alarm.dataanalyse.baselineCache.BaselineCacheService;
 import com.dianping.cache.alarm.dataanalyse.mapper.MemcacheBaselineMapper;
 import com.dianping.cache.alarm.dataanalyse.mapper.RedisBaselineMapper;
 import com.dianping.cache.alarm.dataanalyse.service.BaselineComputeTaskService;
@@ -42,6 +43,9 @@ public class BaselineComputeTask {
     @Autowired
     BaselineComputeTaskService baselineComputeTaskService;
 
+    @Autowired
+    BaselineCacheService baselineCacheService;
+
 
     public void run() {
 
@@ -80,14 +84,19 @@ public class BaselineComputeTask {
 
     private void memcacheBaslineStoreToDb(int taskId, Map<String, MemcacheStats> memcacheStatses) {
 
+        Map<String, MemcacheBaseline>memcacheBaselineMap = new HashMap<String, MemcacheBaseline>();
+
         for (Map.Entry<String, MemcacheStats> entry : memcacheStatses.entrySet()) {
             MemcacheBaseline memcacheBaseline = MemcacheBaselineMapper.convertToMemcacheBaseline(entry.getValue());
             memcacheBaseline.setBaseline_name(entry.getKey());
             memcacheBaseline.setTaskId(taskId);
 
             memcacheBaselineService.insert(memcacheBaseline);
-
+            memcacheBaselineMap.put(memcacheBaseline.getBaseline_name(),memcacheBaseline);
         }
+
+        baselineCacheService.putMemcacheBaselineMapToCache(memcacheBaselineMap);
+
     }
 
     private void redisBaselineCompute(int taskId) throws ParseException {
@@ -102,14 +111,17 @@ public class BaselineComputeTask {
     }
 
     private void redisBaslineStoreToDb(int taskId,Map<String, RedisStats> redisStatsMap) {
+        Map<String, RedisBaseline>redisBaselineMap = new HashMap<String, RedisBaseline>();
 
         for (Map.Entry<String, RedisStats> entry : redisStatsMap.entrySet()) {
             RedisBaseline redisBaseline = RedisBaselineMapper.convertToRedisBaseline(entry.getValue());
             redisBaseline.setBaseline_name(entry.getKey());
             redisBaseline.setTaskId(taskId);
             redisBaselineService.insert(redisBaseline);
-
+            redisBaselineMap.put(redisBaseline.getBaseline_name(),redisBaseline);
         }
+
+        baselineCacheService.putRedisBaselineMapToCache(redisBaselineMap);
     }
 
 
@@ -235,11 +247,11 @@ public class BaselineComputeTask {
 
         Map<String, RedisStats> redisStatsMap = new HashMap<String, RedisStats>();
 
-        for (int i = 0; i < startTimeList.size(); i++) {
+        for (int i = 3; i < startTimeList.size(); i++) {
             String startTime = startTimeList.get(i);
             startTime = startTime.split(" ")[0];
             String endTime;
-            if (i < startTimeList.size()) {
+            if (i < startTimeList.size()-1) {
                 endTime = startTimeList.get(i + 1);
             } else {
                 endTime = endDate;

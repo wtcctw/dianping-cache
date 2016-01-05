@@ -1,6 +1,7 @@
 package com.dianping.cache.alarm.entity;
 
 import java.io.Serializable;
+import java.util.Date;
 
 public class MemcacheBaseline implements Serializable{
 	
@@ -46,6 +47,8 @@ public class MemcacheBaseline implements Serializable{
 	private long bytes;
 
 	private int taskId;
+
+	private Date updateTime;
 
 	public int getId() {
 		return id;
@@ -214,6 +217,15 @@ public class MemcacheBaseline implements Serializable{
 
 	public MemcacheBaseline setTaskId(int taskId) {
 		this.taskId = taskId;
+		return this;
+	}
+
+	public Date getUpdateTime() {
+		return updateTime;
+	}
+
+	public MemcacheBaseline setUpdateTime(Date updateTime) {
+		this.updateTime = updateTime;
 		return this;
 	}
 }

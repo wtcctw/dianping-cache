@@ -1,6 +1,7 @@
 package com.dianping.cache.alarm.entity;
 
 import java.io.Serializable;
+import java.util.Date;
 
 public class RedisBaseline implements Serializable {
 
@@ -38,6 +39,8 @@ public class RedisBaseline implements Serializable {
     private double used_cpu_user_children;
 
     private int taskId;
+
+    private Date updateTime;
 
     public static long getSerialVersionUID() {
         return serialVersionUID;
@@ -174,6 +177,15 @@ public class RedisBaseline implements Serializable {
 
     public RedisBaseline setTaskId(int taskId) {
         this.taskId = taskId;
+        return this;
+    }
+
+    public Date getUpdateTime() {
+        return updateTime;
+    }
+
+    public RedisBaseline setUpdateTime(Date updateTime) {
+        this.updateTime = updateTime;
         return this;
     }
 }
