@@ -127,6 +127,11 @@ public class MemcacheData {
             temp.put("used_memory", item.getValue().getBytes()[length - 1]);
             temp.put("curr_conn", item.getValue().getConnDatas()[length - 1]);
             temp.put("evict", item.getValue().getEvictionsDatas()[length - 1]);
+            temp.put("set",item.getValue().getSetsDatas()[length-1]);
+            temp.put("get", item.getValue().getGetsDatas()[length-1]);
+            temp.put("write_bytes", item.getValue().getWritesDatas()[length-1]);
+            temp.put("read_bytes", item.getValue().getReadsDatas()[length-1]);
+
             long miss = item.getValue().getGetMissDatas()[length - 1];
             long get = item.getValue().getGetsDatas()[length - 1];
             float hitrate;

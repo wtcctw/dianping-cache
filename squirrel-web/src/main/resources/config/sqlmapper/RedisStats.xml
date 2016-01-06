@@ -63,5 +63,9 @@
 		DELETE FROM redis_stats 
    		WHERE curr_time &lt;= #{timeBefore}
 	</delete>
+
+	<select id="search" resultType="RedisStats">
+		${paramSQL}
+	</select>
 	
 </mapper>

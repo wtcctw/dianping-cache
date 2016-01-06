@@ -3,14 +3,14 @@ package com.dianping.cache.alarm.alarmconfig;
 import com.dianping.cache.alarm.dao.AlarmConfigDao;
 import com.dianping.cache.alarm.entity.AlarmConfig;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 
 /**
  * Created by lvshiyun on 15/12/18.
  */
-@Service
+@Component
 public class AlarmConfigServiceImpl implements AlarmConfigService {
 
     @Autowired

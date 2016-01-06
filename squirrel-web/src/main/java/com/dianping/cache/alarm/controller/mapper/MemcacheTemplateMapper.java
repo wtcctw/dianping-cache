@@ -23,6 +23,7 @@ public class MemcacheTemplateMapper {
                 .setSmsMode(memcacheTemplateDto.isSmsMode())
                 .setWeixinMode(memcacheTemplateDto.isWeixinMode());
         memcacheTemplate.setIsDown(memcacheTemplateDto.isDown())
+                .setCheckHistory(memcacheTemplateDto.isCheckHistory())
                 .setMemThreshold(memcacheTemplateDto.getMemThreshold())
                 .setQpsThreshold(memcacheTemplateDto.getQpsThreshold())
                 .setConnThreshold(memcacheTemplateDto.getConnThreshold())

@@ -23,6 +23,7 @@
                         <tr>
                             <th>模板名称</th>
                             <th>宕机</th>
+                            <th>历史数据</th>
                             <th>内存上阈值</th>
                             <th>QPS上阈值</th>
                             <th>连接数上阈值</th>
@@ -39,6 +40,7 @@
                             <!--<td style="text-align: center"><input type="checkbox" name="check-list" value="{{e.id}}"></td>-->
                             <td style="text-align: center width:100px">{{e.templateName}}</td>
                             <td style="text-align: center width:100px">{{e.down}}</td>
+                            <td style="text-align: center width:100px">{{e.checkHistory}}</td>
                             <td style="text-align: center width:100px">{{e.memThreshold}}</td>
                             <td style="text-align: center width:100px">{{e.qpsThreshold}}</td>
                             <td style="text-align: center width:100px">{{e.connThreshold}}</td>
@@ -101,6 +103,8 @@
                                     <div class="col-xs-9" style="font-size: 15px">
                                         宕机：
                                         <input type="checkbox"  ng-model="alarmConfigEntity.isDown" name="isDown">
+                                        &nbsp&nbsp历史：
+                                        <input type="checkbox"  ng-model="alarmConfigEntity.checkHistory" name="checkHistory">
                                         &nbsp&nbsp邮件：
                                         <input type="checkbox"  ng-model="alarmConfigEntity.mailMode" name="mailMode">
                                         &nbsp&nbsp短信：

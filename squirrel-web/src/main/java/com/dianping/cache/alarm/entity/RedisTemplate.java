@@ -9,6 +9,8 @@ public class RedisTemplate extends AlarmConfigTemplate {
 
     private boolean isDown;
 
+    private boolean checkHistory;
+
     private int memThreshold;
 
     private int qpsThreshold;
@@ -19,6 +21,15 @@ public class RedisTemplate extends AlarmConfigTemplate {
 
     public RedisTemplate setIsDown(boolean isDown) {
         this.isDown = isDown;
+        return this;
+    }
+
+    public boolean isCheckHistory() {
+        return checkHistory;
+    }
+
+    public RedisTemplate setCheckHistory(boolean checkHistory) {
+        this.checkHistory = checkHistory;
         return this;
     }
 

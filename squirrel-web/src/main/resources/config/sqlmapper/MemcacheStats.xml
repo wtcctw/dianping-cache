@@ -71,5 +71,10 @@
 		DELETE FROM memcache_stats 
    		WHERE curr_time &lt;= #{timeBefore}
 	</delete>
+
+
+	<select id="search" resultType="MemcacheStats">
+		${paramSQL}
+	</select>
 	
 </mapper>

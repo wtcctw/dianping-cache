@@ -5,6 +5,8 @@ import com.dianping.cache.alarm.alarmtemplate.MemcacheAlarmTemplateService;
 import com.dianping.cache.alarm.alarmtemplate.RedisAlarmTemplateService;
 import com.dianping.cache.alarm.controller.dto.AlarmConfigDto;
 import com.dianping.cache.alarm.controller.mapper.AlarmConfigMapper;
+import com.dianping.cache.alarm.dataanalyse.BaselineComputeTask;
+import com.dianping.cache.alarm.dataanalyse.BaselineComputeTaskFactory;
 import com.dianping.cache.alarm.entity.AlarmConfig;
 import com.dianping.cache.alarm.entity.MemcacheTemplate;
 import com.dianping.cache.alarm.entity.RedisTemplate;
@@ -39,6 +41,9 @@ public class AlarmConfigController extends AbstractSidebarController {
 
     @Autowired
     private RedisAlarmTemplateService redisAlarmTemplateService;
+
+    @Autowired
+    private BaselineComputeTaskFactory baselineComputeTaskFactory;
 
     @RequestMapping(value = "/setting/alarmrule")
     public ModelAndView topicSetting(HttpServletRequest request, HttpServletResponse response) {
@@ -141,6 +146,16 @@ public class AlarmConfigController extends AbstractSidebarController {
 
         return templateNames;
     }
+
+    @RequestMapping(value = "/setting/alarmrule/baselineCompute")
+    public void baselineCompute() {
+
+        BaselineComputeTask task = baselineComputeTaskFactory.createBaselineComputeTask();
+
+        task.run();
+
+    }
+
 
     @Override
     protected String getSide() {

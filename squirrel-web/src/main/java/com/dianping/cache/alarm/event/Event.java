@@ -28,10 +28,10 @@ public abstract class Event {
     protected static Logger logger = LoggerFactory.getLogger(Event.class);
 
     private static final ArrayList<String> IPLIST = new ArrayList<String>(){{
-        add("10.3.8.62");//线上
-        add("10.2.8.147");//ppe
-        add("192.168.211.117");//beta
-        //add("10.128.120.31");//my host
+        add("10.1.14.104");//线上
+        add("10.2.7.129");//ppe
+        add("192.168.227.113");//beta
+        add("10.128.121.42");//my host
     }};
 
 

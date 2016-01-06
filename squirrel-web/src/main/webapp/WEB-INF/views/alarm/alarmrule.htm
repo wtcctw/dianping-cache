@@ -11,15 +11,18 @@
             </script>
             <ul class="breadcrumb">
                 <li class="active">告警管理</li>
-                <li class="#if($subside == 'rdashboard') active #end"><a
-                        href="${rc.contextPath}/setting/memcachetemplate"> <i
-                        class="icon-globe"></i>添加Memcache告警模板
+                <li><a href="${rc.contextPath}/setting/memcachetemplate"> <i
+                        class="icon-globe"></i>Memcache告警模板管理
                 </a></li>
-                <li class="#if($subside == 'rdashboard') active #end"><a
-                        href="${rc.contextPath}/setting/redistemplate"> <i
-                        class="icon-globe"></i>添加Redis告警模板
+                <li><a href="${rc.contextPath}/setting/redistemplate"> <i
+                        class="icon-globe"></i>Redis告警模板管理
                 </a></li>
+                <li>
+                    <button ng-click="baselineCompute()">BaselineCompute</button>
+                </li>
             </ul>
+            </ul>
+
         </div>
 
 
@@ -50,8 +53,10 @@
                             <td style="text-align: center">{{e.receiver}}</td>
                             <td style="text-align: center">
                                 <span class="sticker">
-                                    <span class="label arrowed-in" ng-class="{'label-success':e.toBusiness==true,'label-danger':e.toBusiness==false}">
-                                        <i class="bigger-110" ng-class="{'ace-icon fa fa-check':e.toBusiness==true,'ace-icon fa fa-times':e.toBusiness==false}">业务线</i>
+                                    <span class="label arrowed-in"
+                                          ng-class="{'label-success':e.toBusiness==true,'label-danger':e.toBusiness==false}">
+                                        <i class="bigger-110"
+                                           ng-class="{'ace-icon fa fa-check':e.toBusiness==true,'ace-icon fa fa-times':e.toBusiness==false}">业务线</i>
                                     </span>
 
                                 </span>
@@ -88,9 +93,10 @@
                         <form method="post"
                               class="form-horizontal bs-example bs-example-form" role="form"
                               name="myForm" ng-submit="refreshpage(myForm)">
-                            <div class="input-group"  ng-switch="alarmConfigEntity.clusterType">
+                            <div class="input-group" ng-switch="alarmConfigEntity.clusterType">
                                 <div class="col-xs-12 form-group">
                                     <label class="col-xs-3 control-label control-label no-padding-right">告警集群类型：</label>
+
                                     <div class="col-xs-9">
                                         <select class="col-xs-12" ng-model="alarmConfigEntity.clusterType"
                                                 name="type" ng-options="o as o for o in clusterTypes" required>
@@ -100,6 +106,7 @@
 
                                 <div class="col-xs-12 form-group" ng-switch-when="Memcache">
                                     <label class="col-xs-3 control-label control-label no-padding-right">Memcache集群：</label>
+
                                     <div class="col-xs-9">
                                         <select class="col-xs-12" ng-model="alarmConfigEntity.clusterName"
                                                 name="type" ng-options="o as o for o in memcacheClusters" required>
@@ -108,6 +115,7 @@
                                 </div>
                                 <div class="col-xs-12 form-group" ng-switch-when="Redis">
                                     <label class="col-xs-3 control-label control-label no-padding-right">Redis集群：</label>
+
                                     <div class="col-xs-9">
                                         <select class="col-xs-12" ng-model="alarmConfigEntity.clusterName"
                                                 name="type" ng-options="o as o for o in redisClusters" required>
@@ -117,14 +125,17 @@
 
                                 <div class="col-xs-12 form-group" ng-switch-when="Memcache">
                                     <label class="col-xs-3 control-label control-label no-padding-right">告警模板：</label>
+
                                     <div class="col-xs-9">
                                         <select class="col-xs-12" ng-model="alarmConfigEntity.alarmTemplate"
-                                                name="type" ng-options="o as o for o in memcacheAlarmTemplates" required>
+                                                name="type" ng-options="o as o for o in memcacheAlarmTemplates"
+                                                required>
                                         </select>
                                     </div>
                                 </div>
                                 <div class="col-xs-12 form-group" ng-switch-when="Redis">
                                     <label class="col-xs-3 control-label control-label no-padding-right">告警模板：</label>
+
                                     <div class="col-xs-9">
                                         <select class="col-xs-12" ng-model="alarmConfigEntity.alarmTemplate"
                                                 name="type" ng-options="o as o for o in redisAlarmTemplates" required>
@@ -135,11 +146,13 @@
 
                                 <div class="col-xs-12 form-group">
                                     <label class="col-xs-3 control-label control-label no-padding-right">收件人：</label>
+
                                     <div class="col-xs-9">
 									<textarea class="form-control" rows="2" type="text"
                                               ng-model="alarmConfigEntity.receiver" name="receiver" required>
                                     </textarea>
-                                        是否发送业务线:<input type="checkbox"  ng-model="alarmConfigEntity.toBusiness" name="toBusiness">
+                                        是否发送业务线:<input type="checkbox" ng-model="alarmConfigEntity.toBusiness"
+                                                       name="toBusiness">
                                     </div>
                                 </div>
                                 <div class="control-group" style="margin-top: 20px;text-align: center;">

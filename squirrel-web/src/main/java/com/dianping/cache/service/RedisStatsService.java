@@ -1,8 +1,8 @@
 package com.dianping.cache.service;
 
-import java.util.List;
-
 import com.dianping.cache.entity.RedisStats;
+
+import java.util.List;
 
 public interface RedisStatsService {
 	List<RedisStats> findByServer(String server);
@@ -12,5 +12,7 @@ public interface RedisStatsService {
 	List<RedisStats> findByServerWithInterval(String address, long start, long end);
 	
 	void delete(long timeBefore);
+
+	List<RedisStats>search(String sql);
 	
 }

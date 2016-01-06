@@ -1,8 +1,8 @@
 package com.dianping.cache.service;
 
-import java.util.List;
-
 import com.dianping.cache.entity.MemcacheStats;
+
+import java.util.List;
 
 public interface MemcacheStatsService {
 	
@@ -13,4 +13,6 @@ public interface MemcacheStatsService {
 	List<MemcacheStats> findByServerWithInterval(String address, long start, long end);
 	
 	void delete(long timeBefore);
+
+	List<MemcacheStats>search(String sql);
 }

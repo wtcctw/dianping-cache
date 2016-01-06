@@ -1,6 +1,7 @@
 package com.dianping.cache.monitor;
 
-import net.rubyeye.xmemcached.MemcachedClient;
+import net.spy.memcached.MemcachedClient;
+import net.spy.memcached.internal.OperationFuture;
 
 import org.apache.commons.lang.RandomStringUtils;
 import org.apache.curator.framework.CuratorFramework;
@@ -22,7 +23,7 @@ public class TaskRunner implements Runnable, ServerListener {
     private final int LOG_THRESHOLD = 100;
     
     private final String LOCAL_IP = IPUtils.getFirstNoLoopbackIP4Address();
-
+    
     private String server;
     
     private ServerState serverState;
@@ -68,10 +69,12 @@ public class TaskRunner implements Runnable, ServerListener {
 
     boolean checkNode() throws Exception {
         String value = RandomStringUtils.randomAlphanumeric(8);
-        MemcachedClient mc = MemcachedClientFactory.getMemcachedClient(server);
+        MemcachedClient mc = MemcachedClientFactory.getInstance().getClient(server);
         // go through the set & get circle
-        mc.set(NODE_MONITOR_KEY, NODE_DEFAULT_EXPIRATION, value);
-        String value2 = mc.get(NODE_MONITOR_KEY);
+        OperationFuture<Boolean> future = mc.set(NODE_MONITOR_KEY, NODE_DEFAULT_EXPIRATION, value);
+        if(!future.get())
+            return false;
+        String value2 = (String) mc.get(NODE_MONITOR_KEY);
         return value.equals(value2);
     }
 

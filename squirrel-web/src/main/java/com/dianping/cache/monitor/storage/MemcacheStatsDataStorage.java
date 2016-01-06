@@ -7,15 +7,16 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+import net.spy.memcached.MemcachedClient;
+
 import com.dianping.cache.alarm.memcache.MemcacheAlarmer;
-import com.dianping.cache.support.spring.SpringLocator;
-import net.rubyeye.xmemcached.MemcachedClient;
 
 import com.dianping.cache.entity.MemcacheStats;
 import com.dianping.cache.entity.Server;
 import com.dianping.cache.monitor.MemcachedClientFactory;
 import com.dianping.cache.service.MemcacheStatsService;
 import com.dianping.cache.service.ServerService;
+import com.dianping.combiz.spring.context.SpringLocator;
 
 public class MemcacheStatsDataStorage extends AbstractStatsDataStorage{
 	
@@ -135,10 +136,10 @@ public class MemcacheStatsDataStorage extends AbstractStatsDataStorage{
 		public void run() {
 			try {
 				 //getclient
-				 MemcachedClient mc = MemcachedClientFactory.getMemcachedClient(server.getAddress());
+				 MemcachedClient mc = MemcachedClientFactory.getInstance().getClient(server.getAddress());
 				 //getStats
 				 ServerInfo serverInfo = parseServer(server.getAddress());
-				 Map<String, String> stats = mc.stats(new InetSocketAddress(serverInfo.ip, serverInfo.port),1000);
+				 Map<String, String> stats = mc.getStats().get(new InetSocketAddress(serverInfo.ip, serverInfo.port));
 				 
 				 //process data
 				 MemcacheStats msData = processStats(stats);

@@ -90,10 +90,10 @@ module
         '$interval',
         function ($rootScope, $scope, $http, Paginator, ngDialog, $interval) {
 
-            $scope.clusterTypes=["Memcache","Redis"];
+            $scope.clusterTypes = ["Memcache", "Redis"];
             $scope.memcacheAlarmTemplates;
             $scope.redisAlarmTemplates;
-            $scope.thresholdTypes = ["上阈值","下阈值"];
+            $scope.thresholdTypes = ["上阈值", "下阈值"];
             $scope.memcacheClusters;
             $scope.redisCluters;
 
@@ -197,6 +197,19 @@ module
                         plain: true,
                         className: 'ngdialog-theme-default'
                     });
+            }
+
+
+            $scope.baselineCompute = function () {
+                $http
+                    .post(
+                    window.contextPath + "/setting/alarmrule/baselineCompute"
+                )
+                    .success(
+                    function (data) {
+                        alert("计算完毕。")
+                    }
+                );
             };
 
             $scope.query();
@@ -204,60 +217,60 @@ module
 
             $http(
                 {
-                    method:"GET",
-                    url:window.contextPath + '/setting/alarmrule/query/memcacheclusters'
+                    method: "GET",
+                    url: window.contextPath + '/setting/alarmrule/query/memcacheclusters'
                 }
             ).success(
-                function(datas,status,headers,config){
+                function (datas, status, headers, config) {
                     $scope.memcacheClusters = datas;
                 }
             ).error(
-                function(datas,status,headers,config){
+                function (datas, status, headers, config) {
                     console.log("memcacheclusters读取错误")
                 }
             );
 
             $http(
                 {
-                    method:"GET",
-                    url:window.contextPath + '/setting/alarmrule/query/redisclusters'
+                    method: "GET",
+                    url: window.contextPath + '/setting/alarmrule/query/redisclusters'
                 }
             ).success(
-                function(datas,status,headers,config){
+                function (datas, status, headers, config) {
                     $scope.redisClusters = datas;
                 }
             ).error(
-                function(datas,status,headers,config){
+                function (datas, status, headers, config) {
                     console.log("redisclusters读取错误")
                 }
             );
 
             $http(
                 {
-                    method:"GET",
-                    url:window.contextPath + '/setting/alarmrule/query/memcachetemplates'
+                    method: "GET",
+                    url: window.contextPath + '/setting/alarmrule/query/memcachetemplates'
                 }
             ).success(
-                function(datas,status,headers,config){
+                function (datas, status, headers, config) {
                     $scope.memcacheAlarmTemplates = datas;
                 }
             ).error(
-                function(datas,status,headers,config){
+                function (datas, status, headers, config) {
                     console.log("memcacheAlarmTemplates")
                 }
             );
 
             $http(
                 {
-                    method:"GET",
-                    url:window.contextPath + '/setting/alarmrule/query/redistemplates'
+                    method: "GET",
+                    url: window.contextPath + '/setting/alarmrule/query/redistemplates'
                 }
             ).success(
-                function(datas,status,headers,config){
+                function (datas, status, headers, config) {
                     $scope.redisAlarmTemplates = datas;
                 }
             ).error(
-                function(datas,status,headers,config){
+                function (datas, status, headers, config) {
                     console.log("redisAlarmTemplates读取错误")
                 }
             );

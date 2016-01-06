@@ -1,10 +1,9 @@
 package com.dianping.cache.dao;
 
-import java.util.List;
-
+import com.dianping.cache.entity.RedisStats;
 import org.apache.ibatis.annotations.Param;
 
-import com.dianping.cache.entity.RedisStats;
+import java.util.List;
 
 public interface RedisStatsDao {
 	
@@ -19,4 +18,10 @@ public interface RedisStatsDao {
 	RedisStats findLast(String server);
 
 	void delete(long timeBefore);
+
+	/**
+	 * @param sql
+	 * @return
+	 */
+	List<RedisStats> search(@Param("paramSQL") String sql);
 }

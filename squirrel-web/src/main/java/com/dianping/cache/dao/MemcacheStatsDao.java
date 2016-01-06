@@ -1,10 +1,9 @@
 package com.dianping.cache.dao;
 
-import java.util.List;
-
+import com.dianping.cache.entity.MemcacheStats;
 import org.apache.ibatis.annotations.Param;
 
-import com.dianping.cache.entity.MemcacheStats;
+import java.util.List;
 
 public interface MemcacheStatsDao {
 
@@ -19,4 +18,10 @@ public interface MemcacheStatsDao {
 	MemcacheStats findLast(String server);
 
 	void delete(long timeBefore);
+
+	/**
+	 * @param sql
+	 * @return
+	 */
+	List<MemcacheStats> search(@Param("paramSQL") String sql);
 }
