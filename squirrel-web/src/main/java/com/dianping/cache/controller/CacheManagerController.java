@@ -16,6 +16,9 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.dianping.cache.controller.dto.CategoryParams;
 import com.dianping.cache.controller.dto.ConfigurationParams;
+import com.dianping.cache.deamontask.CacheDeamonTaskManager;
+import com.dianping.cache.deamontask.dao.DeamonTaskDao;
+import com.dianping.cache.deamontask.tasks.ClearCategoryTask;
 import jodd.util.StringUtil;
 import net.spy.memcached.AddrUtil;
 import net.spy.memcached.MemcachedClient;
@@ -65,6 +68,9 @@ public class CacheManagerController extends AbstractCacheController {
 
     @Resource(name = "categoryToAppService")
     private CategoryToAppService categoryToAppService;
+
+    @Resource(name = "deamonTaskDao")
+    private DeamonTaskDao deamonTaskDao;
 
     @RequestMapping(value = "/cache/config")
     public ModelAndView viewCacheConfig() {
@@ -191,7 +197,7 @@ public class CacheManagerController extends AbstractCacheController {
         Map<String, Object> paras = super.createViewMap();
         boolean flag = false;
         // 获取数据库中最新的 servers 信息 对比看是否有变化
-        CacheConfiguration oldConfig = cacheConfigurationService.findWithSwimLane(cacheKey,swimlane);
+        CacheConfiguration oldConfig = cacheConfigurationService.findWithSwimLane(cacheKey, swimlane);
         if ((oldservers != null && oldservers.equals(oldConfig.getServers()))
                 || ("".equals(oldservers) && oldConfig.getServers() == null)) {
             List<String> serverList;
@@ -292,7 +298,7 @@ public class CacheManagerController extends AbstractCacheController {
     @ResponseBody
     public Boolean configDelete(@RequestBody ConfigurationParams configurationParams) {
         subside = "config";
-        cacheConfigurationService.deleteWithSwimLane(configurationParams.getCacheKey(),configurationParams.getSwimlane());
+        cacheConfigurationService.deleteWithSwimLane(configurationParams.getCacheKey(), configurationParams.getSwimlane());
         return Boolean.TRUE;
     }
 
@@ -490,9 +496,29 @@ public class CacheManagerController extends AbstractCacheController {
         return new ModelAndView("cache/query", createViewMap());
     }
 
+    @RequestMapping(value = "/cache/query/deleteCategory", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public Object deleteCategory(@RequestParam("category")String category) {
+        ClearCategoryTask task = new ClearCategoryTask(category);
+        CacheDeamonTaskManager.submit(task);
+        return true;
+    }
+
+
     @RequestMapping(value = "/cache/query/getKeyValue", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public Object getKeyValue(@RequestParam("finalKey") String finalKey) {
+
+//        DeamonTask task = new DeamonTask();
+//        task.setCommitTime(System.currentTimeMillis());
+//        task.setDescription("123");
+//        task.setEndTime(System.currentTimeMillis());
+//        task.setStartTime(System.currentTimeMillis());
+//        task.setStat(1);
+//        task.setStatMax(1);
+//        task.setStatMin(1);
+//        task.setType(1);
+//        deamonTaskDao.insert(task);
 
         CacheKeyConfiguration key = cacheKeyConfigurationService.find(finalKey.substring(0, finalKey.indexOf(".")));
         Map<String, Object> paras = super.createViewMap();
