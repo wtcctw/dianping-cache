@@ -59,7 +59,7 @@ public class BaselineComputeTask {
             int taskId = baselineComputeTaskService.getRecentTaskId().get(0).getId();
 
 
-//            memcacheBaselineCompute(taskId);
+            memcacheBaselineCompute(taskId);
 
             redisBaselineCompute(taskId);
 

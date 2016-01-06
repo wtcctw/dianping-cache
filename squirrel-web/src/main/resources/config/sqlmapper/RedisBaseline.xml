@@ -45,6 +45,13 @@
    		ORDER BY id DESC
 	</select>
 
+	<select id="findByTaskId" resultMap="RedisBaselineResult" parameterType="int">
+		SELECT *
+		FROM redis_baseline
+		WHERE taskId = #{taskId}
+		ORDER BY id DESC
+	</select>
+
 	<select id="findLast" resultMap="RedisBaselineResult" >
 		SELECT *
    		FROM redis_baseline

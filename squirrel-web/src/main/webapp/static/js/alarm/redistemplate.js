@@ -143,6 +143,7 @@ module
                 $scope.alarmConfigEntity.smsMode = $scope.searchPaginator.currentPageItems[index].smsMode;
                 $scope.alarmConfigEntity.weixinMode = $scope.searchPaginator.currentPageItems[index].weixinMode;
                 $scope.alarmConfigEntity.isDown = $scope.searchPaginator.currentPageItems[index].isDown;
+                $scope.alarmConfigEntity.checkHistory = $scope.searchPaginator.currentPageItems[index].checkHistory;
                 $scope.alarmConfigEntity.memThreshold = $scope.searchPaginator.currentPageItems[index].memThreshold;
                 $scope.alarmConfigEntity.qpsThreshold = $scope.searchPaginator.currentPageItems[index].qpsThreshold;
                 $scope.alarmConfigEntity.isUpdate = true;

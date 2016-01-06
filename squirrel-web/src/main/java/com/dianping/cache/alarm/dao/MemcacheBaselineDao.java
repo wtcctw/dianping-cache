@@ -8,6 +8,8 @@ import java.util.List;
 public interface MemcacheBaselineDao {
 
 	List<MemcacheBaseline> findAll();
+
+	List<MemcacheBaseline> findByTaskId(int taskId);
 	
 	List<MemcacheBaseline> findByServer(String server);
 	

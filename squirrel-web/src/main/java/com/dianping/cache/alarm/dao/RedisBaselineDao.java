@@ -8,6 +8,8 @@ import java.util.List;
 public interface RedisBaselineDao {
 	
 	List<RedisBaseline> findAll();
+
+	List<RedisBaseline>findByTaskId(int taskId);
 	
 	List<RedisBaseline> findByServer(String server);
 	

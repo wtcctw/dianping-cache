@@ -1,5 +1,6 @@
 package com.dianping.cache.alarm.dataanalyse.baselineCache;
 
+import com.dianping.cache.alarm.dataanalyse.service.BaselineComputeTaskService;
 import com.dianping.cache.alarm.dataanalyse.service.MemcacheBaselineService;
 import com.dianping.cache.alarm.dataanalyse.service.RedisBaselineService;
 import com.dianping.cache.alarm.entity.MemcacheBaseline;
@@ -23,9 +24,14 @@ public class BaselineCacheServiceImpl implements BaselineCacheService {
     @Autowired
     RedisBaselineService redisBaselineService;
 
+    @Autowired
+    BaselineComputeTaskService baselineComputeTaskService;
+
     private Map<String, MemcacheBaseline> memcacheBaselineMap;
 
     private Map<String, RedisBaseline> redisBaselineMap;
+
+
 
 
     public BaselineCacheServiceImpl() {
@@ -68,7 +74,9 @@ public class BaselineCacheServiceImpl implements BaselineCacheService {
 
         Map<String, RedisBaseline> redisBaselineMap = new HashMap<String, RedisBaseline>();
 
-        List<RedisBaseline> redisBaselines = redisBaselineService.findAll();
+        int taskId = baselineComputeTaskService.getRecentTaskId().get(0).getId();
+
+        List<RedisBaseline> redisBaselines = redisBaselineService.findByTaskId(taskId);
 
         for (RedisBaseline redisBaseline : redisBaselines) {
             redisBaselineMap.put(redisBaseline.getBaseline_name(), redisBaseline);
@@ -90,7 +98,9 @@ public class BaselineCacheServiceImpl implements BaselineCacheService {
     public Map<String, MemcacheBaseline> getMemcacheBaselineFromDb() {
         Map<String, MemcacheBaseline> memcacheBaselineMap = new HashMap<String, MemcacheBaseline>();
 
-        List<MemcacheBaseline> memcacheBaselines = memcacheBaselineService.findAll();
+        int taskId = baselineComputeTaskService.getRecentTaskId().get(0).getId();
+
+        List<MemcacheBaseline> memcacheBaselines = memcacheBaselineService.findByTaskId(taskId);
 
         for (MemcacheBaseline memcacheBaseline : memcacheBaselines) {
             memcacheBaselineMap.put(memcacheBaseline.getBaseline_name(), memcacheBaseline);

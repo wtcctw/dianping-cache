@@ -128,7 +128,10 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
                     isReport = true;
                 }
 
-//                boolean history = isHistoryAlarm(item, currentServerStats, memcacheEvent);
+                boolean history = isHistoryAlarm(item, currentServerStats, memcacheEvent);
+                if(history){
+                    isReport = true;
+                }
 
             }
         }
@@ -168,6 +171,10 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
                 AlarmDetail alarmDetail = new AlarmDetail(alarmConfig);
 
                 MemcacheTemplate memcacheTemplate = memcacheAlarmTemplateService.findAlarmTemplateByTemplateName(alarmDetail.getAlarmTemplate());
+
+                if(!memcacheTemplate.isDown()){
+                    return false;
+                }
 
                 alarmDetail.setClusterName(item.getCacheKey());
                 alarmDetail.setAlarmTitle(CLUSTER_DOWN)
@@ -424,6 +431,10 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
         if (null == memcacheTemplate) {
             logger.info(item.getCacheKey() + "not config template");
             memcacheTemplate = memcacheAlarmTemplateService.findAlarmTemplateByTemplateName("Default");
+        }
+
+        if(!memcacheTemplate.isCheckHistory()){
+            return false;
         }
 
         List<String> serverList = item.getServerList();

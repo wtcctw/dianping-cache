@@ -21,6 +21,11 @@ public class RedisBaselineServiceImpl implements RedisBaselineService {
     }
 
     @Override
+    public List<RedisBaseline> findByTaskId(int taskId) {
+        return redisBaselineDao.findByTaskId(taskId);
+    }
+
+    @Override
     public List<RedisBaseline> findByServer(String server) {
         return redisBaselineDao.findByServer(server);
     }
