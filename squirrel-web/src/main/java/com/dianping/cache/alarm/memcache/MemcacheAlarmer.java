@@ -439,12 +439,12 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
 
         List<String> serverList = item.getServerList();
 
-        int set = 0;
-        int get = 0;
-        int write_bytes = 0;
-        int read_bytes = 0;
+        long set = 0;
+        long get = 0;
+        long write_bytes = 0;
+        long read_bytes = 0;
 
-        int evict = 0;
+        long evict = 0;
         float hitrate = 0;
 
         String ip = "";
@@ -455,12 +455,12 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
 
             if (0 != currentServerStats.size()) {
                 if (null != currentServerStats.get(server)) {
-                    Integer settmp = (Integer)currentServerStats.get(server).get("set");
-                    Integer gettmp = (Integer)currentServerStats.get(server).get("get");
-                    Integer write_bytestmp = (Integer)currentServerStats.get(server).get("write_bytes");
-                    Integer read_bytestmp = (Integer)currentServerStats.get(server).get("read_bytes");
+                    Long settmp = (Long)currentServerStats.get(server).get("set");
+                    Long gettmp = (Long)currentServerStats.get(server).get("get");
+                    Long write_bytestmp = (Long)currentServerStats.get(server).get("write_bytes");
+                    Long read_bytestmp = (Long)currentServerStats.get(server).get("read_bytes");
 
-                    Integer evicttmp = (Integer) currentServerStats.get(server).get("evict");
+                    Long evicttmp = (Long) currentServerStats.get(server).get("evict");
                     Float hitratetmp = (Float) currentServerStats.get(server).get("hitrate");
 
                     if ((null != evicttmp) && (null != hitratetmp)) {
@@ -483,8 +483,13 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
             Date nameDate = new Date();
             String name = "Memcache_" + sdf.format(nameDate);
 
+            if(null == baselineCacheService.getMemcacheBaselineByName(name)){
+                return false;
+            }
 
-            if (fluctTooMuch((double) set, (double) baselineCacheService.getMemcacheBaselineByName(name).getCmd_set())) {
+            double base_set = (double) baselineCacheService.getMemcacheBaselineByName(name).getCmd_set();
+
+            if (fluctTooMuch((double) set, base_set)) {
                 flag = true;
                 AlarmDetail alarmDetail = new AlarmDetail(alarmConfig);
 
@@ -506,7 +511,8 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
                 memcacheEvent.put(alarmDetail);
             }
 
-            if (fluctTooMuch((double) get, (double) baselineCacheService.getMemcacheBaselineByName(name).getGet_hits())) {
+            double base_get = (double) baselineCacheService.getMemcacheBaselineByName(name).getGet_hits();
+            if (fluctTooMuch((double) get, base_get)) {
                 flag = true;
                 AlarmDetail alarmDetail = new AlarmDetail(alarmConfig);
 
@@ -528,7 +534,9 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
                 memcacheEvent.put(alarmDetail);
             }
 
-            if (fluctTooMuch((double) write_bytes, (double) baselineCacheService.getMemcacheBaselineByName(name).getBytes_written())) {
+            double base_write_bytes=(double) baselineCacheService.getMemcacheBaselineByName(name).getBytes_written();
+
+            if (fluctTooMuch((double) write_bytes,base_write_bytes )) {
                 flag = true;
                 AlarmDetail alarmDetail = new AlarmDetail(alarmConfig);
 
@@ -550,7 +558,9 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
                 memcacheEvent.put(alarmDetail);
             }
 
-            if (fluctTooMuch((double) read_bytes, (double) baselineCacheService.getMemcacheBaselineByName(name).getBytes_read())) {
+            double base_read_bytes = (double) baselineCacheService.getMemcacheBaselineByName(name).getBytes_read();
+
+            if (fluctTooMuch((double) read_bytes, base_read_bytes)) {
                 flag = true;
                 AlarmDetail alarmDetail = new AlarmDetail(alarmConfig);
 
@@ -572,8 +582,8 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
                 memcacheEvent.put(alarmDetail);
             }
 
-
-            if (fluctTooMuch((double) evict, (double) baselineCacheService.getMemcacheBaselineByName(name).getEvictions())) {
+            double base_evict = (double) baselineCacheService.getMemcacheBaselineByName(name).getEvictions();
+            if (fluctTooMuch((double) evict, base_evict)) {
                 flag = true;
                 AlarmDetail alarmDetail = new AlarmDetail(alarmConfig);
 
@@ -595,8 +605,8 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
                 memcacheEvent.put(alarmDetail);
             }
 
-            double hitrate_base = (double) baselineCacheService.getMemcacheBaselineByName(name).getGet_hits() / (baselineCacheService.getMemcacheBaselineByName(name).getGet_hits() + baselineCacheService.getMemcacheBaselineByName(name).getDelete_hits());
-            if (fluctTooMuch((double) hitrate, hitrate_base)) {
+            double base_hitrate = (double) baselineCacheService.getMemcacheBaselineByName(name).getGet_hits() / (baselineCacheService.getMemcacheBaselineByName(name).getGet_hits() + baselineCacheService.getMemcacheBaselineByName(name).getDelete_hits());
+            if (fluctTooMuch((double) hitrate, base_hitrate)) {
                 flag = true;
                 AlarmDetail alarmDetail = new AlarmDetail(alarmConfig);
 

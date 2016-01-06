@@ -19,7 +19,7 @@
 	<select id="getRecentTaskId" resultMap="BaselinecomputeTaskResult">
    		SELECT id,createTime
    		FROM baselineComputeTask
-   		ORDER BY createTime DESC
+   		ORDER BY id DESC
    		LIMIT 1 OFFSET 0
 	</select>
 	
