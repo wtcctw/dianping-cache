@@ -83,6 +83,7 @@ module.controller('RedisController', [
     '$http',
     function($scope, $http) {
         $scope.redisData = {};
+        $scope.reshardParams = {};
         $scope.categoryList = [];
         $scope.avgsrc = [];
         $scope.exportsrc = [];
@@ -105,13 +106,42 @@ module.controller('RedisController', [
 
 
         $scope.reshard = function(){
-            if($scope.reshardType = "average"){
+            $scope.avgsrc = [];
+            $scope.exportsrc = [];
+            $scope.exportdes = [];
+            $scope.reshardParams = {};
 
-                $scope.avgsrc.push();
-            }else if($scope.reshardType = "export"){
-                $scope.exportsrc.push();
-                $scope.exportdes.push();
+            if($scope.reshardType === "average"){
+                var avgTemp = $('.avg');
+                for(var i = 0;i<avgTemp.length;i++){
+                    if(avgTemp[i].checked){
+                        $scope.avgsrc.push($scope.redisData.nodes[i].master.address);
+                    }
+                }
+
+                $scope.reshardParams.isAverage = true;
+                $scope.reshardParams.srcNodes = $scope.avgsrc;
+            }else if($scope.reshardType === "export"){
+                var src = $('.exsrc');
+                var des = $('.exdes');
+                for(var i = 0;i<src.length;i++){
+                    if(src[i].checked){
+                        $scope.exportsrc.push($scope.redisData.nodes[i].master.address);
+                    }
+                }
+                for(var i = 0;i<des.length;i++){
+                    if(des[i].checked){
+                        $scope.exportdes.push($scope.redisData.nodes[i].master.address);
+                    }
+                }
+
+                $scope.reshardParams.isAverage = false;
+                $scope.reshardParams.srcNodes = $scope.exportsrc;
+                $scope.reshardParams.desNodes = $scope.exportdes;
             }
+
+            $http.post(window.contextPath + '/redis/1/reshard',$scope.reshardParams)
+                .success();
         }
 
     } ]);

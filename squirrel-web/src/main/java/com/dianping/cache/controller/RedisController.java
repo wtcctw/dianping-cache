@@ -6,6 +6,7 @@ import java.util.concurrent.TimeUnit;
 import javax.annotation.Resource;
 
 import com.dianping.cache.controller.dto.RedisDashBoardData;
+import com.dianping.cache.controller.dto.RedisReshardParams;
 import com.dianping.cache.controller.dto.RedisScaleParams;
 import com.dianping.cache.scale.cluster.redis.RedisManager;
 import com.dianping.cache.scale.cluster.redis.RedisScaler;
@@ -90,6 +91,13 @@ public class RedisController extends AbstractCacheController{
 		return ChartsBuilder.buildRedisStatsCharts(statsData);
 	}
 
+	@RequestMapping(value = "/redis/1/reshard")
+	@ResponseBody
+	public void reshard(@RequestBody RedisReshardParams redisReshardParams){
+
+		redisReshardParams.isAverage();
+		return;
+	}
 
 	@RequestMapping(value = "/redis/addslave", method = RequestMethod.POST)
 	@ResponseBody

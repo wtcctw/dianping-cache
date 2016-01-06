@@ -72,17 +72,7 @@
 			$(".chosen-select").chosen()
 		}, 500);//由于angularjs加载option也是延迟的，所以这个操作得更迟才行。 3000
 	});
+
+	$('[data-rel=tooltip]').tooltip({container:'body'});
+	$('[data-rel=popover]').popover({container:'body'});
 </script>
-
-
-
-<script type="text/javascript">
-			jQuery(function($) {
-				$('[data-rel=tooltip]').tooltip();
-				$('[data-rel=popover]').popover({html:true});
-	
-			});
-</script>
- 
-
-

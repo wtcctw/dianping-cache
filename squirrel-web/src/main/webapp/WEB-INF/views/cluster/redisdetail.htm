@@ -58,7 +58,6 @@
                                         <a class="grey" href="#reshardModal" data-toggle="modal">
                                             <i class="ace-icon fa fa-share bigger-130"></i>
                                         </a>
-
                                         <a class="grey" href="#">
                                             <i class="ace-icon fa fa-exchange bigger-130"></i>
                                         </a>
@@ -130,7 +129,7 @@
                                         <tr ng-repeat="address in redisData.nodes">
                                             <td class="center">
                                                 <label class="position-relative">
-                                                    <input type="checkbox" class="ace" />
+                                                    <input type="checkbox" class="ace avg"/>
                                                     <span class="lbl"></span>
                                                 </label>
                                             </td>
@@ -150,7 +149,7 @@
                                             <tr >
                                                 <th class="center">
                                                     <label class="position-relative">
-                                                        <input type="checkbox" class="ace"/>
+                                                        <input type="checkbox" class="ace "/>
                                                         <span class="lbl"></span>
                                                     </label>
                                                 </th>
@@ -161,7 +160,7 @@
                                             <tr ng-repeat="address in redisData.nodes">
                                                 <td class="center">
                                                     <label class="position-relative">
-                                                        <input type="checkbox" class="ace" />
+                                                        <input type="checkbox" class="ace exsrc" />
                                                         <span class="lbl"></span>
                                                     </label>
                                                 </td>
@@ -192,7 +191,7 @@
                                         <tr ng-repeat="address in redisData.nodes">
                                             <td class="center">
                                                 <label class="position-relative">
-                                                    <input type="checkbox" class="ace" />
+                                                    <input type="checkbox" class="ace exdes" />
                                                     <span class="lbl"></span>
                                                 </label>
                                             </td>
@@ -231,4 +230,5 @@
                     $(this).closest('tr').toggleClass('selected');
                 });
     });
+
 </script>
