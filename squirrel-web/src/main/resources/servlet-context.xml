@@ -37,6 +37,8 @@
 			<mvc:mapping path="/monitor/cluster"/>
 			<mvc:mapping path="/monitor/dashboard"/>
 			<mvc:mapping path="/redis/dashboard"/>
+			<mvc:mapping path="/redis/redis-*"/>
+			<mvc:mapping path="/redis"/>
 			<bean class="com.dianping.cache.interceptor.ModelAndViewInterceptor">
 			</bean>
 		</mvc:interceptor>
@@ -59,7 +61,8 @@
 				<entry key="cache/*" value="layout/layoutcache.htm" />
 				<entry key="monitor/*" value="layout/layoutcache.htm" />
 				<entry key="alarm/*" value="layout/layoutcache.htm" />
-				<entry key="*" value="layout/layout.htm" />
+				<entry key="cluster/*" value="layout/layoutcache.htm" />
+				<entry key="*" value="layout/layoutcache.htm" />
 			</map>
 		</property>
 		<property name="toolboxConfigLocation">

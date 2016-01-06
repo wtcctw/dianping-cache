@@ -8,11 +8,11 @@
 		}
 	</script>
 		<ul class="nav nav-list">
-		<li class="#if($side == 'cachemanager') open #end"><a href="#"
+		<li class="#if($side == 'cachemanager') active open #end"><a href="#"
 			class="dropdown-toggle"> <i class="menu-icon  fa fa-gavel bigger-130"></i> <span
 				class="menu-text">存储管理</span> <b class="arrow fa fa-angle-down"></b>
 		</a>
-			<ul class="submenu" style="display: block;">
+			<ul class="submenu">
 				<li class="#if($subside == 'config') active #end"><a
 					href="${rc.contextPath}/cache/config"> <i
 						class="icon-globe"></i> 存储集群配置
@@ -30,11 +30,11 @@
 						class="icon-globe"></i> 数据查询
 				</a></li>
 			</ul></li>
-		<li class="#if($side == 'monitor') open #end"><a href="#"
+		<li class="#if($side == 'monitor') active open #end"><a href="#"
 			class="dropdown-toggle"> <i class="menu-icon  fa fa-tachometer bigger-130"></i> <span
 				class="menu-text">存储监控</span> <b class="arrow fa fa-angle-down"></b>
 		</a>
-			<ul class="submenu" style="display: block;">
+			<ul class="submenu">
 				
 				<li class="#if($subside == 'mdashboard') active #end"><a
 					href="${rc.contextPath}/monitor/dashboard"> <i
@@ -62,17 +62,42 @@
 				<a href="#" class="dropdown-toggle"> <i class="menu-icon  fa fa-tachometer bigger-130"></i> <span
 					class="menu-text">告警</span> <b class="arrow fa fa-angle-down"></b>
 			</a>
-				<ul class="submenu" style="display: block;">
+				<ul class="submenu">
 
-					<li class="#if($subside == 'mdashboard') active #end"><a
+					<li><a
 							href="${rc.contextPath}/setting/alarmrecord"> <i
 							class="icon-globe"></i> 告警记录
 					</a></li>
-					<li class="#if($subside == 'rdashboard') active #end"><a
+					<li><a
 							href="${rc.contextPath}/setting/alarmrule"> <i
 							class="icon-globe"></i> 告警规则配置
 					</a></li>
 				</ul></li>
+
+
+			<!--<li class="#if($side == 'cluster') active open #end">-->
+				<!--<a href="#" class="dropdown-toggle"> <i class="menu-icon  fa fa-cloud  bigger-130"></i> <span-->
+						<!--class="menu-text">集群</span> <b class="arrow fa fa-angle-down"></b>-->
+				<!--</a>-->
+				<!--<ul class="submenu">-->
+
+					<!--<li class="#if($subside == 'memcached') active #end"><a-->
+							<!--href="${rc.contextPath}/memcached"> <i-->
+							<!--class="icon-globe"></i> Memcached集群-->
+					<!--</a></li>-->
+					<!--<li class="#if($subside == 'redis') active #end"><a-->
+							<!--href="${rc.contextPath}/redis"> <i-->
+							<!--class="icon-globe"></i> Redis集群-->
+					<!--</a></li>-->
+					<!--<li class="#if($subside == 'dcache') active #end"><a-->
+							<!--href="${rc.contextPath}/dcache"> <i-->
+							<!--class="icon-globe"></i> Dcache集群-->
+					<!--</a></li>-->
+					<!--<li class="#if($subside == 'ehcache') active #end"><a-->
+							<!--href="${rc.contextPath}/ehcache"> <i-->
+							<!--class="icon-globe"></i> Ehcache集群-->
+					<!--</a></li>-->
+				<!--</ul></li>-->
 	</ul>
 
 	<div class="sidebar-collapse sidebar-toggle" id="sidebar-collapse">

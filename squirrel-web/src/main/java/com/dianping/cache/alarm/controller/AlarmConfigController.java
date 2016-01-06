@@ -9,7 +9,7 @@ import com.dianping.cache.alarm.entity.AlarmConfig;
 import com.dianping.cache.alarm.entity.MemcacheTemplate;
 import com.dianping.cache.alarm.entity.RedisTemplate;
 import com.dianping.cache.controller.AbstractSidebarController;
-import com.dianping.cache.controller.RedisDashBoardUtil;
+import com.dianping.cache.controller.RedisDataUtil;
 import com.dianping.cache.entity.CacheConfiguration;
 import com.dianping.cache.monitor.statsdata.RedisClusterData;
 import com.dianping.cache.service.CacheConfigurationService;
@@ -106,7 +106,7 @@ public class AlarmConfigController extends AbstractSidebarController {
     @ResponseBody
     public List<String> findRedisClusters() {
         List<String> clusterNames = new ArrayList<String>();
-        List<RedisClusterData> redisClusterDatas = RedisDashBoardUtil.getClusterData();
+        List<RedisClusterData> redisClusterDatas = RedisDataUtil.getClusterData();
 
         for (RedisClusterData redisClusterData : redisClusterDatas) {
             clusterNames.add(redisClusterData.getClusterName());

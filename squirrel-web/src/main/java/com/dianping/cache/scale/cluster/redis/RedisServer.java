@@ -33,8 +33,6 @@ public class RedisServer extends Server {
 
     private boolean migrating;
 
-    private JedisPool jedisPool;
-
     public RedisServer(String address) {
         super(address);
     }
@@ -191,7 +189,7 @@ public class RedisServer extends Server {
         return ss.length() > 0 ? ss.substring(0, ss.length() - 1) : "";
     }
 
-    public void loadRedisInfo() {
+    public RedisInfo loadRedisInfo() {
         Jedis jedis = new Jedis(getIp(), getPort());
         info = new RedisInfo();
         try {
@@ -218,6 +216,7 @@ public class RedisServer extends Server {
         } finally {
             jedis.close();
         }
+        return info;
     }
 
     public String getId() {
@@ -282,15 +281,5 @@ public class RedisServer extends Server {
 
     public void setMigrating(boolean migrating) {
         this.migrating = migrating;
-    }
-
-    public JedisPool getJedisPool() {
-        if(jedisPool == null)
-            synchronized (this){
-                if(jedisPool == null){
-                    jedisPool = new JedisPool(getIp(),getPort());
-                }
-            }
-        return jedisPool;
     }
 }

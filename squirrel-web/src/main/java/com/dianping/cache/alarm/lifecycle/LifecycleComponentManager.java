@@ -42,7 +42,7 @@ public class LifecycleComponentManager implements ApplicationContextAware, Initi
             if (logger.isInfoEnabled()) {
                 logger.info("[stop]" + name);
             }
-            lifecycleComponent.stop();
+           // lifecycleComponent.stop();
         }
 
         for (int i = componentWrappers.size() - 1; i >= 0; i--) {

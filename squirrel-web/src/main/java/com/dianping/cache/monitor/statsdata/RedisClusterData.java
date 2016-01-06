@@ -150,53 +150,47 @@ public class RedisClusterData {
 	class ColorsCheck{
 
 		private int alarm = 1;
-
-		private final int WARN = 2;
-
 		private final int DANGER = 4;
 
-		private float memUsedWarn = 50.0f;
-		private float memUsedDanger = 90.0f;
-
+		private float memUsedDanger = 80.0f;
+		private int qpsDanger = 90000;
 		public  void check(){
-			if(maxMemory == 0L)
+			colors.put("used",switchColors(switchColors(used,memUsedDanger)));
+			if(maxMemory == 0L){
 				alarm = 4;
-			colors.put("used",switchColors(used,memUsedWarn,memUsedDanger));
-			colors.put("dead",switchColors(masterNum,slaveNum+1,slaveNum+1));
-			colors.put("alarm",switchColors(alarm,WARN,DANGER));
+				colors.put("used","red");
+			}
+			colors.put("dead",switchColors(switchColors(masterNum,slaveNum+1)));
+			colors.put("qps",switchColors(switchColors(qps,qpsDanger)));
+			colors.put("alarm",switchColors(alarm,DANGER));
 		}
 
-		private String switchColors(int value,int warn,int danger){
+		private String switchColors(int value,int danger){
 			if(value >= danger){
-				alarm |= DANGER;
+				alarm = DANGER;
 				return "red";
-			} else if(value >= warn){
-				alarm |= WARN;
-				return "orange";
 			}
 			return "green";
 		}
 
-		private String switchColors(float value,float warn,float danger){
+		private String switchColors(float value,float danger){
 			if(value >= danger){
-				alarm |= DANGER;
+				alarm = DANGER;
 				return "red";
-			} else if(value >= warn){
-				alarm |= WARN;
-				return "orange";
 			}
 			return "green";
 		}
 
-		private String switchColors(long value,long warn,long danger){
+		private String switchColors(long value,long danger){
 			if(value >= danger){
-				alarm |= DANGER;
+				alarm = DANGER;
 				return "red";
-			} else if(value >= warn){
-				alarm |= WARN;
-				return "orange";
 			}
 			return "green";
+		}
+
+		private String switchColors(String color){
+			return "green".equals(color) ? "" : color;
 		}
 	}
 }

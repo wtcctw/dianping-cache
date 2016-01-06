@@ -20,10 +20,10 @@ import static org.junit.Assert.*;
 public class ReshardPlanTest {
 
     private List<String> srcNodes = new ArrayList<String>(){{
-        add("192.168.211.63:7004");
+        add("192.168.217.36:7003");
     }};
     private List<String> desNodes = new ArrayList<String>(){{
-        add("192.168.211.63:7003");
+        add("192.168.211.63:7004");
     }};
 
 
@@ -54,8 +54,7 @@ public class ReshardPlanTest {
 
     @Test
     public void testReshard(){
-        ReshardPlan reshardPlan = new ReshardPlan("redis-test", srcNodes, desNodes, true);
-        List<ReshardRecord> reshardRecordList = reshardPlan.getReshardRecordList();
+        ReshardPlan reshardPlan = new ReshardPlan("redis-test", srcNodes, desNodes, false);List<ReshardRecord> reshardRecordList = reshardPlan.getReshardRecordList();
         for (ReshardRecord reshardRecord : reshardRecordList) {
             System.out.println("From :" + reshardRecord.getSrcNode() + "-- > To :" + reshardRecord.getDesNode() + " slots : " + reshardRecord.getSlotsToMigrate());
         }

@@ -5,6 +5,7 @@ import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Resource;
 
+import com.dianping.cache.controller.dto.RedisDashBoardData;
 import com.dianping.cache.controller.dto.RedisScaleParams;
 import com.dianping.cache.scale.cluster.redis.RedisManager;
 import com.dianping.cache.scale.cluster.redis.RedisScaler;
@@ -30,6 +31,8 @@ public class RedisController extends AbstractCacheController{
 	
 	private String subside;
 
+	private String currentCluster;
+
 	@RequestMapping(value = "/redis/dashboard", method = RequestMethod.GET)
 	public ModelAndView viewClusterDashBoard(){
 		return new ModelAndView("monitor/redisdashboard",createViewMap());
@@ -38,7 +41,13 @@ public class RedisController extends AbstractCacheController{
 	@RequestMapping(value = "/redis/dashboardinfo", method = RequestMethod.GET)
 	@ResponseBody
 	public List<RedisClusterData> getDashboard(){
-		return RedisDashBoardUtil.getClusterData();
+		return RedisDataUtil.getClusterData();
+	}
+
+	@RequestMapping(value = "/redis/dashboard/data")
+	@ResponseBody
+	public RedisDashBoardData getRedisDashboard(){
+		return RedisDataUtil.getRedisDashBoardData();
 	}
 	
 	@RequestMapping(value = "/redis/serverinfo", method = RequestMethod.GET)
@@ -50,14 +59,25 @@ public class RedisController extends AbstractCacheController{
 	@RequestMapping(value = "/redis/serverinfodata", method = RequestMethod.GET)
 	@ResponseBody
 	public Map<String, Object> getRedisServerInfo(String address){
-		return RedisDashBoardUtil.getRedisServerData(address);
+		return RedisDataUtil.getRedisServerData(address);
 	}
 	
-	@RequestMapping(value = "/redis/scale", method = RequestMethod.GET)
-	public ModelAndView redisScale(){
-		
-		subside = "dashboard";
-		return new ModelAndView("cache/redisscale",createViewMap());
+	@RequestMapping(value = "/redis", method = RequestMethod.GET)
+	public ModelAndView redis(){
+		subside = "redis";
+		return new ModelAndView("cluster/redis",createViewMap());
+	}
+
+	@RequestMapping(value = "/redis/{cluster}")
+	public ModelAndView getRedisDetail(@PathVariable("cluster") String cluster){
+		subside = "redis";
+		currentCluster = cluster;
+		return new ModelAndView("cluster/redisdetail",createViewMap());
+	}
+	@RequestMapping(value = "/redis/detail")
+	@ResponseBody
+	public Map<String, Object> getRedisDetailData(){
+		return RedisDataUtil.getRedisDetailData(currentCluster);
 	}
 
 	@RequestMapping(value = "/redis/historydata", method = RequestMethod.GET)
@@ -87,18 +107,18 @@ public class RedisController extends AbstractCacheController{
 	@ResponseBody
 	public List<RedisClusterData> refreshClusterCache(String cluster) throws ScaleException{
 		RedisManager.refreshCache(cluster);
-		return RedisDashBoardUtil.getClusterData();
+		return RedisDataUtil.getClusterData();
 	}
 
 
 	@Override
 	protected String getSide() {
-		return "monitor";
+		return "cluster";
 	}
 
 	@Override
 	public String getSubSide() {
-		return "rdashboard";
+		return subside;
 	}
 
 }

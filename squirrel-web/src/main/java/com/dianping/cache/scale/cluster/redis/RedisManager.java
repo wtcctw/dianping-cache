@@ -5,6 +5,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import com.dianping.cache.alarm.utils.ThreadFactoryUtils;
 import com.dianping.cache.entity.CacheConfiguration;
 import com.dianping.cache.entity.ReshardRecord;
 import org.apache.log4j.Logger;
@@ -24,7 +25,7 @@ public class RedisManager {
 	public static final String SLOT_IMPORTING_IDENTIFIER = "--<--";
 	public static final String SLOT_MIGRATING_IDENTIFIER = "-->--";
 	public static final long CLUSTER_SLEEP_INTERVAL = 50;
-	public static final int CLUSTER_DEFAULT_TIMEOUT = 300;
+	public static final int CLUSTER_DEFAULT_TIMEOUT = 1000;
 	public static final int CLUSTER_MIGRATE_NUM = 100;
 	public static final int DEFAULT_CHECKPORT_TIMEOUT = 60000;
 	public static final int CLUSTER_DEFAULT_DB = 0;
@@ -32,7 +33,7 @@ public class RedisManager {
 	public static final String WINDOWS_LINE_SEPARATOR = "\r\n";
 	public static final String COLON_SEPARATOR = ":";
 
-	private static final Map<String,RedisCluster> clusterCache = new TreeMap<String, RedisCluster>();
+	private static Map<String,RedisCluster> clusterCache = new TreeMap<String, RedisCluster>();
 
 	private static final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 
@@ -75,41 +76,58 @@ public class RedisManager {
 		return true;
 	}
 
-	public static boolean reshard(final ReshardPlan reshardPlan) {
+	public static void reshard(final ReshardPlan reshardPlan) {
 		if (!checkClusterStatus(reshardPlan)) {
-			return false;
+			return;
 		}
-		RedisCluster redisCluster = new RedisCluster(reshardPlan.getSrcNode());
-		List<ReshardRecord> reshardRecordList = reshardPlan.getReshardRecordList();
-		for (final ReshardRecord reshardRecord : reshardRecordList) {
-			while (true) {
-				try {
-					redisCluster.loadClusterInfo();
-					RedisServer src = redisCluster.getServer(reshardRecord.getSrcNode());
-					if(src == null)
-                        continue;
-					if(src.getSlotSize() == 0)
-                        break;
-					RedisServer des = redisCluster.getServer(reshardRecord.getDesNode());
-					if (reshardRecord.getSlotsDone() < reshardRecord.getSlotsToMigrateCount()) {
-                        int slot = src.getSlotList().get(0);
-                        // set curr migrate slot in reshardplan
-                        boolean result = migrate(src, des, slot);
-                        if (result) {
-                            //update resharRecord(slotsDone++)  reshardPlan(slotInMigrate = -1)
-                            reshardRecord.setSlotsDone(reshardRecord.getSlotsDone()+1);
-                        } else {
-                            // re migrate this slot
-                        }
-                    } else {
-                        break;
-                    }
-				} catch (Exception e) {
-					e.printStackTrace();
+
+		Runnable runnable = new Runnable() {
+			@Override
+			public void run() {
+				RedisCluster redisCluster = new RedisCluster(reshardPlan.getSrcNode());
+				List<ReshardRecord> reshardRecordList = reshardPlan.getReshardRecordList();
+				for (final ReshardRecord reshardRecord : reshardRecordList) {
+					while (true) {
+						try {
+
+							redisCluster.loadClusterInfo();
+							RedisServer src = redisCluster.getServer(reshardRecord.getSrcNode());
+							if(src == null)
+								continue;
+							if(src.getSlotSize() == 0)
+								break;
+							RedisServer des = redisCluster.getServer(reshardRecord.getDesNode());
+							if (reshardRecord.getSlotsDone() < reshardRecord.getSlotsToMigrateCount()) {
+								int slot = src.getSlotList().get(0);
+								System.out.println(slot);
+								// set curr migrate slot in reshardplan
+								boolean result = migrate(src, des, slot);
+								if (result) {
+									//update resharRecord(slotsDone++)  reshardPlan(slotInMigrate = -1)
+									reshardRecord.setSlotsDone(reshardRecord.getSlotsDone()+1);
+								} else {
+									// re migrate this slot
+								}
+							} else {
+								break;
+							}
+						} catch (Throwable e) {
+							logger.error("Some Error Occured In Migrating",e);
+							e.printStackTrace();
+							//uptate resharRecord,set statuts = 400
+							break;
+						}
+					}
 				}
 			}
+		};
+		Thread t = new Thread(runnable,"Migrate-thread");
+		t.start();
+		try {
+			t.join();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
 		}
-		return true;
 	}
 
 	/**
@@ -422,7 +440,7 @@ public class RedisManager {
 							"".equals(configuration.getSwimlane())) {
 						String url = configuration.getServers();
 						List<String> servers = ParseServersUtil.parseRedisServers(url);
-						RedisCluster cluster = new RedisCluster(servers);
+						RedisCluster cluster = new RedisCluster(configuration.getCacheKey(),servers);
 						for (RedisNode node : cluster.getNodes()) {
 							node.getMaster().loadRedisInfo();
 							if (node.getSlave() != null)
@@ -431,8 +449,7 @@ public class RedisManager {
 						tempClusterCache.put(configuration.getCacheKey(), cluster);
 					}
 				}
-				clusterCache.clear();
-				clusterCache.putAll(tempClusterCache);
+				clusterCache = tempClusterCache;
 			}
 		},15,30,TimeUnit.SECONDS);
 	}

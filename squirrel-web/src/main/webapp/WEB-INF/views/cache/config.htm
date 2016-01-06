@@ -13,17 +13,15 @@
                         <thead>
                         <tr>
                             <th style="width: 15%; text-align: left">服务名称</th>
-                            <th style="width: 10%; text-align: center">客户端实现类</th>
+                            <th style="width: 15%; text-align: center">客户端实现类</th>
                             <th style="width: 10%; text-align: center">泳道</th>
-                            <th style="width: 30%; text-align: left">服务地址</th>
+                            <th style="width: 25%; text-align: left">服务地址</th>
                             <th style="width: 20%; text-align: center">transcoder</th>
                             <th
                                     style="width: 15%; text-align: left;#if(${isadmin})display: table-cell;#else display: none;#end;">
                                 操作
                                 <a href="${rc.contextPath}/cache/config/new">
-                                    <button type="button" class="btn btn-success btn-xs ">
                                         <i class="ace-icon fa fa-plus"></i>
-                                    </button>
                                 </a>
                             </th>
                         </tr>
@@ -160,7 +158,7 @@
 </div>
 <script type="application/javascript">
     $(document).ready(function () {
-        setTimeout(function() {
+        setTimeout(function () {
             $('#configTable').dataTable({
                 "bAutoWidth": true,
                 "bPaginate": true, //翻页功能
@@ -172,8 +170,8 @@
                 "aaSorting": [],
                 "iDisplayLength": 10,
                 "aoColumns": [
-                    null, null,null, null, null,
-                    { "bSortable": false }
+                    null, null, null, null, null,
+                    {"bSortable": false}
                 ],
             });
         }, 300);

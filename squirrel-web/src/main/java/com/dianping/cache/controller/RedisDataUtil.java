@@ -1,23 +1,23 @@
 package com.dianping.cache.controller;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 
+import com.dianping.cache.controller.dto.RedisDashBoardData;
+import com.dianping.cache.scale.cluster.redis.RedisCluster;
+import com.dianping.cache.scale.cluster.redis.RedisNode;
 import redis.clients.jedis.Jedis;
 
 import com.dianping.cache.monitor.statsdata.RedisClusterData;
 
-import static com.dianping.cache.scale.cluster.redis.RedisManager.getClusterCache;
+import com.dianping.cache.scale.cluster.redis.RedisManager;
 
-public class RedisDashBoardUtil {
+public class RedisDataUtil {
 
     public static List<RedisClusterData> getClusterData() {
         List<RedisClusterData> data = new ArrayList<RedisClusterData>();
-
-        for (Map.Entry<String, com.dianping.cache.scale.cluster.redis.RedisCluster> cluster : getClusterCache().entrySet()) {
+        Set<Map.Entry<String,RedisCluster>> clusterCache = RedisManager.getClusterCache().entrySet();
+        for (Map.Entry<String, RedisCluster> cluster : clusterCache) {
             RedisClusterData tmp = new RedisClusterData();
             tmp.setClusterName(cluster.getKey());
             com.dianping.cache.scale.cluster.redis.RedisCluster redisCluster = cluster.getValue();
@@ -25,7 +25,7 @@ public class RedisDashBoardUtil {
             int masterNum = 0,slaveNum = 0;
             int ops = 0;
 
-            for (com.dianping.cache.scale.cluster.redis.RedisNode node : redisCluster.getNodes()) {
+            for (RedisNode node : redisCluster.getNodes()) {
                 maxmemory += node.getMaster().getInfo().getMaxMemory();
                 usedmemory += node.getMaster().getInfo().getUsedMemory();
                 masterNum++;
@@ -48,10 +48,23 @@ public class RedisDashBoardUtil {
             used = convert(used);
             tmp.setUsed(used);
             tmp.check();
-
-            data.add(tmp);
+            if("red".equals(tmp.getColors().get("alarm"))){
+                data.add(0,tmp);
+            }else{
+                data.add(tmp);
+            }
         }
         return data;
+    }
+
+    public static RedisDashBoardData getRedisDashBoardData(){
+        Map<String,RedisCluster> clusterCache = RedisManager.getClusterCache();
+        List<RedisCluster> clusters = new ArrayList<RedisCluster>();
+        for(Map.Entry<String, RedisCluster> cluster : clusterCache.entrySet()){
+            clusters.add(cluster.getValue());
+        }
+        RedisDashBoardData redisDashBoardData = new RedisDashBoardData(clusters);
+        return redisDashBoardData;
     }
 
     public static Map<String, Object> getRedisServerData(String address) {
@@ -79,4 +92,15 @@ public class RedisDashBoardUtil {
         return (float) (tmp / 100.0);
     }
 
+    public static Map<String,Object> getRedisDetailData(String currentCluster) {
+        Map<String,Object> result = new HashMap<String, Object>();
+        RedisCluster redisCluster =  RedisManager.getRedisCluster(currentCluster);
+        RedisDashBoardData data = new RedisDashBoardData();
+        RedisDashBoardData.SimpleAnalysisData simpleAnalysisData = data.new SimpleAnalysisData(redisCluster);
+        simpleAnalysisData.analysis();
+        List<String> categoryList = null;
+        result.put("data",simpleAnalysisData);
+        result.put("categoryList",80);
+        return result;
+    }
 }
