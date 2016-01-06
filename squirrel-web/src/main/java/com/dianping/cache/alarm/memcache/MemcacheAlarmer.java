@@ -248,7 +248,7 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
                 AlarmDetail alarmDetail = new AlarmDetail(alarmConfig);
 
                 alarmDetail.setAlarmTitle(MEMUSAGE_TOO_HIGH)
-                        .setAlarmDetail(item.getCacheKey() + ":" + MEMUSAGE_TOO_HIGH + ";IP为" + ip + ";使用率为" + usage)
+                        .setAlarmDetail(item.getCacheKey() + ":" + MEMUSAGE_TOO_HIGH + ",IP为" + ip + ";使用率为" + usage)
                         .setMailMode(memcacheTemplate.isMailMode())
                         .setSmsMode(memcacheTemplate.isSmsMode())
                         .setWeixinMode(memcacheTemplate.isWeixinMode())
@@ -314,7 +314,7 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
                 AlarmDetail alarmDetail = new AlarmDetail(alarmConfig);
 
                 alarmDetail.setAlarmTitle(QPS_TOO_HIGH)
-                        .setAlarmDetail(item.getCacheKey() + ":" + QPS_TOO_HIGH + ";IP为" + ip + ";QPS为" + qps)
+                        .setAlarmDetail(item.getCacheKey() + ":" + QPS_TOO_HIGH + ",IP为" + ip + ";QPS为" + qps)
                         .setMailMode(memcacheTemplate.isMailMode())
                         .setSmsMode(memcacheTemplate.isSmsMode())
                         .setWeixinMode(memcacheTemplate.isWeixinMode())
@@ -385,7 +385,7 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
                 AlarmDetail alarmDetail = new AlarmDetail(alarmConfig);
 
                 alarmDetail.setAlarmTitle(CONN_TOO_HIGH)
-                        .setAlarmDetail(item.getCacheKey() + ":" + CONN_TOO_HIGH + ";IP为" + ip + ";连接数为" + conn)
+                        .setAlarmDetail(item.getCacheKey() + ":" + CONN_TOO_HIGH + ",IP为" + ip + ";连接数为" + conn)
                         .setMailMode(memcacheTemplate.isMailMode())
                         .setSmsMode(memcacheTemplate.isSmsMode())
                         .setWeixinMode(memcacheTemplate.isWeixinMode())
@@ -478,7 +478,7 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
                 AlarmDetail alarmDetail = new AlarmDetail(alarmConfig);
 
                 alarmDetail.setAlarmTitle(SET_FLUC_TOO_MUCH)
-                        .setAlarmDetail(item.getCacheKey() + ":" + SET_FLUC_TOO_MUCH + ";IP为" + ip)
+                        .setAlarmDetail(item.getCacheKey() + ":" + SET_FLUC_TOO_MUCH + ",IP为" + ip)
                         .setMailMode(memcacheTemplate.isMailMode())
                         .setSmsMode(memcacheTemplate.isSmsMode())
                         .setWeixinMode(memcacheTemplate.isWeixinMode())
@@ -500,7 +500,7 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
                 AlarmDetail alarmDetail = new AlarmDetail(alarmConfig);
 
                 alarmDetail.setAlarmTitle(GET_FLUC_TOO_MUCH)
-                        .setAlarmDetail(item.getCacheKey() + ":" + GET_FLUC_TOO_MUCH + ";IP为" + ip)
+                        .setAlarmDetail(item.getCacheKey() + ":" + GET_FLUC_TOO_MUCH + ",IP为" + ip)
                         .setMailMode(memcacheTemplate.isMailMode())
                         .setSmsMode(memcacheTemplate.isSmsMode())
                         .setWeixinMode(memcacheTemplate.isWeixinMode())
@@ -522,7 +522,7 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
                 AlarmDetail alarmDetail = new AlarmDetail(alarmConfig);
 
                 alarmDetail.setAlarmTitle(WRITE_BYTES_FLUC_TOO_MUCH)
-                        .setAlarmDetail(item.getCacheKey() + ":" + WRITE_BYTES_FLUC_TOO_MUCH + ";IP为" + ip)
+                        .setAlarmDetail(item.getCacheKey() + ":" + WRITE_BYTES_FLUC_TOO_MUCH + ",IP为" + ip)
                         .setMailMode(memcacheTemplate.isMailMode())
                         .setSmsMode(memcacheTemplate.isSmsMode())
                         .setWeixinMode(memcacheTemplate.isWeixinMode())
@@ -544,7 +544,7 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
                 AlarmDetail alarmDetail = new AlarmDetail(alarmConfig);
 
                 alarmDetail.setAlarmTitle(READ_BYTES_FLUC_TOO_MUCH)
-                        .setAlarmDetail(item.getCacheKey() + ":" + READ_BYTES_FLUC_TOO_MUCH + ";IP为" + ip)
+                        .setAlarmDetail(item.getCacheKey() + ":" + READ_BYTES_FLUC_TOO_MUCH + ",IP为" + ip)
                         .setMailMode(memcacheTemplate.isMailMode())
                         .setSmsMode(memcacheTemplate.isSmsMode())
                         .setWeixinMode(memcacheTemplate.isWeixinMode())
@@ -567,7 +567,7 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
                 AlarmDetail alarmDetail = new AlarmDetail(alarmConfig);
 
                 alarmDetail.setAlarmTitle(EVICT_FLUC_TOO_MUCH)
-                        .setAlarmDetail(item.getCacheKey() + ":" + EVICT_FLUC_TOO_MUCH + ";IP为" + ip)
+                        .setAlarmDetail(item.getCacheKey() + ":" + EVICT_FLUC_TOO_MUCH + ",IP为" + ip)
                         .setMailMode(memcacheTemplate.isMailMode())
                         .setSmsMode(memcacheTemplate.isSmsMode())
                         .setWeixinMode(memcacheTemplate.isWeixinMode())
@@ -590,7 +590,7 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
                 AlarmDetail alarmDetail = new AlarmDetail(alarmConfig);
 
                 alarmDetail.setAlarmTitle(HITRATE_FLUC_TOO_MUCH)
-                        .setAlarmDetail(item.getCacheKey() + ":" + HITRATE_FLUC_TOO_MUCH + ";IP为" + ip)
+                        .setAlarmDetail(item.getCacheKey() + ":" + HITRATE_FLUC_TOO_MUCH + ",IP为" + ip)
                         .setMailMode(memcacheTemplate.isMailMode())
                         .setSmsMode(memcacheTemplate.isSmsMode())
                         .setWeixinMode(memcacheTemplate.isWeixinMode())

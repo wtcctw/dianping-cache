@@ -24,20 +24,20 @@ public class EventCache {
 
         flush();
 
-        if (null == eventCache.get(delayItem.getDetail())) {
+        if (null == eventCache.get(delayItem.getDetail().split(";")[0])) {
             delayItem.setCount(1);
             delayItem.setTimeStamp(new Date());
-            eventCache.put(delayItem.getDetail(), delayItem);
+            eventCache.put(delayItem.getDetail().split(";")[0], delayItem);
         } else {
-            delayItem = eventCache.get(alarmDetail.getAlarmDetail());
+            delayItem = eventCache.get(alarmDetail.getAlarmDetail().split(";")[0]);
             delayItem.setCount(delayItem.getCount() + 1);
             delayItem.setTimeStamp(new Date());
-            eventCache.put(delayItem.getDetail(), delayItem);
+            eventCache.put(delayItem.getDetail().split(";")[0], delayItem);
         }
     }
 
     public synchronized boolean check(AlarmDetail alarmDetail) {
-        DelayItem delayItem = eventCache.get(alarmDetail.getAlarmDetail());
+        DelayItem delayItem = eventCache.get(alarmDetail.getAlarmDetail().split(";")[0]);
 
         if ((1 == delayItem.getCount()) || (10 == delayItem.getCount()) || (30 == delayItem.getCount()) || (60 == delayItem.getCount()) || (120 == delayItem.getCount()) || (240 == delayItem.getCount())) {
             return true;
