@@ -51,6 +51,7 @@ public class RedisClientManager {
     
     private static RedisClientManager instance = new RedisClientManager();
     
+    private volatile String password = null;
     private volatile int connTimeout = DEFAULT_CONN_TIMEOUT;
     private volatile int readTimeout = DEFAULT_READ_TIMEOUT;
     private volatile int maxRedirects = DEFAULT_MAX_REDIRECTS;
@@ -62,7 +63,7 @@ public class RedisClientManager {
     private volatile int asyncQueueSize = DEFAULT_ASYNC_QUEUESIZE;
     private volatile int clusterUpdateInterval = DEFAULT_CLUSTER_UPDATE_INTERVAL;
     
-    private volatile String connString;
+    private volatile String paramString;
     
     private volatile RedisClientConfig clientConfig;
     
@@ -80,6 +81,7 @@ public class RedisClientManager {
     
     public void setClientConfig(RedisClientConfig clientConfig) {
         this.clientConfig = clientConfig;
+        this.password = clientConfig.getPassword();
         renewClient();
     }
     
@@ -101,7 +103,7 @@ public class RedisClientManager {
         if(newClient != null) {
             executor = newExecutor;
             client = newClient;
-            logger.info("renewed redis cluster client: " + connString);
+            logger.info("renewed redis cluster client: " + paramString);
             if(oldExecutor != null) {
                 oldExecutor.shutdown();
                 try {
@@ -120,7 +122,7 @@ public class RedisClientManager {
     
     private void init() {
         try {
-            connString = configManager.getStringValue(KEY_REDIS_CONN_PARAMS);
+            paramString = configManager.getStringValue(KEY_REDIS_CONN_PARAMS);
             parseConnString();
 
             configManager.registerConfigChangeListener(new ConfigChangeListener() {
@@ -129,7 +131,7 @@ public class RedisClientManager {
                 public void onChange(String key, String value) {
                     if(key != null && key.endsWith(KEY_REDIS_CONN_PARAMS)) {
                         logger.info("redis connection params changed: " + value);
-                        connString = value;
+                        paramString = value;
                         parseConnString();
                         renewClient();
                     }
@@ -142,8 +144,8 @@ public class RedisClientManager {
     }
     
     private void parseConnString() {
-        if(connString != null) {
-            ParamHelper helper = new ParamHelper(connString);
+        if(paramString != null) {
+            ParamHelper helper = new ParamHelper(paramString);
             connTimeout = helper.getInteger(KEY_CONN_TIMEOUT, connTimeout);
             readTimeout = helper.getInteger(KEY_READ_TIMEOUT, readTimeout);
             maxRedirects = helper.getInteger(KEY_MAX_REDIRECTS, maxRedirects);
@@ -165,7 +167,8 @@ public class RedisClientManager {
                 maxRedirects, 
                 getPoolConfig(clientConfig),
                 executor,
-                clusterUpdateInterval);
+                clusterUpdateInterval, 
+                password);
         return client;
     }
 
