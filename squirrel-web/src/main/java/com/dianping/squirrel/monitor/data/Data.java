@@ -1,7 +1,16 @@
 package com.dianping.squirrel.monitor.data;
 
-public interface Data {
+public class Data {
 
-    enum Type {MemcachedStats, MemcachedHeartbeat, RedisStats, ZabbixStats, CatStats};
+    public enum DataType {MemcachedStats, MemcachedHeartbeat, RedisStats, ZabbixStats, CatStats};
+    
+    private String type;
+    private String server;
+    private String cluster;
+    private Stats stats;
+    
+    public Object getType() {
+        return null;
+    }
     
 }
