@@ -9,6 +9,8 @@ public class MemcacheTemplate extends AlarmConfigTemplate {
 
     private boolean isDown;
 
+    private boolean checkHistory;
+
     private int memThreshold;
 
     private int qpsThreshold;
@@ -21,6 +23,15 @@ public class MemcacheTemplate extends AlarmConfigTemplate {
 
     public MemcacheTemplate setIsDown(boolean isDown) {
         this.isDown = isDown;
+        return this;
+    }
+
+    public boolean isCheckHistory() {
+        return checkHistory;
+    }
+
+    public MemcacheTemplate setCheckHistory(boolean checkHistory) {
+        this.checkHistory = checkHistory;
         return this;
     }
 

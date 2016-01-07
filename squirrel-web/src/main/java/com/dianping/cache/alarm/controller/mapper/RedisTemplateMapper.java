@@ -22,6 +22,7 @@ public class RedisTemplateMapper {
                 .setSmsMode(redisTemplateDto.isSmsMode())
                 .setWeixinMode(redisTemplateDto.isWeixinMode());
         redisTemplate.setIsDown(redisTemplateDto.isDown())
+                .setCheckHistory(redisTemplateDto.isCheckHistory())
                 .setMemThreshold(redisTemplateDto.getMemThreshold())
                 .setQpsThreshold(redisTemplateDto.getQpsThreshold())
                 .setCreateTime(redisTemplateDto.getCreateTime())

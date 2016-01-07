@@ -19,6 +19,8 @@ public class MemcacheTemplateDto {
 
     private boolean isDown;
 
+    private boolean checkHistory;
+
     private int memThreshold;
 
     private int qpsThreshold;
@@ -77,6 +79,14 @@ public class MemcacheTemplateDto {
 
     public void setIsDown(boolean isDown) {
         this.isDown = isDown;
+    }
+
+    public boolean isCheckHistory() {
+        return checkHistory;
+    }
+
+    public void setCheckHistory(boolean checkHistory) {
+        this.checkHistory = checkHistory;
     }
 
     public int getMemThreshold() {

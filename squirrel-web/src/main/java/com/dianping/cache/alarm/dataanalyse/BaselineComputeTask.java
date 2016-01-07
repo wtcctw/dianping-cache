@@ -10,8 +10,12 @@ import com.dianping.cache.alarm.entity.MemcacheBaseline;
 import com.dianping.cache.alarm.entity.RedisBaseline;
 import com.dianping.cache.entity.MemcacheStats;
 import com.dianping.cache.entity.RedisStats;
+import com.dianping.cache.entity.Server;
 import com.dianping.cache.service.MemcacheStatsService;
 import com.dianping.cache.service.RedisStatsService;
+import com.dianping.cache.service.ServerService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -26,6 +30,9 @@ import java.util.*;
 @Component("baselineComputeTask")
 @Scope("prototype")
 public class BaselineComputeTask {
+
+    protected final Logger logger = LoggerFactory.getLogger(getClass());
+
 
     @Autowired
     MemcacheStatsService memcacheStatsService;
@@ -46,6 +53,9 @@ public class BaselineComputeTask {
     @Autowired
     BaselineCacheService baselineCacheService;
 
+    @Autowired
+    ServerService serverService;
+
 
     public void run() {
 
@@ -59,7 +69,7 @@ public class BaselineComputeTask {
             int taskId = baselineComputeTaskService.getRecentTaskId().get(0).getId();
 
 
-//            memcacheBaselineCompute(taskId);
+            memcacheBaselineCompute(taskId);
 
             redisBaselineCompute(taskId);
 
@@ -77,14 +87,14 @@ public class BaselineComputeTask {
 
         Map<String, MemcacheStats> memcacheStatses = getMemcacheState(startTime, endTime);
 
-        memcacheBaslineStoreToDb(taskId,memcacheStatses);
+        memcacheBaslineStoreToDb(taskId, memcacheStatses);
 
 
     }
 
     private void memcacheBaslineStoreToDb(int taskId, Map<String, MemcacheStats> memcacheStatses) {
 
-        Map<String, MemcacheBaseline>memcacheBaselineMap = new HashMap<String, MemcacheBaseline>();
+        Map<String, MemcacheBaseline> memcacheBaselineMap = new HashMap<String, MemcacheBaseline>();
 
         for (Map.Entry<String, MemcacheStats> entry : memcacheStatses.entrySet()) {
             MemcacheBaseline memcacheBaseline = MemcacheBaselineMapper.convertToMemcacheBaseline(entry.getValue());
@@ -92,7 +102,7 @@ public class BaselineComputeTask {
             memcacheBaseline.setTaskId(taskId);
 
             memcacheBaselineService.insert(memcacheBaseline);
-            memcacheBaselineMap.put(memcacheBaseline.getBaseline_name(),memcacheBaseline);
+            memcacheBaselineMap.put(memcacheBaseline.getBaseline_name(), memcacheBaseline);
         }
 
         baselineCacheService.putMemcacheBaselineMapToCache(memcacheBaselineMap);
@@ -106,19 +116,19 @@ public class BaselineComputeTask {
 
         Map<String, RedisStats> redisStatsMap = getRedisState(startTime, endTime);
 
-        redisBaslineStoreToDb(taskId,redisStatsMap);
+        redisBaslineStoreToDb(taskId, redisStatsMap);
 
     }
 
-    private void redisBaslineStoreToDb(int taskId,Map<String, RedisStats> redisStatsMap) {
-        Map<String, RedisBaseline>redisBaselineMap = new HashMap<String, RedisBaseline>();
+    private void redisBaslineStoreToDb(int taskId, Map<String, RedisStats> redisStatsMap) {
+        Map<String, RedisBaseline> redisBaselineMap = new HashMap<String, RedisBaseline>();
 
         for (Map.Entry<String, RedisStats> entry : redisStatsMap.entrySet()) {
             RedisBaseline redisBaseline = RedisBaselineMapper.convertToRedisBaseline(entry.getValue());
             redisBaseline.setBaseline_name(entry.getKey());
             redisBaseline.setTaskId(taskId);
             redisBaselineService.insert(redisBaseline);
-            redisBaselineMap.put(redisBaseline.getBaseline_name(),redisBaseline);
+            redisBaselineMap.put(redisBaseline.getBaseline_name(), redisBaseline);
         }
 
         baselineCacheService.putRedisBaselineMapToCache(redisBaselineMap);
@@ -135,7 +145,7 @@ public class BaselineComputeTask {
             String startTime = startTimeList.get(i);
             startTime = startTime.split(" ")[0];
             String endTime;
-            if (i < startTimeList.size()-1) {
+            if (i < startTimeList.size() - 1) {
                 endTime = startTimeList.get(i + 1);
             } else {
                 endTime = endDate;
@@ -150,52 +160,66 @@ public class BaselineComputeTask {
             long tmp = startLong;
             long endLong = df.parse(endTime).getTime() / 1000;
 
-
+            List<Server> serverList = serverService.findAllMemcachedServers();
 
             while (tmp + 60 < endLong) {//每分钟只采样一次
-                long end = tmp + 60;
+                long end = tmp + 120;
 
-                Date s = new Date(tmp);
-                Date e = new Date(end);
+                for (Server server : serverList) {
+
+                    String sql = "SELECT id,serverId, uptime, curr_time, total_conn, curr_conn, curr_items, cmd_set, get_hits, get_misses," +
+                            " bytes_read, bytes_written, delete_hits, delete_misses, evictions,limit_maxbytes, bytes " +
+                            "FROM memcache_stats " +
+                            " WHERE curr_time > " + tmp + " AND curr_time <= " + end + " AND serverId =" + server.getId();
+
+                    List<MemcacheStats> memcacheStatsestmp = memcacheStatsService.search(sql);
+                    if (0 != memcacheStatsestmp.size()) {
+                        SimpleDateFormat sdf = new SimpleDateFormat("EEEE:HH:mm");
+                        Date nameDate = new Date(tmp * 1000);
+                        String name = "Memcache_" + sdf.format(nameDate) + "_" + server.getAddress();
+
+                        MemcacheStats memcacheStatsDelta = getMemcacheDelta(memcacheStatsestmp);
+
+                        if (null == memcacheStatsDelta) {
+                            continue;
+                        }
+
+                        if (null == memcacheStatsMap.get(name)) {
+                            memcacheStatsMap.put(name, memcacheStatsDelta);
+                        } else {
+                            MemcacheStats memcacheStats = dealMemcacheStats(memcacheStatsDelta, memcacheStatsMap.get(name));
+
+                            memcacheStatsMap.remove(name);
+                            memcacheStatsMap.put(name, memcacheStats);
+                        }
+                    }
+
+                }
+                tmp += 60;
+            }
+            for (Server server : serverList) {
 
                 String sql = "SELECT id,serverId, uptime, curr_time, total_conn, curr_conn, curr_items, cmd_set, get_hits, get_misses," +
                         " bytes_read, bytes_written, delete_hits, delete_misses, evictions,limit_maxbytes, bytes " +
                         "FROM memcache_stats " +
-                        " WHERE curr_time > " + tmp + " AND curr_time < " + end;
-
+                        " WHERE curr_time > " + tmp + " AND curr_time <= " + endLong + " AND serverId =" + server.getId();
                 List<MemcacheStats> memcacheStatsestmp = memcacheStatsService.search(sql);
                 if (0 != memcacheStatsestmp.size()) {
                     SimpleDateFormat sdf = new SimpleDateFormat("EEEE:HH:mm");
-                    Date nameDate = new Date(tmp*1000);
-                    String name = "Memcache_" + sdf.format(nameDate);
+                    Date nameDate = new Date(tmp * 1000);
+                    String name = "Memcache_" + sdf.format(nameDate) + "_" + server.getAddress();
+                    MemcacheStats memcacheStatsDelta = getMemcacheDelta(memcacheStatsestmp);
+                    if (null == memcacheStatsDelta) {
+                        continue;
+                    }
                     if (null == memcacheStatsMap.get(name)) {
-                        memcacheStatsMap.put(name, memcacheStatsestmp.get(0));
+                        memcacheStatsMap.put(name, memcacheStatsDelta);
                     } else {
-                        MemcacheStats memcacheStats = dealMemcacheStats(memcacheStatsestmp.get(0), memcacheStatsMap.get(name));
+                        MemcacheStats memcacheStats = dealMemcacheStats(memcacheStatsDelta, memcacheStatsMap.get(name));
 
                         memcacheStatsMap.remove(name);
                         memcacheStatsMap.put(name, memcacheStats);
                     }
-                }
-                tmp += 60;
-            }
-
-            String sql = "SELECT id,serverId, uptime, curr_time, total_conn, curr_conn, curr_items, cmd_set, get_hits, get_misses," +
-                    " bytes_read, bytes_written, delete_hits, delete_misses, evictions,limit_maxbytes, bytes " +
-                    "FROM memcache_stats " +
-                    " WHERE curr_time > " + tmp + " AND curr_time < " + endLong;
-            List<MemcacheStats> memcacheStatsestmp = memcacheStatsService.search(sql);
-            if (0 != memcacheStatsestmp.size()) {
-                SimpleDateFormat sdf = new SimpleDateFormat("EEEE:HH:mm");
-                Date nameDate = new Date(tmp*1000);
-                String name = "Memcache_" + sdf.format(nameDate);
-                if (null == memcacheStatsMap.get(name)) {
-                    memcacheStatsMap.put(name, memcacheStatsestmp.get(0));
-                } else {
-                    MemcacheStats memcacheStats = dealMemcacheStats(memcacheStatsestmp.get(0), memcacheStatsMap.get(name));
-
-                    memcacheStatsMap.remove(name);
-                    memcacheStatsMap.put(name, memcacheStats);
                 }
             }
         }
@@ -203,6 +227,46 @@ public class BaselineComputeTask {
 
         return memcacheStatsMap;
 
+    }
+
+    private MemcacheStats getMemcacheDelta(List<MemcacheStats> memcacheStatsestmp) {
+
+        MemcacheStats memcacheStats = new MemcacheStats();
+        if (memcacheStatsestmp.size() < 2) {
+            return null;
+        }
+
+        memcacheStats.setId(memcacheStatsestmp.get(0).getId());
+        memcacheStats.setServerId(memcacheStatsestmp.get(0).getServerId());
+        memcacheStats.setCurr_time(memcacheStatsestmp.get(0).getCurr_time());
+
+        memcacheStats.setBytes(Math.abs(memcacheStatsestmp.get(1).getBytes() - memcacheStatsestmp.get(0).getBytes()));
+
+        memcacheStats.setBytes_read(Math.abs(memcacheStatsestmp.get(1).getBytes_read() - memcacheStatsestmp.get(0).getBytes_read()));
+
+        memcacheStats.setBytes_written(Math.abs(memcacheStatsestmp.get(1).getBytes_written() - memcacheStatsestmp.get(0).getBytes_written()));
+
+        memcacheStats.setCmd_set(Math.abs(memcacheStatsestmp.get(1).getCmd_set() - memcacheStatsestmp.get(0).getCmd_set()));
+
+        memcacheStats.setCurr_conn(Math.abs(memcacheStatsestmp.get(1).getCurr_conn() - memcacheStatsestmp.get(0).getCurr_conn()));
+
+        memcacheStats.setDelete_hits(Math.abs(memcacheStatsestmp.get(1).getDelete_hits() - memcacheStatsestmp.get(0).getDelete_hits()));
+
+        memcacheStats.setEvictions(Math.abs(memcacheStatsestmp.get(1).getEvictions() - memcacheStatsestmp.get(0).getEvictions()));
+
+        memcacheStats.setDelete_misses(Math.abs(memcacheStatsestmp.get(1).getDelete_misses() - memcacheStatsestmp.get(0).getDelete_misses()));
+
+        memcacheStats.setCurr_items(Math.abs(memcacheStatsestmp.get(1).getCurr_items() - memcacheStatsestmp.get(0).getCurr_items()));
+
+        memcacheStats.setGet_hits(Math.abs(memcacheStatsestmp.get(1).getGet_hits() - memcacheStatsestmp.get(0).getGet_hits()));
+
+        memcacheStats.setGet_misses(Math.abs(memcacheStatsestmp.get(1).getGet_misses() - memcacheStatsestmp.get(0).getGet_misses()));
+
+        memcacheStats.setLimit_maxbytes(Math.abs(memcacheStatsestmp.get(1).getLimit_maxbytes() - memcacheStatsestmp.get(0).getLimit_maxbytes()));
+
+        memcacheStats.setTotal_conn(Math.abs(memcacheStatsestmp.get(1).getTotal_conn() - memcacheStatsestmp.get(0).getTotal_conn()));
+
+        return memcacheStats;
     }
 
     private MemcacheStats dealMemcacheStats(MemcacheStats curr, MemcacheStats base) {
@@ -247,11 +311,13 @@ public class BaselineComputeTask {
 
         Map<String, RedisStats> redisStatsMap = new HashMap<String, RedisStats>();
 
-        for (int i = 3; i < startTimeList.size(); i++) {
+        List<Server> serverList = serverService.findAllRedisServers();
+
+        for (int i = 0; i < startTimeList.size(); i++) {
             String startTime = startTimeList.get(i);
             startTime = startTime.split(" ")[0];
             String endTime;
-            if (i < startTimeList.size()-1) {
+            if (i < startTimeList.size() - 1) {
                 endTime = startTimeList.get(i + 1);
             } else {
                 endTime = endDate;
@@ -265,43 +331,72 @@ public class BaselineComputeTask {
             long startLong = df.parse(startTime).getTime() / 1000;
             long tmp = startLong;
             long endLong = df.parse(endTime).getTime() / 1000;
+//            startLong = endLong - 100;
+//            tmp = startLong;
 
 
             while (tmp + 60 < endLong) {//每分钟只采样一次
-                long end = tmp + 60;
+                long end = tmp + 120;
 
-                String sql = "SELECT * FROM redis_stats WHERE curr_time > " + tmp + " AND curr_time < " + end;
+                for (Server server : serverList) {
+                    try {
 
-                List<RedisStats> redisStatsestmp = redisStatsService.search(sql);
-                if (0 != redisStatsestmp.size()) {
-                    SimpleDateFormat sdf = new SimpleDateFormat("EEEE:HH:mm");
-                    Date nameDate = new Date(tmp*1000);
-                    String name = "Redis_" + sdf.format(nameDate);
-                    if (null == redisStatsMap.get(name)) {
-                        redisStatsMap.put(name, redisStatsestmp.get(0));
-                    } else {
-                        RedisStats redisStats = dealRedisStats(redisStatsestmp.get(0), redisStatsMap.get(name));
+                        String sql = "SELECT * FROM redis_stats WHERE curr_time > " + tmp + " AND curr_time <= " + end + " AND serverId =" + server.getId() + " LIMIT " + 2 + " OFFSET " + 0;
 
-                        redisStatsMap.remove(name);
-                        redisStatsMap.put(name, redisStats);
+                        List<RedisStats> redisStatsestmp = redisStatsService.search(sql);
+                        if (0 != redisStatsestmp.size()) {
+                            SimpleDateFormat sdf = new SimpleDateFormat("EEEE:HH:mm");
+                            Date nameDate = new Date(tmp * 1000);
+                            String name = "Redis_" + sdf.format(nameDate) + "_" + server.getAddress();
+
+                            RedisStats redisStatsDelta = getRedisDelta(redisStatsestmp);
+
+                            if (null == redisStatsDelta) {
+                                continue;
+                            }
+
+                            if (null == redisStatsMap.get(name)) {
+                                redisStatsMap.put(name, redisStatsDelta);
+                            } else {
+                                RedisStats redisStats = dealRedisStats(redisStatsDelta, redisStatsMap.get(name));
+
+                                redisStatsMap.remove(name);
+                                redisStatsMap.put(name, redisStats);
+                            }
+                        }
+                    }catch (Exception e){
+                        logger.error("getRedisState:" + e);
                     }
                 }
                 tmp += 60;
             }
 
-            String sql = "SELECT * FROM redis_stats WHERE curr_time > " + tmp + " AND curr_time < " + endLong;
-            List<RedisStats> redisStatsestmp = redisStatsService.search(sql);
-            if (0 != redisStatsestmp.size()) {
-                SimpleDateFormat sdf = new SimpleDateFormat("EEEE:HH:mm");
-                Date nameDate = new Date(tmp*1000);
-                String name = "Redis_" + sdf.format(nameDate);
-                if (null == redisStatsMap.get(name)) {
-                    redisStatsMap.put(name, redisStatsestmp.get(0));
-                } else {
-                    RedisStats redisStats = dealRedisStats(redisStatsestmp.get(0), redisStatsMap.get(name));
+            for (Server server : serverList) {
+                String sql = "SELECT * FROM redis_stats WHERE curr_time > " + tmp + " AND curr_time <= " + endLong + " AND serverId =" + server.getId() + " LIMIT " + 2 + " OFFSET " + 0;
+                try {
+                    List<RedisStats> redisStatsestmp = redisStatsService.search(sql);
+                    if (0 != redisStatsestmp.size()) {
+                        SimpleDateFormat sdf = new SimpleDateFormat("EEEE:HH:mm");
+                        Date nameDate = new Date(tmp * 1000);
+                        String name = "Redis_" + sdf.format(nameDate) + "_" + server.getAddress();
 
-                    redisStatsMap.remove(name);
-                    redisStatsMap.put(name, redisStats);
+                        RedisStats redisStatsDelta = getRedisDelta(redisStatsestmp);
+
+                        if (null == redisStatsDelta) {
+                            continue;
+                        }
+
+                        if (null == redisStatsMap.get(name)) {
+                            redisStatsMap.put(name, redisStatsDelta);
+                        } else {
+                            RedisStats redisStats = dealRedisStats(redisStatsDelta, redisStatsMap.get(name));
+
+                            redisStatsMap.remove(name);
+                            redisStatsMap.put(name, redisStats);
+                        }
+                    }
+                } catch (Exception e) {
+                    logger.error("getRedisState:" + e);
                 }
             }
         }
@@ -309,6 +404,38 @@ public class BaselineComputeTask {
 
         return redisStatsMap;
 
+    }
+
+    private RedisStats getRedisDelta(List<RedisStats> redisStatsestmp) {
+        RedisStats redisStats = new RedisStats();
+
+        if (redisStatsestmp.size() < 2) {
+            return null;
+        }
+
+        redisStats.setInput_kbps(Math.abs(redisStatsestmp.get(1).getInput_kbps() - redisStatsestmp.get(0).getInput_kbps()));
+
+        redisStats.setMemory_used(Math.abs(redisStatsestmp.get(1).getMemory_used() - redisStatsestmp.get(0).getMemory_used()));
+
+        redisStats.setOutput_kbps(Math.abs(redisStatsestmp.get(1).getOutput_kbps() - redisStatsestmp.get(0).getOutput_kbps()));
+
+        redisStats.setQps(Math.abs(redisStatsestmp.get(1).getQps() - redisStatsestmp.get(0).getQps()));
+
+        redisStats.setTotal_connections(Math.abs(redisStatsestmp.get(1).getTotal_connections() - redisStatsestmp.get(0).getTotal_connections()));
+
+        redisStats.setUsed_cpu_sys(Math.abs(redisStatsestmp.get(1).getUsed_cpu_sys() - redisStatsestmp.get(0).getUsed_cpu_sys()));
+
+        redisStats.setUsed_cpu_sys_children(Math.abs(redisStatsestmp.get(1).getUsed_cpu_sys_children() - redisStatsestmp.get(0).getUsed_cpu_sys_children()));
+
+        redisStats.setUsed_cpu_user(Math.abs(redisStatsestmp.get(1).getUsed_cpu_user() - redisStatsestmp.get(0).getUsed_cpu_user()));
+
+        redisStats.setUsed_cpu_user_children(Math.abs(redisStatsestmp.get(1).getUsed_cpu_user_children() - redisStatsestmp.get(0).getUsed_cpu_user_children()));
+
+        redisStats.setId(redisStatsestmp.get(0).getId());
+        redisStats.setServerId(redisStatsestmp.get(0).getServerId());
+        redisStats.setCurr_time(redisStatsestmp.get(0).getCurr_time());
+
+        return redisStats;
     }
 
     private RedisStats dealRedisStats(RedisStats curr, RedisStats base) {
