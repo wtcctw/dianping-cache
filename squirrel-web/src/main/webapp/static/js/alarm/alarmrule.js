@@ -207,7 +207,7 @@ module
                 )
                     .success(
                     function (data) {
-                        alert("计算完毕。")
+                        alert("计算任务已启动……")
                     }
                 );
             };
