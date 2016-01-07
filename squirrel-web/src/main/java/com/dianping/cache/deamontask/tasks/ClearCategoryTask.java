@@ -19,16 +19,6 @@ public class ClearCategoryTask extends AbstractDeamonTask {
 
 
     public ClearCategoryTask(String category) {
-
-//        CacheKeyConfiguration key = cacheKeyConfigurationService.find(finalKey.substring(0, finalKey.indexOf(".")));
-//        Map<String, Object> paras = super.createViewMap();
-//        Object o = storeClient.get(finalKey);
-//        paras.put("result", o);
-//        StoreClient cc = StoreClientFactory.getStoreClient(key.getCacheType());
-//        if(cc instanceof Locatable){
-//            String location = ((Locatable)cc).locate(finalKey);
-//            paras.put("address", location);
-//        }
         this.category = category;
         this.storeClient = StoreClientFactory.getStoreClientByCategory(category);
     }
