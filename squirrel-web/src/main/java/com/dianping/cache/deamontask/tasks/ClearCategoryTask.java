@@ -3,6 +3,7 @@ package com.dianping.cache.deamontask.tasks;
 import com.dianping.cache.deamontask.AbstractDeamonTask;
 import com.dianping.squirrel.client.StoreClient;
 import com.dianping.squirrel.client.StoreClientFactory;
+import com.dianping.squirrel.client.StoreKey;
 import com.dianping.squirrel.client.impl.redis.RedisStoreClient;
 import redis.clients.jedis.*;
 
@@ -48,10 +49,12 @@ public class ClearCategoryTask extends AbstractDeamonTask {
             ScanResult<String> result;
             result = jedis.scan("0", scanParams);
             while (!result.getStringCursor().equals("0")) {
-                System.out.println(result.getStringCursor());
-                jedis.del(result.getResult().toArray(new String[0]));
+                for(String k : result.getResult()) {
+                    jedis.del(k);
+                }
                 result = jedis.scan(result.getStringCursor(), scanParams);
             }
         }
     }
+
 }
