@@ -1,6 +1,7 @@
 package com.dianping.cache.alarm.dataanalyse;
 
 
+import com.dianping.cache.alarm.threadmanager.ThreadManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,15 +16,16 @@ public class BaselineJob {
     protected static Logger logger = LoggerFactory.getLogger(BaselineJob.class);
 
     @Autowired
-    BaselineComputeTaskFactory baselineComputeTaskFactory;
+    BaselineThreadFactory baselineThreadFactory;
 
 
     @Scheduled(cron = "0 30 1 ? * SUN")//每个周日的1点30触发定时任务
     public void baselineWeeklyJob() {
         logger.info("baselineWeeklyJob", getClass().getSimpleName());
 
-        BaselineComputeTask baselineComputeTask = baselineComputeTaskFactory.createBaselineComputeTask();
-        baselineComputeTask.run();
+        BaselineThread baselineThread = baselineThreadFactory.createBaselineThread();
+
+        ThreadManager.getInstance().execute(baselineThread);
 
     }
 

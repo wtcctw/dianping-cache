@@ -5,11 +5,13 @@ import com.dianping.cache.alarm.alarmtemplate.MemcacheAlarmTemplateService;
 import com.dianping.cache.alarm.alarmtemplate.RedisAlarmTemplateService;
 import com.dianping.cache.alarm.controller.dto.AlarmConfigDto;
 import com.dianping.cache.alarm.controller.mapper.AlarmConfigMapper;
-import com.dianping.cache.alarm.dataanalyse.BaselineComputeTask;
 import com.dianping.cache.alarm.dataanalyse.BaselineComputeTaskFactory;
+import com.dianping.cache.alarm.dataanalyse.BaselineThread;
+import com.dianping.cache.alarm.dataanalyse.BaselineThreadFactory;
 import com.dianping.cache.alarm.entity.AlarmConfig;
 import com.dianping.cache.alarm.entity.MemcacheTemplate;
 import com.dianping.cache.alarm.entity.RedisTemplate;
+import com.dianping.cache.alarm.threadmanager.ThreadManager;
 import com.dianping.cache.controller.AbstractSidebarController;
 import com.dianping.cache.controller.RedisDataUtil;
 import com.dianping.cache.entity.CacheConfiguration;
@@ -44,6 +46,9 @@ public class AlarmConfigController extends AbstractSidebarController {
 
     @Autowired
     private BaselineComputeTaskFactory baselineComputeTaskFactory;
+
+    @Autowired
+    private BaselineThreadFactory baselineThreadFactory;
 
     @RequestMapping(value = "/setting/alarmrule")
     public ModelAndView topicSetting(HttpServletRequest request, HttpServletResponse response) {
@@ -148,12 +153,15 @@ public class AlarmConfigController extends AbstractSidebarController {
     }
 
     @RequestMapping(value = "/setting/alarmrule/baselineCompute")
+    @ResponseBody
     public void baselineCompute() {
+        System.out.println("Hello world");
 
-        BaselineComputeTask task = baselineComputeTaskFactory.createBaselineComputeTask();
+        BaselineThread baselineThread = baselineThreadFactory.createBaselineThread();
 
-        task.run();
+        ThreadManager.getInstance().execute(baselineThread);
 
+        return;
     }
 
 

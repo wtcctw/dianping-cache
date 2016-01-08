@@ -1,11 +1,11 @@
 package com.dianping.squirrel.monitor.task;
 
 /**
- * Task to generate history baseline data
+ * Task to calculate history baseline data
  * 
  * @author enlight
  *
  */
-public class AlarmBaselineTask {
+public class CalcHistoryBaselineTask {
 
 }

@@ -6,6 +6,6 @@ package com.dianping.squirrel.monitor.task;
  * @author enlight
  *
  */
-public class DataMaintainTask {
+public class PurgeHistoryDataTask {
 
 }
