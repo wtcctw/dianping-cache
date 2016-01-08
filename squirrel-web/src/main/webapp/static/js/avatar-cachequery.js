@@ -75,9 +75,6 @@ module.controller('CacheQueryController', [
 								$scope.params.push([pname,desc[i]]);
 							}
 							
-							paranum = 0;
-							
-							
 						}else{
 							$scope.hasTemplate = false;
 						}
@@ -100,8 +97,22 @@ module.controller('CacheQueryController', [
 					});
 				
 			};
-			
-			
+
+            $scope.deleteCategory = function(){
+                $http.get(window.contextPath + '/cache/query/deleteCategory',{
+                    params : {
+                        "category": $scope.category
+                    }
+                }).success(function(response){
+                    //$scope.result = response.result;
+                    //$scope.address = response.address;
+                });
+
+            };
+
+
+
+
 			$scope.setKeyValue = function(){
 				var tmpParams = [];
 				for(var i = 0; i < $scope.params.length; i++){

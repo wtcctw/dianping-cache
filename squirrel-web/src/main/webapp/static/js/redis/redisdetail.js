@@ -84,11 +84,13 @@ module.controller('RedisController', [
     function($scope, $http) {
         $scope.redisData = {};
         $scope.reshardParams = {};
+        $scope.redisScaleParams = {};
         $scope.categoryList = [];
         $scope.avgsrc = [];
         $scope.exportsrc = [];
         $scope.exportdes = [];
         $scope.reshardType;
+        $scope.failover;
         $scope.initPage = function(){
             $http.get(window.contextPath + '/redis/detail',{
                 params : {}
@@ -110,7 +112,7 @@ module.controller('RedisController', [
             $scope.exportsrc = [];
             $scope.exportdes = [];
             $scope.reshardParams = {};
-
+            $scope.reshardParams.cluster = $scope.redisData.clusterName;
             if($scope.reshardType === "average"){
                 var avgTemp = $('.avg');
                 for(var i = 0;i<avgTemp.length;i++){
@@ -140,8 +142,50 @@ module.controller('RedisController', [
                 $scope.reshardParams.desNodes = $scope.exportdes;
             }
 
-            $http.post(window.contextPath + '/redis/1/reshard',$scope.reshardParams)
+            $http.post(window.contextPath + '/redis/reshard',$scope.reshardParams)
                 .success();
         }
 
+        $scope.setParams = function(cluster,address){
+            $scope.cluster = cluster;
+            $scope.address = address;
+        }
+
+        $scope.deleteSlave = function(cluster,address){
+            $scope.redisScaleParams = {};
+            $scope.redisScaleParams.cluster = cluster;
+            $scope.redisScaleParams.slaveAddress = address;
+            $http.post(window.contextPath + '/redis/deleteslave', $scope.redisScaleParams
+            ).success(function(response) {
+            }).error(function(response) {
+            });
+        };
+
+        $scope.addSlave = function(cluster,address){
+            $scope.redisScaleParams = {};
+            $scope.redisScaleParams.cluster = cluster;
+            $scope.redisScaleParams.masterAddress = address;
+            $http.post(window.contextPath + '/redis/addslave', $scope.redisScaleParams
+            ).success(function(response) {
+            }).error(function(response) {
+            });
+        };
+
+        $scope.setFailover = function(failover){
+            $scope.failover = failover;
+        }
+
+        $scope.execFailover = function(){
+            loadmask();
+            $scope.redisScaleParams.cluster = $scope.redisData.clusterName;
+            $scope.redisScaleParams.slaveAddress = $scope.failover;
+            $http.post(window.contextPath + '/redis/failover',$scope.redisScaleParams)
+                .success(function(response){
+                    if(response == true){
+                        hidemask();
+                    }else{
+                        hidemask();
+                    }
+                });
+        }
     } ]);

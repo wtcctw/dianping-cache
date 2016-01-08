@@ -6,9 +6,14 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import redis.clients.jedis.Jedis;
+import redis.clients.jedis.Pipeline;
+import redis.clients.jedis.Response;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.Assert.*;
 
@@ -61,5 +66,15 @@ public class ReshardPlanTest {
 
         System.out.println("Start to Migrate");
         RedisManager.reshard(reshardPlan);
+    }
+
+    @Test
+    public void setStable(){
+        Jedis srcNode = new Jedis("192.168.217.36",7003);
+        Jedis destNode = new Jedis("192.168.211.63",7004);
+
+        /** migrate every slot from src node to dest node */
+        srcNode.clusterSetSlotStable(4098);
+        destNode.clusterSetSlotStable(4098);
     }
 }

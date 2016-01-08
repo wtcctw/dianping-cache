@@ -1,5 +1,6 @@
 package com.dianping.cache.controller;
 
+import com.dianping.cache.controller.dto.MemcachedDashBoardData;
 import com.dianping.cache.entity.CacheConfiguration;
 import com.dianping.cache.entity.MemcacheStats;
 import com.dianping.cache.entity.Server;
@@ -40,10 +41,11 @@ public class MemcachedController extends AbstractCacheController{
 
     @RequestMapping(value = "/memcached/dashboard/data")
     @ResponseBody
-    public void getDashboardData(){
+    public MemcachedDashBoardData getDashboardData(){
         List<CacheConfiguration> configList = cacheConfigurationService.findAll();
-        List<HashMap<String, Object>> data = new ArrayList<HashMap<String,Object>>();
         Map<String, Map<String, Object>> currentServerStats = this.getCurrentServerStatsData();
+        MemcachedDashBoardData data = new MemcachedDashBoardData(configList,currentServerStats);
+        return data;
     }
 
     private  Map<String,Map<String,Object>> getCurrentServerStatsData(){
@@ -59,8 +61,6 @@ public class MemcachedController extends AbstractCacheController{
             temp.put("QPS", item.getValue().getHitDatas()[length-1]);
             temp.put("max_memory", item.getValue().getMax_memory());
             temp.put("used_memory", item.getValue().getBytes()[length-1]);
-            temp.put("curr_conn", item.getValue().getConnDatas()[length-1]);
-            temp.put("evict", item.getValue().getEvictionsDatas()[length-1]);
             long miss = item.getValue().getGetMissDatas()[length-1];
             long get = item.getValue().getGetsDatas()[length-1];
             float hitrate;
@@ -77,12 +77,9 @@ public class MemcachedController extends AbstractCacheController{
     }
 
     private  Map<String,List<MemcacheStats>> getAllServerStats() {
-        //get all server in cluster
         List<Server> sc = serverService.findAllMemcachedServers();
-
         long start = (System.currentTimeMillis()- TimeUnit.MILLISECONDS.convert(2, TimeUnit.MINUTES))/1000;
         long end = (System.currentTimeMillis())/1000;
-
         Map<String,List<MemcacheStats>> result = new HashMap<String,List<MemcacheStats>>();
         for(Server server : sc){
             result.put(server.getAddress(),getMemcacheStats(server.getAddress(),start,end));
@@ -103,13 +100,10 @@ public class MemcachedController extends AbstractCacheController{
             if(item.getValue() != null && item.getValue().size() > 1){
                 result.put(item.getKey(), new MemcachedStatsData(item.getValue()));
             }
-//			else{
-//				result.put(item.getKey(),null);
-//			}
         }
         return result;
     }
-    private String subside;
+    private String subside = "memcached";
 
     @Override
     protected String getSide() {
@@ -118,6 +112,6 @@ public class MemcachedController extends AbstractCacheController{
 
     @Override
     public String getSubSide() {
-        return null;
+        return subside;
     }
 }

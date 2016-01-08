@@ -3,14 +3,18 @@ package com.dianping.cache.controller;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
-import javax.annotation.Resource;
 
 import com.dianping.cache.controller.dto.RedisDashBoardData;
 import com.dianping.cache.controller.dto.RedisReshardParams;
 import com.dianping.cache.controller.dto.RedisScaleParams;
+import com.dianping.cache.deamontask.CacheDeamonTaskManager;
+import com.dianping.cache.deamontask.tasks.RedisReshardTask;
 import com.dianping.cache.scale.cluster.redis.RedisManager;
 import com.dianping.cache.scale.cluster.redis.RedisScaler;
+import com.dianping.cache.scale.cluster.redis.ReshardPlan;
 import com.dianping.cache.scale.exceptions.ScaleException;
+import com.dianping.cache.service.ReshardService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
@@ -25,21 +29,24 @@ import com.dianping.cache.service.RedisStatsService;
 
 @Controller
 public class RedisController extends AbstractCacheController{
-	
-	
-	@Resource(name = "redisStatsService")
+
+
+	@Autowired
 	private RedisStatsService redisStatsService;
-	
+
+	@Autowired
+	private ReshardService reshardService;
+
 	private String subside;
 
 	private String currentCluster;
 
-	@RequestMapping(value = "/redis/dashboard", method = RequestMethod.GET)
+	@RequestMapping(value = "/redis/dashboard")
 	public ModelAndView viewClusterDashBoard(){
 		return new ModelAndView("monitor/redisdashboard",createViewMap());
 	}
 	
-	@RequestMapping(value = "/redis/dashboardinfo", method = RequestMethod.GET)
+	@RequestMapping(value = "/redis/dashboardinfo")
 	@ResponseBody
 	public List<RedisClusterData> getDashboard(){
 		return RedisDataUtil.getClusterData();
@@ -51,19 +58,19 @@ public class RedisController extends AbstractCacheController{
 		return RedisDataUtil.getRedisDashBoardData();
 	}
 	
-	@RequestMapping(value = "/redis/serverinfo", method = RequestMethod.GET)
+	@RequestMapping(value = "/redis/serverinfo")
 	public ModelAndView viewRedisServerInfo(){
 		subside = "dashboard";
 		return new ModelAndView("monitor/redisserverinfo",createViewMap());
 	}
 	
-	@RequestMapping(value = "/redis/serverinfodata", method = RequestMethod.GET)
+	@RequestMapping(value = "/redis/serverinfodata")
 	@ResponseBody
 	public Map<String, Object> getRedisServerInfo(String address){
 		return RedisDataUtil.getRedisServerData(address);
 	}
 	
-	@RequestMapping(value = "/redis", method = RequestMethod.GET)
+	@RequestMapping(value = "/redis")
 	public ModelAndView redis(){
 		subside = "redis";
 		return new ModelAndView("cluster/redis",createViewMap());
@@ -81,7 +88,7 @@ public class RedisController extends AbstractCacheController{
 		return RedisDataUtil.getRedisDetailData(currentCluster);
 	}
 
-	@RequestMapping(value = "/redis/historydata", method = RequestMethod.GET)
+	@RequestMapping(value = "/redis/historydata")
 	@ResponseBody
 	public List<HighChartsWrapper> getRedisHistoryData(String address,long endTime){
 		long start = (endTime - TimeUnit.MILLISECONDS.convert(120, TimeUnit.MINUTES))/1000;
@@ -91,21 +98,29 @@ public class RedisController extends AbstractCacheController{
 		return ChartsBuilder.buildRedisStatsCharts(statsData);
 	}
 
-	@RequestMapping(value = "/redis/1/reshard")
+	@RequestMapping(value = "/redis/reshard")
 	@ResponseBody
-	public void reshard(@RequestBody RedisReshardParams redisReshardParams){
+	public void reshard(@RequestBody RedisReshardParams redisReshardParams) {
 
-		redisReshardParams.isAverage();
-		return;
+		ReshardPlan reshardPlan = reshardService.createReshardPlan(redisReshardParams.getCluster(), redisReshardParams.getSrcNodes(),
+				redisReshardParams.getDesNodes(), redisReshardParams.isAverage());
+		RedisReshardTask task = new RedisReshardTask(reshardPlan);
+		CacheDeamonTaskManager.submit(task);
 	}
 
-	@RequestMapping(value = "/redis/addslave", method = RequestMethod.POST)
+	@RequestMapping(value = "/redis/failover")
 	@ResponseBody
-	public void addSlave(@RequestBody RedisScaleParams redisScaleParams) throws ScaleException {
+	public boolean failover(@RequestBody RedisScaleParams redisScaleParams){
+		return RedisManager.failover(redisScaleParams.getCluster(),redisScaleParams.getSlaveAddress());
+	}
+
+	@RequestMapping(value = "/redis/addslave")
+	@ResponseBody
+	public void addSlave(@RequestBody RedisScaleParams redisScaleParams){
 		RedisScaler.addSlave(redisScaleParams.getCluster(),redisScaleParams.getMasterAddress());
 	}
 
-	@RequestMapping(value = "/redis/deleteslave", method = RequestMethod.POST)
+	@RequestMapping(value = "/redis/deleteslave")
 	@ResponseBody
 	public void delSlave(@RequestBody RedisScaleParams redisScaleParams) throws ScaleException{
 		RedisScaler.removeSlave(redisScaleParams.getCluster(),redisScaleParams.getSlaveAddress());

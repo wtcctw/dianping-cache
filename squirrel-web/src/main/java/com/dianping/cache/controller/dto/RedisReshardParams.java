@@ -6,9 +6,18 @@ import java.util.List;
  * Created by dp on 16/1/6.
  */
 public class RedisReshardParams {
+    private String cluster;
     private boolean isAverage;
     private List<String> srcNodes;
     private List<String> desNodes;
+
+    public String getCluster() {
+        return cluster;
+    }
+
+    public void setCluster(String cluster) {
+        this.cluster = cluster;
+    }
 
     public boolean isAverage() {
         return isAverage;

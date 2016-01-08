@@ -20,7 +20,7 @@ module.controller('MemcachedDashBoardController', [ '$scope', '$http','$document
         var init = function (num1,num2,width1,width2) {
             $(document).ready(function () {
                 setTimeout(function () {
-                    $('#redisTable').dataTable({
+                    $('#memcachedTable').dataTable({
                         "bAutoWidth": true,
                         "bPaginate": true, //翻页功能
                         "bLengthChange": true, //改变每页显示数据数量
@@ -32,10 +32,10 @@ module.controller('MemcachedDashBoardController', [ '$scope', '$http','$document
                         "iDisplayLength": 10,
                         "aoColumns": [
                             {"bSortable": false},null, null, null, {"bSortable": false},
-                            {"bSortable": false}, {"bSortable": false}
+                            {"bSortable": false}, {"bSortable": false},{"bSortable": false}
                         ],
                     });
-                    var obj = document.getElementById("redisTable_length");
+                    var obj = document.getElementById("memcachedTable_length");
                     obj.innerHTML='<div style="margin-top: 5px"> <div class="col-sm-2">总览</div> '+
                         '</div><div class="col-sm-7" style="margin-top: 3px"><div class="progress progress-small"> <div class="progress-bar progress-bar-success" style="width:'+width1+'%;background-color:#68ff5c;position: relative;"></div>' +
                         '<div class="progress-bar progress-bar-danger" style="width: '+width2+'%;background-color:#ff6a6a;position: relative;"></div></div></div>' +

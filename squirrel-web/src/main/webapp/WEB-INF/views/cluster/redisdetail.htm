@@ -9,6 +9,8 @@
                 src="${rc.contextPath}/static/js/highcharts/solid-gauge.js"></script>
         <script type="text/javascript"
                 src="${rc.contextPath}/static/js/redis/redisdetail.js"></script>
+        <script type="text/javascript"
+                src="${rc.contextPath}/static/js/mask/loadmask.js"></script>
         <style>
             th{
                font-size: 14px;  color: #404040;
@@ -39,8 +41,9 @@
                                 <th style="width: 5%">ID</th>
                                 <th style="width: 25%">Master</th>
                                 <th style="width: 20%">Slave</th>
-                                <th style="width: 20%">内存</th>
+                                <th style="width: 10%">内存</th>
                                 <th style="width: 10%">Slots</th>
+                                <th style="width: 10%">QPS</th>
                                 <th style="width: 20%">操作</th>
                             </tr>
                             </thead>
@@ -49,22 +52,24 @@
                                 <td>{{$index+1}}</td>
                                 <td>{{data.master.address}}
                                     <span ng-show="data.master.migrating"><i class="ace-icon fa fa-cloud-upload bigger-130"></i></span>
+                                    <span class= "warning" ng-show="data.master.importing"><i class="ace-icon fa fa-cloud-download bigger-130"></i></span>
                                 </td>
                                 <td>{{data.slave.address}}</td>
                                 <td>{{data.master.info.used}}%/{{data.master.info.maxMem}}G</td>
                                 <td>{{data.master.slotSize}}</td>
+                                <td>{{data.master.info.qps}}</td>
                                 <td>
                                     <div class="hidden-sm hidden-xs action-buttons">
                                         <a class="grey" href="#reshardModal" data-toggle="modal">
                                             <i class="ace-icon fa fa-share bigger-130"></i>
                                         </a>
-                                        <a class="grey" href="#">
+                                        <a class="grey" href="#changeConfirm" data-toggle="modal" ng-click="setFailover(data.slave.address)">
                                             <i class="ace-icon fa fa-exchange bigger-130"></i>
                                         </a>
-                                        <a class="grey" href="#" ng-show="{{data.slave.address==null}}">
+                                        <a class="grey" href="#addModal" data-toggle="modal" ng-click="setParams(redisData.clusterName,data.master.address)" ng-show="{{data.slave.address==null}}">
                                             <i class="ace-icon bigger-130"> S+ </i>
                                         </a>
-                                        <a class="grey" href="#" ng-show="{{data.slave.address!=null}}">
+                                        <a class="grey" href="#deleteModal" data-toggle="modal" ng-click="setParams(redisData.clusterName,data.slave.address)" ng-show="{{data.slave.address!=null}}">
                                             <i class="ace-icon bigger-130"> S- </i>
                                         </a>
 
@@ -220,6 +225,106 @@
         <!--/.modal-content-->
     </div>
 
+    <div class="modal fade" id="changeConfirm" tabindex="-1" role="dialog"
+         aria-labelledby="myModalLabel" aria-hidden="true" style="width: 300px; margin: 0 auto;margin-top: 150px;">
+        <div class="modal-dialog" style="width: 300px; margin: 0 auto;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close"
+                            data-dismiss="modal" aria-hidden="true">
+                        &times;
+                    </button>
+                    <h4 class="modal-title red">
+                        警告
+                    </h4>
+                </div>
+                <div class="modal-body bolder center">
+                    确认主从切换 ?<br>从 : {{failover}} <br>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-sm btn-default pull-left"
+                            data-dismiss="modal">取消
+                    </button>
+                    <button type="button" class="btn btn-sm btn-danger pull-right" ng-click="execFailover()" data-dismiss="modal">
+                        确认
+                    </button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal -->
+    </div>
+
+    <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog"
+         aria-labelledby="myModalLabel" aria-hidden="true" style="width: 300px; margin: 0 auto;margin-top: 150px;">
+        <div class="modal-dialog" style="width: 300px; margin: 0 auto;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close"
+                            data-dismiss="modal" aria-hidden="true">
+                        &times;
+                    </button>
+                    <h4 class="modal-title red">
+                        警告
+                    </h4>
+                </div>
+                <div class="modal-body bolder center">
+                    确认删除Slave ?<br>从 : {{address}} <br>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-sm btn-default pull-left"
+                            data-dismiss="modal">取消
+                    </button>
+                    <button type="button" class="btn btn-sm btn-danger pull-right" ng-click="deleteSlave(cluster,address)" data-dismiss="modal">
+                        确认
+                    </button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal -->
+    </div>
+
+
+    <div class="modal fade" id="addModal" tabindex="-1" role="dialog"
+         aria-labelledby="myModalLabel" aria-hidden="true" style="width: 300px; margin: 0 auto;margin-top: 150px;">
+        <div class="modal-dialog" style="width: 300px; margin: 0 auto;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close"
+                            data-dismiss="modal" aria-hidden="true">
+                        &times;
+                    </button>
+                    <h4 class="modal-title red">
+                        警告
+                    </h4>
+                </div>
+                <div class="modal-body bolder center">
+                    确认为该节点添加Slave?<br>主 : {{address}} <br>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-sm btn-default pull-left"
+                            data-dismiss="modal">取消
+                    </button>
+                    <button type="button" class="btn btn-sm btn-danger pull-right" ng-click="addSlave(cluster,address)" data-dismiss="modal">
+                        确认
+                    </button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal -->
+    </div>
+
+</div>
+<div id="BgDiv"></div>
+<div class="DialogDiv" style="display:none;position:fixed;">
+    <div class="U-guodu-box">
+        <div>
+            <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                    <td align="center"><img src="../static/js/mask/loading.gif"></td>
+                </tr>
+                <tr>
+                    <td valign="middle" align="center">处理中，请稍后！</td>
+                </tr>
+            </table>
+        </div>
+    </div>
 </div>
 <script type="application/javascript">
     $(document).on('click', 'th input:checkbox' , function(){
@@ -230,5 +335,5 @@
                     $(this).closest('tr').toggleClass('selected');
                 });
     });
-
+    //loadmask();
 </script>

@@ -13,9 +13,6 @@ import java.util.*;
 @Component
 public class ReshardPlan {
 
-    //@Autowired
-    private ReshardRecordService reshardRecordService;
-
     private int id;
 
     private String cluster;
@@ -67,16 +64,16 @@ public class ReshardPlan {
         totalSlots = totalSrcSlots + totalDesSlots;
         if(isAverage){
             totalNodes = srcNodeServer.size() + desNodeServer.size();
-            baseLine = totalSlots / totalNodes + 1;
+            baseLine = totalSlots / totalNodes + (totalSlots % totalNodes == 0 ? 0 : 1);
         }else{
             totalNodes = desNodeServer.size();
             baseLine = 0;
         }
-        avgSlots = totalSlots / totalNodes + 1;
+        avgSlots = totalSlots / totalNodes + (totalSlots % totalNodes == 0 ? 0 : 1);
         int order = 0;
         for(RedisServer desServer : desNodeServer){
             int need = avgSlots - desCapacity.get(desServer.getAddress());
-            if(need < 0){
+            if(need <= 0){
                 continue;
             }
             for(RedisServer srcServer : srcNodeServer){
@@ -97,7 +94,6 @@ public class ReshardPlan {
                     reshardRecord.setMigrateSwitch(false);
                     reshardRecord.setOrder(order++);
                     reshardRecords.add(reshardRecord);
-                    //reshardRecordService.insert(reshardRecord);
                 }
                 if(need <= 0){
                     break;
@@ -112,20 +108,17 @@ public class ReshardPlan {
             return null;
         RedisCluster redisCluster = RedisManager.refreshCache(cluster);
         if(redisCluster == null){
-
+            throw new ScaleException("can't find cluster " + cluster);
         }
         List<RedisServer> servers = new ArrayList<RedisServer>();
         for(String address : addressList){
             RedisServer server = redisCluster.getServer(address);
             if(server.isSlave()){
-                throw new ScaleException("can't migrate slave node");//can't migrate slave node
+                throw new ScaleException("can't migrate slave node");
             }
             servers.add(server);
         }
         return servers;
-    }
-    public void updateRecode(){
-
     }
 
     public String getCluster() {
