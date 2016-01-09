@@ -274,7 +274,8 @@ public class RedisAlarmer extends AbstractRedisAlarmer {
 
         AlarmDetail alarmDetail = new AlarmDetail(alarmConfig);
 
-        alarmDetail.setAlarmDetail(detail)
+        alarmDetail.setAlarmTitle(item.getClusterName() + type)
+                .setAlarmDetail(detail)
                 .setMailMode(redisTemplate.isMailMode())
                 .setSmsMode(redisTemplate.isSmsMode())
                 .setWeixinMode(redisTemplate.isWeixinMode())

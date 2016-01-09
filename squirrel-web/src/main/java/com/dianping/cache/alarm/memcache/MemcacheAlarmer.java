@@ -487,7 +487,7 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
         }
 
         alarmDetail.setClusterName(item.getCacheKey());
-        alarmDetail.setAlarmTitle(type)
+        alarmDetail.setAlarmTitle(item.getCacheKey()+type)
                 .setAlarmDetail(detail)
                 .setMailMode(memcacheTemplate.isMailMode())
                 .setSmsMode(memcacheTemplate.isSmsMode())
