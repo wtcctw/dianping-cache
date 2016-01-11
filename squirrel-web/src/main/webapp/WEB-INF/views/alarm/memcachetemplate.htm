@@ -99,18 +99,9 @@
                                 </div>
 
                                 <div class="col-xs-12 form-group">
-                                    <label class="col-xs-3 control-label control-label no-padding-right">配置：</label>
+                                    <label class="col-xs-3 control-label control-label no-padding-right">宕机：</label>
                                     <div class="col-xs-9" style="font-size: 15px">
-                                        宕机：
                                         <input type="checkbox"  ng-model="alarmConfigEntity.isDown" name="isDown">
-                                        &nbsp&nbsp历史：
-                                        <input type="checkbox"  ng-model="alarmConfigEntity.checkHistory" name="checkHistory">
-                                        &nbsp&nbsp邮件：
-                                        <input type="checkbox"  ng-model="alarmConfigEntity.mailMode" name="mailMode">
-                                        &nbsp&nbsp短信：
-                                        <input type="checkbox"  ng-model="alarmConfigEntity.smsMode" name="smsMode">
-                                        &nbsp&nbsp微信：
-                                        <input type="checkbox"  ng-model="alarmConfigEntity.weixinMode" name="weixinMode">
                                     </div>
                                 </div>
 
@@ -136,6 +127,25 @@
                                     <div class="col-xs-9">
                                         <input type="text" class="form-control"
                                                ng-model="alarmConfigEntity.connThreshold" name="connThreshold">
+                                    </div>
+                                </div>
+
+                                <div class="col-xs-12 form-group">
+                                    <label class="col-xs-3 control-label control-label no-padding-right">历史数据分析：</label>
+                                    <div class="col-xs-9" style="font-size: 15px">
+                                        <input type="checkbox"  ng-model="alarmConfigEntity.checkHistory" name="checkHistory">
+                                    </div>
+                                </div>
+
+                                <div class="col-xs-12 form-group">
+                                    <label class="col-xs-3 control-label control-label no-padding-right">告警方式配置：</label>
+                                    <div class="col-xs-9" style="font-size: 15px">
+                                        邮件：
+                                        <input type="checkbox"  ng-model="alarmConfigEntity.mailMode" name="mailMode">
+                                        &nbsp&nbsp短信：
+                                        <input type="checkbox"  ng-model="alarmConfigEntity.smsMode" name="smsMode">
+                                        &nbsp&nbsp微信：
+                                        <input type="checkbox"  ng-model="alarmConfigEntity.weixinMode" name="weixinMode">
                                     </div>
                                 </div>
 
