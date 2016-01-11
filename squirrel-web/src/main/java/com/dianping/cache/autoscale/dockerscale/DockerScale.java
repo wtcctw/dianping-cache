@@ -12,8 +12,8 @@ import com.dianping.cache.autoscale.Instance;
 import com.dianping.cache.autoscale.Result;
 import com.dianping.cache.autoscale.dockerscale.DockerResultParse.OperateResult;
 import com.dianping.cache.service.ServerService;
-import com.dianping.cache.support.spring.SpringLocator;
 import com.dianping.cache.util.RequestUtil;
+import com.dianping.cache.util.SpringLocator;
 
 
 public class DockerScale implements AutoScale{

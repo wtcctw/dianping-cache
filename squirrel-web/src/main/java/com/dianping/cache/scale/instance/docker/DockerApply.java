@@ -14,8 +14,9 @@ import com.dianping.cache.scale.instance.Instance;
 import com.dianping.cache.scale.instance.Result;
 import com.dianping.cache.scale.instance.docker.DockerResultParse.OperateResult;
 import com.dianping.cache.service.ServerService;
-import com.dianping.cache.support.spring.SpringLocator;
 import com.dianping.cache.util.RequestUtil;
+import com.dianping.cache.util.SpringLocator;
+
 import org.springframework.dao.DuplicateKeyException;
 
 public class DockerApply implements Apply{

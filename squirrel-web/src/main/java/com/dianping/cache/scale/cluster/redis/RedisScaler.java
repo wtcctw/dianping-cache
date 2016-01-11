@@ -3,7 +3,6 @@ package com.dianping.cache.scale.cluster.redis;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.dianping.cache.support.spring.SpringLocator;
 
 import com.dianping.cache.entity.CacheConfiguration;
 import com.dianping.cache.entity.Server;
@@ -15,6 +14,8 @@ import com.dianping.cache.scale.instance.docker.DockerApply;
 import com.dianping.cache.service.CacheConfigurationService;
 import com.dianping.cache.service.ServerService;
 import com.dianping.cache.util.ParseServersUtil;
+import com.dianping.cache.util.SpringLocator;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

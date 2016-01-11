@@ -16,8 +16,8 @@ import org.slf4j.LoggerFactory;
 
 import com.dianping.cache.entity.CacheConfiguration;
 import com.dianping.cache.service.CacheConfigurationService;
-import com.dianping.cache.support.spring.SpringLocator;
 import com.dianping.cache.util.CollectionUtils;
+import com.dianping.cache.util.SpringLocator;
 import com.dianping.lion.Environment;
 import com.dianping.pigeon.threadpool.NamedThreadFactory;
 import com.dianping.squirrel.common.config.ConfigChangeListener;
