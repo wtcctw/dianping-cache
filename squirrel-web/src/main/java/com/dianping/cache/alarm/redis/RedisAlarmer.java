@@ -4,7 +4,7 @@ import com.dianping.cache.alarm.AlarmType;
 import com.dianping.cache.alarm.alarmconfig.AlarmConfigService;
 import com.dianping.cache.alarm.alarmtemplate.RedisAlarmTemplateService;
 import com.dianping.cache.alarm.dao.AlarmRecordDao;
-import com.dianping.cache.alarm.dataanalyse.baselineCache.BaselineCacheService;
+import com.dianping.cache.alarm.dataanalyse.service.RedisBaselineService;
 import com.dianping.cache.alarm.entity.AlarmConfig;
 import com.dianping.cache.alarm.entity.AlarmDetail;
 import com.dianping.cache.alarm.entity.AlarmRecord;
@@ -62,7 +62,7 @@ public class RedisAlarmer extends AbstractRedisAlarmer {
     RedisAlarmTemplateService redisAlarmTemplateService;
 
     @Autowired
-    BaselineCacheService baselineCacheService;
+    RedisBaselineService redisBaselineService;
 
     @Override
     public void doAlarm() throws InterruptedException, IOException, TimeoutException {
@@ -177,7 +177,7 @@ public class RedisAlarmer extends AbstractRedisAlarmer {
                     }
 
 
-                    if (fluctTooMuch((double) node.getMaster().getInfo().getTotal_connections(), (double) baselineCacheService.getRedisBaselineByName(name).getTotal_connections())) {
+                    if (fluctTooMuch((double) node.getMaster().getInfo().getTotal_connections(), (double) redisBaselineService.findByName(name).get(0).getTotal_connections())) {
 
                         isReport = true;
                         String detail = item.getClusterName() + ":" + node.getMaster().getAddress() + "," + TOTAL_CONNECTIONS;
@@ -191,7 +191,7 @@ public class RedisAlarmer extends AbstractRedisAlarmer {
                     }
 
 
-                    if (fluctTooMuch((double) node.getMaster().getInfo().getConnected_clients(), (double) baselineCacheService.getRedisBaselineByName(name).getConnected_clients())) {
+                    if (fluctTooMuch((double) node.getMaster().getInfo().getConnected_clients(), (double) redisBaselineService.findByName(name).get(0).getConnected_clients())) {
 
                         isReport = true;
                         String detail = item.getClusterName() + ":" + node.getMaster().getAddress() + "," + CONNECTED_CLIENTS;
@@ -206,7 +206,7 @@ public class RedisAlarmer extends AbstractRedisAlarmer {
                     }
 
 
-                    if (fluctTooMuch((double) node.getMaster().getInfo().getInput_kbps(), (double) baselineCacheService.getRedisBaselineByName(name).getInput_kbps())) {
+                    if (fluctTooMuch((double) node.getMaster().getInfo().getInput_kbps(), (double) redisBaselineService.findByName(name).get(0).getInput_kbps())) {
 
                         isReport = true;
                         String detail = item.getClusterName() + ":" + node.getMaster().getAddress() + "," + INPUT_KBPS;
@@ -220,7 +220,7 @@ public class RedisAlarmer extends AbstractRedisAlarmer {
                     }
 
 
-                    if (fluctTooMuch((double) node.getMaster().getInfo().getOutput_kbps(), (double) baselineCacheService.getRedisBaselineByName(name).getOutput_kbps())) {
+                    if (fluctTooMuch((double) node.getMaster().getInfo().getOutput_kbps(), (double) redisBaselineService.findByName(name).get(0).getOutput_kbps())) {
 
                         isReport = true;
                         String detail = item.getClusterName() + ":" + node.getMaster().getAddress() + "," + OUTPUT_KBPS;
@@ -235,7 +235,7 @@ public class RedisAlarmer extends AbstractRedisAlarmer {
                     }
 
 
-                    if (fluctTooMuch((double) node.getMaster().getInfo().getUsed_cpu_sys(), (double) baselineCacheService.getRedisBaselineByName(name).getUsed_cpu_sys())) {
+                    if (fluctTooMuch((double) node.getMaster().getInfo().getUsed_cpu_sys(), (double) redisBaselineService.findByName(name).get(0).getUsed_cpu_sys())) {
                         isReport = true;
                         String detail = item.getClusterName() + ":" + node.getMaster().getAddress() + "," + USED_CPU_SYS;
                         putToChannel(alarmConfig, USED_CPU_SYS, item, redisTemplate, node, detail, redisEvent, null);
@@ -249,7 +249,7 @@ public class RedisAlarmer extends AbstractRedisAlarmer {
                     }
 
 
-                    if (fluctTooMuch((double) node.getMaster().getInfo().getUsed_cpu_user(), (double) baselineCacheService.getRedisBaselineByName(name).getUsed_cpu_user())) {
+                    if (fluctTooMuch((double) node.getMaster().getInfo().getUsed_cpu_user(), (double) redisBaselineService.findByName(name).get(0).getUsed_cpu_user())) {
 
                         isReport = true;
                         String detail = item.getClusterName() + ":" + node.getMaster().getAddress() + "," + USED_CPU_USER;
@@ -294,14 +294,14 @@ public class RedisAlarmer extends AbstractRedisAlarmer {
     }
 
 
-    private boolean fluctTooMuch(double v1, double v2) {
+    private boolean fluctTooMuch(double cur, double base) {
         boolean result = false;
 
-        if(0 == v2){
+        if(0 == base){
             return result;
         }
 
-        if (Math.abs((v1 - v2)) / v2 > 0.5) {
+        if (Math.abs((cur - base)) / base > 0.5) {
             result = true;
         }
 

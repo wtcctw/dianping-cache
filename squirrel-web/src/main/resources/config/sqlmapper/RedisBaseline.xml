@@ -32,10 +32,10 @@
 	</insert>
 	
 	
-	<select id="findByServer" resultMap="RedisBaselineResult" parameterType="String">
+	<select id="findByName" resultMap="RedisBaselineResult" parameterType="String">
    		SELECT *
    		FROM redis_baseline
-   		WHERE serverId = select id from servers where address = #{server}
+   		WHERE baseline_name = #{baseline_name}
    		ORDER BY id DESC
 	</select>
 	
