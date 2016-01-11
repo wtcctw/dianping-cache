@@ -1,6 +1,5 @@
 package com.dianping.squirrel.client.auth;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -10,17 +9,14 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.curator.framework.CuratorFramework;
-import org.apache.curator.framework.CuratorFrameworkFactory;
-import org.apache.curator.retry.RetryNTimes;
-import org.apache.zookeeper.KeeperException.NoNodeException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.dianping.squirrel.common.config.ConfigManager;
 import com.dianping.squirrel.common.config.ConfigManagerLoader;
 import com.dianping.squirrel.common.util.NamedThreadFactory;
+import com.dianping.squirrel.common.zookeeper.PathProvider;
+import com.dianping.squirrel.common.zookeeper.ZookeeperClient;
 
 public class DefaultAuthProvider implements AuthProvider {
     
@@ -28,11 +24,10 @@ public class DefaultAuthProvider implements AuthProvider {
     
     private static final String KEY_ZOOKEEPER_ADDRESS = "avatar-cache.zookeeper.address";
     
-    private static final String AUTH_ROOT = "/dp/cache/auth";
-    
     private ConfigManager configManager = ConfigManagerLoader.getConfigManager();
     
-    private CuratorFramework zkClient;
+    private ZookeeperClient zkClient;
+    private PathProvider pathProvider;
 
     private boolean globalStrict;
     private Map<String, Boolean> strictMap;
@@ -40,10 +35,13 @@ public class DefaultAuthProvider implements AuthProvider {
     
     public DefaultAuthProvider() throws Exception {
         String zkAddress = configManager.getStringValue(KEY_ZOOKEEPER_ADDRESS);
-        if (StringUtils.isBlank(zkAddress))
-            throw new NullPointerException("squirrel zookeeper address is empty");
-        zkClient = CuratorFrameworkFactory.newClient(zkAddress, 60 * 1000, 30 * 1000, 
-                new RetryNTimes(3, 1000));
+        if (zkAddress == null)
+            throw new NullPointerException("squirrel zookeeper address is null");
+        pathProvider = new PathProvider();
+        pathProvider.addTemplate("root", "/dp/cache/auth");
+        pathProvider.addTemplate("resource", "/dp/cache/auth/$0");
+        pathProvider.addTemplate("applications", "/dp/cache/auth/$0/applications");
+        zkClient = new ZookeeperClient(zkAddress);
         zkClient.start();
         initAuthData();
         startAuthDataSyncer();
@@ -69,48 +67,25 @@ public class DefaultAuthProvider implements AuthProvider {
     }
 
     private boolean getGlobalStrict() throws Exception {
-        String value = getData(AUTH_ROOT);
-        return value != null && value.equalsIgnoreCase("true");
-    }
-
-    private String getData(String path) throws Exception {
-        try {
-            byte[] bytes = zkClient.getData().forPath(path);
-            return bytes == null ? null : new String(bytes);
-        } catch(NoNodeException e) {
-            return null;
-        }
+        String value = zkClient.get(pathProvider.getRootPath());
+        return "true".equalsIgnoreCase(value);
     }
 
     private Map<String, Boolean> loadStrictMap() throws Exception {
         Map<String, Boolean> strictMap = new HashMap<String, Boolean>();
-        List<String> children = getChildren(AUTH_ROOT);
+        List<String> children = zkClient.getChildren(pathProvider.getRootPath());
         for(String child : children) {
-            String path = AUTH_ROOT + "/" + child;
-            String data = getData(path);
-            if(data != null) {
-                boolean strict = data.equalsIgnoreCase("true");
-                strictMap.put(child, strict);
-            }
+            String value = zkClient.get(pathProvider.getPath("resource", child));
+            strictMap.put(child, "true".equalsIgnoreCase(value));
         }
         return strictMap;
-    }
-    
-    private List<String> getChildren(String path) throws Exception {
-        try {
-            List<String> children = zkClient.getChildren().forPath(path);
-            return children;
-        } catch(NoNodeException e) {
-            return Collections.emptyList();
-        }
     }
 
     private Map<String, Set<String>> loadResourceMap() throws Exception {
         Map<String, Set<String>> resourceMap = new HashMap<String, Set<String>>();
-        List<String> children = getChildren(AUTH_ROOT);
+        List<String> children = zkClient.getChildren(pathProvider.getRootPath());
         for(String child : children) {
-            String path = AUTH_ROOT + "/" + child + "/applications";
-            String data = getData(path);
+            String data = zkClient.get(pathProvider.getPath("applications", child));
             if(data != null) {
                 String [] apps = data.split(",");
                 Set<String> appSet = new HashSet<String>();

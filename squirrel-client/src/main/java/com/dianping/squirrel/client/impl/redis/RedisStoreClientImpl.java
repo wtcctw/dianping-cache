@@ -36,7 +36,6 @@ import com.dianping.squirrel.client.auth.AuthException;
 import com.dianping.squirrel.client.auth.AuthManager;
 import com.dianping.squirrel.client.config.StoreCategoryConfig;
 import com.dianping.squirrel.client.config.StoreClientConfig;
-import com.dianping.squirrel.client.core.Authorizable;
 import com.dianping.squirrel.client.core.StoreCallback;
 import com.dianping.squirrel.client.core.StoreFuture;
 import com.dianping.squirrel.client.core.Transcoder;
@@ -46,6 +45,7 @@ import com.dianping.squirrel.client.monitor.KeyCountMonitor;
 import com.dianping.squirrel.client.monitor.StatusHolder;
 import com.dianping.squirrel.common.exception.StoreException;
 import com.dianping.squirrel.common.exception.StoreTimeoutException;
+import com.dianping.squirrel.common.lifecycle.Authorizable;
 
 public class RedisStoreClientImpl extends AbstractStoreClient implements RedisStoreClient, Authorizable {
 
