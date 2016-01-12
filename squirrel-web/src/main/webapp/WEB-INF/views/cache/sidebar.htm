@@ -1,90 +1,185 @@
 <div class="sidebar " id="sidebar"
-	data-sidebar="true" data-sidebar-scroll="true"
-	data-sidebar-hover="true" style="float:left">
-	<script type="text/javascript">
-		try {
-			ace.settings.check('sidebar', 'fixed')
-		} catch (e) {
-		}
-	</script>
-		<ul class="nav nav-list">
-		<li class="#if($side == 'cachemanager') open #end"><a href="#"
-			class="dropdown-toggle"> <i class="menu-icon  fa fa-gavel bigger-130"></i> <span
-				class="menu-text">存储管理</span> <b class="arrow fa fa-angle-down"></b>
-		</a>
-			<ul class="submenu" style="display: block;">
-				<li class="#if($subside == 'config') active #end"><a
-					href="${rc.contextPath}/cache/config"> <i
-						class="icon-globe"></i> 存储集群配置
-				</a></li>
-				<li class="#if($subside == 'key') active #end"><a
-					href="${rc.contextPath}/cache/key"> <i
-						class="icon-globe"></i> 存储类别配置
-				</a></li>
-				<li class="#if($subside == 'operator') active #end"><a
-					href="${rc.contextPath}/cache/operator"> <i
-						class="icon-globe"></i> 操作日志
-				</a></li>
-				<li class="#if($subside == 'query') active #end"><a
-					href="${rc.contextPath}/cache/query"> <i
-						class="icon-globe"></i> 数据查询
-				</a></li>
-			</ul></li>
-		<li class="#if($side == 'monitor') open #end"><a href="#"
-			class="dropdown-toggle"> <i class="menu-icon  fa fa-tachometer bigger-130"></i> <span
-				class="menu-text">存储监控</span> <b class="arrow fa fa-angle-down"></b>
-		</a>
-			<ul class="submenu" style="display: block;">
-				
-				<li class="#if($subside == 'mdashboard') active #end"><a
-					href="${rc.contextPath}/monitor/dashboard"> <i
-						class="icon-globe"></i> Memcached 集群监控
-				</a></li>
-				<li class="#if($subside == 'rdashboard') active #end"><a
-					href="${rc.contextPath}/redis/dashboard"> <i
-						class="icon-globe"></i> Redis 集群监控
-				</a></li>
-				<li class="#if($subside == 'paascat') active #end"><a
-					href="http://cat.dp/cat/r/system?type=paasSystem" target="_blank"> <i
-						class="icon-globe"></i> PAAS监控
-				</a></li>
-				<li class="#if($subside == 'paasweb') active #end"><a
-					href="http://10.1.139.138" target="_blank"> <i
-						class="icon-globe"></i> PAAS管理
-				</a></li>
-				<!-- <li class="#if($subside == 'node') active #end"><a
-					href="${rc.contextPath}/monitor/node"> <i
-						class="icon-globe"></i> 节点监控
-				</a></li> -->
-				
-			</ul></li>
-			<li class="#if($side == 'monitor') open #end">
-				<a href="#" class="dropdown-toggle"> <i class="menu-icon  fa fa-tachometer bigger-130"></i> <span
-					class="menu-text">告警</span> <b class="arrow fa fa-angle-down"></b>
-			</a>
-				<ul class="submenu" style="display: block;">
+     data-sidebar="true" data-sidebar-scroll="true"
+     data-sidebar-hover="true" style="float:left">
+    <script type="text/javascript">
+        try {
+            ace.settings.check('sidebar', 'fixed')
+        } catch (e) {
+        }
+    </script>
+    <ul class="nav nav-list">
+        <li class="#if($subside == 'dashboard') active #end"><a
+                href="${rc.contextPath}/dashboard"> <i class="menu-icon  fa fa-tachometer"></i> 首页
+        </a></li>
 
-					<li class="#if($subside == 'mdashboard') active #end"><a
-							href="${rc.contextPath}/setting/alarmrecord"> <i
-							class="icon-globe"></i> 告警记录
-					</a></li>
-					<li class="#if($subside == 'rdashboard') active #end"><a
-							href="${rc.contextPath}/setting/alarmrule"> <i
-							class="icon-globe"></i> 告警规则配置
-					</a></li>
-				</ul></li>
-	</ul>
+        <li class="#if($side == 'cluster') active open #end">
+            <a href="#" class="dropdown-toggle"> <i class="menu-icon  fa fa-cloud  bigger-130"></i> <span
+                    class="menu-text">集群</span> <b class="arrow fa fa-angle-down"></b>
+            </a>
+            <ul class="submenu">
 
-	<div class="sidebar-collapse sidebar-toggle" id="sidebar-collapse">
-		<i class="ace-icon fa fa-angle-double-left" data-icon1="ace-icon fa fa-angle-double-left"
-			data-icon2="ace-icon fa fa-angle-double-right"></i>
-	</div>
+                <li class="#if($subside == 'redis') active #end"><a
+                        href="${rc.contextPath}/redis"> <i
+                        class="icon-globe"></i> Redis集群
+                </a></li>
+                <li class="#if($subside == 'memcached') active #end"><a
+                        href="${rc.contextPath}/memcached"> <i
+                        class="icon-globe"></i> Memcached集群
+                </a></li>
+                <li class="#if($subside == 'dcache') active #end"><a
+                        href="#"> <i
+                        class="icon-globe"></i> Dcache集群
+                </a></li>
+                <li class="#if($subside == 'ehcache') active #end"><a
+                        href="#"> <i
+                        class="icon-globe"></i> Ehcache集群
+                </a></li>
+            </ul>
+        </li>
+        <li class="#if($side == 'data') active open #end">
+            <a href="#" class="dropdown-toggle"> <i class="menu-icon  fa fa-database  bigger-130"></i> <span
+                    class="menu-text">数据</span> <b class="arrow fa fa-angle-down"></b>
+            </a>
+            <ul class="submenu">
+                <li class="#if($subside == 'query') active #end"><a
+                        href="${rc.contextPath}/data/query"> <i
+                        class="icon-globe"></i> 缓存查询
+                </a></li>
+                <li class="#if($subside == 'clean') active #end"><a
+                        href="${rc.contextPath}/data/clean"> <i
+                        class="icon-globe"></i> 缓存清理
+                </a></li>
+            </ul>
+        </li>
 
-	<script type="text/javascript">
-		try {
-			ace.settings.check('sidebar', 'collapsed')
-		} catch (e) {
-		}
-	</script>
+        <li class="#if($side == 'config') active open #end"><a href="#"
+                                                               class="dropdown-toggle"> <i
+                class="menu-icon  fa fa-gavel bigger-130"></i> <span
+                class="menu-text">配置</span> <b class="arrow fa fa-angle-down"></b>
+        </a>
+            <ul class="submenu">
+                <li class="#if($subside == 'clusterconfig') active #end"><a
+                        href="${rc.contextPath}/config/cluster"> <i
+                        class="icon-globe"></i> 集群管理
+                </a></li>
+                <li class="#if($subside == 'categoryconfig') active #end"><a
+                        href="${rc.contextPath}/config/category"> <i
+                        class="icon-globe"></i> 类别管理
+                </a></li>
+                <li class="#if($subside == 'alarmconfig') active #end"><a
+                        href="${rc.contextPath}/config/alarm"> <i
+                        class="icon-globe"></i> 告警管理
+                </a></li>
+                <li class="#if($subside == 'userconfig') active #end"><a
+                        href="${rc.contextPath}/config/user"> <i
+                        class="icon-globe"></i> 用户管理
+                </a></li>
+
+            </ul>
+        </li>
+        <li class="#if($side == 'event') active open #end"><a href="#"
+                                                              class="dropdown-toggle"> <i
+                class="menu-icon fa fa-tasks bigger-130"></i> <span
+                class="menu-text">事件</span> <b class="arrow fa fa-angle-down"></b>
+        </a>
+            <ul class="submenu">
+                <li class="#if($subside == 'alarmevent') active #end"><a
+                        href="${rc.contextPath}/event/alarm"> <i
+                        class="icon-globe"></i> 告警历史
+                </a></li>
+                <li class="#if($subside == 'audit') active #end"><a
+                        href="${rc.contextPath}/event/audit"> <i
+                        class="icon-globe"></i> 操作日志
+                </a></li>
+                <li class="#if($subside == 'tasklist') active #end"><a
+                        href="${rc.contextPath}/event/task"> <i
+                        class="icon-globe"></i> 任务列表
+                </a></li>
+
+
+            </ul>
+        </li>
+
+
+        <!--<li class="#if($side == 'cachemanager') active open #end"><a href="#"-->
+        <!--class="dropdown-toggle"> <i class="menu-icon  fa fa-gavel bigger-130"></i> <span-->
+        <!--class="menu-text">存储管理</span> <b class="arrow fa fa-angle-down"></b>-->
+        <!--</a>-->
+        <!--<ul class="submenu">-->
+        <!--<li class="#if($subside == 'config') active #end"><a-->
+        <!--href="${rc.contextPath}/cache/config"> <i-->
+        <!--class="icon-globe"></i> 存储集群配置-->
+        <!--</a></li>-->
+        <!--<li class="#if($subside == 'key') active #end"><a-->
+        <!--href="${rc.contextPath}/cache/key"> <i-->
+        <!--class="icon-globe"></i> 存储类别配置-->
+        <!--</a></li>-->
+        <!--<li class="#if($subside == 'operator') active #end"><a-->
+        <!--href="${rc.contextPath}/cache/operator"> <i-->
+        <!--class="icon-globe"></i> 操作日志-->
+        <!--</a></li>-->
+        <!--<li class="#if($subside == 'query') active #end"><a-->
+        <!--href="${rc.contextPath}/cache/query"> <i-->
+        <!--class="icon-globe"></i> 数据查询-->
+        <!--</a></li>-->
+        <!--</ul></li>-->
+        <!--<li class="#if($side == 'monitor') active open #end"><a href="#"-->
+        <!--class="dropdown-toggle"> <i class="menu-icon  fa fa-tachometer bigger-130"></i> <span-->
+        <!--class="menu-text">存储监控</span> <b class="arrow fa fa-angle-down"></b>-->
+        <!--</a>-->
+        <!--<ul class="submenu">-->
+        <!---->
+        <!--<li class="#if($subside == 'mdashboard') active #end"><a-->
+        <!--href="${rc.contextPath}/monitor/dashboard"> <i-->
+        <!--class="icon-globe"></i> Memcached 集群监控-->
+        <!--</a></li>-->
+        <!--<li class="#if($subside == 'rdashboard') active #end"><a-->
+        <!--href="${rc.contextPath}/redis/dashboard"> <i-->
+        <!--class="icon-globe"></i> Redis 集群监控-->
+        <!--</a></li>-->
+        <!--<li class="#if($subside == 'paascat') active #end"><a-->
+        <!--href="http://cat.dp/cat/r/system?type=paasSystem" target="_blank"> <i-->
+        <!--class="icon-globe"></i> PAAS监控-->
+        <!--</a></li>-->
+        <!--<li class="#if($subside == 'paasweb') active #end"><a-->
+        <!--href="http://10.1.139.138" target="_blank"> <i-->
+        <!--class="icon-globe"></i> PAAS管理-->
+        <!--</a></li>-->
+        <!--&lt;!&ndash; <li class="#if($subside == 'node') active #end"><a-->
+        <!--href="${rc.contextPath}/monitor/node"> <i-->
+        <!--class="icon-globe"></i> 节点监控-->
+        <!--</a></li> &ndash;&gt;-->
+        <!---->
+        <!--</ul></li>-->
+        <!--<li class="#if($side == 'monitor') open #end">-->
+        <!--<a href="#" class="dropdown-toggle"> <i class="menu-icon  fa fa-tachometer bigger-130"></i> <span-->
+        <!--class="menu-text">告警</span> <b class="arrow fa fa-angle-down"></b>-->
+        <!--</a>-->
+        <!--<ul class="submenu">-->
+
+        <!--<li><a-->
+        <!--href="${rc.contextPath}/setting/alarmrecord"> <i-->
+        <!--class="icon-globe"></i> 告警记录-->
+        <!--</a></li>-->
+        <!--<li><a-->
+        <!--href="${rc.contextPath}/setting/alarmrule"> <i-->
+        <!--class="icon-globe"></i> 告警规则配置-->
+        <!--</a></li>-->
+        <!--</ul></li>-->
+
+
+    </ul>
+
+    <div class="sidebar-collapse sidebar-toggle" id="sidebar-collapse">
+        <i class="ace-icon fa fa-angle-double-left" data-icon1="ace-icon fa fa-angle-double-left"
+           data-icon2="ace-icon fa fa-angle-double-right"></i>
+    </div>
+
+    <script type="text/javascript">
+        try {
+            ace.settings.check('sidebar', 'collapsed')
+        } catch (e) {
+        }
+    </script>
 </div>
 

@@ -4,7 +4,7 @@ import com.dianping.cache.entity.RedisStats;
 
 import java.util.List;
 
-public interface RedisStatsService {
+public interface RedisService {
 	List<RedisStats> findByServer(String server);
 	
 	void insert(RedisStats stat);
@@ -14,5 +14,7 @@ public interface RedisStatsService {
 	void delete(long timeBefore);
 
 	List<RedisStats>search(String sql);
+
+
 	
 }

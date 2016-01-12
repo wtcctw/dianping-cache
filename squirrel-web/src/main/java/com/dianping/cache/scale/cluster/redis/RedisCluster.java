@@ -18,9 +18,11 @@ import com.dianping.cache.scale.exceptions.ScaleException;
 public class RedisCluster implements Cluster<RedisNode>{
 	
 	private static Logger logger = LoggerFactory.getLogger(RedisCluster.class);
-	
+
+	private String clusterName;
+
     private List<String> serverList;
-    
+
     private List<RedisNode> nodes = new ArrayList<RedisNode>();
 
 	private List<RedisServer> failedServers = new ArrayList<RedisServer>();
@@ -29,6 +31,11 @@ public class RedisCluster implements Cluster<RedisNode>{
         this.serverList = serverList;
         loadClusterInfo();
     }
+	public RedisCluster(String clusterName,List<String> serverList){
+		this.clusterName = clusterName;
+		this.serverList = serverList;
+		loadClusterInfo();
+	}
 
 	@Override
 	public List<RedisNode> getNodes() {
@@ -156,5 +163,13 @@ public class RedisCluster implements Cluster<RedisNode>{
 				return true;
 		}
 		return false;
+	}
+
+	public String getClusterName() {
+		return clusterName;
+	}
+
+	public void setClusterName(String clusterName) {
+		this.clusterName = clusterName;
 	}
 }

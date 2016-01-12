@@ -56,6 +56,8 @@ public interface CacheKeyConfigurationService {
 	 * @param config
 	 */
 	CacheKeyConfiguration update(CacheKeyConfiguration config);
+
+	List<CacheKeyConfiguration> findByCacheType(String cacheType);
 	
 	void delete(String category);
 	

@@ -16,6 +16,9 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.dianping.cache.controller.dto.CategoryParams;
 import com.dianping.cache.controller.dto.ConfigurationParams;
+import com.dianping.cache.deamontask.CacheDeamonTaskManager;
+import com.dianping.cache.deamontask.dao.DeamonTaskDao;
+import com.dianping.cache.deamontask.tasks.ClearCategoryTask;
 import jodd.util.StringUtil;
 import net.spy.memcached.AddrUtil;
 import net.spy.memcached.MemcachedClient;
@@ -34,7 +37,6 @@ import com.dianping.cache.monitor.storage.MemcacheStatsDataStorage;
 import com.dianping.cache.monitor.storage.ServerStatsDataStorage;
 import com.dianping.cache.service.*;
 import com.dianping.cache.service.condition.CacheKeyConfigSearchCondition;
-import com.dianping.cache.service.condition.OperationLogSearchCondition;
 import com.dianping.cache.util.NetUtil;
 import com.dianping.core.type.PageModel;
 import com.dianping.squirrel.client.StoreClient;
@@ -48,8 +50,6 @@ public class CacheManagerController extends AbstractCacheController {
     @Resource(name = "cacheConfigurationService")
     private CacheConfigurationService cacheConfigurationService;
 
-    @Resource(name = "operationLogService")
-    private OperationLogService operationLogService;
 
     @Resource(name = "cacheKeyConfigurationService")
     private CacheKeyConfigurationService cacheKeyConfigurationService;
@@ -65,6 +65,9 @@ public class CacheManagerController extends AbstractCacheController {
 
     @Resource(name = "categoryToAppService")
     private CategoryToAppService categoryToAppService;
+
+    @Resource(name = "deamonTaskDao")
+    private DeamonTaskDao deamonTaskDao;
 
     @RequestMapping(value = "/cache/config")
     public ModelAndView viewCacheConfig() {
@@ -90,7 +93,6 @@ public class CacheManagerController extends AbstractCacheController {
     @RequestMapping(value = "/cache/config/find")
     @ResponseBody
     public Object findByCacheKey(@RequestParam("cacheKey") String cacheKey,@RequestParam("swimlane") String swimlane ) {
-        subside = "config";
         Map<String, Object> paras = super.createViewMap();
 
         CacheConfiguration config = cacheConfigurationService.findWithSwimLane(cacheKey,swimlane);
@@ -102,7 +104,6 @@ public class CacheManagerController extends AbstractCacheController {
     @ResponseBody
     public Map<String, Object> manualAdd(@RequestParam("ip") String ip,
                                          @RequestParam("port") String port) {
-        subside = "config";
         Map<String, Object> paras = super.createViewMap();
         boolean flag = true;
         MemcachedClient client = null;
@@ -123,8 +124,7 @@ public class CacheManagerController extends AbstractCacheController {
 
     @RequestMapping(value = "/cache/config/findAll")
     @ResponseBody
-    public Object configSearch() {
-        subside = "config";
+    public Map<String, Object> configSearch() {
         Map<String, Object> paras = super.createViewMap();
 
         List<CacheConfiguration> config = cacheConfigurationService.findAll();
@@ -138,7 +138,6 @@ public class CacheManagerController extends AbstractCacheController {
                              @RequestParam("servers") String servers,
                              @RequestParam("swimlane") String swimlane,
                              @RequestParam("transcoderClazz") String transcoderClazz) {
-        subside = "config";
         CacheConfiguration newConfig = new CacheConfiguration();
 
         newConfig.setCacheKey(cacheKey);
@@ -156,7 +155,6 @@ public class CacheManagerController extends AbstractCacheController {
                                       @RequestParam("newservers") String newservers,
                                       @RequestParam("oldservers") String oldservers,
                                       HttpServletResponse response) {
-        subside = "config";
         Map<String, Object> paras = super.createViewMap();
         boolean flag = false;
         CacheConfiguration newConfig = new CacheConfiguration();
@@ -187,11 +185,10 @@ public class CacheManagerController extends AbstractCacheController {
                                   @RequestParam("server") String server,
                                   @RequestParam("swimlane") String swimlane,
                                   @RequestParam("oldservers") String oldservers) {
-        subside = "config";
         Map<String, Object> paras = super.createViewMap();
         boolean flag = false;
         // 获取数据库中最新的 servers 信息 对比看是否有变化
-        CacheConfiguration oldConfig = cacheConfigurationService.findWithSwimLane(cacheKey,swimlane);
+        CacheConfiguration oldConfig = cacheConfigurationService.findWithSwimLane(cacheKey, swimlane);
         if ((oldservers != null && oldservers.equals(oldConfig.getServers()))
                 || ("".equals(oldservers) && oldConfig.getServers() == null)) {
             List<String> serverList;
@@ -226,7 +223,6 @@ public class CacheManagerController extends AbstractCacheController {
                                                   @RequestParam("server") String server,
                                                   @RequestParam("swimlane") String swimlane,
                                                   @RequestParam("oldservers") String oldservers) {
-        subside = "config";
         Map<String, Object> paras = super.createViewMap();
         boolean flag = false;
         // 获取数据库中最新的 servers 信息 对比看是否有变化
@@ -254,7 +250,6 @@ public class CacheManagerController extends AbstractCacheController {
     @RequestMapping(value = "/cache/config/create")
     @ResponseBody
     public Map<String, Object> configCreate(@RequestBody ConfigurationParams configurationParams) {
-        subside = "config";
         Map<String, Object> paras = super.createViewMap();
         boolean flag = true;
         CacheConfiguration newConfig = new CacheConfiguration();
@@ -291,8 +286,7 @@ public class CacheManagerController extends AbstractCacheController {
     @RequestMapping(value = "/cache/config/delete")
     @ResponseBody
     public Boolean configDelete(@RequestBody ConfigurationParams configurationParams) {
-        subside = "config";
-        cacheConfigurationService.deleteWithSwimLane(configurationParams.getCacheKey(),configurationParams.getSwimlane());
+        cacheConfigurationService.deleteWithSwimLane(configurationParams.getCacheKey(), configurationParams.getSwimlane());
         return Boolean.TRUE;
     }
 
@@ -300,7 +294,6 @@ public class CacheManagerController extends AbstractCacheController {
     @ResponseBody
     public void configClear(@RequestParam("cacheKey") String cacheKey,
                             @RequestParam("ipKey") String ipKey) {
-        subside = "config";
         CacheConfiguration newConfig = new CacheConfiguration();
         newConfig.setCacheKey(cacheKey);
         cacheConfigurationService.clearByKey(cacheKey, ipKey);
@@ -317,7 +310,6 @@ public class CacheManagerController extends AbstractCacheController {
     public Map<String, Object> keySearch(@RequestParam("category") String category,
                                          @RequestParam("cacheType") String cacheType,
                                          @RequestParam("pageId") int pageId) {
-        subside = "key";
 
         PageModel pageModel = new PageModel();
         pageModel.setPage(pageId);
@@ -374,7 +366,6 @@ public class CacheManagerController extends AbstractCacheController {
     @ResponseBody
     public void creatCacheKey(@RequestBody CategoryParams categoryParams) {
 
-        subside = "key";
         CacheKeyConfiguration newCacheKey = new CacheKeyConfiguration();
         newCacheKey.setCategory(categoryParams.getCategory());
         newCacheKey.setCacheType(categoryParams.getCacheType());
@@ -396,7 +387,6 @@ public class CacheManagerController extends AbstractCacheController {
     @ResponseBody
     public void updateCacheKey(@RequestBody CategoryParams categoryParams) {
 
-        subside = "key";
         CacheKeyConfiguration newCacheKey = new CacheKeyConfiguration();
         newCacheKey.setCategory(categoryParams.getCategory());
         newCacheKey.setCacheType(categoryParams.getCacheType());
@@ -413,76 +403,24 @@ public class CacheManagerController extends AbstractCacheController {
     @RequestMapping(value = "/cache/key/delete")
     @ResponseBody
     public void deleteCacheKeyByCategory(@RequestBody CategoryParams categoryParams) {
-        subside = "key";
         cacheKeyConfigurationService.delete(categoryParams.getCategory());
     }
 
     @RequestMapping(value = "/cache/key/clear")
     @ResponseBody
     public void clearCacheKeyByCategory(@RequestBody CategoryParams categoryParams) {
-        subside = "key";
         cacheConfigurationService.clearByCategory(categoryParams.getCategory());
     }
 
     @RequestMapping(value = "/cache/key/applist")
     @ResponseBody
     public List<CategoryToApp> getAppList(@RequestBody CategoryParams categoryParams) {
-        subside = "key";
         return categoryToAppService.findByCategory(categoryParams.getCategory());
     }
 
-    @RequestMapping(value = "/cache/operator")
-    public ModelAndView viewCacheOperator() {
-        subside = "operator";
-        return new ModelAndView("cache/operator", createViewMap());
-    }
 
-    @RequestMapping(value = "/cache/operator/search")
-    @ResponseBody
-    public Object operatorSearch(@RequestParam("operator") String operator,
-                                 @RequestParam("content") String content,
-                                 @RequestParam("startTime") String startTime,
-                                 @RequestParam("endTime") String endTime,
-                                 @RequestParam("pageId") int pageId) {
-        subside = "operator";
 
-        PageModel pageModel = new PageModel();
-        pageModel.setPage(pageId);
-        pageModel.setPageSize(20);
-        // 设置操作日志的搜索条件
-        OperationLogSearchCondition condition = new OperationLogSearchCondition();
-        Date start = null;
-        Date end = null;
-        String _operator = null;
-        String _content = null;
-        if (StringUtils.isNotBlank(startTime)) {
-            start = strToDate(startTime);
-        }
-        if (StringUtils.isNotBlank(endTime)) {
-            end = strToDate(endTime);
-        }
-        if (StringUtils.isNotBlank(operator)) {
-            _operator = operator;
-        }
-        if (StringUtils.isNotBlank(content)) {
-            _content = content;
-        }
 
-        condition.setContent(_content);
-        condition.setOperator(_operator);
-        condition.setOperateStart(start);
-        condition.setOperateEnd(end);
-
-        // 数据库检索相应的操作日志
-        PageModel result = operationLogService.paginate(pageModel, condition);
-        List<?> recodes = result.getRecords();
-        Map<String, Object> paras = super.createViewMap();
-        paras.put("entitys", recodes);
-        paras.put("page", result.getPage());
-        paras.put("totalpage", result.getPageCount());
-        return paras;
-
-    }
 
     @RequestMapping(value = "/cache/query", method = RequestMethod.GET)
     public ModelAndView viewCacheQuery() {
@@ -490,9 +428,29 @@ public class CacheManagerController extends AbstractCacheController {
         return new ModelAndView("cache/query", createViewMap());
     }
 
+    @RequestMapping(value = "/cache/query/deleteCategory", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public Object deleteCategory(@RequestParam("category")String category) {
+        ClearCategoryTask task = new ClearCategoryTask(category);
+        CacheDeamonTaskManager.submit(task);
+        return true;
+    }
+
+
     @RequestMapping(value = "/cache/query/getKeyValue", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public Object getKeyValue(@RequestParam("finalKey") String finalKey) {
+
+//        DeamonTask task = new DeamonTask();
+//        task.setCommitTime(System.currentTimeMillis());
+//        task.setDescription("123");
+//        task.setEndTime(System.currentTimeMillis());
+//        task.setStartTime(System.currentTimeMillis());
+//        task.setStat(1);
+//        task.setStatMax(1);
+//        task.setStatMin(1);
+//        task.setType(1);
+//        deamonTaskDao.insert(task);
 
         CacheKeyConfiguration key = cacheKeyConfigurationService.find(finalKey.substring(0, finalKey.indexOf(".")));
         Map<String, Object> paras = super.createViewMap();
@@ -600,17 +558,6 @@ public class CacheManagerController extends AbstractCacheController {
         return subside;
     }
 
-    private Date strToDate(String strTime) {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        Date result = null;
-        try {
-            result = sdf.parse(strTime);
-            return result;
-        } catch (ParseException e) {
-            logger.info("data tranform failed.", e);
-            return new Date();
-        }
-    }
 
     private boolean requireCacheClose(String server, String cacheKey) {
         boolean hasServer = false;

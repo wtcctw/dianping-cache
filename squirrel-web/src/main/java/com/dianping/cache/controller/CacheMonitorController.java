@@ -270,7 +270,6 @@ public class CacheMonitorController  extends AbstractSidebarController {
 			temp.put("hitrate", hitrate);
 			currentStats.put(item.getKey(), temp);
 		}
-		
 		return currentStats;
 	}
 	

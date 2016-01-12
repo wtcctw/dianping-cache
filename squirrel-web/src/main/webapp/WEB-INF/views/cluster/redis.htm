@@ -1,0 +1,87 @@
+<div class="main-content" style="opacity: 1.0;"
+     ng-controller="RedisDashBoardController">
+    <div class=" main-content-inner">
+        <script type="text/javascript"
+                src="${rc.contextPath}/static/js/redis/redisdash.js"></script>
+        <style>
+            th{
+                font-size: 14px;  color: #404040;
+            }
+            .bold{
+                font-weight: bolder;
+            }
+        </style>
+        <div class="page-content">
+            <div class="page-header">
+                <h1>集群
+                    <i class="ace-icon fa fa-angle-double-right"></i>
+                    Redis
+                </h1>
+            </div>
+            <div class="row">
+                <div class="col-xs-12">
+                    <table id="redisTable" class="table table-striped">
+                        <thead>
+                        <tr>
+                            <th style="width: 10%;"><i class="ace-icon fa fa-angle-down icon-on-right"></i></th>
+                            <th style="width: 20%; text-align: left;">集群</th>
+                            <th style="width: 15%;">内存使用率</th>
+                            <th style="width: 15%;">QPS</th>
+                            <th style="width: 15%;">主/从</th>
+                            <th style="#if(${isadmin})display: table-cell;#else display: none;#end;">操作
+                                <a href="${rc.contextPath}/cache/config/new" class="grey pull-right">
+                                    <i class="ace-icon fa fa-plus-square bigger-110"></i>
+                                </a>
+                            </th>
+                            <th style="display: none"></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr ng-repeat="item in redisdata">
+                            <td><i class="red" ng-show="item.clusterAlarm">●</i>
+                                <i class="green" ng-show="!item.clusterAlarm">●</i></td>
+                            <td style="text-align: left;font: 14px Open Sans ;color: #3764a0" >
+                                <a href="${rc.contextPath}/redis/{{item.clusterName}}">
+                                    {{item.clusterName}}
+                                </a>
+                            </td>
+                            <td ng-class="{'red':item.usageAlarm,'bold':item.usageAlarm}">{{item.memoryUsage}}%/{{item.maxMemory}}G</td>
+                            <td ng-class="{'red':item.qpsAlarm,'bold':item.qpsAlarm}">{{item.qps}}</td>
+                            <td ng-class="{'red':item.msAlarm,'bold':item.msAlarm}">{{item.masterNum}}/{{item.slaveNum}}</td>
+                            <td style="#if(${isadmin})display: table-cell;#else display: none;#end;">
+                                <div class="hidden-sm hidden-xs action-buttons">
+                                    <a class="grey" href="${rc.contextPath}/redis/{{item.clusterName}}/edit" ng-click="transport(item.clusterName)">
+                                        <i class="ace-icon fa fa-cog bigger-130"></i>
+                                    </a>
+
+                                    <a class="grey" href="#">
+                                        <i class="ace-icon fa fa-bar-chart-o bigger-130"></i>
+                                    </a>
+
+                                    <a class="grey" href="#">
+                                        <i class="ace-icon glyphicon glyphicon-th-large bigger-130"></i>
+                                    </a>
+                                    <a class="grey" href="#">
+                                        <i class="ace-icon fa fa-key bigger-130"></i>
+                                    </a>
+                                    <a class="grey" href="#">
+                                        <i class="ace-icon fa fa-file-text-o bigger-130"></i>
+                                    </a>
+
+                                    <a class="grey" href="#">
+                                        <i class="ace-icon fa fa-trash-o bigger-140"></i>
+                                    </a>
+                                </div>
+                            </td>
+                            <td style="display: none">{{item.redisCluster}}</td>
+                        </tr>
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+

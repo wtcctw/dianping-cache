@@ -11,7 +11,7 @@ public class TestClient {
     @Test
     public void test(){
         RedisStoreClient storeClient = (RedisStoreClient) StoreClientFactory.getStoreClientByCategory("HuiUserTicket");
-        StoreKey sk = new StoreKey("HuiUserTicket",1);
+        StoreKey sk = new StoreKey("mt-spu-shop",195234455);
         storeClient.set(sk,1);
         storeClient.get(sk);
     }

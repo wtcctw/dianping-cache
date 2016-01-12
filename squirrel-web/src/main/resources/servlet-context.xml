@@ -9,21 +9,21 @@
         http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.2.xsd">
 
 	<!-- 完成请求和注解POJO的映射 -->
-	<bean class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter">
-		<property name="messageConverters">
-			<bean
-				class="org.springframework.http.converter.json.MappingJacksonHttpMessageConverter">
-				<property name="supportedMediaTypes">
-					<list>
-						<value>text/plain;charset=utf-8</value>
-						<value>text/html;charset=utf-8</value>
-						<value>text/json;charset=utf-8</value>
-						<value>application/json;charset=utf-8</value>
-					</list>
-				</property>
-			</bean>
-		</property>
-	</bean>
+	<!--<bean class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter">-->
+		<!--<property name="messageConverters">-->
+			<!--<bean-->
+				<!--class="org.springframework.http.converter.json.MappingJacksonHttpMessageConverter">-->
+				<!--<property name="supportedMediaTypes">-->
+					<!--<list>-->
+						<!--<value>text/plain;charset=utf-8</value>-->
+						<!--<value>text/html;charset=utf-8</value>-->
+						<!--<value>text/json;charset=utf-8</value>-->
+						<!--<value>application/json;charset=utf-8</value>-->
+					<!--</list>-->
+				<!--</property>-->
+			<!--</bean>-->
+		<!--</property>-->
+	<!--</bean>-->
 	<context:component-scan base-package="com.dianping.cache"></context:component-scan>
 	<mvc:annotation-driven/>
 
@@ -37,6 +37,17 @@
 			<mvc:mapping path="/monitor/cluster"/>
 			<mvc:mapping path="/monitor/dashboard"/>
 			<mvc:mapping path="/redis/dashboard"/>
+
+			<!--  new  -->
+			<mvc:mapping path="/config/*"/>
+			<mvc:mapping path="/event/*"/>
+			<mvc:mapping path="/data/*"/>
+			<mvc:mapping path="/redis"/>
+			<mvc:mapping path="/redis/redis-*"/>
+			<mvc:mapping path="/memcached"/>
+			<mvc:mapping path="/memcached/memcached-*"/>
+
+
 			<bean class="com.dianping.cache.interceptor.ModelAndViewInterceptor">
 			</bean>
 		</mvc:interceptor>
@@ -59,7 +70,8 @@
 				<entry key="cache/*" value="layout/layoutcache.htm" />
 				<entry key="monitor/*" value="layout/layoutcache.htm" />
 				<entry key="alarm/*" value="layout/layoutcache.htm" />
-				<entry key="*" value="layout/layout.htm" />
+				<entry key="cluster/*" value="layout/layoutcache.htm" />
+				<entry key="*" value="layout/layoutcache.htm" />
 			</map>
 		</property>
 		<property name="toolboxConfigLocation">

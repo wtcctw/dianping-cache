@@ -185,7 +185,7 @@ public class DockerApply implements Apply{
 									break;
 								}
 							}
-							
+							break;
 						} else if (result.getOperationStatus() == 500) {
 							logger.error("ShutDown instances " + paras + "  failed,need to remove instance manal !");
 							break;

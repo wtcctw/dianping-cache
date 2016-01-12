@@ -12,7 +12,7 @@ import com.dianping.cache.alarm.entity.RedisTemplate;
 import com.dianping.cache.alarm.event.EventFactory;
 import com.dianping.cache.alarm.event.EventType;
 import com.dianping.cache.alarm.report.EventReporter;
-import com.dianping.cache.controller.RedisDashBoardUtil;
+import com.dianping.cache.controller.RedisDataUtil;
 import com.dianping.cache.monitor.statsdata.RedisClusterData;
 import com.dianping.cache.scale.cluster.redis.RedisNode;
 import com.dianping.cache.scale.cluster.redis.RedisServer;
@@ -75,7 +75,7 @@ public class RedisAlarmer extends AbstractRedisAlarmer {
         RedisEvent redisEvent = eventFactory.createRedisEvent();
 
 
-        List<RedisClusterData> redisClusterDatas = RedisDashBoardUtil.getClusterData();
+        List<RedisClusterData> redisClusterDatas = RedisDataUtil.getClusterData();
 
         boolean isReport = false;
 

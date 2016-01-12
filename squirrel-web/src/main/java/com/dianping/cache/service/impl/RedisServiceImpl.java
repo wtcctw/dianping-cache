@@ -2,11 +2,11 @@ package com.dianping.cache.service.impl;
 
 import com.dianping.cache.dao.RedisStatsDao;
 import com.dianping.cache.entity.RedisStats;
-import com.dianping.cache.service.RedisStatsService;
+import com.dianping.cache.service.RedisService;
 
 import java.util.List;
 
-public class RedisStatsServiceImpl implements RedisStatsService{
+public class RedisServiceImpl implements RedisService {
 	
 	private RedisStatsDao redisStatsDao;
 

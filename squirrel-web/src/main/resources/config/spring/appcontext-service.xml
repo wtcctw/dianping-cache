@@ -40,7 +40,7 @@
 		<property name="serverStatsDao" ref="serverStatsDao"/>
 	</bean>
 	
-	<bean id="redisStatsService" class="com.dianping.cache.service.impl.RedisStatsServiceImpl">
+	<bean id="redisService" class="com.dianping.cache.service.impl.RedisServiceImpl">
 		<property name="redisStatsDao" ref="redisStatsDao"/>
 	</bean>
 	
@@ -60,6 +60,9 @@
         <property name="categoryToAppDao" ref="categoryToAppDao" />
     </bean>
 
+    <bean id="reshardService" class="com.dianping.cache.service.impl.ReshardServiceImpl">
+
+    </bean>
     <bean id="mailService" class="com.dianping.dpsf.spring.ProxyBeanFactory"
         init-method="init">
         <property name="serviceName"
