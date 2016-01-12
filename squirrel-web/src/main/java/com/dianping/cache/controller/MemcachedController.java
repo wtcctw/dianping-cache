@@ -25,7 +25,7 @@ import java.util.concurrent.TimeUnit;
  * Created by dp on 16/1/4.
  */
 @Controller
-public class MemcachedController extends AbstractCacheController{
+public class MemcachedController extends AbstractSidebarController{
 
     @Autowired
     private CacheConfigurationService cacheConfigurationService ;
@@ -60,12 +60,6 @@ public class MemcachedController extends AbstractCacheController{
     public ModelAndView monitor(@PathVariable("cluster") String cluster){
         currentCluster = cluster;
         return new ModelAndView("monitor/cluster",createViewMap());
-    }
-
-    @RequestMapping(value = "/memcached/detail/1")
-    @ResponseBody
-    public void getDetail(){
-
     }
 
 

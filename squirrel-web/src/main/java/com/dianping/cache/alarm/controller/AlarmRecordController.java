@@ -121,9 +121,4 @@ public class AlarmRecordController extends AbstractSidebarController {
     public String getSubSide() {
         return "alarmmeta";
     }
-
-    @Override
-    protected String getMenu() {
-        return "tool";
-    }
 }

@@ -2,12 +2,14 @@ package com.dianping.cache.controller;
 
 import com.dianping.cache.controller.dto.ConfigurationParams;
 import com.dianping.cache.entity.CacheConfiguration;
+import com.dianping.cache.entity.CacheKeyConfiguration;
 import com.dianping.cache.service.CacheConfigurationService;
 import com.dianping.cache.service.CacheKeyConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -17,7 +19,7 @@ import java.util.List;
  * Created by dp on 16/1/11.
  */
 @Controller
-public class ConfigController extends AbstractCacheController {
+public class ConfigController extends AbstractSidebarController {
 
     @Autowired
     private CacheKeyConfigurationService cacheKeyConfigurationService;
@@ -55,6 +57,12 @@ public class ConfigController extends AbstractCacheController {
     @ResponseBody
     public List<CacheConfiguration> getConfigurations() {
         return cacheConfigurationService.findAll();
+    }
+
+    @RequestMapping(value = "/config/category/findbycluster")
+    @ResponseBody
+    public List<CacheKeyConfiguration> getCategoryByCluster(@RequestParam String cluster) {
+        return cacheKeyConfigurationService.findByCacheType(cluster);
     }
 
     @RequestMapping(value = "/config/cluster/update")

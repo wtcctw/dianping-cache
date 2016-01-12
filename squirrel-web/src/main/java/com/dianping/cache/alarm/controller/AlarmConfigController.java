@@ -175,8 +175,4 @@ public class AlarmConfigController extends AbstractSidebarController {
         return "memcache";
     }
 
-    @Override
-    protected String getMenu() {
-        return "tool";
-    }
 }

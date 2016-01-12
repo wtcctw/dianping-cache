@@ -21,7 +21,7 @@ import java.util.Map;
  * Created by dp on 16/1/11.
  */
 @Controller
-public class EventController extends AbstractCacheController {
+public class EventController extends AbstractSidebarController {
 
 
     @Autowired

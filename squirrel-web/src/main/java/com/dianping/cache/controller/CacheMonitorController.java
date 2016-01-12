@@ -305,9 +305,4 @@ public class CacheMonitorController  extends AbstractSidebarController {
 		return subside;
 	}
 
-	@Override
-	protected String getMenu() {
-		return "monitor";
-	}
-
 }

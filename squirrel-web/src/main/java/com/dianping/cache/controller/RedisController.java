@@ -32,7 +32,7 @@ import com.dianping.cache.service.RedisService;
 
 
 @Controller
-public class RedisController extends AbstractCacheController{
+public class RedisController extends AbstractSidebarController{
 
 
 	@Autowired

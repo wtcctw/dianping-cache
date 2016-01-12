@@ -42,7 +42,7 @@
                             <td><i class="ace-icon fa fa-xs fa-circle red" ng-show="item.clusterAlarm"></i>
                                 <i class="ace-icon fa fa-xs fa-circle green" ng-show="!item.clusterAlarm"></i></td>
                             <td style="text-align: left;font: 14px Open Sans ;color: #3764a0" >
-                                <a href="${rc.contextPath}/memcached/{{item.clusterName}}">
+                                <a href="${rc.contextPath}/memcached/{{item.clusterName}}" ng-click="transport(item.clusterName,item.configuration.swimlane)">
                                     {{item.clusterName}}
                                 </a>
                             </td>

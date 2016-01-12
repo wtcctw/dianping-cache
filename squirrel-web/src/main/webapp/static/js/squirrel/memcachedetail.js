@@ -60,7 +60,6 @@ function makeGraph(divName,max,title,currentValue) {
                     text: title+ ':' + currentValue,
                 }
             },
-
             credits: {
                 enabled: false
             },
@@ -82,20 +81,73 @@ module.controller('MemcachedController', [
     '$scope',
     '$http',
     function($scope, $http) {
-
+        $scope.mCacheKey;
+        $scope.mClientClazz;
+        $scope.mServers;
+        $scope.mSwimLane;
+        $scope.mTranscoderClazz;
+        $scope.configuration;
+        $scope.servers;
+        $scope.scaleType="auto";
+        $scope.nodes = [];
         $scope.categoryList = [];
         $scope.configParas = [];
         $scope.categoryEntity = {
+        };
+        $scope.configurationParams = {};
+        $scope.wrapperParams = function () {
+            $scope.configurationParams = {};
+            $scope.configurationParams.cacheKey = $scope.mCacheKey;
+            $scope.configurationParams.clientClazz = $scope.mClientClazz;
+            $scope.configurationParams.servers = $scope.mServers;
+            $scope.configurationParams.swimlane = $scope.mSwimLane;
+            $scope.configurationParams.transcoderClazz = $scope.mTranscoderClazz;
         }
-
         $scope.initPage = function(){
-            $http.get(window.contextPath + '/memcached/detail/1',{
-                params : {}
-            }).success(function(response){
-
+            $scope.mCacheKey = window.localStorage.cacheKey;
+            $scope.mSwimLane = window.localStorage.swimlane;
+            $scope.wrapperParams();
+            $http.post(window.contextPath + '/config/configuration/1',$scope.configurationParams
+            ).success(function(response){
+                $scope.initValue(response);
+                $scope.servers = [];
+                if($scope.mServers != null){
+                    $scope.nodes = [];
+                    $scope.servers = $scope.mServers.split(/;~;|\|/);
+                    var serverArr = $scope.mServers.split(/;~;|\|/);
+                    var len = serverArr.length;
+                    for(var i=0;i < len;i++){
+                        var node = {};
+                        node.IP = serverArr[i].split(/:/)[0];
+                        node.Port = serverArr[i].split(/:/)[1];
+                        node.status = "在线";
+                        $scope.nodes.push(node);
+                    }
+                }
+                iniTable("node");
             }).error(function(){
             });
+            $http.get(window.contextPath + '/config/category/findbycluster',{
+                params: {
+                    cluster : $scope.mCacheKey,
+                }
+            }).success(function(response){
+                $scope.categoryList = response;
+                initCategory();
+            }).error(function(){
+
+            });
         };
+
+        $scope.initValue = function (data) {
+            $scope.configuration = data;
+            $scope.mCacheKey = data.cacheKey;
+            $scope.mClientClazz = data.clientClazz;
+            $scope.mServers = data.servers;
+            $scope.mSwimLane = data.swimlane;
+            $scope.mTranscoderClazz = data.transcoderClazz;
+        };
+
         $scope.initPage();
 
 
@@ -126,11 +178,20 @@ module.controller('MemcachedController', [
                         "bStateSave": false,
                         "aaSorting": [],
                         "aoColumns": [
-                            {"bSortable": false},{"bSortable": false}, {"bSortable": false}, {"bSortable": false}, {"bSortable": false},
+                            {"bSortable": false},{"bSortable": false}, {"bSortable": false},
                             {"bSortable": false}, {"bSortable": false}
                         ],
                     });
                 }, 0);
+                var obj = document.getElementsByClassName("dataTables_length");
+                obj.innerHTML = 'AVSDVDFDF';
+
+
+                    //'<div>'+
+                    //'<label class="col-sm-3 no-padding-right">扩容</label>'+
+                    //'<div > auto</div>'+
+                    //'<div > manul</div>'+
+                    //'</div>';
             });
         };
         var initCategory = function () {
@@ -145,7 +206,7 @@ module.controller('MemcachedController', [
                         "iDisplayLength": 50,
                         "aaSorting": [],
                         "aoColumns": [
-                            {"bSortable": false},{"bSortable": false}, {"bSortable": false}, {"bSortable": false}, {"bSortable": false},
+                            {"bSortable": false},{"bSortable": false}, {"bSortable": false}, {"bSortable": false}, null,
                             {"bSortable": false}, {"bSortable": false}
                         ],
                     });

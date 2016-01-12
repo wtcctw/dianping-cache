@@ -1,5 +1,5 @@
 <div class="main-content" style="opacity: 1.0;"
-     ng-controller="RedisController">
+     ng-controller="MemcachedController">
     <div class=" main-content-inner">
         <script type="text/javascript"
                 src="${rc.contextPath}/static/js/highcharts/highcharts.js"></script>
@@ -9,8 +9,6 @@
                 src="${rc.contextPath}/static/js/highcharts/solid-gauge.js"></script>
         <script type="text/javascript"
                 src="${rc.contextPath}/static/js/squirrel/memcachedetail.js"></script>
-        <script type="text/javascript"
-                src="${rc.contextPath}/static/js/mask/loadmask.js"></script>
         <style>
             th{
                 font-size: 14px;  color: #404040;
@@ -20,8 +18,8 @@
             <div class="page-header">
                 <h1>集群
                     <i class="ace-icon fa fa-angle-double-right"></i>
-                    Redis  <i class="ace-icon fa fa-angle-right"></i>
-                    {{redisData.clusterName}}
+                    Memcached  <i class="ace-icon fa fa-angle-right"></i>
+                    {{clusterName}}
                 </h1>
             </div>
 
@@ -39,12 +37,10 @@
                             <thead>
                             <tr>
                                 <th style="width: 5%">ID</th>
-                                <th style="width: 25%">Master</th>
-                                <th style="width: 20%">Slave</th>
-                                <th style="width: 10%">内存</th>
-                                <th style="width: 10%">Slots</th>
-                                <th style="width: 10%">QPS</th>
-                                <th style="width: 20%;#if(${isadmin})display: table-cell;#else display: none;#end;">操作
+                                <th style="width: 25%">IP</th>
+                                <th style="width: 20%">Port</th>
+                                <th style="width: 20%">状态</th>
+                                <th style="#if(${isadmin})display: table-cell;#else display: none;#end;">操作
                                     <a href="#" class="grey pull-right">
                                         <i class="ace-icon fa fa-plus-square bigger-110"></i>
                                     </a>
@@ -52,31 +48,16 @@
                             </tr>
                             </thead>
                             <tbody>
-                            <tr ng-repeat = "data in redisData.nodes">
+                            <tr ng-repeat = "data in nodes">
                                 <td>{{$index+1}}</td>
-                                <td>{{data.master.address}}
-                                    <a href="#" class="warning" ng-show="data.master.migrating"><i class="ace-icon fa fa-upload bigger-130"></i></a>
-                                    <a href="#" class="warning" ng-show="data.master.importing"><i class="ace-icon fa fa-download bigger-130"></i></a>
-                                </td>
-                                <td>{{data.slave.address}}</td>
-                                <td>{{data.master.info.used}}%/{{data.master.info.maxMem}}G</td>
-                                <td>{{data.master.slotSize}}</td>
-                                <td>{{data.master.info.qps}}</td>
+                                <td>{{data.IP}}</td>
+                                <td>{{data.Port}}</td>
+                                <td>{{data.status}}</td>
                                 <td style="margin-right: 20px;#if(${isadmin})display: table-cell;#else display: none;#end;">
                                     <div class="hidden-sm hidden-xs action-buttons">
-                                        <a class="grey" href="#reshardModal" data-toggle="modal">
-                                            <i class="ace-icon fa fa-share bigger-130"></i>
+                                        <a class="grey" href="#">
+                                            <i class="ace-icon fa fa-trash-o bigger-140"></i>
                                         </a>
-                                        <a class="grey" href="#changeConfirm" data-toggle="modal" ng-click="setFailover(data.slave.address)">
-                                            <i class="ace-icon fa fa-exchange bigger-130"></i>
-                                        </a>
-                                        <a class="grey" href="#addModal" data-toggle="modal" ng-click="setParams(redisData.clusterName,data.master.address)" ng-show="{{data.slave.address==null}}">
-                                            <i class="ace-icon bigger-130"> S+ </i>
-                                        </a>
-                                        <a class="grey" href="#deleteModal" data-toggle="modal" ng-click="setParams(redisData.clusterName,data.slave.address)" ng-show="{{data.slave.address!=null}}">
-                                            <i class="ace-icon bigger-130"> S- </i>
-                                        </a>
-
                                     </div>
                                 </td>
                             </tr>

@@ -14,10 +14,4 @@ public class IndexController extends AbstractMenuController{
 	public ModelAndView allApps() {
 		return new ModelAndView("cache/config",createViewMap());
 	}
-	
-	@Override
-	protected String getMenu() {
-		return "index";
-	}
-	
 }

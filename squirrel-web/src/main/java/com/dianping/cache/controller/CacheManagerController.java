@@ -1,10 +1,7 @@
 package com.dianping.cache.controller;
 
 import java.net.InetAddress;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -45,7 +42,7 @@ import com.dianping.squirrel.client.StoreKey;
 import com.dianping.squirrel.common.lifecycle.Locatable;
 
 @Controller
-public class CacheManagerController extends AbstractCacheController {
+public class CacheManagerController extends AbstractSidebarController {
 
     @Resource(name = "cacheConfigurationService")
     private CacheConfigurationService cacheConfigurationService;
@@ -548,9 +545,10 @@ public class CacheManagerController extends AbstractCacheController {
 
     @Override
     protected String getSide() {
-        return "cachemanager";
+        return side;
     }
 
+    private String side = "data";
     private String subside = "config";
 
     @Override

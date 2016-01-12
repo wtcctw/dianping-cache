@@ -97,8 +97,4 @@ public class RedisAlarmTemplateController extends AbstractSidebarController {
         return "template";
     }
 
-    @Override
-    protected String getMenu() {
-        return "tool";
-    }
 }
