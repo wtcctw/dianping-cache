@@ -1,4 +1,4 @@
-package com.dianping.modules.spring.flex;
+package com.dianping.cache.security;
 
 import java.util.HashMap;
 import java.util.Map;

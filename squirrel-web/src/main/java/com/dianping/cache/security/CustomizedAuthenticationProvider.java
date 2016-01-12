@@ -31,7 +31,6 @@ import com.dianping.cache.entity.Resource;
 import com.dianping.cache.entity.Role;
 import com.dianping.cache.entity.User;
 import com.dianping.cache.service.UserService;
-import com.dianping.modules.spring.flex.SecurityHelper;
 
 /**
  * @author danson.liu

@@ -1,4 +1,4 @@
-package com.dianping.cache.util;
+package com.dianping.squirrel.view;
 
 import java.util.HashMap;
 import java.util.Map;
