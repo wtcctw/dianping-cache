@@ -167,12 +167,12 @@ public class AlarmConfigController extends AbstractSidebarController {
 
     @Override
     protected String getSide() {
-        return "alarm";
+        return "config";
     }
 
     @Override
     public String getSubSide() {
-        return "memcache";
+        return "alarmconfig";
     }
 
     @Override

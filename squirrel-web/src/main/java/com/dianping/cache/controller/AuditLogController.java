@@ -21,17 +21,14 @@ import java.util.Map;
  * Created by dp on 16/1/11.
  */
 @Controller
-public class EventController extends AbstractCacheController {
+public class AuditLogController extends AbstractCacheController {
 
 
     @Autowired
     private OperationLogService operationLogService;
 
-    private String subside;
-
     @RequestMapping(value = "/auditlog")
     public ModelAndView audit() {
-        subside = "audit";
         return new ModelAndView("event/audit", createViewMap());
     }
 
@@ -96,11 +93,11 @@ public class EventController extends AbstractCacheController {
 
     @Override
     protected String getSide() {
-        return "event";
+        return "log";
     }
 
     @Override
     public String getSubSide() {
-        return subside;
+        return "auditlog";
     }
 }

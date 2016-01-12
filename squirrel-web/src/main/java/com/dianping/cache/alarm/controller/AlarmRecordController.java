@@ -114,12 +114,12 @@ public class AlarmRecordController extends AbstractSidebarController {
 
     @Override
     protected String getSide() {
-        return "alarm";
+        return "log";
     }
 
     @Override
     public String getSubSide() {
-        return "alarmmeta";
+        return "event";
     }
 
     @Override

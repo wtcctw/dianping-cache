@@ -418,16 +418,6 @@ public class CacheManagerController extends AbstractCacheController {
         return categoryToAppService.findByCategory(categoryParams.getCategory());
     }
 
-
-
-
-
-    @RequestMapping(value = "/data/query", method = RequestMethod.GET)
-    public ModelAndView viewCacheQuery() {
-        subside = "query";
-        return new ModelAndView("cache/query", createViewMap());
-    }
-
     @RequestMapping(value = "/cache/query/deleteCategory", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public Object deleteCategory(@RequestParam("category")String category) {

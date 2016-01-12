@@ -12,6 +12,10 @@ import com.dianping.cache.monitor.statsdata.RedisClusterData;
 
 import com.dianping.cache.scale.cluster.redis.RedisManager;
 
+/**
+ * @deprecated
+ * @TODO remove this class
+ */
 public class RedisDataUtil {
 
     public static List<RedisClusterData> getClusterData() {
