@@ -50,12 +50,12 @@ public class AlarmConfigController extends AbstractSidebarController {
     @Autowired
     private BaselineThreadFactory baselineThreadFactory;
 
-    @RequestMapping(value = "/setting/alarmrule")
+    @RequestMapping(value = "/config/alarm")
     public ModelAndView topicSetting(HttpServletRequest request, HttpServletResponse response) {
         return new ModelAndView("alarm/alarmrule", createViewMap());
     }
 
-    @RequestMapping(value = "/setting/alarmrule/list", method = RequestMethod.GET, produces = "application/json; charset=utf-8")
+    @RequestMapping(value = "/config/alarm/list", method = RequestMethod.GET, produces = "application/json; charset=utf-8")
     @ResponseBody
     public Object alarmMetaList(int offset, int limit, HttpServletRequest request, HttpServletResponse response) {
         List<AlarmConfig> alarmConfigs = alarmConfigService.findByPage(offset, limit);
@@ -66,7 +66,7 @@ public class AlarmConfigController extends AbstractSidebarController {
     }
 
 
-    @RequestMapping(value = "/setting/alarmrule/create", method = RequestMethod.POST, produces = "application/json; charset=utf-8")
+    @RequestMapping(value = "/config/alarm/create", method = RequestMethod.POST, produces = "application/json; charset=utf-8")
     @ResponseBody
     public boolean createAlarmConfig(@RequestBody AlarmConfigDto alarmConfigDto) {
         boolean result = false;
@@ -86,7 +86,7 @@ public class AlarmConfigController extends AbstractSidebarController {
     }
 
 
-    @RequestMapping(value = "/setting/alarmrule/remove", method = RequestMethod.GET, produces = "application/json; charset=utf-8")
+    @RequestMapping(value = "/config/alarm/remove", method = RequestMethod.GET, produces = "application/json; charset=utf-8")
     @ResponseBody
     public int removeAlarmConfig(int id) {
         int result = alarmConfigService.deleteById(id);
@@ -97,7 +97,7 @@ public class AlarmConfigController extends AbstractSidebarController {
     @Autowired
     private CacheConfigurationService cacheConfigurationService;
 
-    @RequestMapping(value = "/setting/alarmrule/query/memcacheclusters", method = RequestMethod.GET)
+    @RequestMapping(value = "/config/alarm/query/memcacheclusters", method = RequestMethod.GET)
     @ResponseBody
     public Object findMemcacheClusters() {
         List<String> clusterNames = new ArrayList<String>();
@@ -112,7 +112,7 @@ public class AlarmConfigController extends AbstractSidebarController {
         return clusterNames;
     }
 
-    @RequestMapping(value = "/setting/alarmrule/query/redisclusters", method = RequestMethod.GET)
+    @RequestMapping(value = "/config/alarm/query/redisclusters", method = RequestMethod.GET)
     @ResponseBody
     public List<String> findRedisClusters() {
         List<String> clusterNames = new ArrayList<String>();
@@ -125,7 +125,7 @@ public class AlarmConfigController extends AbstractSidebarController {
         return clusterNames;
     }
 
-    @RequestMapping(value = "/setting/alarmrule/query/memcachetemplates", method = RequestMethod.GET)
+    @RequestMapping(value = "/config/alarm/query/memcachetemplates", method = RequestMethod.GET)
     @ResponseBody
     public List<String> findMemcacheTemplates() {
         List<String> templateNames = new ArrayList<String>();
@@ -139,7 +139,7 @@ public class AlarmConfigController extends AbstractSidebarController {
     }
 
 
-    @RequestMapping(value = "/setting/alarmrule/query/redistemplates", method = RequestMethod.GET)
+    @RequestMapping(value = "/config/alarm/query/redistemplates", method = RequestMethod.GET)
     @ResponseBody
     public List<String> findRedisTemplates() {
         List<String> templateNames = new ArrayList<String>();
@@ -152,7 +152,7 @@ public class AlarmConfigController extends AbstractSidebarController {
         return templateNames;
     }
 
-    @RequestMapping(value = "/setting/alarmrule/baselineCompute")
+    @RequestMapping(value = "/config/alarm/baselineCompute")
     @ResponseBody
     public void baselineCompute() {
         System.out.println("Hello world");

@@ -108,7 +108,7 @@ module
                     params: $scope.searchEntity
                 }).success(callback);
             };
-            $scope.suburl = "/setting/alarmrule/list";
+            $scope.suburl = "/config/alarm/list";
             $scope.pageSize = 30000;
             $scope.queryCount = 0;
 
@@ -123,7 +123,7 @@ module
                 console.log($scope.alarmConfigEntity);
                 $http
                     .post(
-                    window.contextPath + '/setting/alarmrule/create',
+                    window.contextPath + '/config/alarm/create',
                     $scope.alarmConfigEntity
                 )
                     .success(
@@ -155,7 +155,7 @@ module
                 console.log(cid);
                 $http
                     .get(
-                    window.contextPath + "/setting/alarmrule/remove",
+                    window.contextPath + "/config/alarm/remove",
                     {
                         params: {
                             id: cid
@@ -203,7 +203,7 @@ module
             $scope.baselineCompute = function () {
                 $http
                     .post(
-                    window.contextPath + "/setting/alarmrule/baselineCompute"
+                    window.contextPath + "/config/alarm/baselineCompute"
                 )
                     .success(
                     function (data) {
@@ -218,7 +218,7 @@ module
             $http(
                 {
                     method: "GET",
-                    url: window.contextPath + '/setting/alarmrule/query/memcacheclusters'
+                    url: window.contextPath + '/config/alarm/query/memcacheclusters'
                 }
             ).success(
                 function (datas, status, headers, config) {
@@ -233,7 +233,7 @@ module
             $http(
                 {
                     method: "GET",
-                    url: window.contextPath + '/setting/alarmrule/query/redisclusters'
+                    url: window.contextPath + '/config/alarm/query/redisclusters'
                 }
             ).success(
                 function (datas, status, headers, config) {
@@ -248,7 +248,7 @@ module
             $http(
                 {
                     method: "GET",
-                    url: window.contextPath + '/setting/alarmrule/query/memcachetemplates'
+                    url: window.contextPath + '/config/alarm/query/memcachetemplates'
                 }
             ).success(
                 function (datas, status, headers, config) {
@@ -263,7 +263,7 @@ module
             $http(
                 {
                     method: "GET",
-                    url: window.contextPath + '/setting/alarmrule/query/redistemplates'
+                    url: window.contextPath + '/config/alarm/query/redistemplates'
                 }
             ).success(
                 function (datas, status, headers, config) {
