@@ -1,57 +1,64 @@
 <div class="main-content" id="AlarmRuleController" ng-controller="AlarmRuleController">
     <div class="main-content-inner">
-        <div class="breadcrumbs" id="breadcrumbs">
+        <div>
             <script type="text/javascript"
                     src="${rc.contextPath}/static/js/alarm/alarmrule.js"></script>
-            <script type="text/javascript">
-                try {
-                    ace.settings.check('breadcrumbs', 'fixed')
-                } catch (e) {
-                }
-            </script>
-            <ul class="breadcrumb">
-                <li class="active">告警管理</li>
-                <tab><a href="${rc.contextPath}/setting/memcachetemplate"> <i
-                        class="icon-globe"></i>Memcache告警模板管理
-                </a></tab>
-                <tab><a href="${rc.contextPath}/setting/redistemplate"> <i
-                        class="icon-globe"></i>Redis告警模板管理
-                </a></tab>
-                <tab>
-                    <label ng-click="baselineCompute()">BaselineCompute</label>
-                </tab>
-            </ul>
-            </ul>
 
         </div>
 
+        <div class="tabbable">
+            <ul class="nav nav-tabs" id="myTab" style="height: 45px;">
+                <li class="active">
+                    <a data-toggle="tab" href="#alarmconfig">
+                        <i class="green ace-icon fa fa-home bigger-120"></i>
+                        告警配置
+                    </a>
+                </li>
 
-        <div class="page-content" id="container">
-            <div class="row">
-                <div class="col-xs-12">
-                    <table id="configTable" class="table table-striped table-bordered table-hover">
-                        <thead>
-                        <tr>
-                            <!--<td><input type="checkbox" id="check-all"></td>-->
-                            <!--<th>告警集群类型</th>-->
-                            <th>告警集群类型及名称</th>
-                            <th>模板名称</th>
-                            <th>收件人</th>
-                            <th>是否发送业务线</th>
-                            <th>操作
-                                <a class="breadcrumbs-btn" href="#myModal" ng-click="clearModal()" data-toggle="modal">
-                                    <i class="ace-icon fa fa-plus green"></i>
-                                </a>
-                            </th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr ng-repeat="e in searchPaginator.currentPageItems">
-                            <!--<td style="text-align: center"><input type="checkbox" name="check-list" value="{{e.id}}"></td>-->
-                            <td style="text-align: center">{{e.clusterType}}:{{e.clusterName}}</td>
-                            <td style="text-align: center">{{e.alarmTemplate}}</td>
-                            <td style="text-align: center">{{e.receiver}}</td>
-                            <td style="text-align: center">
+                <li>
+                    <a data-toggle="tab" href="#MemcacheAlarmTemplate">
+                        Memcache告警模板
+                        <span class="badge badge-danger">Memcache</span>
+                    </a>
+                </li>
+
+                <li>
+                    <a data-toggle="tab" href="#RedisAlarmTemplate">
+                        Redis告警模板
+                        <span class="badge badge-danger">Redis</span>
+                    </a>
+                </li>
+            </ul>
+
+            <div class="tab-content">
+                <div id="alarmconfig" class="tab-pane fade in active">
+                    <div class="page-content" id="container">
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <table id="configTable" class="table table-striped table-bordered table-hover">
+                                    <thead>
+                                    <tr>
+                                        <!--<td><input type="checkbox" id="check-all"></td>-->
+                                        <!--<th>告警集群类型</th>-->
+                                        <th>告警集群类型及名称</th>
+                                        <th>模板名称</th>
+                                        <th>收件人</th>
+                                        <th>是否发送业务线</th>
+                                        <th>操作
+                                            <a class="breadcrumbs-btn" href="#configModal" ng-click="clearModal()"
+                                               data-toggle="modal">
+                                                <i class="ace-icon fa fa-plus green"></i>
+                                            </a>
+                                        </th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr ng-repeat="e in alarmRuleSearchPaginator.currentPageItems">
+                                        <!--<td style="text-align: center"><input type="checkbox" name="check-list" value="{{e.id}}"></td>-->
+                                        <td style="text-align: center">{{e.clusterType}}:{{e.clusterName}}</td>
+                                        <td style="text-align: center">{{e.alarmTemplate}}</td>
+                                        <td style="text-align: center">{{e.receiver}}</td>
+                                        <td style="text-align: center">
                                 <span class="sticker">
                                     <span class="label arrowed-in"
                                           ng-class="{'label-success':e.toBusiness==true,'label-danger':e.toBusiness==false}">
@@ -60,46 +67,199 @@
                                     </span>
 
                                 </span>
-                            </td>
+                                        </td>
 
 
-                            <td style="text-align: center">
-                                <a href="#myModal" ng-click="setModalInput($index);" data-toggle="modal"
-                                   class="edit-config-btn">编辑
-                                    <i class="ace-icon fa fa-edit" rel="tooltip" data-original-title="编辑配置值"></i>
-                                </a>
-                                <a href="" ng-click="dialog(e.id);" class="edit-config-btn">删除
-                                    <i class="ace-icon fa fa-times" rel="tooltip" data-original-title="删除配置项"></i>
-                                </a>
-                            </td>
-                        </tr>
-                        <tbody>
-                    </table>
+                                        <td style="text-align: center">
+                                            <a href="#configModal" ng-click="setModalInput($index);" data-toggle="modal"
+                                               class="edit-config-btn">编辑
+                                                <i class="ace-icon fa fa-edit" rel="tooltip"
+                                                   data-original-title="编辑配置值"></i>
+                                            </a>
+                                            <a href="" ng-click="dialog(e.id);" class="edit-config-btn">删除
+                                                <i class="ace-icon fa fa-times" rel="tooltip"
+                                                   data-original-title="删除配置项"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    <tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
                 </div>
+
+                <div id="MemcacheAlarmTemplate" class="tab-pane fade">
+                    <div class="page-content" id="memcacheTemplatecontainer">
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <table id="memcacheTemplateconfigTable"
+                                       class="table table-striped table-bordered table-hover">
+                                    <thead>
+                                    <tr>
+                                        <th>模板名称</th>
+                                        <th>宕机</th>
+                                        <th>历史数据</th>
+                                        <th>内存上阈值</th>
+                                        <th>QPS上阈值</th>
+                                        <th>连接数上阈值</th>
+                                        <th>告警方式</th>
+                                        <th>操作
+                                            <a class="breadcrumbs-btn" href="#memcacheTemplateModal"
+                                               ng-click="memcacheclearModal()" data-toggle="modal">
+                                                <i class="ace-icon fa fa-plus green"></i>
+                                            </a>
+                                        </th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr ng-repeat="e in memcacheTemplateSearchPaginator.currentPageItems">
+                                        <!--<td style="text-align: center"><input type="checkbox" name="check-list" value="{{e.id}}"></td>-->
+                                        <td style="text-align: center width:100px">{{e.templateName}}</td>
+                                        <td style="text-align: center width:100px">{{e.down}}</td>
+                                        <td style="text-align: center width:100px">{{e.checkHistory}}</td>
+                                        <td style="text-align: center width:100px">{{e.memThreshold}}</td>
+                                        <td style="text-align: center width:100px">{{e.qpsThreshold}}</td>
+                                        <td style="text-align: center width:100px">{{e.connThreshold}}</td>
+                                        <td style="text-align: center width:100px">
+                                <span class="sticker">
+                                    <span class="label arrowed-in"
+                                          ng-class="{'label-success':e.mailMode==true,'label-danger':e.mailMode==false}">
+                                        <i class="bigger-110"
+                                           ng-class="{'ace-icon fa fa-check':e.mailMode==true,'ace-icon fa fa-times':e.mailMode==false}">邮件</i>
+                                    </span>
+                                    <span class="label arrowed-in"
+                                          ng-class="{'label-success':e.smsMode==true,'label-danger':e.smsMode==false}">
+                                        <i class="bigger-110"
+                                           ng-class="{'ace-icon fa fa-check':e.smsMode==true,'ace-icon fa fa-times':e.smsMode==false}">短信</i>
+                                    </span>
+                                    <span class="label arrowed-in"
+                                          ng-class="{'label-success':e.weixinMode==true,'label-danger':e.weixinMode==false}">
+                                        <i class="bigger-110"
+                                           ng-class="{'ace-icon fa fa-check':e.weixinMode==true,'ace-icon fa fa-times':e.weixinMode==false}">微信</i>
+                                    </span>
+                                </span>
+                                        </td>
+
+                                        <td style="text-align: center">
+                                            <a href="#memcacheTemplateModal" ng-click="memcachesetModalInput($index);"
+                                               data-toggle="modal"
+                                               class="edit-config-btn">编辑
+                                                <i class="ace-icon fa fa-edit" rel="tooltip"
+                                                   data-original-title="编辑配置值"></i>
+                                            </a>
+                                            <a href="" ng-click="memcachedialog(e.id);" class="edit-config-btn">删除
+                                                <i class="ace-icon fa fa-times" rel="tooltip"
+                                                   data-original-title="删除配置项"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    <tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="RedisAlarmTemplate" class="tab-pane fade">
+                    <div class="page-content" id="redisTemplatecontainer">
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <table id="redisTemplateconfigTable"
+                                       class="table table-striped table-bordered table-hover">
+                                    <thead>
+                                    <tr>
+                                        <!--<td><input type="checkbox" id="check-all"></td>-->
+                                        <!--<th>告警集群类型</th>-->
+                                        <th>告警模板名称</th>
+                                        <th>宕机</th>
+                                        <th>历史数据</th>
+                                        <th>内存上阈值</th>
+                                        <th>QPS上阈值</th>
+                                        <th>告警方式</th>
+                                        <th>操作
+                                            <a class="breadcrumbs-btn" href="#redisTemplateModal"
+                                               ng-click="redisClearModal()" data-toggle="modal">
+                                                <i class="ace-icon fa fa-plus green"></i>
+                                            </a>
+                                        </th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr ng-repeat="e in redisTemplateSearchPaginator.currentPageItems">
+                                        <!--<td style="text-align: center"><input type="checkbox" name="check-list" value="{{e.id}}"></td>-->
+                                        <td style="text-align: center width:100px">{{e.templateName}}</td>
+                                        <td style="text-align: center width:100px">{{e.down}}</td>
+                                        <td style="text-align: center width:100px">{{e.checkHistory}}</td>
+                                        <td style="text-align: center width:100px">{{e.memThreshold}}</td>
+                                        <td style="text-align: center width:100px">{{e.qpsThreshold}}</td>
+                                        <td style="text-align: center width:100px">
+                                <span class="sticker">
+                                    <span class="label arrowed-in"
+                                          ng-class="{'label-success':e.mailMode==true,'label-danger':e.mailMode==false}">
+                                        <i class="bigger-110"
+                                           ng-class="{'ace-icon fa fa-check':e.mailMode==true,'ace-icon fa fa-times':e.mailMode==false}">邮件</i>
+                                    </span>
+                                    <span class="label arrowed-in"
+                                          ng-class="{'label-success':e.smsMode==true,'label-danger':e.smsMode==false}">
+                                        <i class="bigger-110"
+                                           ng-class="{'ace-icon fa fa-check':e.smsMode==true,'ace-icon fa fa-times':e.smsMode==false}">短信</i>
+                                    </span>
+                                    <span class="label arrowed-in"
+                                          ng-class="{'label-success':e.weixinMode==true,'label-danger':e.weixinMode==false}">
+                                        <i class="bigger-110"
+                                           ng-class="{'ace-icon fa fa-check':e.weixinMode==true,'ace-icon fa fa-times':e.weixinMode==false}">微信</i>
+                                    </span>
+
+                                </span>
+                                        </td>
+                                        <td style="text-align: center">
+                                            <a href="#redisTemplateModal" ng-click="redissetModalInput($index);"
+                                               data-toggle="modal"
+                                               class="edit-config-btn">编辑
+                                                <i class="ace-icon fa fa-edit" rel="tooltip"
+                                                   data-original-title="编辑配置值"></i>
+                                            </a>
+                                            <a href="" ng-click="redisDialog(e.id);" class="edit-config-btn">删除
+                                                <i class="ace-icon fa fa-times" rel="tooltip"
+                                                   data-original-title="删除配置项"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    <tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+
+                </div>
+
             </div>
         </div>
 
+
         <!--模态框(Modal)告警配置修改-->
-        <div class="modal fade" id="myModal" tabindex="-1" role="dialog"
+        <div class="modal fade" id="configModal" tabindex="-1" role="dialog"
              aria-labelledby="myModalLabel" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
                         <button type="button" class="close" data-dismiss="modal"
                                 aria-hidden="true">&times;</button>
-                        <h4 class="modal-title" id="myModalLabel">编辑告警配置信息</h4>
+                        <h4 class="modal-title" id="configModalLabel">编辑告警配置信息</h4>
                     </div>
                     <div class="modal-body">
                         <form method="post"
                               class="form-horizontal bs-example bs-example-form" role="form"
-                              name="myForm" ng-submit="refreshpage(myForm)">
+                              name="configForm" ng-submit="refreshpage(configForm)">
                             <div class="input-group" ng-switch="alarmConfigEntity.clusterType">
                                 <div class="col-xs-12 form-group">
                                     <label class="col-xs-3 control-label control-label no-padding-right">告警集群类型：</label>
 
                                     <div class="col-xs-9">
                                         <select class="col-xs-12" ng-model="alarmConfigEntity.clusterType"
-                                                name="type" ng-options="o as o for o in clusterTypes" required>
+                                                name="configType" ng-options="o as o for o in clusterTypes" required>
                                         </select>
                                     </div>
                                 </div>
@@ -109,7 +269,8 @@
 
                                     <div class="col-xs-9">
                                         <select class="col-xs-12" ng-model="alarmConfigEntity.clusterName"
-                                                name="type" ng-options="o as o for o in memcacheClusters" required>
+                                                name="configType" ng-options="o as o for o in memcacheClusters"
+                                                required>
                                         </select>
                                     </div>
                                 </div>
@@ -118,7 +279,7 @@
 
                                     <div class="col-xs-9">
                                         <select class="col-xs-12" ng-model="alarmConfigEntity.clusterName"
-                                                name="type" ng-options="o as o for o in redisClusters" required>
+                                                name="configType" ng-options="o as o for o in redisClusters" required>
                                         </select>
                                     </div>
                                 </div>
@@ -128,7 +289,7 @@
 
                                     <div class="col-xs-9">
                                         <select class="col-xs-12" ng-model="alarmConfigEntity.alarmTemplate"
-                                                name="type" ng-options="o as o for o in memcacheAlarmTemplates"
+                                                name="configType" ng-options="o as o for o in memcacheAlarmTemplates"
                                                 required>
                                         </select>
                                     </div>
@@ -138,7 +299,8 @@
 
                                     <div class="col-xs-9">
                                         <select class="col-xs-12" ng-model="alarmConfigEntity.alarmTemplate"
-                                                name="type" ng-options="o as o for o in redisAlarmTemplates" required>
+                                                name="configType" ng-options="o as o for o in redisAlarmTemplates"
+                                                required>
                                         </select>
                                     </div>
                                 </div>
@@ -149,10 +311,10 @@
 
                                     <div class="col-xs-9">
 									<textarea class="form-control" rows="2" type="text"
-                                              ng-model="alarmConfigEntity.receiver" name="receiver" required>
+                                              ng-model="alarmConfigEntity.receiver" name="configreceiver" required>
                                     </textarea>
                                         是否发送业务线:<input type="checkbox" ng-model="alarmConfigEntity.toBusiness"
-                                                       name="toBusiness">
+                                                       name="configtoBusiness">
                                     </div>
                                 </div>
                                 <div class="control-group" style="margin-top: 20px;text-align: center;">
@@ -171,20 +333,214 @@
             <!--/.modal-content-->
         </div>
         <!--/.modal-->
-        <div class="footer">
-            <div class="footer-inner">
-                <!-- #section:basics/footer -->
-                <div class="footer-content">
-               <span class="bigger-120">
-                   <span class="blue bolder">Squirrel</span>
-                   架构组 &copy; 2015-2016
-               </span>
-                </div>
 
-                <!-- /section:basics/footer -->
+        <!--模态框(Modal)告警配置修改-->
+        <div class="modal fade" id="memcacheTemplateModal" tabindex="-1" role="dialog"
+             aria-labelledby="memcacheTemplateModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal"
+                                aria-hidden="true">&times;</button>
+                        <h4 class="modal-title" id="memcacheTemplateModalLabel">编辑告警模板配置信息</h4>
+                    </div>
+                    <div class="modal-body">
+                        <form method="post"
+                              class="form-horizontal bs-example bs-example-form" role="form"
+                              name="memcacheForm" ng-submit="memcacherefreshpage(memcacheForm)">
+                            <div class="input-group">
+
+                                <div class="col-xs-12 form-group">
+                                    <label class="col-xs-3 control-label control-label no-padding-right">模板名称：</label>
+
+                                    <div class="col-xs-9">
+                                        <input type="text" class="form-control"
+                                               ng-model="memcacheTemplateConfigEntity.templateName"
+                                               name="memcachetemplateName">
+                                    </div>
+                                </div>
+
+                                <div class="col-xs-12 form-group">
+                                    <label class="col-xs-3 control-label control-label no-padding-right">宕机：</label>
+
+                                    <div class="col-xs-9" style="font-size: 15px">
+                                        <input type="checkbox" ng-model="memcacheTemplateConfigEntity.isDown"
+                                               name="memcacheisDown">
+                                    </div>
+                                </div>
+
+
+                                <div class="col-xs-12 form-group">
+                                    <label class="col-xs-3 control-label control-label no-padding-right">内存上阈值：</label>
+
+                                    <div class="col-xs-9">
+                                        <input type="text" class="form-control"
+                                               ng-model="memcacheTemplateConfigEntity.memThreshold"
+                                               name="memcachememThreshold">
+                                    </div>
+                                </div>
+
+                                <div class="col-xs-12 form-group">
+                                    <label class="col-xs-3 control-label control-label no-padding-right">QPS上阈值：</label>
+
+                                    <div class="col-xs-9">
+                                        <input type="text" class="form-control"
+                                               ng-model="memcacheTemplateConfigEntity.qpsThreshold"
+                                               name="memcacheqpsThreshold">
+                                    </div>
+                                </div>
+
+                                <div class="col-xs-12 form-group">
+                                    <label class="col-xs-3 control-label control-label no-padding-right">连接数上阈值：</label>
+
+                                    <div class="col-xs-9">
+                                        <input type="text" class="form-control"
+                                               ng-model="memcacheTemplateConfigEntity.connThreshold"
+                                               name="memcacheconnThreshold">
+                                    </div>
+                                </div>
+
+                                <div class="col-xs-12 form-group">
+                                    <label class="col-xs-3 control-label control-label no-padding-right">历史数据分析：</label>
+
+                                    <div class="col-xs-9" style="font-size: 15px">
+                                        <input type="checkbox" ng-model="memcacheTemplateConfigEntity.checkHistory"
+                                               name="memcachecheckHistory">
+                                    </div>
+                                </div>
+
+                                <div class="col-xs-12 form-group">
+                                    <label class="col-xs-3 control-label control-label no-padding-right">告警方式配置：</label>
+
+                                    <div class="col-xs-9" style="font-size: 15px">
+                                        邮件：
+                                        <input type="checkbox" ng-model="memcacheTemplateConfigEntity.mailMode"
+                                               name="memcachemailMode">
+                                        &nbsp&nbsp短信：
+                                        <input type="checkbox" ng-model="memcacheTemplateConfigEntity.smsMode"
+                                               name="memcachesmsMode">
+                                        &nbsp&nbsp微信：
+                                        <input type="checkbox" ng-model="memcacheTemplateConfigEntity.weixinMode"
+                                               name="memcacheweixinMode">
+                                    </div>
+                                </div>
+
+
+                                <div class="control-group" style="margin-top: 20px;text-align: center;">
+                                    <div class="controls">
+                                        <button type="button" class="btn btn-default"
+                                                data-dismiss="modal">关闭
+                                        </button>
+                                        <button type="submit" class="btn btn-success">提交</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <!--/.modal-content-->
+        </div>
+
+        <!--模态框(Modal)告警配置修改-->
+        <div class="modal fade" id="redisTemplateModal" tabindex="-1" role="dialog"
+             aria-labelledby="redisTemplateModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal"
+                                aria-hidden="true">&times;</button>
+                        <h4 class="modal-title" id="redisTemplateModalLabel">编辑告警模板配置信息</h4>
+                    </div>
+                    <div class="modal-body">
+                        <form method="post"
+                              class="form-horizontal bs-example bs-example-form" role="form"
+                              name="redisForm" ng-submit="redisrefreshpage(redisForm)">
+                            <div class="input-group">
+
+
+                                <div class="col-xs-12 form-group">
+                                    <label class="col-xs-3 control-label control-label no-padding-right">模板名称：</label>
+
+                                    <div class="col-xs-9">
+                                        <input type="text" class="form-control"
+                                               ng-model="redisTemplateConfigEntity.templateName"
+                                               name="redistemplateName">
+                                    </div>
+                                </div>
+
+                                <div class="col-xs-12 form-group">
+                                    <label class="col-xs-3 control-label control-label no-padding-right">宕机：</label>
+
+                                    <div class="col-xs-9" style="font-size: 15px">
+                                        <input type="checkbox" ng-model="redisTemplateConfigEntity.isDown"
+                                               name="redisisDown">
+                                    </div>
+                                </div>
+
+                                <div class="col-xs-12 form-group">
+                                    <label class="col-xs-3 control-label control-label no-padding-right">内存上阈值：</label>
+
+                                    <div class="col-xs-9">
+                                        <input type="text" class="form-control"
+                                               ng-model="redisTemplateConfigEntity.memThreshold"
+                                               name="redismemThreshold">
+                                    </div>
+                                </div>
+                                <div class="col-xs-12 form-group">
+                                    <label class="col-xs-3 control-label control-label no-padding-right">QPS上阈值：</label>
+
+                                    <div class="col-xs-9">
+                                        <input type="text" class="form-control"
+                                               ng-model="redisTemplateConfigEntity.qpsThreshold"
+                                               name="redisqpsThreshold">
+                                    </div>
+                                </div>
+
+
+                                <div class="col-xs-12 form-group">
+                                    <label class="col-xs-3 control-label control-label no-padding-right">历史数据分析：</label>
+
+                                    <div class="col-xs-9" style="font-size: 15px">
+                                        <input type="checkbox" ng-model="redisTemplateConfigEntity.checkHistory"
+                                               name="redischeckHistory">
+                                    </div>
+                                </div>
+
+                                <div class="col-xs-12 form-group">
+                                    <label class="col-xs-3 control-label control-label no-padding-right">告警方式配置：</label>
+
+                                    <div class="col-xs-9" style="font-size: 15px">
+                                        邮件：
+                                        <input type="checkbox" ng-model="redisTemplateConfigEntity.mailMode"
+                                               name="redismailMode">
+                                        &nbsp&nbsp短信：
+                                        <input type="checkbox" ng-model="redisTemplateConfigEntity.smsMode"
+                                               name="redissmsMode">
+                                        &nbsp&nbsp微信：
+                                        <input type="checkbox" ng-model="redisTemplateConfigEntity.weixinMode"
+                                               name="redisweixinMode">
+                                    </div>
+                                </div>
+
+
+                                <div class="control-group" style="margin-top: 20px;text-align: center;">
+                                    <div class="controls">
+                                        <button type="button" class="btn btn-default"
+                                                data-dismiss="modal">关闭
+                                        </button>
+                                        <button type="submit" class="btn btn-success">提交</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
+
+
+</div>
 
 </div>
 
