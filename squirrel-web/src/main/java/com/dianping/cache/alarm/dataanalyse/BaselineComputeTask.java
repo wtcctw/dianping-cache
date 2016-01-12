@@ -80,7 +80,7 @@ public class BaselineComputeTask {
 
 
     private void memcacheBaselineCompute(int taskId) throws ParseException {
-        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd",Locale.ENGLISH);
         List<String> startTime = getStartTime();
         String endTime = df.format(new Date());
 
@@ -109,7 +109,7 @@ public class BaselineComputeTask {
     }
 
     private void redisBaselineCompute(int taskId) throws ParseException {
-        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd",Locale.ENGLISH);
         List<String> startTime = getStartTime();
         String endTime = df.format(new Date());
 
@@ -136,7 +136,7 @@ public class BaselineComputeTask {
 
     private Map<String, MemcacheStats> getMemcacheState(List<String> startTimeList, String endDate) throws ParseException {
 
-        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss",Locale.ENGLISH);
 
         Map<String, MemcacheStats> memcacheStatsMap = new HashMap<String, MemcacheStats>();
 
@@ -173,7 +173,7 @@ public class BaselineComputeTask {
 
                     List<MemcacheStats> memcacheStatsestmp = memcacheStatsService.search(sql);
                     if (0 != memcacheStatsestmp.size()) {
-                        SimpleDateFormat sdf = new SimpleDateFormat("EEEE:HH:mm");
+                        SimpleDateFormat sdf = new SimpleDateFormat("EEEE:HH:mm",Locale.ENGLISH);
                         Date nameDate = new Date(tmp * 1000);
                         String name = "Memcache_" + sdf.format(nameDate) + "_" + server.getAddress();
 
@@ -204,7 +204,7 @@ public class BaselineComputeTask {
                         " WHERE curr_time > " + tmp + " AND curr_time <= " + endLong + " AND serverId =" + server.getId();
                 List<MemcacheStats> memcacheStatsestmp = memcacheStatsService.search(sql);
                 if (0 != memcacheStatsestmp.size()) {
-                    SimpleDateFormat sdf = new SimpleDateFormat("EEEE:HH:mm");
+                    SimpleDateFormat sdf = new SimpleDateFormat("EEEE:HH:mm",Locale.ENGLISH);
                     Date nameDate = new Date(tmp * 1000);
                     String name = "Memcache_" + sdf.format(nameDate) + "_" + server.getAddress();
                     MemcacheStats memcacheStatsDelta = getMemcacheDelta(memcacheStatsestmp);
@@ -306,7 +306,7 @@ public class BaselineComputeTask {
     }
 
     private Map<String, RedisStats> getRedisState(List<String> startTimeList, String endDate) throws ParseException {
-        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss",Locale.ENGLISH);
 
         Map<String, RedisStats> redisStatsMap = new HashMap<String, RedisStats>();
 
@@ -344,7 +344,7 @@ public class BaselineComputeTask {
 
                         List<RedisStats> redisStatsestmp = redisStatsService.search(sql);
                         if (0 != redisStatsestmp.size()) {
-                            SimpleDateFormat sdf = new SimpleDateFormat("EEEE:HH:mm");
+                            SimpleDateFormat sdf = new SimpleDateFormat("EEEE:HH:mm",Locale.ENGLISH);
                             Date nameDate = new Date(tmp * 1000);
                             String name = "Redis_" + sdf.format(nameDate) + "_" + server.getAddress();
 
@@ -375,7 +375,7 @@ public class BaselineComputeTask {
                 try {
                     List<RedisStats> redisStatsestmp = redisStatsService.search(sql);
                     if (0 != redisStatsestmp.size()) {
-                        SimpleDateFormat sdf = new SimpleDateFormat("EEEE:HH:mm");
+                        SimpleDateFormat sdf = new SimpleDateFormat("EEEE:HH:mm",Locale.ENGLISH);
                         Date nameDate = new Date(tmp * 1000);
                         String name = "Redis_" + sdf.format(nameDate) + "_" + server.getAddress();
 
@@ -484,7 +484,7 @@ public class BaselineComputeTask {
 
     private List<String> getStartTime() {
         List<String> startList = new LinkedList<String>();
-        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss",Locale.ENGLISH);
         GregorianCalendar gc = new GregorianCalendar();
         gc.setTime(new Date());
         for (int i = 0; i < 4; i++) {
