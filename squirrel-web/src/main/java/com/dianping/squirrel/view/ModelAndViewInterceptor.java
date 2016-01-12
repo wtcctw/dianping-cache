@@ -1,4 +1,4 @@
-package com.dianping.cache.interceptor;
+package com.dianping.squirrel.view;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
