@@ -38,7 +38,7 @@
     <bean id="dataStorage" class="com.dianping.cache.monitor.storage.MemcacheStatsDataStorage"></bean>
     <bean id="store" class="com.dianping.cache.monitor.storage.ServerStatsDataStorage"></bean>
     <bean id="redisDataStorage" class="com.dianping.cache.monitor.storage.RedisStatsDataStorage"></bean>
-    <bean id="cleanData" class="com.dianping.squirrel.task.TimedCleanData"></bean>
-    <bean id="applist" class="com.dianping.squirrel.task.TimedRetriCategoryToApp"></bean>
+    <bean id="retrieveCategoryMappingTask" class="com.dianping.squirrel.task.RetrieveCategoryMappingTask"></bean>
+    <bean id="purgeHistoryDataTask" class="com.dianping.squirrel.task.PurgeHistoryDataTask"></bean>
 
 </beans>

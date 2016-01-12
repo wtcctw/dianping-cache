@@ -1,4 +1,4 @@
-package com.dianping.cache.deamontask;
+package com.dianping.squirrel.task;
 
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ThreadFactory;
@@ -9,7 +9,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * Created by thunder on 16/1/5.
  */
-public class CacheDeamonTaskManager {
+public class TaskManager {
     private static ThreadPoolExecutor executor;
 
     private static int DEFAULT_WATING_QUEUE_SIZE = 16384;
@@ -30,7 +30,7 @@ public class CacheDeamonTaskManager {
         }, new ThreadPoolExecutor.CallerRunsPolicy());
     }
 
-    public static void submit(AbstractDeamonTask task) {
+    public static void submit(AbstractTask task) {
         executor.submit(task);
     }
 

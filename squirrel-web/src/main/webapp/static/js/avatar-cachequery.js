@@ -26,26 +26,13 @@ module.controller('CacheQueryController', [
 					}).success(function(response) {
 						
 						$scope.categorySet = response.categorySet;
-						$('.typeahead').typeahead({
-							items: 16, 
-							source : $scope.categorySet,
-							updater : function(c) {
-								$scope.finalkey = c;
-								$scope.$apply();
-								return c;
-							}
-						})
+						initSelect();
 						
-					}).error(function(response) {
+					}).error(function() {
 						$scope.categorySet = "null";
-						
 					});
-					
 			};
-			
-		
-			
-			
+
 			$scope.getTemplateParas = function(){
 				$http.get(window.contextPath + '/cache/key/findByCategory',{
 					params : {
@@ -138,4 +125,13 @@ module.controller('CacheQueryController', [
 				$scope.finalkey = key;
 			},true);
 			$scope.initpage();
+
+
+			var initSelect = function(){
+				$(document).ready(function() {
+					setTimeout(function() {
+						$(".chosen-select").chosen()
+					}, 0);//由于angularjs加载option也是延迟的，所以这个操作得更迟才行。 3000
+				});
+			}
 } ]);

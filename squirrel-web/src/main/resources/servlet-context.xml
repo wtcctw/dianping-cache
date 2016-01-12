@@ -48,7 +48,7 @@
 			<mvc:mapping path="/memcached/memcached-*"/>
 
 
-			<bean class="com.dianping.cache.interceptor.ModelAndViewInterceptor">
+			<bean class="com.dianping.squirrel.view.ModelAndViewInterceptor">
 			</bean>
 		</mvc:interceptor>
 	</mvc:interceptors>

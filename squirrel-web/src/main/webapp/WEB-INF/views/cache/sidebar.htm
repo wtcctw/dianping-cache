@@ -77,23 +77,23 @@
 
             </ul>
         </li>
-        <li class="#if($side == 'event') active open #end"><a href="#"
+        <li class="#if($side == 'log') active open #end"><a href="#"
                                                               class="dropdown-toggle"> <i
                 class="menu-icon fa fa-tasks bigger-130"></i> <span
-                class="menu-text">事件</span> <b class="arrow fa fa-angle-down"></b>
+                class="menu-text">日志</span> <b class="arrow fa fa-angle-down"></b>
         </a>
             <ul class="submenu">
-                <li class="#if($subside == 'alarmevent') active #end"><a
-                        href="${rc.contextPath}/event/alarm"> <i
-                        class="icon-globe"></i> 告警历史
+                <li class="#if($subside == 'event') active #end"><a
+                        href="${rc.contextPath}/event"> <i
+                        class="icon-globe"></i> 事件
                 </a></li>
-                <li class="#if($subside == 'audit') active #end"><a
-                        href="${rc.contextPath}/event/audit"> <i
+                <li class="#if($subside == 'auditlog') active #end"><a
+                        href="${rc.contextPath}/auditlog"> <i
                         class="icon-globe"></i> 操作日志
                 </a></li>
-                <li class="#if($subside == 'tasklist') active #end"><a
-                        href="${rc.contextPath}/event/task"> <i
-                        class="icon-globe"></i> 任务列表
+                <li class="#if($subside == 'task') active #end"><a
+                        href="${rc.contextPath}/task"> <i
+                        class="icon-globe"></i> 任务
                 </a></li>
 
 

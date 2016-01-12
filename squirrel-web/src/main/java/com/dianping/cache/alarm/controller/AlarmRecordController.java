@@ -28,12 +28,12 @@ public class AlarmRecordController extends AbstractSidebarController {
     @Autowired
     private AlarmRecordService alarmRecordService;
 
-    @RequestMapping(value = "/setting/alarmrecord")
+    @RequestMapping(value = "/event")
     public ModelAndView topicSetting(HttpServletRequest request, HttpServletResponse response) {
         return new ModelAndView("alarm/alarmrecord", createViewMap());
     }
 
-    @RequestMapping(value = "/setting/alarmrecord/list", method = RequestMethod.GET)
+    @RequestMapping(value = "/event/list", method = RequestMethod.GET)
     @ResponseBody
     public Object alarmRecordList(int offset, int limit) {
         List<AlarmRecord> alarmRecords = alarmRecordService.findByPage(offset, limit);
@@ -44,7 +44,7 @@ public class AlarmRecordController extends AbstractSidebarController {
     }
 
 
-    @RequestMapping(value = "/setting/alarmrecord/search")
+    @RequestMapping(value = "/event/search")
     @ResponseBody
     public Object alarmRecordSearchedList(@RequestBody RecordSearchDto recordSearchDto) {
 
@@ -114,11 +114,11 @@ public class AlarmRecordController extends AbstractSidebarController {
 
     @Override
     protected String getSide() {
-        return "alarm";
+        return "log";
     }
 
     @Override
     public String getSubSide() {
-        return "alarmmeta";
+        return "event";
     }
 }

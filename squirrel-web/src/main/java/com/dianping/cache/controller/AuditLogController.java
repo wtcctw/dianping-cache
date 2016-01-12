@@ -21,21 +21,19 @@ import java.util.Map;
  * Created by dp on 16/1/11.
  */
 @Controller
-public class EventController extends AbstractSidebarController {
+
+public class AuditLogController extends AbstractSidebarController {
 
 
     @Autowired
     private OperationLogService operationLogService;
 
-    private String subside;
-
-    @RequestMapping(value = "/event/audit")
+    @RequestMapping(value = "/auditlog")
     public ModelAndView audit() {
-        subside = "audit";
         return new ModelAndView("event/audit", createViewMap());
     }
 
-    @RequestMapping(value = "/audit/search")
+    @RequestMapping(value = "/auditlog/search")
     @ResponseBody
     public Object operatorSearch(@RequestParam("operator") String operator,
                                  @RequestParam("content") String content,
@@ -96,11 +94,11 @@ public class EventController extends AbstractSidebarController {
 
     @Override
     protected String getSide() {
-        return "event";
+        return "log";
     }
 
     @Override
     public String getSubSide() {
-        return subside;
+        return "auditlog";
     }
 }

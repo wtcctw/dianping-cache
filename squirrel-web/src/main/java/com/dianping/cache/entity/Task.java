@@ -3,7 +3,7 @@ package com.dianping.cache.entity;
 /**
  * Created by thunder on 16/1/5.
  */
-public class DeamonTask {
+public class Task {
     int id;
     int stat;
     int statMin;

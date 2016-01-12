@@ -67,11 +67,7 @@
 <script type="text/javascript" src="${rc.contextPath}/assets/js/jquery.dataTables.min.js"></script>
 <script type="text/javascript" src="${rc.contextPath}/assets/js/jquery.dataTables.bootstrap.js"></script>
 <script type="text/javascript">
-	$(document).ready(function() {
-		setTimeout(function() {
-			$(".chosen-select").chosen()
-		}, 500);//由于angularjs加载option也是延迟的，所以这个操作得更迟才行。 3000
-	});
+
 
 	$('[data-rel=tooltip]').tooltip({container:'body'});
 	$('[data-rel=popover]').popover({container:'body'});

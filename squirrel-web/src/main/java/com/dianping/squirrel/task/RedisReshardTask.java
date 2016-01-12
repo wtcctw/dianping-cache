@@ -1,6 +1,5 @@
-package com.dianping.cache.deamontask.tasks;
+package com.dianping.squirrel.task;
 
-import com.dianping.cache.deamontask.AbstractDeamonTask;
 import com.dianping.cache.entity.ReshardRecord;
 import com.dianping.cache.scale.cluster.redis.RedisCluster;
 import com.dianping.cache.scale.cluster.redis.RedisManager;
@@ -8,6 +7,7 @@ import com.dianping.cache.scale.cluster.redis.RedisServer;
 import com.dianping.cache.scale.cluster.redis.ReshardPlan;
 import com.dianping.cache.service.ReshardService;
 import com.dianping.cache.util.SpringLocator;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,7 +16,7 @@ import java.util.List;
 /**
  * Created by dp on 16/1/6.
  */
-public class RedisReshardTask extends AbstractDeamonTask {
+public class RedisReshardTask extends AbstractTask {
 
     private Logger logger = LoggerFactory.getLogger(RedisReshardTask.class);
 

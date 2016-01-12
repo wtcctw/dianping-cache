@@ -22,7 +22,7 @@ import com.dianping.cache.monitor.statsdata.MemcachedStatsData;
 import com.dianping.cache.monitor.statsdata.ServerStatsData;
 
 @Controller
-public class CacheMonitorController  extends AbstractSidebarController {
+public class MonitorController  extends AbstractSidebarController {
 	
 	
 	@Resource(name = "cacheConfigurationService")
