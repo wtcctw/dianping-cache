@@ -29,13 +29,13 @@ public class EventController extends AbstractCacheController {
 
     private String subside;
 
-    @RequestMapping(value = "/event/audit")
+    @RequestMapping(value = "/auditlog")
     public ModelAndView audit() {
         subside = "audit";
         return new ModelAndView("event/audit", createViewMap());
     }
 
-    @RequestMapping(value = "/audit/search")
+    @RequestMapping(value = "/auditlog/search")
     @ResponseBody
     public Object operatorSearch(@RequestParam("operator") String operator,
                                  @RequestParam("content") String content,
