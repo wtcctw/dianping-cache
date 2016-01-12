@@ -26,6 +26,8 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import com.dianping.remote.cache.dto.CacheConfigurationRemoveDTO;
+
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,7 +47,6 @@ import com.dianping.cache.service.CacheConfigurationService;
 import com.dianping.cache.service.CacheKeyConfigurationService;
 import com.dianping.cache.service.OperationLogService;
 import com.dianping.cache.service.ServerGroupService;
-import com.dianping.cache.util.CollectionUtils;
 import com.dianping.cache.util.Migrator;
 import com.dianping.lion.Environment;
 import com.dianping.ops.cmdb.CmdbManager;
@@ -63,6 +64,8 @@ import com.dianping.squirrel.client.core.StoreClientBuilder;
 import com.dianping.squirrel.client.impl.memcached.MemcachedClientConfig;
 import com.dianping.squirrel.common.config.ConfigChangeListener;
 import com.dianping.squirrel.common.config.ConfigManagerLoader;
+import com.google.common.base.Splitter;
+import com.google.common.collect.Lists;
 
 /**
  * CacheConfigurationService to provide cache configuration data
@@ -109,14 +112,14 @@ public class CacheConfigurationServiceImpl implements CacheConfigurationService,
 	    try {
 	        String disabledCategories = ConfigManagerLoader.getConfigManager().getStringValue(
 	                KEY_DISABLE_CLEAR_CATEGORIES, DEFAULT_DISABLE_CLEAR_CATEGORIES);
-	        disabledCategoryList = CollectionUtils.toList(disabledCategories, ",");
+	        disabledCategoryList = Lists.newArrayList(Splitter.on(" , ").trimResults().split(disabledCategories));
             ConfigManagerLoader.getConfigManager().registerConfigChangeListener(new ConfigChangeListener() {
 
                 @Override
                 public void onChange(String key, String value) {
                     if(KEY_DISABLE_CLEAR_CATEGORIES.equals(key)) {
                         if(value != null) {
-                            disabledCategoryList = CollectionUtils.toList(value, ",");
+                            disabledCategoryList = Lists.newArrayList(Splitter.on(" , ").trimResults().split(value));
                         }
                     }
                 }
