@@ -99,27 +99,27 @@ module
 
 
             var fetchFunction = function (offset, limit, callback) {
-                $scope.searchEntity = {
+                $scope.alarmRuleSearchEntity = {
                     offset: offset,
                     limit: limit
                 };
-                console.log($scope.searchEntity);
-                $http.get(window.contextPath + $scope.suburl, {
-                    params: $scope.searchEntity
+                console.log($scope.alarmRuleSearchEntity);
+                $http.get(window.contextPath + $scope.alarmRuleSuburl, {
+                    params: $scope.alarmRuleSearchEntity
                 }).success(callback);
             };
-            $scope.suburl = "/config/alarm/list";
-            $scope.pageSize = 30000;
+            $scope.alarmRuleSuburl = "/config/alarm/list";
+            $scope.PageSize = 30000;
             $scope.queryCount = 0;
 
             $scope.query = function () {
-                $scope.searchPaginator = Paginator(
-                    fetchFunction, $scope.pageSize
+                $scope.alarmRuleSearchPaginator = Paginator(
+                    fetchFunction, $scope.PageSize
                 );
             }
 
-            $scope.refreshpage = function (myForm) {
-                $('#myModal').modal('hide');
+            $scope.refreshpage = function (configForm) {
+                $('#configModal').modal('hide');
                 console.log($scope.alarmConfigEntity);
                 $http
                     .post(
@@ -128,9 +128,9 @@ module
                 )
                     .success(
                     function (data) {
-                        $scope.searchPaginator = Paginator(
+                        $scope.alarmRuleSearchPaginator = Paginator(
                             fetchFunction,
-                            $scope.pageSize
+                            $scope.PageSize
                         );
                     }
                 );
@@ -142,12 +142,12 @@ module
             }
 
             $scope.setModalInput = function (index) {
-                $scope.alarmConfigEntity.id = $scope.searchPaginator.currentPageItems[index].id;
-                $scope.alarmConfigEntity.clusterType = $scope.searchPaginator.currentPageItems[index].clusterType;
-                $scope.alarmConfigEntity.clusterName = $scope.searchPaginator.currentPageItems[index].clusterName;
-                $scope.alarmConfigEntity.alarmTemplate = $scope.searchPaginator.currentPageItems[index].alarmTemplate;
-                $scope.alarmConfigEntity.receiver = $scope.searchPaginator.currentPageItems[index].receiver;
-                $scope.alarmConfigEntity.toBusiness = $scope.searchPaginator.currentPageItems[index].toBusiness;
+                $scope.alarmConfigEntity.id = $scope.alarmRuleSearchPaginator.currentPageItems[index].id;
+                $scope.alarmConfigEntity.clusterType = $scope.alarmRuleSearchPaginator.currentPageItems[index].clusterType;
+                $scope.alarmConfigEntity.clusterName = $scope.alarmRuleSearchPaginator.currentPageItems[index].clusterName;
+                $scope.alarmConfigEntity.alarmTemplate = $scope.alarmRuleSearchPaginator.currentPageItems[index].alarmTemplate;
+                $scope.alarmConfigEntity.receiver = $scope.alarmRuleSearchPaginator.currentPageItems[index].receiver;
+                $scope.alarmConfigEntity.toBusiness = $scope.alarmRuleSearchPaginator.currentPageItems[index].toBusiness;
                 $scope.alarmConfigEntity.isUpdate = true;
             }
 
@@ -164,9 +164,9 @@ module
                 )
                     .success(
                     function (data) {
-                        $scope.searchPaginator = Paginator(
+                        $scope.alarmRuleSearchPaginator = Paginator(
                             fetchFunction,
-                            $scope.pageSize
+                            $scope.PageSize
                         );
                     }
                 );
@@ -275,6 +275,241 @@ module
                 }
             );
 
+
+
+            //memcacheTemplate
+            $scope.memcacheClusters;
+
+
+            var memcachefetchFunction = function (offset, limit, callback) {
+                $scope.memcachesearchEntity = {
+                    offset: offset,
+                    limit: limit
+                };
+                console.log($scope.memcachesearchEntity);
+                $http.get(window.contextPath + $scope.memcachesuburl, {
+                    params: $scope.memcachesearchEntity
+                }).success(callback);
+            };
+            $scope.memcachesuburl = "/setting/memcachetemplate/list";
+            $scope.PageSize = 30000;
+            $scope.queryCount = 0;
+
+            $scope.memcachequery = function () {
+                $scope.memcacheTemplateSearchPaginator = Paginator(
+                    memcachefetchFunction, $scope.PageSize
+                );
+            }
+
+            $scope.memcacherefreshpage = function (memcacheForm) {
+                $('#memcacheTemplateModal').modal('hide');
+                console.log($scope.memcacheTemplateConfigEntity);
+                $http
+                    .post(
+                    window.contextPath + '/setting/memcachetemplate/create',
+                    $scope.memcacheTemplateConfigEntity
+                )
+                    .success(
+                    function (data) {
+                        $scope.memcacheTemplateSearchPaginator = Paginator(
+                            memcachefetchFunction,
+                            $scope.PageSize
+                        );
+                    }
+                );
+            }
+
+            $scope.memcacheclearModal = function () {
+                $scope.memcacheTemplateConfigEntity = {};
+                $scope.memcacheTemplateConfigEntity.isUpdate = false;
+            }
+
+            $scope.memcachesetModalInput = function (index) {
+                $scope.memcacheTemplateConfigEntity.id = $scope.memcacheTemplateSearchPaginator.currentPageItems[index].id;
+                $scope.memcacheTemplateConfigEntity.templateName = $scope.memcacheTemplateSearchPaginator.currentPageItems[index].templateName;
+                $scope.memcacheTemplateConfigEntity.mailMode = $scope.memcacheTemplateSearchPaginator.currentPageItems[index].mailMode;
+                $scope.memcacheTemplateConfigEntity.smsMode = $scope.memcacheTemplateSearchPaginator.currentPageItems[index].smsMode;
+                $scope.memcacheTemplateConfigEntity.weixinMode = $scope.memcacheTemplateSearchPaginator.currentPageItems[index].weixinMode;
+                $scope.memcacheTemplateConfigEntity.isDown = $scope.memcacheTemplateSearchPaginator.currentPageItems[index].isDown;
+                $scope.memcacheTemplateConfigEntity.checkHistory = $scope.memcacheTemplateSearchPaginator.currentPageItems[index].checkHistory;
+                $scope.memcacheTemplateConfigEntity.memThreshold = $scope.memcacheTemplateSearchPaginator.currentPageItems[index].memThreshold;
+                $scope.memcacheTemplateConfigEntity.qpsThreshold = $scope.memcacheTemplateSearchPaginator.currentPageItems[index].qpsThreshold;
+                $scope.memcacheTemplateConfigEntity.connThreshold = $scope.memcacheTemplateSearchPaginator.currentPageItems[index].connThreshold;
+                $scope.memcacheTemplateConfigEntity.isUpdate = true;
+            }
+
+            $rootScope.memcacheremoverecord = function (cid) {
+                console.log(cid);
+                $http
+                    .get(
+                    window.contextPath + "/setting/memcachetemplate/remove",
+                    {
+                        params: {
+                            id: cid
+                        }
+                    }
+                )
+                    .success(
+                    function (data) {
+                        $scope.memcacheTemplateSearchPaginator = Paginator(
+                            memcachefetchFunction,
+                            $scope.PageSize
+                        );
+                    }
+                );
+                return true;
+            }
+
+            $scope.memcachedialog = function (cid) {
+                $rootScope.cid = cid;
+                ngDialog
+                    .open({
+                        template: '\
+                        <div class = "widget-box">\
+                        <div class="widget-header">\
+                            <h4 class="widget-title">警告</h4>\
+                        </div>\
+                        <div class="widget-body">\
+                            <div class="widget-main">\
+                                <p class="alert alert-info">\
+                                    您确认要删除吗？\
+                                </p>\
+                            </div>\
+                             <div class="modal-footer">\
+                                <button type="button" class="btn btn-default" ng-click="closeThisDialog()">取消</button>\
+                                <button type="button" class="btn btn-primary" ng-click="memcacheremoverecord(cid)&&closeThisDialog()">确定</button>\
+                             </div>\
+                        </div>\
+                        </div>',
+                        plain: true,
+                        className: 'ngdialog-theme-default'
+                    });
+            };
+
+            $scope.memcachequery();
+            $scope.memcacheclearModal();
+
+
+
+            //redisTemplate
+            $scope.redisClusters;
+
+
+            var redisfetchFunction = function (offset, limit, callback) {
+                $scope.redisSearchEntity = {
+                    offset: offset,
+                    limit: limit
+                };
+                console.log($scope.redisSearchEntity);
+                $http.get(window.contextPath + $scope.redissuburl, {
+                    params: $scope.redisSearchEntity
+                }).success(callback);
+            };
+            $scope.redissuburl = "/setting/redistemplate/list";
+            $scope.PageSize = 30000;
+            $scope.queryCount = 0;
+
+            $scope.redisQuery = function () {
+                $scope.redisTemplateSearchPaginator = Paginator(
+                    redisfetchFunction, $scope.PageSize
+                );
+            }
+
+            $scope.redisrefreshpage = function (redisForm) {
+                $('#redisTemplateModal').modal('hide');
+                console.log($scope.redisTemplateConfigEntity);
+                $http
+                    .post(
+                    window.contextPath + '/setting/redistemplate/create',
+                    $scope.redisTemplateConfigEntity
+                )
+                    .success(
+                    function (data) {
+                        $scope.redisTemplateSearchPaginator = Paginator(
+                            redisfetchFunction,
+                            $scope.PageSize
+                        );
+                    }
+                );
+            }
+
+            $scope.redisClearModal = function () {
+                $scope.redisTemplateConfigEntity = {};
+                $scope.redisTemplateConfigEntity.isUpdate = false;
+            }
+
+            $scope.redissetModalInput = function (index) {
+                $scope.redisTemplateConfigEntity.id = $scope.redisTemplateSearchPaginator.currentPageItems[index].id;
+                $scope.redisTemplateConfigEntity.templateName = $scope.redisTemplateSearchPaginator.currentPageItems[index].templateName;
+                $scope.redisTemplateConfigEntity.mailMode = $scope.redisTemplateSearchPaginator.currentPageItems[index].mailMode;
+                $scope.redisTemplateConfigEntity.smsMode = $scope.redisTemplateSearchPaginator.currentPageItems[index].smsMode;
+                $scope.redisTemplateConfigEntity.weixinMode = $scope.redisTemplateSearchPaginator.currentPageItems[index].weixinMode;
+                $scope.redisTemplateConfigEntity.isDown = $scope.redisTemplateSearchPaginator.currentPageItems[index].isDown;
+                $scope.redisTemplateConfigEntity.checkHistory = $scope.redisTemplateSearchPaginator.currentPageItems[index].checkHistory;
+                $scope.redisTemplateConfigEntity.memThreshold = $scope.redisTemplateSearchPaginator.currentPageItems[index].memThreshold;
+                $scope.redisTemplateConfigEntity.qpsThreshold = $scope.redisTemplateSearchPaginator.currentPageItems[index].qpsThreshold;
+                $scope.redisTemplateConfigEntity.isUpdate = true;
+            }
+
+            $rootScope.redisremoverecord = function (cid) {
+                console.log(cid);
+                $http
+                    .get(
+                    window.contextPath + "/setting/redistemplate/remove",
+                    {
+                        params: {
+                            id: cid
+                        }
+                    }
+                )
+                    .success(
+                    function (data) {
+                        $scope.redisTemplateSearchPaginator = Paginator(
+                            redisfetchFunction,
+                            $scope.PageSize
+                        );
+                    }
+                );
+                return true;
+            }
+
+            $scope.redisDialog = function (cid) {
+                $rootScope.cid = cid;
+                ngDialog
+                    .open({
+                        template: '\
+                        <div class = "widget-box">\
+                        <div class="widget-header">\
+                            <h4 class="widget-title">警告</h4>\
+                        </div>\
+                        <div class="widget-body">\
+                            <div class="widget-main">\
+                                <p class="alert alert-info">\
+                                    您确认要删除吗？\
+                                </p>\
+                            </div>\
+                             <div class="modal-footer">\
+                                <button type="button" class="btn btn-default" ng-click="closeThisDialog()">取消</button>\
+                                <button type="button" class="btn btn-primary" ng-click="redisremoverecord(cid)&&closeThisDialog()">确定</button>\
+                             </div>\
+                        </div>\
+                        </div>',
+                        plain: true,
+                        className: 'ngdialog-theme-default'
+                    });
+            };
+
+            $scope.redisQuery();
+            $scope.redisClearModal();
+
+
         }
     ]
 );
+
+
+
+
+
+
+
