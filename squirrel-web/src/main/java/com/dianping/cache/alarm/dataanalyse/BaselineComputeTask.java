@@ -1,6 +1,5 @@
 package com.dianping.cache.alarm.dataanalyse;
 
-import com.dianping.cache.alarm.dataanalyse.baselineCache.BaselineCacheService;
 import com.dianping.cache.alarm.dataanalyse.mapper.MemcacheBaselineMapper;
 import com.dianping.cache.alarm.dataanalyse.mapper.RedisBaselineMapper;
 import com.dianping.cache.alarm.dataanalyse.service.BaselineComputeTaskService;
@@ -50,8 +49,8 @@ public class BaselineComputeTask {
     @Autowired
     BaselineComputeTaskService baselineComputeTaskService;
 
-    @Autowired
-    BaselineCacheService baselineCacheService;
+//    @Autowired
+//    BaselineCacheService baselineCacheService;
 
     @Autowired
     ServerService serverService;
@@ -105,7 +104,7 @@ public class BaselineComputeTask {
             memcacheBaselineMap.put(memcacheBaseline.getBaseline_name(), memcacheBaseline);
         }
 
-        baselineCacheService.putMemcacheBaselineMapToCache(memcacheBaselineMap);
+//        baselineCacheService.putMemcacheBaselineMapToCache(memcacheBaselineMap);
 
     }
 
@@ -131,7 +130,7 @@ public class BaselineComputeTask {
             redisBaselineMap.put(redisBaseline.getBaseline_name(), redisBaseline);
         }
 
-        baselineCacheService.putRedisBaselineMapToCache(redisBaselineMap);
+//        baselineCacheService.putRedisBaselineMapToCache(redisBaselineMap);
     }
 
 
@@ -248,7 +247,7 @@ public class BaselineComputeTask {
 
         memcacheStats.setCmd_set(Math.abs(memcacheStatsestmp.get(1).getCmd_set() - memcacheStatsestmp.get(0).getCmd_set()));
 
-        memcacheStats.setCurr_conn(Math.abs(memcacheStatsestmp.get(1).getCurr_conn() - memcacheStatsestmp.get(0).getCurr_conn()));
+        memcacheStats.setCurr_conn(memcacheStatsestmp.get(0).getCurr_conn());
 
         memcacheStats.setDelete_hits(Math.abs(memcacheStatsestmp.get(1).getDelete_hits() - memcacheStatsestmp.get(0).getDelete_hits()));
 
@@ -256,15 +255,15 @@ public class BaselineComputeTask {
 
         memcacheStats.setDelete_misses(Math.abs(memcacheStatsestmp.get(1).getDelete_misses() - memcacheStatsestmp.get(0).getDelete_misses()));
 
-        memcacheStats.setCurr_items(Math.abs(memcacheStatsestmp.get(1).getCurr_items() - memcacheStatsestmp.get(0).getCurr_items()));
+        memcacheStats.setCurr_items( memcacheStatsestmp.get(0).getCurr_items());
 
         memcacheStats.setGet_hits(Math.abs(memcacheStatsestmp.get(1).getGet_hits() - memcacheStatsestmp.get(0).getGet_hits()));
 
         memcacheStats.setGet_misses(Math.abs(memcacheStatsestmp.get(1).getGet_misses() - memcacheStatsestmp.get(0).getGet_misses()));
 
-        memcacheStats.setLimit_maxbytes(Math.abs(memcacheStatsestmp.get(1).getLimit_maxbytes() - memcacheStatsestmp.get(0).getLimit_maxbytes()));
+        memcacheStats.setLimit_maxbytes(memcacheStatsestmp.get(0).getLimit_maxbytes());
 
-        memcacheStats.setTotal_conn(Math.abs(memcacheStatsestmp.get(1).getTotal_conn() - memcacheStatsestmp.get(0).getTotal_conn()));
+        memcacheStats.setTotal_conn(memcacheStatsestmp.get(0).getTotal_conn());
 
         return memcacheStats;
     }
@@ -276,31 +275,31 @@ public class BaselineComputeTask {
         memcacheStats.setServerId(curr.getServerId());
         memcacheStats.setCurr_time(curr.getCurr_time());
 
-        memcacheStats.setBytes((long) (curr.getBytes() * 0.2 + base.getBytes() * 0.8));
+        memcacheStats.setBytes((long) (compute(curr.getBytes(), base.getBytes())));
 
-        memcacheStats.setBytes_read((long) (curr.getBytes_read() * 0.2 + base.getBytes_read() * 0.8));
+        memcacheStats.setBytes_read((long) (compute(curr.getBytes_read(), base.getBytes_read())));
 
-        memcacheStats.setBytes_written((long) (curr.getBytes_written() * 0.2 + base.getBytes_written() * 0.8));
+        memcacheStats.setBytes_written((long) (compute(curr.getBytes_written(), base.getBytes_written())));
 
-        memcacheStats.setCmd_set((long) (curr.getCmd_set() * 0.2 + base.getCmd_set() * 0.8));
+        memcacheStats.setCmd_set((long) (compute(curr.getCmd_set(), base.getCmd_set())));
 
-        memcacheStats.setCurr_conn((int) (curr.getCurr_conn() * 0.2 + base.getCurr_conn() * 0.8));
+        memcacheStats.setCurr_conn((int) (compute(curr.getCurr_conn(), base.getCurr_conn())));
 
-        memcacheStats.setDelete_hits((long) (curr.getDelete_hits() * 0.2 + base.getDelete_hits() * 0.8));
+        memcacheStats.setDelete_hits((long) (compute(curr.getDelete_hits(), base.getDelete_hits())));
 
-        memcacheStats.setEvictions((long) (curr.getEvictions() * 0.2 + base.getEvictions() * 0.8));
+        memcacheStats.setEvictions((long) (compute(curr.getEvictions(), base.getEvictions())));
 
-        memcacheStats.setDelete_misses((long) (curr.getDelete_misses() * 0.2 + base.getDelete_misses() * 0.8));
+        memcacheStats.setDelete_misses((long) (compute(curr.getDelete_misses(), base.getDelete_misses())));
 
-        memcacheStats.setCurr_items((int) (curr.getCurr_items() * 0.2 + base.getCurr_items() * 0.8));
+        memcacheStats.setCurr_items((int) (compute(curr.getCurr_items(), base.getCurr_items())));
 
-        memcacheStats.setGet_hits((long) (curr.getGet_hits() * 0.2 + base.getGet_hits() * 0.8));
+        memcacheStats.setGet_hits((long) (compute(curr.getGet_hits(), base.getGet_hits())));
 
-        memcacheStats.setGet_misses((long) (curr.getGet_misses() * 0.2 + base.getGet_misses() * 0.8));
+        memcacheStats.setGet_misses((long) (compute(curr.getGet_misses(), base.getGet_misses())));
 
-        memcacheStats.setLimit_maxbytes((long) (curr.getLimit_maxbytes() * 0.2 + base.getLimit_maxbytes() * 0.8));
+        memcacheStats.setLimit_maxbytes((long) (compute(curr.getLimit_maxbytes(), base.getLimit_maxbytes())));
 
-        memcacheStats.setTotal_conn((int) (curr.getTotal_conn() * 0.2 + base.getTotal_conn() * 0.8));
+        memcacheStats.setTotal_conn((int) (compute(curr.getTotal_conn(), base.getTotal_conn())));
 
         return memcacheStats;
 
@@ -415,21 +414,21 @@ public class BaselineComputeTask {
 
         redisStats.setInput_kbps(Math.abs(redisStatsestmp.get(1).getInput_kbps() - redisStatsestmp.get(0).getInput_kbps()));
 
-        redisStats.setMemory_used(Math.abs(redisStatsestmp.get(1).getMemory_used() - redisStatsestmp.get(0).getMemory_used()));
+        redisStats.setMemory_used(redisStatsestmp.get(0).getMemory_used());
 
         redisStats.setOutput_kbps(Math.abs(redisStatsestmp.get(1).getOutput_kbps() - redisStatsestmp.get(0).getOutput_kbps()));
 
         redisStats.setQps(Math.abs(redisStatsestmp.get(1).getQps() - redisStatsestmp.get(0).getQps()));
 
-        redisStats.setTotal_connections(Math.abs(redisStatsestmp.get(1).getTotal_connections() - redisStatsestmp.get(0).getTotal_connections()));
+        redisStats.setTotal_connections(redisStatsestmp.get(0).getTotal_connections());
 
-        redisStats.setUsed_cpu_sys(Math.abs(redisStatsestmp.get(1).getUsed_cpu_sys() - redisStatsestmp.get(0).getUsed_cpu_sys()));
+        redisStats.setUsed_cpu_sys(redisStatsestmp.get(0).getUsed_cpu_sys());
 
-        redisStats.setUsed_cpu_sys_children(Math.abs(redisStatsestmp.get(1).getUsed_cpu_sys_children() - redisStatsestmp.get(0).getUsed_cpu_sys_children()));
+        redisStats.setUsed_cpu_sys_children(redisStatsestmp.get(0).getUsed_cpu_sys_children());
 
-        redisStats.setUsed_cpu_user(Math.abs(redisStatsestmp.get(1).getUsed_cpu_user() - redisStatsestmp.get(0).getUsed_cpu_user()));
+        redisStats.setUsed_cpu_user(redisStatsestmp.get(0).getUsed_cpu_user());
 
-        redisStats.setUsed_cpu_user_children(Math.abs(redisStatsestmp.get(1).getUsed_cpu_user_children() - redisStatsestmp.get(0).getUsed_cpu_user_children()));
+        redisStats.setUsed_cpu_user_children(redisStatsestmp.get(0).getUsed_cpu_user_children());
 
         redisStats.setId(redisStatsestmp.get(0).getId());
         redisStats.setServerId(redisStatsestmp.get(0).getServerId());
@@ -441,25 +440,25 @@ public class BaselineComputeTask {
     private RedisStats dealRedisStats(RedisStats curr, RedisStats base) {
         RedisStats redisStats = new RedisStats();
 
-        redisStats.setConnected_clients((int) (curr.getConnected_clients() * 0.2 + base.getConnected_clients() * 0.8));
+        redisStats.setConnected_clients((int) (compute(curr.getConnected_clients(), base.getConnected_clients())));
 
-        redisStats.setInput_kbps(curr.getInput_kbps() * 0.2 + base.getInput_kbps() * 0.8);
+        redisStats.setInput_kbps(compute(curr.getInput_kbps(), base.getInput_kbps()));
 
-        redisStats.setMemory_used((long) (curr.getMemory_used() * 0.2 + base.getMemory_used() * 0.8));
+        redisStats.setMemory_used((long) (compute(curr.getMemory_used(), base.getMemory_used())));
 
-        redisStats.setOutput_kbps(curr.getOutput_kbps() * 0.2 + base.getOutput_kbps() * 0.8);
+        redisStats.setOutput_kbps(compute(curr.getOutput_kbps(), base.getOutput_kbps()));
 
-        redisStats.setQps((int) (curr.getQps() * 0.2 + base.getQps() * 0.8));
+        redisStats.setQps((int) (compute(curr.getQps(), base.getQps())));
 
-        redisStats.setTotal_connections((int) (curr.getTotal_connections() * 0.2 + base.getTotal_connections() * 0.8));
+        redisStats.setTotal_connections((int) (compute(curr.getTotal_connections(), base.getTotal_connections())));
 
-        redisStats.setUsed_cpu_sys(curr.getUsed_cpu_sys() * 0.2 + base.getUsed_cpu_sys() * 0.8);
+        redisStats.setUsed_cpu_sys(compute(curr.getUsed_cpu_sys(), base.getUsed_cpu_sys()));
 
-        redisStats.setUsed_cpu_sys_children(curr.getUsed_cpu_sys_children() * 0.2 + base.getUsed_cpu_sys_children() * 0.8);
+        redisStats.setUsed_cpu_sys_children(compute(curr.getUsed_cpu_sys_children(), base.getUsed_cpu_sys_children()));
 
-        redisStats.setUsed_cpu_user(curr.getUsed_cpu_user() * 0.2 + base.getUsed_cpu_user() * 0.8);
+        redisStats.setUsed_cpu_user(compute(curr.getUsed_cpu_user(), base.getUsed_cpu_user()));
 
-        redisStats.setUsed_cpu_user_children(curr.getUsed_cpu_user_children() * 0.2 + base.getUsed_cpu_user_children() * 0.8);
+        redisStats.setUsed_cpu_user_children(compute(curr.getUsed_cpu_user_children(), base.getUsed_cpu_user_children()));
 
         redisStats.setId(curr.getId());
         redisStats.setServerId(curr.getServerId());
@@ -467,6 +466,19 @@ public class BaselineComputeTask {
 
 
         return redisStats;
+    }
+
+    private double compute(double cur, double base) {
+        if(0 == cur && 0 == base){
+            return base;
+        }else if(0==cur && 0 != base){
+            return base;
+        }else if(0!=cur && 0 == base){
+            return cur;
+        }else {
+            return cur* 0.2 + base * 0.8;
+        }
+
     }
 
 

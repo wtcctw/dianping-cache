@@ -39,7 +39,7 @@ public class DataAnalyser extends AbstractLifeCycle implements AlarmerLifecycle 
     protected void doStart() throws Exception {
         super.doStart();
 
-        baselineCacheService.reload();
+//        baselineCacheService.reload();
 
         logger.info("[doStart] {} start."+ getClass().getSimpleName());
     }

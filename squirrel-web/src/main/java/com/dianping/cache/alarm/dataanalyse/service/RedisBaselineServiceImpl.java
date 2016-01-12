@@ -26,8 +26,8 @@ public class RedisBaselineServiceImpl implements RedisBaselineService {
     }
 
     @Override
-    public List<RedisBaseline> findByServer(String server) {
-        return redisBaselineDao.findByServer(server);
+    public List<RedisBaseline> findByName(String baseline_name) {
+        return redisBaselineDao.findByName(baseline_name);
     }
 
     @Override

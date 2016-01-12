@@ -11,7 +11,7 @@ public interface RedisBaselineService {
 
 	List<RedisBaseline> findByTaskId(int taskId);
 
-	List<RedisBaseline> findByServer(String server);
+	List<RedisBaseline> findByName(String baseline_name);
 	
 	void insert(RedisBaseline stat);
 	

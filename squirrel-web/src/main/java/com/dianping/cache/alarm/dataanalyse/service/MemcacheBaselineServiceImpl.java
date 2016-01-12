@@ -27,8 +27,8 @@ public class MemcacheBaselineServiceImpl implements MemcacheBaselineService {
     }
 
     @Override
-    public List<MemcacheBaseline> findByServer(String server) {
-        return memcacheBaselineDao.findByServer(server);
+    public List<MemcacheBaseline> findByName(String baseline_name) {
+        return memcacheBaselineDao.findByName(baseline_name);
     }
 
     @Override

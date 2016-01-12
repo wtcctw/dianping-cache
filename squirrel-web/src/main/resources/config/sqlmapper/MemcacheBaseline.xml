@@ -36,11 +36,11 @@
 	</insert>
 	
 	
-	<select id="findByServer" resultMap="MemcacheBaselineResult" parameterType="String">
+	<select id="findByName" resultMap="MemcacheBaselineResult" parameterType="String">
    		SELECT id,baseline_name, serverId, uptime,curr_time, total_conn, curr_conn, curr_items, cmd_set, get_hits, get_misses,
 				 bytes_read, bytes_written, delete_hits, delete_misses, evictions,limit_maxbytes, bytes, taskId, updateTime
    		FROM memcache_baseline
-   		WHERE serverId = select id from servers where address = #{server}
+   		WHERE baseline_name = #{baseline_name}
    		ORDER BY id DESC
 	</select>
 	
