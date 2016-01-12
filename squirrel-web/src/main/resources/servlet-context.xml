@@ -48,7 +48,7 @@
 	</bean>
 
 	<bean id="viewResolver"
-		class="com.dianping.cache.util.VelocityMultipleLayoutViewResolver">
+		class="com.dianping.squirrel.view.VelocityMultipleLayoutViewResolver">
 		<property name="cache" value="true" />
 		<property name="exposeSpringMacroHelpers" value="true" />
 		<property name="exposeSessionAttributes" value="true" />
