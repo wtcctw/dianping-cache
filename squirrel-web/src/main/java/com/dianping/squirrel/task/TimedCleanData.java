@@ -1,4 +1,4 @@
-package com.dianping.cache.timedtask;
+package com.dianping.squirrel.task;
 
 import java.util.Date;
 import java.util.concurrent.Executors;

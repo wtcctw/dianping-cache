@@ -21,7 +21,7 @@
     <context:component-scan base-package="com.dianping" />
 
     <task:annotation-driven scheduler="scheduler" mode="proxy" />
-    <task:scheduler id="scheduler" pool-size="10" />
+    <task:scheduler id="scheduler" pool-size="8" />
 
     <bean class="com.dianping.cache.util.SpringLocator" />
 
