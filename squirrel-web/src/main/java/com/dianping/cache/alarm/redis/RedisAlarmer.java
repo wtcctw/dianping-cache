@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.TimeoutException;
 
 /**
@@ -166,7 +167,7 @@ public class RedisAlarmer extends AbstractRedisAlarmer {
 
                 if (redisTemplate.isCheckHistory()) {//是否进行历史数据分析开关
 
-                    SimpleDateFormat sdf = new SimpleDateFormat("EEEE:HH:mm");
+                    SimpleDateFormat sdf = new SimpleDateFormat("EEEE:HH:mm", Locale.ENGLISH);
                     Date nameDate = new Date();
                     String name = "Redis_" + sdf.format(nameDate) + "_" + node.getMaster().getAddress();
 
@@ -176,6 +177,9 @@ public class RedisAlarmer extends AbstractRedisAlarmer {
                         continue;
                     }
 
+                    if(0==redisBaselineService.findByName(name).size()){
+                        continue;
+                    }
 
                     if (fluctTooMuch((double) node.getMaster().getInfo().getTotal_connections(), (double) redisBaselineService.findByName(name).get(0).getTotal_connections())) {
 

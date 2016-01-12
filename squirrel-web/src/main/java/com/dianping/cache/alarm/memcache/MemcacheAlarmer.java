@@ -24,10 +24,7 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.TimeoutException;
 
 /**
@@ -407,11 +404,15 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
                 }
             }
 
-            SimpleDateFormat sdf = new SimpleDateFormat("EEEE:HH:mm");
+            SimpleDateFormat sdf = new SimpleDateFormat("EEEE:HH:mm", Locale.ENGLISH);
             Date nameDate = new Date();
             String name = "Memcache_" + sdf.format(nameDate)+"_"+server;
 
             if(null == memcacheBaselineService.findByName(name)){
+                return false;
+            }
+
+            if(0 ==memcacheBaselineService.findByName(name).size()){
                 return false;
             }
 
@@ -518,7 +519,7 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
             return result;
         }
 
-        if (Math.abs((v1 - v2)) / v2 > 0.5) {
+        if (Math.abs((v1 - v2)) / v2 > 0.01) {
             result = true;
         }
 
