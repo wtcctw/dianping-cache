@@ -1,4 +1,4 @@
-package com.dianping.squirrel.auth;
+package com.dianping.squirrel.service;
 
 import java.util.List;
 

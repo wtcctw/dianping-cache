@@ -1,4 +1,4 @@
-package com.dianping.squirrel.auth;
+package com.dianping.squirrel.service.impl;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -12,10 +12,11 @@ import com.dianping.squirrel.common.config.ConfigManager;
 import com.dianping.squirrel.common.config.ConfigManagerLoader;
 import com.dianping.squirrel.common.zookeeper.PathProvider;
 import com.dianping.squirrel.common.zookeeper.ZookeeperClient;
+import com.dianping.squirrel.service.AuthService;
 
-public class DefaultAuthService implements AuthService {
+public class AuthServiceImpl implements AuthService {
 
-    private static Logger logger = LoggerFactory.getLogger(DefaultAuthService.class);
+    private static Logger logger = LoggerFactory.getLogger(AuthServiceImpl.class);
     
     private static final String KEY_ZOOKEEPER_ADDRESS = "avatar-cache.zookeeper.address";
     
@@ -24,7 +25,7 @@ public class DefaultAuthService implements AuthService {
     private PathProvider pathProvider;
     private ZookeeperClient zkClient;
     
-    public DefaultAuthService() throws Exception {
+    public AuthServiceImpl() throws Exception {
         String zkAddress = configManager.getStringValue(KEY_ZOOKEEPER_ADDRESS);
         if (zkAddress == null)
             throw new NullPointerException("squirrel zookeeper address is null");
