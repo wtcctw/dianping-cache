@@ -28,7 +28,6 @@ import org.springframework.security.userdetails.UsernameNotFoundException;
 
 import com.dianping.cache.entity.Role;
 import com.dianping.cache.service.UserService;
-import com.dianping.modules.spring.flex.SecurityHelper;
 
 /**
  * @author danson.liu
