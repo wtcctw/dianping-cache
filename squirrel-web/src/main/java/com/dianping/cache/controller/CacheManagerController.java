@@ -40,7 +40,7 @@ import com.dianping.core.type.PageModel;
 import com.dianping.squirrel.client.StoreClient;
 import com.dianping.squirrel.client.StoreClientFactory;
 import com.dianping.squirrel.client.StoreKey;
-import com.dianping.squirrel.client.core.Locatable;
+import com.dianping.squirrel.common.lifecycle.Locatable;
 
 @Controller
 public class CacheManagerController extends AbstractCacheController {

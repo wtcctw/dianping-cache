@@ -1,4 +1,4 @@
-package com.dianping.squirrel.client.core;
+package com.dianping.squirrel.common.lifecycle;
 
 public interface Stopable {
 
