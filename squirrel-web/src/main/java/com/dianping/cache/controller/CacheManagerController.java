@@ -66,7 +66,7 @@ public class CacheManagerController extends AbstractCacheController {
     @Resource(name = "categoryToAppService")
     private CategoryToAppService categoryToAppService;
 
-    @Resource(name = "deamonTaskDao")
+    @Resource(name = "taskDao")
     private TaskDao deamonTaskDao;
 
     @RequestMapping(value = "/cache/config")
@@ -422,7 +422,7 @@ public class CacheManagerController extends AbstractCacheController {
 
 
 
-    @RequestMapping(value = "/cache/query", method = RequestMethod.GET)
+    @RequestMapping(value = "/data/query", method = RequestMethod.GET)
     public ModelAndView viewCacheQuery() {
         subside = "query";
         return new ModelAndView("cache/query", createViewMap());
