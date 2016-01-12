@@ -1,13 +1,12 @@
 package com.dianping.squirrel.client.impl.redis;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import com.dianping.remote.cache.dto.CacheConfigurationDTO;
 import com.dianping.squirrel.client.config.StoreClientConfig;
 import com.dianping.squirrel.client.config.StoreClientConfigParser;
+import com.dianping.squirrel.client.util.ParamHelper;
 
 /**
  * Redis cluster URL: redis-cluster://ip1:port1,ip2:port2?param1=value1&param2=value2
@@ -18,12 +17,13 @@ import com.dianping.squirrel.client.config.StoreClientConfigParser;
 public class RedisClientConfigParser implements StoreClientConfigParser {
 
     private static final String URL_PREFIX = "redis-cluster://";
+    private static final String KEY_PASSWORD = "password";
     private static final String KEY_READ_TIMEOUT = "readTimeout";
     private static final String KEY_CONN_TIMEOUT = "connTimeout";
     private static final String KEY_MAX_REDIRECTS = "maxRedirects";
-    private static final int DEFAULT_READ_TIMEOUT = 2000;
-    private static final int DEFAULT_CONN_TIMEOUT = 2000;
-    private static final int DEFAULT_MAX_REDIRECTS = 3;
+    private static final int DEFAULT_READ_TIMEOUT = 1000;
+    private static final int DEFAULT_CONN_TIMEOUT = 1000;
+    private static final int DEFAULT_MAX_REDIRECTS = 1;
     
     @Override
     public StoreClientConfig parse(CacheConfigurationDTO detail) {
@@ -41,28 +41,13 @@ public class RedisClientConfigParser implements StoreClientConfigParser {
             servers = servers.substring(0, idx);
         }
         
-        Map<String, String> paramMap = parseParams(params);
-        String value = paramMap.get(KEY_READ_TIMEOUT);
-        if(value != null) {
-            config.setReadTimeout(Integer.parseInt(value));
-        } else {
-            config.setReadTimeout(DEFAULT_READ_TIMEOUT);
-        }
-        value = paramMap.get(KEY_CONN_TIMEOUT);
-        if(value != null) {
-            config.setConnTimeout(Integer.parseInt(value));
-        } else {
-            config.setConnTimeout(DEFAULT_CONN_TIMEOUT);
-        }
-        value = paramMap.get(KEY_MAX_REDIRECTS);
-        if(value != null) {
-            config.setMaxRedirects(Integer.parseInt(value));
-        } else {
-            config.setMaxRedirects(DEFAULT_MAX_REDIRECTS);
-        }
+        ParamHelper paramHelper = new ParamHelper(params);
         
+        config.setPassword(paramHelper.get(KEY_PASSWORD));
+        config.setReadTimeout(paramHelper.getInteger(KEY_READ_TIMEOUT, DEFAULT_READ_TIMEOUT));
+        config.setConnTimeout(paramHelper.getInteger(KEY_CONN_TIMEOUT, DEFAULT_CONN_TIMEOUT));
+        config.setMaxRedirects(paramHelper.getInteger(KEY_MAX_REDIRECTS, DEFAULT_MAX_REDIRECTS));
         config.setServerList(parseServers(servers));
-
         config.setClientClazz(detail.getClientClazz());
 
         return config;
@@ -72,21 +57,12 @@ public class RedisClientConfigParser implements StoreClientConfigParser {
         List<String> serverList = new ArrayList<String>();
         String[] array = servers.split(",");
         for(String s : array) {
-            serverList.add(s);
-        }
-        return serverList;
-    }
-
-    private Map<String, String> parseParams(String params) {
-        Map<String, String> paramMap = new HashMap<String, String>();
-        String[] array = params.split("&");
-        for(String param : array) {
-            String[] pair = param.split("=");
-            if(pair.length == 2) {
-                paramMap.put(pair[0], pair[1]);
+            String trim = s.trim();
+            if(trim.length() > 0) {
+                serverList.add(trim);
             }
         }
-        return paramMap;
+        return serverList;
     }
 
 }

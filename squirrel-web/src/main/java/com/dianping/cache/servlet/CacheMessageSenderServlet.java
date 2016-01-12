@@ -25,7 +25,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.util.StringUtils;
 
-import com.dianping.cache.support.spring.SpringLocator;
+import com.dianping.cache.util.SpringLocator;
 import com.dianping.remote.cache.CacheManageWebService;
 
 /**

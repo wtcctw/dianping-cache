@@ -91,7 +91,7 @@ public class EhcacheStoreClientImpl extends AbstractStoreClient {
 	}
 
 	/**
-	 * @see com.dianping.squirrel.client.core.Lifecycle#start()
+	 * @see com.dianping.squirrel.common.lifecycle.Lifecycle#start()
 	 */
 	@Override
 	public void start() {

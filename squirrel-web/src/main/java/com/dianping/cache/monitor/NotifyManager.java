@@ -1,6 +1,5 @@
 package com.dianping.cache.monitor;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -12,16 +11,15 @@ import com.dianping.ba.es.qyweixin.adapter.api.dto.MessageDto;
 import com.dianping.ba.es.qyweixin.adapter.api.dto.media.TextDto;
 import com.dianping.ba.es.qyweixin.adapter.api.exception.QyWeixinAdaperException;
 import com.dianping.ba.es.qyweixin.adapter.api.service.MessageService;
-
-import com.dianping.cache.util.CollectionUtils;
 import com.dianping.cache.util.RequestUtil;
 import com.dianping.lion.Environment;
 import com.dianping.mailremote.remote.MailService;
 import com.dianping.pigeon.remoting.ServiceFactory;
-import com.dianping.sms.biz.SMSService;
 import com.dianping.squirrel.common.config.ConfigChangeListener;
 import com.dianping.squirrel.common.config.ConfigManager;
 import com.dianping.squirrel.common.config.ConfigManagerLoader;
+import com.google.common.base.Splitter;
+import com.google.common.collect.Lists;
 public class NotifyManager {
 
     private static Logger logger = LoggerFactory.getLogger(NotifyManager.class);
@@ -97,7 +95,8 @@ public class NotifyManager {
         Map<String,String> subPair = new HashMap<String, String>();
         subPair.put("title", title);
         subPair.put("body", message);
-        boolean result = mailService.send(emailType, CollectionUtils.toList(emailList, ","), subPair, "");
+        List<String> emails = Lists.newArrayList(Splitter.on(',').trimResults().split(emailList));
+        boolean result = mailService.send(emailType, emails, subPair, "");
         if(!result) {
             logger.warn("failed to send email, content: " + message);
         }
@@ -124,8 +123,7 @@ public class NotifyManager {
     public void notifyWeixin(String message) {
         TextDto text = new TextDto();
         text.setContent(message);
-        List<String> users = new ArrayList<String>();
-        users.addAll(CollectionUtils.toList(weixinList, ","));
+        List<String> users = Lists.newArrayList(Splitter.on(',').trimResults().split(weixinList));
         MessageDto messageDto = new MessageDto();
         messageDto.setAgentid(weixinType);
         messageDto.setMediaDto(text);

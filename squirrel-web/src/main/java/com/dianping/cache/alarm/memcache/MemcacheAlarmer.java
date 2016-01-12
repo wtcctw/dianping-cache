@@ -4,7 +4,7 @@ import com.dianping.cache.alarm.AlarmType;
 import com.dianping.cache.alarm.alarmconfig.AlarmConfigService;
 import com.dianping.cache.alarm.alarmtemplate.MemcacheAlarmTemplateService;
 import com.dianping.cache.alarm.dao.AlarmRecordDao;
-import com.dianping.cache.alarm.dataanalyse.baselineCache.BaselineCacheService;
+import com.dianping.cache.alarm.dataanalyse.service.MemcacheBaselineService;
 import com.dianping.cache.alarm.entity.AlarmConfig;
 import com.dianping.cache.alarm.entity.AlarmDetail;
 import com.dianping.cache.alarm.entity.AlarmRecord;
@@ -24,10 +24,7 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.TimeoutException;
 
 /**
@@ -79,7 +76,7 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
 
 
     @Autowired
-    BaselineCacheService baselineCacheService;
+    MemcacheBaselineService memcacheBaselineService;
 
     @Override
     public void doAlarm() throws InterruptedException, IOException, TimeoutException {
@@ -407,15 +404,19 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
                 }
             }
 
-            SimpleDateFormat sdf = new SimpleDateFormat("EEEE:HH:mm");
+            SimpleDateFormat sdf = new SimpleDateFormat("EEEE:HH:mm", Locale.ENGLISH);
             Date nameDate = new Date();
             String name = "Memcache_" + sdf.format(nameDate)+"_"+server;
 
-            if(null == baselineCacheService.getMemcacheBaselineByName(name)){
+            if(null == memcacheBaselineService.findByName(name)){
                 return false;
             }
 
-            double base_set = (double) baselineCacheService.getMemcacheBaselineByName(name).getCmd_set();
+            if(0 ==memcacheBaselineService.findByName(name).size()){
+                return false;
+            }
+
+            double base_set = (double) memcacheBaselineService.findByName(name).get(0).getCmd_set();
 
             if (fluctTooMuch((double) set, base_set)) {
 
@@ -425,7 +426,7 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
 
             }
 
-            double base_get = (double) baselineCacheService.getMemcacheBaselineByName(name).getGet_hits();
+            double base_get = (double) memcacheBaselineService.findByName(name).get(0).getGet_hits();
             if (fluctTooMuch((double) get, base_get)) {
 
                 String detail = item.getCacheKey() + ":" + GET_FLUC_TOO_MUCH + ",IP为" + ip;
@@ -434,7 +435,7 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
 
             }
 
-            double base_write_bytes=(double) baselineCacheService.getMemcacheBaselineByName(name).getBytes_written();
+            double base_write_bytes=(double) memcacheBaselineService.findByName(name).get(0).getBytes_written();
 
             if (fluctTooMuch((double) write_bytes,base_write_bytes )) {
 
@@ -444,7 +445,7 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
 
             }
 
-            double base_read_bytes = (double) baselineCacheService.getMemcacheBaselineByName(name).getBytes_read();
+            double base_read_bytes = (double) memcacheBaselineService.findByName(name).get(0).getBytes_read();
 
             if (fluctTooMuch((double) read_bytes, base_read_bytes)) {
 
@@ -454,7 +455,7 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
 
             }
 
-            double base_evict = (double) baselineCacheService.getMemcacheBaselineByName(name).getEvictions();
+            double base_evict = (double) memcacheBaselineService.findByName(name).get(0).getEvictions();
             if (fluctTooMuch((double) evict, base_evict)) {
 
                 String detail = item.getCacheKey() + ":" + EVICT_FLUC_TOO_MUCH + ",IP为" + ip;
@@ -463,7 +464,7 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
 
             }
 
-            double base_hitrate = (double) baselineCacheService.getMemcacheBaselineByName(name).getGet_hits() / (baselineCacheService.getMemcacheBaselineByName(name).getGet_hits() + baselineCacheService.getMemcacheBaselineByName(name).getDelete_hits());
+            double base_hitrate = (double) memcacheBaselineService.findByName(name).get(0).getGet_hits() / (memcacheBaselineService.findByName(name).get(0).getGet_hits() + memcacheBaselineService.findByName(name).get(0).getDelete_hits());
             if (fluctTooMuch((double) hitrate, base_hitrate)) {
 
                 String detail = item.getCacheKey() + ":" + HITRATE_FLUC_TOO_MUCH + ",IP为" + ip;
@@ -487,7 +488,7 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
         }
 
         alarmDetail.setClusterName(item.getCacheKey());
-        alarmDetail.setAlarmTitle(type)
+        alarmDetail.setAlarmTitle(item.getCacheKey()+type)
                 .setAlarmDetail(detail)
                 .setMailMode(memcacheTemplate.isMailMode())
                 .setSmsMode(memcacheTemplate.isSmsMode())
@@ -518,7 +519,7 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
             return result;
         }
 
-        if (Math.abs((v1 - v2)) / v2 > 0.5) {
+        if (Math.abs((v1 - v2)) / v2 > 0.01) {
             result = true;
         }
 

@@ -11,7 +11,7 @@ public interface MemcacheBaselineDao {
 
 	List<MemcacheBaseline> findByTaskId(int taskId);
 	
-	List<MemcacheBaseline> findByServer(String server);
+	List<MemcacheBaseline> findByName(String baseline_name);
 	
 	List<MemcacheBaseline> findByServerWithInterval(@Param("address") String address, @Param("start") long start, @Param("end") long end);
 	

@@ -2,7 +2,7 @@
  * Copyright (c) 2010-2015 by Shanghai HanTao Information Co., Ltd.
  * All rights reserved.
  */
-package com.dianping.cache.support.spring;
+package com.dianping.cache.util;
 
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactoryUtils;

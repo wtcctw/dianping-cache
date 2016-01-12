@@ -5,11 +5,12 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import com.dianping.cache.support.spring.SpringLocator;
 import org.apache.curator.framework.CuratorFramework;
 
 import com.dianping.cache.monitor.CuratorManager;
 import com.dianping.cache.service.CategoryToAppService;
+import com.dianping.cache.util.SpringLocator;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

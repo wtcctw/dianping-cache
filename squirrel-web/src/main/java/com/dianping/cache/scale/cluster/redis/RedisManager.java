@@ -13,8 +13,9 @@ import org.slf4j.LoggerFactory;
 import redis.clients.jedis.*;
 import redis.clients.jedis.exceptions.JedisClusterException;
 import com.dianping.cache.service.CacheConfigurationService;
-import com.dianping.cache.support.spring.SpringLocator;
 import com.dianping.cache.util.ParseServersUtil;
+import com.dianping.cache.util.SpringLocator;
+
 import redis.clients.jedis.exceptions.JedisConnectionException;
 
 import static com.google.common.base.Preconditions.checkNotNull;

@@ -11,7 +11,7 @@
         <property name="propertiesPath" value="config/applicationContext.properties" />
     </bean>
 
-	<bean class="com.dianping.cache.support.spring.SpringLocator"/>
+	<bean class="com.dianping.cache.util.SpringLocator"/>
 
     <bean id="migrator" class="com.dianping.cache.util.Migrator">
         <property name="cacheConfigService" ref="cacheConfigurationService"/>

@@ -140,7 +140,6 @@
     <orderEntry type="library" name="Maven: org.codehaus.jackson:jackson-mapper-asl:1.9.4" level="project" />
     <orderEntry type="library" name="Maven: com.fasterxml.jackson.core:jackson-databind:2.1.4" level="project" />
     <orderEntry type="library" name="Maven: org.springframework.security:spring-security-core:2.0.4" level="project" />
-    <orderEntry type="library" name="Maven: commons-collections:commons-collections:3.2" level="project" />
     <orderEntry type="library" name="Maven: org.springframework:spring-flex:1.0.2.RELEASE" level="project" />
     <orderEntry type="library" name="Maven: backport-util-concurrent:backport-util-concurrent:2.2" level="project" />
     <orderEntry type="library" name="Maven: cglib:cglib-nodep:2.1_3" level="project" />
@@ -214,6 +213,7 @@
     <orderEntry type="library" name="Maven: com.dianping.cas.server:cas-server-api:0.0.5" level="project" />
     <orderEntry type="library" name="Maven: com.dianping:ops-remote-host:1.0.14" level="project" />
     <orderEntry type="library" name="Maven: commons-codec:commons-codec:1.4" level="project" />
+    <orderEntry type="library" name="Maven: commons-collections:commons-collections:3.2.1" level="project" />
     <orderEntry type="library" name="Maven: org.opensaml:opensaml:1.1" level="project" />
     <orderEntry type="library" name="Maven: org.apache.santuario:xmlsec:1.4.0" level="project" />
     <orderEntry type="library" name="Maven: com.dianping.ba:masterdata-api:0.1.7" level="project" />

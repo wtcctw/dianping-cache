@@ -7,7 +7,7 @@ import com.dianping.cache.scale.cluster.redis.RedisManager;
 import com.dianping.cache.scale.cluster.redis.RedisServer;
 import com.dianping.cache.scale.cluster.redis.ReshardPlan;
 import com.dianping.cache.service.ReshardService;
-import com.dianping.cache.support.spring.SpringLocator;
+import com.dianping.cache.util.SpringLocator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
