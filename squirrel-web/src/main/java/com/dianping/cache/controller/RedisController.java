@@ -9,10 +9,14 @@ import com.dianping.cache.controller.dto.RedisReshardParams;
 import com.dianping.cache.controller.dto.RedisScaleParams;
 import com.dianping.cache.deamontask.CacheDeamonTaskManager;
 import com.dianping.cache.deamontask.tasks.RedisReshardTask;
+import com.dianping.cache.entity.CacheConfiguration;
+import com.dianping.cache.entity.CacheKeyConfiguration;
 import com.dianping.cache.scale.cluster.redis.RedisManager;
 import com.dianping.cache.scale.cluster.redis.RedisScaler;
 import com.dianping.cache.scale.cluster.redis.ReshardPlan;
 import com.dianping.cache.scale.exceptions.ScaleException;
+import com.dianping.cache.service.CacheConfigurationService;
+import com.dianping.cache.service.CacheKeyConfigurationService;
 import com.dianping.cache.service.ReshardService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -24,7 +28,7 @@ import com.dianping.cache.monitor.highcharts.ChartsBuilder;
 import com.dianping.cache.monitor.highcharts.HighChartsWrapper;
 import com.dianping.cache.monitor.statsdata.RedisClusterData;
 import com.dianping.cache.monitor.statsdata.RedisStatsData;
-import com.dianping.cache.service.RedisStatsService;
+import com.dianping.cache.service.RedisService;
 
 
 @Controller
@@ -32,10 +36,16 @@ public class RedisController extends AbstractCacheController{
 
 
 	@Autowired
-	private RedisStatsService redisStatsService;
+	private RedisService redisService;
 
 	@Autowired
 	private ReshardService reshardService;
+
+	@Autowired
+	private CacheKeyConfigurationService cacheKeyConfigurationService;
+
+	@Autowired
+	private CacheConfigurationService cacheConfigurationService;
 
 	private String subside;
 
@@ -82,10 +92,35 @@ public class RedisController extends AbstractCacheController{
 		currentCluster = cluster;
 		return new ModelAndView("cluster/redisdetail",createViewMap());
 	}
+
+	@RequestMapping(value = "/redis/{cluster}/edit")
+	public ModelAndView edit(@PathVariable("cluster") String cluster){
+		subside = "redis";
+		currentCluster = cluster;
+		return new ModelAndView("cluster/edit",createViewMap());
+	}
+
+	@RequestMapping(value = "/redis/editdata")
+	@ResponseBody
+	public CacheConfiguration editRedis(@RequestParam String swimlane){
+		CacheConfiguration configuration = cacheConfigurationService.findWithSwimLane(currentCluster,swimlane);
+		return configuration;
+	}
+
 	@RequestMapping(value = "/redis/detail")
 	@ResponseBody
 	public Map<String, Object> getRedisDetailData(){
-		return RedisDataUtil.getRedisDetailData(currentCluster);
+		List<CacheKeyConfiguration> categorys = cacheKeyConfigurationService.findByCacheType(currentCluster);
+		Map<String,Object> result = new HashMap<String, Object>();
+		result.put("data",RedisDataUtil.getRedisDetailData(currentCluster));
+		result.put("categorys",categorys);
+		return result;
+	}
+
+	@RequestMapping(value = "/redis/applications")
+	@ResponseBody
+	public List<String> applications(){
+		return null;
 	}
 
 	@RequestMapping(value = "/redis/historydata")
@@ -93,7 +128,7 @@ public class RedisController extends AbstractCacheController{
 	public List<HighChartsWrapper> getRedisHistoryData(String address,long endTime){
 		long start = (endTime - TimeUnit.MILLISECONDS.convert(120, TimeUnit.MINUTES))/1000;
 		long end = endTime/1000;
-		List<RedisStats> data = redisStatsService.findByServerWithInterval(address, start, end);
+		List<RedisStats> data = redisService.findByServerWithInterval(address, start, end);
 		RedisStatsData statsData = new RedisStatsData(data);
 		return ChartsBuilder.buildRedisStatsCharts(statsData);
 	}
@@ -119,6 +154,7 @@ public class RedisController extends AbstractCacheController{
 	public void addSlave(@RequestBody RedisScaleParams redisScaleParams){
 		RedisScaler.addSlave(redisScaleParams.getCluster(),redisScaleParams.getMasterAddress());
 	}
+
 
 	@RequestMapping(value = "/redis/deleteslave")
 	@ResponseBody

@@ -16,6 +16,14 @@ module.controller('MemcachedDashBoardController', [ '$scope', '$http','$document
             }).error(function () {
             });
         }
+
+
+        $scope.transport = function(cachekey,swimlane){
+            window.localStorage.swimlane = swimlane;
+            window.localStorage.cacheKey = cachekey;
+        }
+
+
         $scope.initDashBoard();
         var init = function (num1,num2,width1,width2) {
             $(document).ready(function () {
@@ -26,7 +34,7 @@ module.controller('MemcachedDashBoardController', [ '$scope', '$http','$document
                         "bLengthChange": true, //改变每页显示数据数量
                         "bFilter": true, //过滤功能
                         "bSort": true, //排序功能
-                        "bInfo": true,//页脚信息
+                        "bInfo": false,//页脚信息
                         "bStateSave": false,
                         "aaSorting": [],
                         "iDisplayLength": 10,

@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.dianping.cache.autoscale.dockerscale.DockerScale;
 import com.dianping.cache.monitor.NotifyManager;
 
 
@@ -33,15 +32,7 @@ public class IndexController extends AbstractMenuController{
 			HttpServletResponse response) { 
 		NotifyManager.getInstance().notifySms2("Justtest");
 	}
-	
-	@RequestMapping(value="/dockerinfo")
-	@ResponseBody
-	public Object dockerInfo(){
-		DockerScale ds = new DockerScale();
-		return DockerScale.info();
-	}
-	
-	
+
 	@Override
 	protected String getMenu() {
 		return "index";

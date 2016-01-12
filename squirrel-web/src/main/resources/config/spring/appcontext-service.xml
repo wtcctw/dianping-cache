@@ -41,7 +41,7 @@
 		<property name="serverStatsDao" ref="serverStatsDao"/>
 	</bean>
 	
-	<bean id="redisStatsService" class="com.dianping.cache.service.impl.RedisStatsServiceImpl">
+	<bean id="redisService" class="com.dianping.cache.service.impl.RedisServiceImpl">
 		<property name="redisStatsDao" ref="redisStatsDao"/>
 	</bean>
 	

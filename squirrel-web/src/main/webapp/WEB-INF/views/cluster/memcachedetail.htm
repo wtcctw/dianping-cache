@@ -1,0 +1,144 @@
+<div class="main-content" style="opacity: 1.0;"
+     ng-controller="RedisController">
+    <div class=" main-content-inner">
+        <script type="text/javascript"
+                src="${rc.contextPath}/static/js/highcharts/highcharts.js"></script>
+        <script type="text/javascript"
+                src="${rc.contextPath}/static/js/highcharts/highcharts-more.js"></script>
+        <script type="text/javascript"
+                src="${rc.contextPath}/static/js/highcharts/solid-gauge.js"></script>
+        <script type="text/javascript"
+                src="${rc.contextPath}/static/js/squirrel/memcachedetail.js"></script>
+        <script type="text/javascript"
+                src="${rc.contextPath}/static/js/mask/loadmask.js"></script>
+        <style>
+            th{
+                font-size: 14px;  color: #404040;
+            }
+        </style>
+        <div class="page-content">
+            <div class="page-header">
+                <h1>集群
+                    <i class="ace-icon fa fa-angle-double-right"></i>
+                    Redis  <i class="ace-icon fa fa-angle-right"></i>
+                    {{redisData.clusterName}}
+                </h1>
+            </div>
+
+            <div class="row">
+                <div class="col-xs-12">
+                    <h4 class="col-xs-12 header blue">性能概览</h4>
+                    <div style="width: 600px; height: 200px; margin: 0 auto">
+                        <div id="container-memory" style="width: 300px; height: 200px; float: left">
+                        </div>
+                        <div id="container-qps" style="width: 300px; height: 200px; float: left"></div>
+                    </div>
+                    <h4 class="col-xs-12 header blue">节点信息</h4>
+                    <div class=" col-xs-12">
+                        <table class="table table-striped table-hover" id="node">
+                            <thead>
+                            <tr>
+                                <th style="width: 5%">ID</th>
+                                <th style="width: 25%">Master</th>
+                                <th style="width: 20%">Slave</th>
+                                <th style="width: 10%">内存</th>
+                                <th style="width: 10%">Slots</th>
+                                <th style="width: 10%">QPS</th>
+                                <th style="width: 20%;#if(${isadmin})display: table-cell;#else display: none;#end;">操作
+                                    <a href="#" class="grey pull-right">
+                                        <i class="ace-icon fa fa-plus-square bigger-110"></i>
+                                    </a>
+                                </th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr ng-repeat = "data in redisData.nodes">
+                                <td>{{$index+1}}</td>
+                                <td>{{data.master.address}}
+                                    <a href="#" class="warning" ng-show="data.master.migrating"><i class="ace-icon fa fa-upload bigger-130"></i></a>
+                                    <a href="#" class="warning" ng-show="data.master.importing"><i class="ace-icon fa fa-download bigger-130"></i></a>
+                                </td>
+                                <td>{{data.slave.address}}</td>
+                                <td>{{data.master.info.used}}%/{{data.master.info.maxMem}}G</td>
+                                <td>{{data.master.slotSize}}</td>
+                                <td>{{data.master.info.qps}}</td>
+                                <td style="margin-right: 20px;#if(${isadmin})display: table-cell;#else display: none;#end;">
+                                    <div class="hidden-sm hidden-xs action-buttons">
+                                        <a class="grey" href="#reshardModal" data-toggle="modal">
+                                            <i class="ace-icon fa fa-share bigger-130"></i>
+                                        </a>
+                                        <a class="grey" href="#changeConfirm" data-toggle="modal" ng-click="setFailover(data.slave.address)">
+                                            <i class="ace-icon fa fa-exchange bigger-130"></i>
+                                        </a>
+                                        <a class="grey" href="#addModal" data-toggle="modal" ng-click="setParams(redisData.clusterName,data.master.address)" ng-show="{{data.slave.address==null}}">
+                                            <i class="ace-icon bigger-130"> S+ </i>
+                                        </a>
+                                        <a class="grey" href="#deleteModal" data-toggle="modal" ng-click="setParams(redisData.clusterName,data.slave.address)" ng-show="{{data.slave.address!=null}}">
+                                            <i class="ace-icon bigger-130"> S- </i>
+                                        </a>
+
+                                    </div>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <br>
+                    <br>
+                    <h4 class="col-xs-12 header blue">Category信息</h4>
+                    <div class=" col-xs-12">
+                        <table class="table table-striped table-hover" id="category">
+                            <thead>
+                            <tr>
+                                <th style="width: 5%">ID</th>
+                                <th style="width: 25%">Category</th>
+                                <th style="width: 10%">过期时间</th>
+                                <th style="width: 20%">命名模版</th>
+                                <th style="width: 10%">版本</th>
+                                <th style="width: 10%">是否热点</th>
+                                <th style="width: 20%;#if(${isadmin})display: table-cell;#else display: none;#end;">操作
+                                    <a href="#" class="grey pull-right">
+                                        <i class="ace-icon fa fa-plus-square bigger-110"></i>
+                                    </a>
+                                </th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr ng-repeat="category in categoryList">
+                                <td>{{$index+1}}</td>
+                                <td>{{category.category}}</td>
+                                <td>{{category.duration}}</td>
+                                <td>{{category.indexTemplate}}</td>
+                                <td>{{category.version}}</td>
+                                <td>{{category.hot}}</td>
+                                <td style="margin-right: 20px;#if(${isadmin})display: table-cell;#else display: none;#end;">
+                                    <div class="hidden-sm hidden-xs action-buttons">
+                                        <a class="grey" href="#modifyCategory" ng-click="transportEntity(category)" data-toggle="modal">
+                                            <i class="ace-icon fa fa-cog bigger-130"></i>
+                                        </a>
+
+                                        <a class="grey" href="#">
+                                            <i class="ace-icon fa fa-search bigger-130"></i>
+                                        </a>
+
+                                        <a class="grey" href="#">
+                                            <i class="ace-icon glyphicon glyphicon-th-large bigger-130"></i>
+                                        </a>
+                                        <a class="grey" href="#">
+                                            <i class="ace-icon fa fa-file-text-o bigger-130"></i>
+                                        </a>
+
+                                        <a class="grey" href="#">
+                                            <i class="ace-icon fa fa-trash-o bigger-140"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

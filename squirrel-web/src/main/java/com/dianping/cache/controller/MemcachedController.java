@@ -10,6 +10,7 @@ import com.dianping.cache.service.MemcacheStatsService;
 import com.dianping.cache.service.ServerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
@@ -33,11 +34,40 @@ public class MemcachedController extends AbstractCacheController{
     @Autowired
     private MemcacheStatsService memcacheStatsService;
 
+    private String currentCluster;
+
     @RequestMapping(value = "/memcached")
     public ModelAndView viewCacheConfig() {
         subside = "memcached";
         return new ModelAndView("cluster/memcached", createViewMap());
     }
+
+    @RequestMapping(value = "/memcached/{cluster}")
+    public ModelAndView getDetail(@PathVariable("cluster") String cluster){
+        subside = "memcached";
+        currentCluster = cluster;
+        return new ModelAndView("cluster/memcachedetail",createViewMap());
+    }
+
+    @RequestMapping(value = "/memcached/{cluster}/edit")
+    public ModelAndView edit(@PathVariable("cluster") String cluster){
+        subside = "memcached";
+        currentCluster = cluster;
+        return new ModelAndView("cluster/edit",createViewMap());
+    }
+
+    @RequestMapping(value = "/memcached/{cluster}/monitor")
+    public ModelAndView monitor(@PathVariable("cluster") String cluster){
+        currentCluster = cluster;
+        return new ModelAndView("monitor/cluster",createViewMap());
+    }
+
+    @RequestMapping(value = "/memcached/detail/1")
+    @ResponseBody
+    public void getDetail(){
+
+    }
+
 
     @RequestMapping(value = "/memcached/dashboard/data")
     @ResponseBody

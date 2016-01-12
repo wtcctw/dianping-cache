@@ -82,4 +82,6 @@ public interface CacheKeyConfigurationDao extends GenericDao {
 	 * @param category
 	 */
 	void delete(String category);
+
+	List<CacheKeyConfiguration> findByCacheType(String cacheType);
 }

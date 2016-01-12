@@ -78,81 +78,26 @@ function makeGraph(divName,max,title,currentValue) {
             }]
         }))
 }
-module.controller('RedisController', [
+module.controller('MemcachedController', [
     '$scope',
     '$http',
     function($scope, $http) {
-        $scope.redisData = {};
-        $scope.reshardParams = {};
-        $scope.redisScaleParams = {};
+
         $scope.categoryList = [];
-        $scope.avgsrc = [];
-        $scope.exportsrc = [];
-        $scope.exportdes = [];
-        $scope.reshardType;
-        $scope.failover;
         $scope.configParas = [];
         $scope.categoryEntity = {
         }
 
-
-
         $scope.initPage = function(){
-            $http.get(window.contextPath + '/redis/detail',{
+            $http.get(window.contextPath + '/memcached/detail/1',{
                 params : {}
             }).success(function(response){
-                $scope.redisData = response.data.redisCluster;
-                $scope.categoryList = response.categorys;
-                var usage = response.data.memoryUsage;
-                var qps = response.data.qps;
-                makeGraph("container-memory",100,"内存使用率",usage);
-                makeGraph("container-qps",140000,"QPS",qps);
-                iniTable("node");
-                initCategory();
+
             }).error(function(){
             });
         };
         $scope.initPage();
 
-
-        $scope.reshard = function(){
-            $scope.avgsrc = [];
-            $scope.exportsrc = [];
-            $scope.exportdes = [];
-            $scope.reshardParams = {};
-            $scope.reshardParams.cluster = $scope.redisData.clusterName;
-            if($scope.reshardType === "average"){
-                var avgTemp = $('.avg');
-                for(var i = 0;i<avgTemp.length;i++){
-                    if(avgTemp[i].checked){
-                        $scope.avgsrc.push($scope.redisData.nodes[i].master.address);
-                    }
-                }
-
-                $scope.reshardParams.isAverage = true;
-                $scope.reshardParams.srcNodes = $scope.avgsrc;
-            }else if($scope.reshardType === "export"){
-                var src = $('.exsrc');
-                var des = $('.exdes');
-                for(var i = 0;i<src.length;i++){
-                    if(src[i].checked){
-                        $scope.exportsrc.push($scope.redisData.nodes[i].master.address);
-                    }
-                }
-                for(var i = 0;i<des.length;i++){
-                    if(des[i].checked){
-                        $scope.exportdes.push($scope.redisData.nodes[i].master.address);
-                    }
-                }
-
-                $scope.reshardParams.isAverage = false;
-                $scope.reshardParams.srcNodes = $scope.exportsrc;
-                $scope.reshardParams.desNodes = $scope.exportdes;
-            }
-
-            $http.post(window.contextPath + '/redis/reshard',$scope.reshardParams)
-                .success();
-        }
 
         $scope.setParams = function(cluster,address){
             $scope.cluster = cluster;
@@ -170,43 +115,6 @@ module.controller('RedisController', [
             $scope.categoryEntity = config;
         }
 
-        $scope.deleteSlave = function(cluster,address){
-            $scope.redisScaleParams = {};
-            $scope.redisScaleParams.cluster = cluster;
-            $scope.redisScaleParams.slaveAddress = address;
-            $http.post(window.contextPath + '/redis/deleteslave', $scope.redisScaleParams
-            ).success(function(response) {
-            }).error(function(response) {
-            });
-        };
-
-        $scope.addSlave = function(cluster,address){
-            $scope.redisScaleParams = {};
-            $scope.redisScaleParams.cluster = cluster;
-            $scope.redisScaleParams.masterAddress = address;
-            $http.post(window.contextPath + '/redis/addslave', $scope.redisScaleParams
-            ).success(function(response) {
-            }).error(function(response) {
-            });
-        };
-
-        $scope.setFailover = function(failover){
-            $scope.failover = failover;
-        }
-
-        $scope.execFailover = function(){
-            loadmask();
-            $scope.redisScaleParams.cluster = $scope.redisData.clusterName;
-            $scope.redisScaleParams.slaveAddress = $scope.failover;
-            $http.post(window.contextPath + '/redis/failover',$scope.redisScaleParams)
-                .success(function(response){
-                    if(response == true){
-                        hidemask();
-                    }else{
-                        hidemask();
-                    }
-                });
-        }
         var iniTable = function (table) {
             $(document).ready(function () {
                 setTimeout(function () {

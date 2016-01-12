@@ -12,7 +12,6 @@ import java.util.Map;
 public class MemcachedDashBoardData  extends DashBoardData {
     List<SimpleAnalysisData> datas = new ArrayList<SimpleAnalysisData>();
     public MemcachedDashBoardData(){
-
     }
     public List<SimpleAnalysisData> getDatas() {
         return datas;
@@ -33,6 +32,7 @@ public class MemcachedDashBoardData  extends DashBoardData {
             }
             totalNum++;
             SimpleAnalysisData data = new SimpleAnalysisData(configuration.getCacheKey());
+            data.setConfiguration(configuration);
             List<String> servers = configuration.getServerList();
             int alive = 0;
             long qps = 0,maxmem = 0,memused = 0;
@@ -79,6 +79,7 @@ public class MemcachedDashBoardData  extends DashBoardData {
         boolean aliveAlarm;
         boolean clusterAlarm;
         String clusterName;
+        CacheConfiguration configuration;
         public SimpleAnalysisData(String clusterName){
             this.clusterName = clusterName;
         }
@@ -198,6 +199,22 @@ public class MemcachedDashBoardData  extends DashBoardData {
 
         public void setMemUsed(long memUsed) {
             this.memUsed = memUsed;
+        }
+
+        public CacheConfiguration getConfiguration() {
+            return configuration;
+        }
+
+        public void setConfiguration(CacheConfiguration configuration) {
+            this.configuration = configuration;
+        }
+
+        public boolean isAliveAlarm() {
+            return aliveAlarm;
+        }
+
+        public void setAliveAlarm(boolean aliveAlarm) {
+            this.aliveAlarm = aliveAlarm;
         }
     }
 }

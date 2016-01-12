@@ -121,6 +121,11 @@ public class CacheKeyConfigurationServiceImpl implements CacheKeyConfigurationSe
 	}
 
 	@Override
+	public List<CacheKeyConfiguration> findByCacheType(String cacheType) {
+		return configurationDao.findByCacheType(cacheType);
+	}
+
+	@Override
 	public void delete(String category) {
 		CacheKeyConfiguration configFound = find(category);
 		try {

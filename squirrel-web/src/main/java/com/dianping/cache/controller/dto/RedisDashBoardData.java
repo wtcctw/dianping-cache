@@ -1,5 +1,6 @@
 package com.dianping.cache.controller.dto;
 
+import com.dianping.cache.entity.CacheConfiguration;
 import com.dianping.cache.scale.cluster.redis.RedisCluster;
 import com.dianping.cache.scale.cluster.redis.RedisInfo;
 import com.dianping.cache.scale.cluster.redis.RedisNode;

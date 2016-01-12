@@ -12,7 +12,7 @@ import com.dianping.cache.entity.MemcacheStats;
 import com.dianping.cache.entity.RedisStats;
 import com.dianping.cache.entity.Server;
 import com.dianping.cache.service.MemcacheStatsService;
-import com.dianping.cache.service.RedisStatsService;
+import com.dianping.cache.service.RedisService;
 import com.dianping.cache.service.ServerService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,7 +38,7 @@ public class BaselineComputeTask {
     MemcacheStatsService memcacheStatsService;
 
     @Autowired
-    RedisStatsService redisStatsService;
+    RedisService redisService;
 
     @Autowired
     MemcacheBaselineService memcacheBaselineService;
@@ -343,7 +343,7 @@ public class BaselineComputeTask {
 
                         String sql = "SELECT * FROM redis_stats WHERE curr_time > " + tmp + " AND curr_time <= " + end + " AND serverId =" + server.getId() + " LIMIT " + 2 + " OFFSET " + 0;
 
-                        List<RedisStats> redisStatsestmp = redisStatsService.search(sql);
+                        List<RedisStats> redisStatsestmp = redisService.search(sql);
                         if (0 != redisStatsestmp.size()) {
                             SimpleDateFormat sdf = new SimpleDateFormat("EEEE:HH:mm");
                             Date nameDate = new Date(tmp * 1000);
@@ -374,7 +374,7 @@ public class BaselineComputeTask {
             for (Server server : serverList) {
                 String sql = "SELECT * FROM redis_stats WHERE curr_time > " + tmp + " AND curr_time <= " + endLong + " AND serverId =" + server.getId() + " LIMIT " + 2 + " OFFSET " + 0;
                 try {
-                    List<RedisStats> redisStatsestmp = redisStatsService.search(sql);
+                    List<RedisStats> redisStatsestmp = redisService.search(sql);
                     if (0 != redisStatsestmp.size()) {
                         SimpleDateFormat sdf = new SimpleDateFormat("EEEE:HH:mm");
                         Date nameDate = new Date(tmp * 1000);

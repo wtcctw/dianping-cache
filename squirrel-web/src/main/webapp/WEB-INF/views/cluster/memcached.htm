@@ -29,9 +29,9 @@
                             <th style="width: 10%;">QPS</th>
                             <th style="width: 10%;">实例</th>
                             <th style="width: 10%;">命中率</th>
-                            <th>操作
+                            <th style="#if(${isadmin})display: table-cell;#else display: none;#end;">操作
                                 <a href="${rc.contextPath}/cache/config/new" class="grey pull-right">
-                                    <i class="ace-icon fa fa-plus bigger-110"></i>
+                                    <i class="ace-icon fa fa-plus-square bigger-110"></i>
                                 </a>
                             </th>
                             <th style="display: none"></th>
@@ -42,7 +42,7 @@
                             <td><i class="ace-icon fa fa-xs fa-circle red" ng-show="item.clusterAlarm"></i>
                                 <i class="ace-icon fa fa-xs fa-circle green" ng-show="!item.clusterAlarm"></i></td>
                             <td style="text-align: left;font: 14px Open Sans ;color: #3764a0" >
-                                <a href="${rc.contextPath}/redis/{{item.clusterName}}">
+                                <a href="${rc.contextPath}/memcached/{{item.clusterName}}">
                                     {{item.clusterName}}
                                 </a>
                             </td>
@@ -50,13 +50,13 @@
                             <td ng-class="{'red':item.qpsAlarm,'bold':item.qpsAlarm}">{{item.qps}}</td>
                             <td ng-class="{'red':item.msAlarm,'bold':item.msAlarm}">{{item.servers.length}}/{{item.alive}}</td>
                             <td>{{item.hitrate}}%</td>
-                            <td>
+                            <td style="margin-right: 10px;#if(${isadmin})display: table-cell;#else display: none;#end;" >
                                 <div class="hidden-sm hidden-xs action-buttons">
-                                    <a class="grey" href="${rc.contextPath}/cache/config/edit">
+                                    <a class="grey" href="${rc.contextPath}/memcached/{{item.clusterName}}/edit" ng-click="transport(item.clusterName,item.configuration.swimlane)">
                                         <i class="ace-icon fa fa-cog bigger-130"></i>
                                     </a>
 
-                                    <a class="grey" href="#">
+                                    <a class="grey" href="${rc.contextPath}/memcached/{{item.clusterName}}/monitor" ng-click="transport(item.clusterName,item.configuration.swimlane)">
                                         <i class="ace-icon fa fa-bar-chart-o bigger-130"></i>
                                     </a>
                                     <a class="grey" href="#">

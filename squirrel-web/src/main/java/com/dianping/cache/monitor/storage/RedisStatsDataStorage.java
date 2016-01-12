@@ -1,6 +1,7 @@
 package com.dianping.cache.monitor.storage;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -12,14 +13,14 @@ import redis.clients.jedis.Jedis;
 
 import com.dianping.cache.entity.RedisStats;
 import com.dianping.cache.entity.Server;
-import com.dianping.cache.service.RedisStatsService;
+import com.dianping.cache.service.RedisService;
 import com.dianping.cache.service.ServerService;
 
 public class RedisStatsDataStorage extends AbstractStatsDataStorage{
 	
 	private ServerService serverService;
 	
-	private RedisStatsService redisStatsService;
+	private RedisService redisService;
 	
 	private ExecutorService pool;
 
@@ -40,20 +41,20 @@ public class RedisStatsDataStorage extends AbstractStatsDataStorage{
 	protected void init(){
 		pool = Executors.newFixedThreadPool(5);
 		serverService = SpringLocator.getBean("serverService");
-		redisStatsService = SpringLocator.getBean("redisStatsService");
+		redisService = SpringLocator.getBean("redisService");
 	}
 	
 	private void storage(){
 		if(!isMaster()){
 			return;
 		}
-		for(Map.Entry<String,RedisCluster> value : RedisManager.getClusterCache().entrySet()){
-			pool.submit(new InsertData(value.getValue()));
-		}
-//		List<Server> serverList = serverService.findAllRedisServers();
-//		for(Server server : serverList){
-//			pool.submit(new InsertData(server));
+//		for(Map.Entry<String,RedisCluster> value : RedisManager.getClusterCache().entrySet()){
+//			pool.submit(new InsertData(value.getValue()));
 //		}
+		List<Server> serverList = serverService.findAllRedisServers();
+		for(Server server : serverList){
+			pool.submit(new InsertData(server));
+		}
 	}
 	private class InsertData implements Runnable{
 	    	private Server server;
@@ -79,7 +80,7 @@ public class RedisStatsDataStorage extends AbstractStatsDataStorage{
 						RedisStats stat = processStats(data);
 						stat.setServerId(server.getId());
 						//stat.setMemory_used(data.get("used_memory"));
-						redisStatsService.insert(stat);
+						redisService.insert(stat);
 					} else {
 						for(RedisNode node : cluster.getNodes()){
 							RedisServer master = node.getMaster();
@@ -89,7 +90,7 @@ public class RedisStatsDataStorage extends AbstractStatsDataStorage{
 								if(sm != null){
 									RedisStats stat = processStats(master.getInfo());
 									stat.setServerId(sm.getId());
-									redisStatsService.insert(stat);
+									redisService.insert(stat);
 								}
 							}
 //							if(slave != null  && slave.getInfo() != null){

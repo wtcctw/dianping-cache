@@ -69,7 +69,7 @@ public class RedisDataUtil {
 
     public static Map<String, Object> getRedisServerData(String address) {
         String[] server = address.split(":");
-        Jedis jedis = new Jedis(server[0],6379);
+        Jedis jedis = new Jedis(server[0],Integer.parseInt(server[1]));
         String info = jedis.info();
         jedis.close();
         return parseRedisInfo(info);
@@ -92,15 +92,12 @@ public class RedisDataUtil {
         return (float) (tmp / 100.0);
     }
 
-    public static Map<String,Object> getRedisDetailData(String currentCluster) {
-        Map<String,Object> result = new HashMap<String, Object>();
+    public static RedisDashBoardData.SimpleAnalysisData getRedisDetailData(String currentCluster) {
+
         RedisCluster redisCluster =  RedisManager.getRedisCluster(currentCluster);
         RedisDashBoardData data = new RedisDashBoardData();
         RedisDashBoardData.SimpleAnalysisData simpleAnalysisData = data.new SimpleAnalysisData(redisCluster);
         simpleAnalysisData.analysis();
-        List<String> categoryList = null;
-        result.put("data",simpleAnalysisData);
-        result.put("categoryList",80);
-        return result;
+        return simpleAnalysisData;
     }
 }

@@ -84,7 +84,7 @@ module.controller('OperatorController', [
 			var fetchFunction = function(pageId, operator, content, startTime,
 					endTime, callback) {
 
-				$http.get(window.contextPath + $scope.suburl, {
+				$http.get(window.contextPath + "/audit/search", {
 					params : {
 						pageId : pageId,
 						operator : operator,
