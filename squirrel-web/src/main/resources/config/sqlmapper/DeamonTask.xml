@@ -3,19 +3,9 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.dianping.cache.deamontask.dao.DeamonTaskDao">
+<mapper namespace="com.dianping.cache.dao.TaskDao">
 
-    <!--<resultMap id="AlarmConfigResult" type="AlarmConfig">-->
-        <!--<result column="id" property="id"/>-->
-        <!--<result column="clusterType" property="clusterType"/>-->
-        <!--<result column="clusterName" property="clusterName"/>-->
-        <!--<result column="alarmTemplate" property="alarmTemplate"/>-->
-        <!--<result column="receiver" property="receiver"/>-->
-        <!--<result column="toBusiness" property="toBusiness"/>-->
-        <!--<result column="createTime" property="createTime"/>-->
-        <!--<result column="updateTime" property="updateTime"/>-->
-    <!--</resultMap>-->
-    <resultMap id="DeamonTask" type="com.dianping.cache.deamontask.dao.DeamonTaskDao">
+    <resultMap id="Task" type="com.dianping.cache.entity.Task">
         <result column="id" property="id"/>
         <result column="stat" property="stat"/>
         <result column="statMin" property="statMin"/>
@@ -25,53 +15,11 @@
         <result column="startTime" property="startTime"/>
         <result column="endTime" property="endTime"/>
         <result column="description" property="description"/>
-
     </resultMap>
 
-    <insert id="insert" parameterType="DeamonTask">
+    <insert id="insert" parameterType="Task">
         INSERT INTO task(stat, statMin, statMax, type, commitTime, startTime, endTime, description)
         VALUES(#{stat}, #{statMin}, #{statMax}, #{type}, #{commitTime}, #{startTime}, #{endTime}, #{description})
     </insert>
-
-    <update id="update" parameterType="DeamonTask">
-    </update>
-
-    <!--<update id="update" parameterType="AlarmConfig">-->
-        <!--UPDATE alarm_config-->
-        <!--SET clusterType=#{clusterType},clusterName=#{clusterName},alarmTemplate=#{alarmTemplate},receiver=#{receiver},toBusiness=#{toBusiness},createTime=#{createTime},updateTime=#{updateTime}-->
-        <!--WHERE id = #{id}-->
-    <!--</update>-->
-
-    <!--<delete id="deleteById" parameterType="int">-->
-        <!--DELETE FROM alarm_config-->
-        <!--WHERE id = #{id}-->
-    <!--</delete>-->
-
-    <!--<select id="findByClusterTypeAndName" resultMap="AlarmConfigResult" parameterType="map">-->
-        <!--SELECT id,clusterType,clusterName,alarmTemplate,receiver,toBusiness,createTime, updateTime-->
-        <!--FROM alarm_config-->
-        <!--WHERE clusterType= #{clusterType} AND clusterName=#{clusterName}-->
-        <!--ORDER BY id ASC-->
-    <!--</select>-->
-
-    <!--<select id="findById" resultMap="AlarmConfigResult" parameterType="int">-->
-        <!--SELECT id,clusterType,clusterName,alarmTemplate,receiver,toBusiness,createTime, updateTime-->
-        <!--FROM alarm_config-->
-        <!--WHERE id = #{id}-->
-        <!--ORDER BY id ASC-->
-    <!--</select>-->
-
-    <!--<select id="findByPage" resultMap="AlarmConfigResult" parameterType="map">-->
-        <!--SELECT id,clusterType,clusterName,alarmTemplate,receiver,toBusiness,createTime, updateTime-->
-        <!--FROM alarm_config-->
-        <!--ORDER BY id ASC-->
-        <!--LIMIT #{limit} OFFSET #{offset}-->
-    <!--</select>-->
-
-    <!--<select id="findAll" resultMap="AlarmConfigResult">-->
-        <!--SELECT id,clusterType,clusterName,alarmTemplate,receiver,toBusiness,createTime, updateTime-->
-        <!--FROM alarm_config-->
-        <!--ORDER BY id ASC-->
-    <!--</select>-->
 
 </mapper>

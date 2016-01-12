@@ -86,6 +86,7 @@
 		<property name="mapperInterface" value="com.dianping.cache.alarm.dao.AlarmRecordDao"/>
 		<property name="sqlSessionFactory" ref="sqlSessionFactory"/>
 	</bean>
+    
 	<bean id="alarmConfigDao" class="org.mybatis.spring.mapper.MapperFactoryBean">
 		<property name="mapperInterface" value="com.dianping.cache.alarm.dao.AlarmConfigDao"/>
 		<property name="sqlSessionFactory" ref="sqlSessionFactory"/>
@@ -116,8 +117,8 @@
 		<property name="sqlSessionFactory" ref="sqlSessionFactory"/>
 	</bean>
 
-    <bean id="deamonTaskDao" class="org.mybatis.spring.mapper.MapperFactoryBean">
-        <property name="mapperInterface" value="com.dianping.cache.deamontask.dao.DeamonTaskDao"/>
+    <bean id="taskDao" class="org.mybatis.spring.mapper.MapperFactoryBean">
+        <property name="mapperInterface" value="com.dianping.cache.dao.TaskDao"/>
         <property name="sqlSessionFactory" ref="sqlSessionFactory"/>
     </bean>
 
