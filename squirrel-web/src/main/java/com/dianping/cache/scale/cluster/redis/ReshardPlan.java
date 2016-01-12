@@ -1,7 +1,7 @@
 package com.dianping.cache.scale.cluster.redis;
 
 import com.dianping.cache.entity.ReshardRecord;
-import com.dianping.cache.scale.exceptions.ScaleException;
+import com.dianping.cache.scale.ScaleException;
 import com.dianping.cache.service.ReshardRecordService;
 import org.springframework.stereotype.Component;
 

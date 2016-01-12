@@ -1,10 +1,10 @@
 package com.dianping.cache.service.impl;
 
+import com.dianping.cache.scale.ScaleException;
 import com.dianping.cache.scale.cluster.redis.RedisCluster;
 import com.dianping.cache.scale.cluster.redis.RedisManager;
 import com.dianping.cache.scale.cluster.redis.RedisServer;
 import com.dianping.cache.scale.cluster.redis.ReshardPlan;
-import com.dianping.cache.scale.exceptions.ScaleException;
 import com.dianping.cache.service.ReshardService;
 
 import java.util.ArrayList;

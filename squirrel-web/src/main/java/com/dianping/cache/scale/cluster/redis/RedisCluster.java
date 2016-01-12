@@ -11,9 +11,9 @@ import org.slf4j.LoggerFactory;
 
 import redis.clients.jedis.Jedis;
 
+import com.dianping.cache.scale.ScaleException;
 import com.dianping.cache.scale.cluster.Cluster;
 import com.dianping.cache.scale.cluster.Server;
-import com.dianping.cache.scale.exceptions.ScaleException;
 
 public class RedisCluster implements Cluster<RedisNode>{
 	

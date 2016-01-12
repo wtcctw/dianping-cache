@@ -6,7 +6,7 @@ import java.util.List;
 
 import com.dianping.cache.entity.CacheConfiguration;
 import com.dianping.cache.entity.Server;
-import com.dianping.cache.scale.exceptions.ScaleException;
+import com.dianping.cache.scale.ScaleException;
 import com.dianping.cache.scale.instance.AppId;
 import com.dianping.cache.scale.instance.Apply;
 import com.dianping.cache.scale.instance.Result;
