@@ -1,24 +1,44 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:context="http://www.springframework.org/schema/context"
-       xmlns:squirrel="http://www.dianping.com/schema/squirrel"
-       xmlns:tx="http://www.springframework.org/schema/tx"
-       xmlns:task="http://www.springframework.org/schema/task"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+<beans xmlns="http://www.springframework.org/schema/beans" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:tx="http://www.springframework.org/schema/tx"
+    xmlns:task="http://www.springframework.org/schema/task"
+    xmlns:lion="http://code.dianping.com/schema/lion"
+    xmlns:squirrel="http://www.dianping.com/schema/squirrel" 
+    xsi:schemaLocation="
+    http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
 	http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.2.xsd
-	http://www.dianping.com/schema/squirrel http://www.dianping.com/schema/squirrel/squirrel-1.0.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.0.xsd
-        http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task-3.0.xsd">
+    http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.0.xsd
+    http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task-3.0.xsd
+    http://code.dianping.com/schema/lion http://code.dianping.com/schema/lion/lion-1.0.xsd
+	http://www.dianping.com/schema/squirrel http://www.dianping.com/schema/squirrel/squirrel-1.0.xsd">
 
-    <bean name="placeholder" lazy-init="false"
-          class="com.dianping.lion.client.InitializeConfig">
-        <property name="propertiesPath" value="config/applicationContext.properties"/>
+    <lion:config />
+
+    <squirrel:store />
+    
+    <context:component-scan base-package="com.dianping" />
+
+    <task:annotation-driven scheduler="scheduler" mode="proxy" />
+    <task:scheduler id="scheduler" pool-size="10" />
+
+    <bean class="com.dianping.cache.util.SpringLocator" />
+
+    <bean id="migrator" class="com.dianping.cache.util.Migrator">
+        <property name="cacheConfigService" ref="cacheConfigurationService" />
+        <property name="cacheKeyConfigService" ref="cacheKeyConfigurationService" />
+        <property name="zkAddress" value="${avatar-cache.zookeeper.address}" />
     </bean>
 
-    <squirrel:store/>
-    <context:component-scan base-package="com.dianping.cache"/>
+    <bean id="monitor" class="com.dianping.cache.monitor.TaskManager" init-method="start" />
 
-    <task:annotation-driven scheduler="lsyScheduler" mode="proxy"/>
-    <task:scheduler id="lsyScheduler" pool-size="10"/>
+    <bean class="com.dianping.cache.alarm.lifecycle.LifecycleComponentManager" />
+
+    <bean id="dataStorage" class="com.dianping.cache.monitor.storage.MemcacheStatsDataStorage"></bean>
+    <bean id="store" class="com.dianping.cache.monitor.storage.ServerStatsDataStorage"></bean>
+    <bean id="cleanData" class="com.dianping.cache.timedtask.TimedCleanData"></bean>
+    <bean id="applist" class="com.dianping.cache.timedtask.TimedRetriCategoryToApp"></bean>
+    <bean id="redisDataStorage" class="com.dianping.cache.monitor.storage.RedisStatsDataStorage"></bean>
 
 </beans>

@@ -13,7 +13,6 @@
         <property name="cacheKeyConfigurationService" ref="cacheKeyConfigurationService" />
         <property name="serverGroupService" ref="serverGroupService" />
         <property name="cacheMessageProducer" ref="notifyMessageProducer" />
-        <property name="smsMessageSender" ref="smsMessageSender" />
         <property name="operationLogService" ref="operationLogService" />
         <property name="migrator" ref="migrator" />
     </bean>

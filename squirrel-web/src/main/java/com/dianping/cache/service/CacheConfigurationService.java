@@ -17,7 +17,6 @@ package com.dianping.cache.service;
 
 import java.util.List;
 
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.dianping.avatar.exception.DuplicatedIdentityException;
@@ -55,28 +54,12 @@ public interface CacheConfigurationService {
 	void clearByCategory(String category, String serverOrGroup);
 	
 	/**
-	 * 批量清除，同时通知到.net系统
-	 * @param category
-	 */
-	void clearByCategoryBothSide(String category);
-	
-	/**
 	 * 仅在JAVA端清除缓存(可调整为同时清除.net缓存，但尚无需求，可在.net后台管理系统操作)
 	 * @param cacheType
 	 * @param key
 	 */
 	void clearByKey(String cacheType, String key);
 
-	/**
-	 * 前台APP调用，可同时发送消息通知.net清除相应缓存(category+params)
-	 * @param cacheType
-	 * @param key
-	 * @param category
-	 * @param params
-	 */
-	@Transactional(propagation=Propagation.SUPPORTS)
-	void clearByKeyBothSide(String cacheType, String key, String category, List<Object> params);
-	
 	CacheConfiguration create(CacheConfiguration config) throws DuplicatedIdentityException;
 	
 	CacheConfiguration update(CacheConfiguration config);

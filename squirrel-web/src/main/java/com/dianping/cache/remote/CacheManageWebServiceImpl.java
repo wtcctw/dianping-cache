@@ -55,8 +55,7 @@ public class CacheManageWebServiceImpl implements CacheManageWebService {
 
 	@Override
 	public void clearByKey(CacheClearDTO cacheClear) {
-		cacheConfigurationService.clearByKeyBothSide(cacheClear.getCacheType(), cacheClear.getKey(),
-				cacheClear.getCategory(), cacheClear.getParams());
+		cacheConfigurationService.clearByKey(cacheClear.getCacheType(), cacheClear.getKey());
 	}
 
 	@Override

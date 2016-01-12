@@ -97,8 +97,6 @@ public class CacheConfigurationServiceImpl implements CacheConfigurationService,
 
 	private CacheMessageNotifier cacheMessageNotifier;
 
-	private SimpleQueueService smsMessageSender;
-
 	private Migrator migrator;
 
 	private ExecutorService executorService = new ThreadPoolExecutor(3, 10, 10L, TimeUnit.MINUTES,
@@ -279,12 +277,6 @@ public class CacheConfigurationServiceImpl implements CacheConfigurationService,
 	}
 
 	@Override
-	public void clearByCategoryBothSide(String category) {
-		clearByCategory(category);
-		sendBatchClearMsg2DotNet(category);
-	}
-
-	@Override
 	public void clearByKey(String cacheType, String key) {
 		clearByKey(cacheType, key, true);
 	}
@@ -323,56 +315,6 @@ public class CacheConfigurationServiceImpl implements CacheConfigurationService,
 			}
 		} else {
 			logger.error("Clear cache by key failed, cacheType[" + cacheType + "] not found.");
-		}
-	}
-
-	/*
-	 * 具体应用调用的API，所以无需重复清除分布式缓存，应用已经清除过
-	 */
-	@Override
-	public void clearByKeyBothSide(String cacheType, String key, String category, List<Object> params) {
-		clearByKey(cacheType, key, false);
-		if (category != null) {
-			sendClearMsg2DotNet(category, params);
-		}
-	}
-
-	private void sendBatchClearMsg2DotNet(final String category) {
-		CacheKeyConfiguration cacheKeyConfig = cacheKeyConfigurationService.find(category);
-		if (cacheKeyConfig.isSync2Dnet()) {
-			executorService.execute(new Runnable() {
-				@Override
-				public void run() {
-					try {
-						smsMessageSender.enqueue(new TextMessage("*" + category));
-					} catch (Throwable e) {
-						logger.error("Send cache batch-clear msg to .net failed with category[" + category + "].", e);
-					}
-				}
-			});
-		}
-	}
-
-	private void sendClearMsg2DotNet(final String category, final List<Object> params) {
-		CacheKeyConfiguration cacheKeyConfig = cacheKeyConfigurationService.find(category);
-		if (cacheKeyConfig.isSync2Dnet()) {
-			executorService.execute(new Runnable() {
-				@Override
-				public void run() {
-					StringBuilder msgBuilder = new StringBuilder(category);
-					if (params != null) {
-						for (Object param : params) {
-							msgBuilder.append("|").append(param);
-						}
-					}
-					Message message = new TextMessage(msgBuilder.toString());
-					try {
-						smsMessageSender.enqueue(message);
-					} catch (Throwable e) {
-						logger.error("Send cache clear msg to .net failed with content[" + msgBuilder + "].", e);
-					}
-				}
-			});
 		}
 	}
 
@@ -453,10 +395,6 @@ public class CacheConfigurationServiceImpl implements CacheConfigurationService,
 
 	public void setCacheMessageNotifier(CacheMessageNotifier cacheMessageNotifier) {
 		this.cacheMessageNotifier = cacheMessageNotifier;
-	}
-
-	public void setSmsMessageSender(SimpleQueueService smsMessageSender) {
-		this.smsMessageSender = smsMessageSender;
 	}
 
 	public void setServerGroupService(ServerGroupService serverGroupService) {
@@ -608,4 +546,5 @@ public class CacheConfigurationServiceImpl implements CacheConfigurationService,
 	public void migrate() {
 		migrator.migrate();
 	}
+    
 }
