@@ -102,10 +102,10 @@ module
 
             var searchFunction = function (offset, limit, callback){
 
-                $http.post(window.contextPath + '/setting/alarmrecord/search', $scope.searchRecordEntity).success(callback);
+                $http.post(window.contextPath + '/event/alarm/search', $scope.searchRecordEntity).success(callback);
             };
 
-            $scope.suburl = "/setting/alarmrecord/list";
+            $scope.suburl = "/event/alarm/list";
             $scope.pageSize = 30;
             $scope.queryCount = 0;
 
