@@ -17,8 +17,10 @@ import com.dianping.cache.service.OperationLogService;
 import com.dianping.cache.service.ServerStatsService;
 import com.dianping.cache.util.SpringLocator;
 
-public class TimedCleanData {
-	private Logger logger = LoggerFactory.getLogger(TimedCleanData.class);
+public class PurgeHistoryDataTask {
+    
+	private Logger logger = LoggerFactory.getLogger(PurgeHistoryDataTask.class);
+	
 	private static final ConfigManager configManager = ConfigManagerLoader.getConfigManager();
 	
 	private static final String OPERATIONLOG_CLEAN_TIME = "avatar-cache.timeclean.operationlog";
@@ -40,7 +42,7 @@ public class TimedCleanData {
 
 	private RedisService redisService;
 	
-	public TimedCleanData(){
+	public PurgeHistoryDataTask(){
 		init();
 		scheduled.scheduleWithFixedDelay(new Runnable(){
 			@Override

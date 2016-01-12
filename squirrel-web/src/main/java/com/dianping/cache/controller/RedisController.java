@@ -7,8 +7,6 @@ import java.util.concurrent.TimeUnit;
 import com.dianping.cache.controller.dto.RedisDashBoardData;
 import com.dianping.cache.controller.dto.RedisReshardParams;
 import com.dianping.cache.controller.dto.RedisScaleParams;
-import com.dianping.cache.deamontask.CacheDeamonTaskManager;
-import com.dianping.cache.deamontask.tasks.RedisReshardTask;
 import com.dianping.cache.entity.CacheConfiguration;
 import com.dianping.cache.entity.CacheKeyConfiguration;
 import com.dianping.cache.scale.cluster.redis.RedisManager;
@@ -29,6 +27,8 @@ import com.dianping.cache.monitor.highcharts.HighChartsWrapper;
 import com.dianping.cache.monitor.statsdata.RedisClusterData;
 import com.dianping.cache.monitor.statsdata.RedisStatsData;
 import com.dianping.cache.service.RedisService;
+import com.dianping.squirrel.task.TaskManager;
+import com.dianping.squirrel.task.RedisReshardTask;
 
 
 @Controller
@@ -140,7 +140,7 @@ public class RedisController extends AbstractCacheController{
 		ReshardPlan reshardPlan = reshardService.createReshardPlan(redisReshardParams.getCluster(), redisReshardParams.getSrcNodes(),
 				redisReshardParams.getDesNodes(), redisReshardParams.isAverage());
 		RedisReshardTask task = new RedisReshardTask(reshardPlan);
-		CacheDeamonTaskManager.submit(task);
+		TaskManager.submit(task);
 	}
 
 	@RequestMapping(value = "/redis/failover")

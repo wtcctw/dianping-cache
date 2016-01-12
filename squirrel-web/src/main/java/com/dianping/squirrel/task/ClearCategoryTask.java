@@ -1,9 +1,9 @@
-package com.dianping.cache.deamontask.tasks;
+package com.dianping.squirrel.task;
 
-import com.dianping.cache.deamontask.AbstractDeamonTask;
 import com.dianping.squirrel.client.StoreClient;
 import com.dianping.squirrel.client.StoreClientFactory;
 import com.dianping.squirrel.client.impl.redis.RedisStoreClient;
+
 import redis.clients.jedis.*;
 
 import java.util.Set;
@@ -11,7 +11,7 @@ import java.util.Set;
 /**
  * Created by thunder on 16/1/6.
  */
-public class ClearCategoryTask extends AbstractDeamonTask {
+public class ClearCategoryTask extends AbstractTask {
 
     private String category;
     private StoreClient storeClient;

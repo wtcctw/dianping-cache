@@ -15,7 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
-public class TimedRetriCategoryToApp {
+public class RetrieveCategoryMappingTask {
 	
 	private final String APPLICATION_PATH = "/dp/cache/runtime";
 	
@@ -23,11 +23,11 @@ public class TimedRetriCategoryToApp {
 	
 	private CuratorFramework curatorClient;
 	
-    private Logger logger = LoggerFactory.getLogger(TimedRetriCategoryToApp.class);
+    private Logger logger = LoggerFactory.getLogger(RetrieveCategoryMappingTask.class);
 
     private ScheduledExecutorService scheduled = Executors.newSingleThreadScheduledExecutor();
 
-    public TimedRetriCategoryToApp() {
+    public RetrieveCategoryMappingTask() {
         init();
         scheduled.scheduleWithFixedDelay(new Runnable() {
             @Override

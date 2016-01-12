@@ -1,15 +1,13 @@
-package com.dianping.cache.deamontask;
+package com.dianping.squirrel.task;
 
-import com.dianping.cache.entity.DeamonTask;
-
-import java.util.concurrent.Callable;
+import com.dianping.cache.entity.Task;
 
 /**
  * Created by thunder on 16/1/5.
  */
-public abstract class AbstractDeamonTask<T> implements Runnable{
+public abstract class AbstractTask<T> implements Runnable{
 
-    private DeamonTask deamonTask;
+    private Task deamonTask;
 
     protected void startTask() {
 

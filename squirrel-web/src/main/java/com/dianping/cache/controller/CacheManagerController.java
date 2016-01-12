@@ -16,9 +16,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.dianping.cache.controller.dto.CategoryParams;
 import com.dianping.cache.controller.dto.ConfigurationParams;
-import com.dianping.cache.deamontask.CacheDeamonTaskManager;
-import com.dianping.cache.deamontask.dao.DeamonTaskDao;
-import com.dianping.cache.deamontask.tasks.ClearCategoryTask;
+import com.dianping.cache.dao.TaskDao;
 import jodd.util.StringUtil;
 import net.spy.memcached.AddrUtil;
 import net.spy.memcached.MemcachedClient;
@@ -43,6 +41,8 @@ import com.dianping.squirrel.client.StoreClient;
 import com.dianping.squirrel.client.StoreClientFactory;
 import com.dianping.squirrel.client.StoreKey;
 import com.dianping.squirrel.common.lifecycle.Locatable;
+import com.dianping.squirrel.task.TaskManager;
+import com.dianping.squirrel.task.ClearCategoryTask;
 
 @Controller
 public class CacheManagerController extends AbstractCacheController {
@@ -67,7 +67,7 @@ public class CacheManagerController extends AbstractCacheController {
     private CategoryToAppService categoryToAppService;
 
     @Resource(name = "deamonTaskDao")
-    private DeamonTaskDao deamonTaskDao;
+    private TaskDao deamonTaskDao;
 
     @RequestMapping(value = "/cache/config")
     public ModelAndView viewCacheConfig() {
@@ -432,7 +432,7 @@ public class CacheManagerController extends AbstractCacheController {
     @ResponseBody
     public Object deleteCategory(@RequestParam("category")String category) {
         ClearCategoryTask task = new ClearCategoryTask(category);
-        CacheDeamonTaskManager.submit(task);
+        TaskManager.submit(task);
         return true;
     }
 
