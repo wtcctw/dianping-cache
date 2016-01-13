@@ -20,7 +20,6 @@ import com.dianping.cache.entity.CacheConfiguration;
 import com.dianping.cache.entity.CacheKeyConfiguration;
 import com.dianping.cache.service.CacheConfigurationService;
 import com.dianping.cache.service.CacheKeyConfigurationService;
-import com.dianping.remote.cache.CacheManageWebService;
 import com.dianping.remote.cache.dto.CacheClearDTO;
 import com.dianping.remote.cache.dto.CacheKeyConfigurationDTO;
 import com.dianping.remote.cache.dto.GenericCacheConfigurationDTO;

@@ -25,7 +25,6 @@ import com.dianping.cache.remote.translator.CacheKeyConfiguration2DTOTranslator;
 import com.dianping.cache.remote.translator.Translator;
 import com.dianping.cache.service.CacheConfigurationService;
 import com.dianping.cache.service.CacheKeyConfigurationService;
-import com.dianping.remote.cache.CacheConfigurationWebService;
 import com.dianping.remote.cache.dto.CacheConfigurationDTO;
 import com.dianping.remote.cache.dto.CacheConfigurationsDTO;
 import com.dianping.remote.cache.dto.CacheKeyConfigurationDTO;

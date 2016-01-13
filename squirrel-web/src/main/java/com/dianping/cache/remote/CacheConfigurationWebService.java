@@ -13,7 +13,7 @@
  * accordance with the terms of the license agreement you entered into
  * with Dianping.com.
  */
-package com.dianping.remote.cache;
+package com.dianping.cache.remote;
 
 import java.util.List;
 
