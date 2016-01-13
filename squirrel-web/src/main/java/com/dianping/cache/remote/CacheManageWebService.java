@@ -16,8 +16,6 @@
 package com.dianping.cache.remote;
 
 import com.dianping.remote.cache.dto.CacheClearDTO;
-import com.dianping.remote.cache.dto.CacheKeyConfigurationDTO;
-import com.dianping.remote.cache.dto.GenericCacheConfigurationDTO;
 
 /**
  * Cache Manage Web Service
@@ -48,14 +46,6 @@ public interface CacheManageWebService {
 	 * @param cacheClear
 	 */
 	void clearByKey(CacheClearDTO cacheClear);
-	
-	void createConfiguration(GenericCacheConfigurationDTO configuration);
-	
-	void updateConfiguration(GenericCacheConfigurationDTO configuration);
-	
-	void createCacheKeyConfig(CacheKeyConfigurationDTO config);
-	
-	void updateCacheKeyConfig(CacheKeyConfigurationDTO config);
 
     /**
      * @param category
