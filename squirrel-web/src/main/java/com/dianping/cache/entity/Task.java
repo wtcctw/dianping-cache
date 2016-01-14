@@ -1,5 +1,7 @@
 package com.dianping.cache.entity;
 
+import com.dianping.squirrel.task.TaskType;
+
 /**
  * Created by thunder on 16/1/5.
  */
@@ -12,7 +14,26 @@ public class Task {
     long commitTime;
     long startTime;
     long endTime;
+    String commiter;
+
+    public String getCommiter() {
+        return commiter;
+    }
+
+    public void setCommiter(String commiter) {
+        this.commiter = commiter;
+    }
+
     String description;
+    String typeDescription;
+
+    public String getTypeDescription() {
+        return TaskType.values()[type].name();
+    }
+
+    public void setTypeDescription(String typeDescription) {
+        this.typeDescription = typeDescription;
+    }
 
     public int getId() {
         return id;
