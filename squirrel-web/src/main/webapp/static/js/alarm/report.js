@@ -47,7 +47,6 @@ module
                             }
                             self.currentPagefailDetails = failDetails.slice(0, pageSize);
                             self.currentPagedelayDetails = delayDetails.slice(0, pageSize);
-                            self.hasNextVar = items.length === pageSize + 1;
                         }
                     );
                 },
@@ -101,9 +100,15 @@ module
                 }).success(callback);
             };
 
-            var searchFunction = function (createTime, callback){
+            var searchFunction = function (offset, limit, callback){
+                $scope.searchParam = {
+                    createTime:$scope.createTime
+                };
 
-                $http.post(window.contextPath + '/report/search', createTime).success(callback);
+                $http.get(window.contextPath + '/report/search',
+                    {
+                        params:$scope.searchParam
+            }).success(callback);
             };
 
             $scope.suburl = "/report/list";
@@ -120,7 +125,7 @@ module
 
 
             $scope.search = function (createTime) {
-
+                $scope.createTime = createTime;
                 $scope.searchPaginator = Paginator(
                     searchFunction,
                     $scope.PageSize
@@ -139,6 +144,22 @@ module
                 );
             };
 
+
+            $http(
+                {
+                    method: "GET",
+                    url: window.contextPath + '/report/getWeekList'
+                }
+            ).success(
+                function (datas, status, headers, config) {
+                    $scope.weekList = datas;
+                    $scope.history=datas[0];
+                }
+            ).error(
+                function (datas, status, headers, config) {
+                    console.log("weekList读取错误")
+                }
+            );
 
 
         }
