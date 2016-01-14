@@ -1,0 +1,48 @@
+<div class="main-content" style="opacity: 1.0;"
+     ng-controller="ConfigController">
+    <div class="main-content-inner">
+        <script type="text/javascript"
+                src="${rc.contextPath}/static/js/avatar-cacheconfig.js"></script>
+
+        <!-- page-content -->
+        <div class="page-content">
+            <!--row  -->
+            <div class="row">
+                <div class="col-xs-12">
+                    <table id="taskTable" class="table table-hover progress-panel table-striped"
+                           style="table-layout: fixed;">
+                        <thead>
+                        <tr>
+                            <th>数据ID</th>
+                            <th>category</th>
+                            <th>记录条数</th>
+                            <th>key占用空间</th>
+                            <th>value占用空间</th>
+                            <th>更新时间</th>
+                            <th>HostAndPort</th>
+                        </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="${rc.contextPath}/assets/js/date-time/jquery-ui-sliderAccess.js"></script>
+    <script type="application/javascript">
+        $(document).ready(function () {
+            var quorumTable = $('#taskTable').DataTable( {
+                responsive: true,
+                "ajax": "${rc.contextPath}/rdb/data",
+                "columns": [
+                    { "data": "id" },
+                    { "data": "category" },
+                    { "data": "keyCount" },
+                    { "data": "keySize" },
+                    { "data": "valueSize" },
+                    { "data": "updateTime" },
+                    { "data": "hostAndPort" }
+                ]
+            });
+        });
+    </script>
+
