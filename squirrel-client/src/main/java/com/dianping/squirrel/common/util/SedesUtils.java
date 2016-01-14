@@ -3,7 +3,7 @@ package com.dianping.squirrel.common.util;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.dianping.remote.cache.dto.SingleCacheRemoveDTO;
+import com.dianping.squirrel.common.domain.SingleCacheRemoveDTO;
 
 public class SedesUtils {
 

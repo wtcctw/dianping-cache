@@ -15,9 +15,9 @@
  */
 package com.dianping.squirrel.client.impl.ehcache;
 
-import com.dianping.remote.cache.dto.CacheConfigurationDTO;
 import com.dianping.squirrel.client.config.StoreClientConfig;
 import com.dianping.squirrel.client.config.StoreClientConfigParser;
+import com.dianping.squirrel.common.domain.CacheConfigurationDTO;
 
 /**
  * EhcacheClient Configuration Parser

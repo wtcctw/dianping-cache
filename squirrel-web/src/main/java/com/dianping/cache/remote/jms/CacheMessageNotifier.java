@@ -18,13 +18,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 
 import com.dianping.cat.Cat;
-import com.dianping.remote.cache.dto.CacheConfigurationDTO;
-import com.dianping.remote.cache.dto.CacheConfigurationRemoveDTO;
-import com.dianping.remote.cache.dto.CacheKeyConfigurationDTO;
-import com.dianping.remote.cache.dto.CacheKeyTypeVersionUpdateDTO;
-import com.dianping.remote.cache.dto.SingleCacheRemoveDTO;
 import com.dianping.squirrel.common.config.ConfigManager;
 import com.dianping.squirrel.common.config.ConfigManagerLoader;
+import com.dianping.squirrel.common.domain.CacheConfigurationDTO;
+import com.dianping.squirrel.common.domain.CacheConfigurationRemoveDTO;
+import com.dianping.squirrel.common.domain.CacheKeyConfigurationDTO;
+import com.dianping.squirrel.common.domain.CacheKeyTypeVersionUpdateDTO;
+import com.dianping.squirrel.common.domain.SingleCacheRemoveDTO;
 import com.dianping.squirrel.common.util.BoundedLinkedList;
 import com.dianping.squirrel.common.util.JsonUtils;
 import com.dianping.squirrel.common.util.PathUtils;

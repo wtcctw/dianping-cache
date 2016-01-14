@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-import com.dianping.remote.cache.dto.*;
-import com.dianping.squirrel.client.config.listener.*;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.api.CuratorEvent;
 import org.apache.curator.framework.api.CuratorEventType;
@@ -18,7 +16,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.dianping.cat.Cat;
+import com.dianping.squirrel.client.config.listener.CacheConfigurationRemoveListener;
+import com.dianping.squirrel.client.config.listener.CacheConfigurationUpdateListener;
+import com.dianping.squirrel.client.config.listener.CacheKeyConfigUpdateListener;
+import com.dianping.squirrel.client.config.listener.CacheKeyTypeVersionUpdateListener;
+import com.dianping.squirrel.client.config.listener.SingleCacheRemoveListener;
 import com.dianping.squirrel.client.config.zookeeper.CacheEvent.CacheEventType;
+import com.dianping.squirrel.common.domain.CacheConfigurationDTO;
+import com.dianping.squirrel.common.domain.CacheConfigurationRemoveDTO;
+import com.dianping.squirrel.common.domain.CacheKeyConfigurationDTO;
+import com.dianping.squirrel.common.domain.CacheKeyTypeVersionUpdateDTO;
+import com.dianping.squirrel.common.domain.SingleCacheRemoveDTO;
 import com.dianping.squirrel.common.util.JsonUtils;
 import com.dianping.squirrel.common.util.PathUtils;
 import com.dianping.squirrel.common.util.SedesUtils;

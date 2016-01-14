@@ -17,7 +17,7 @@ package com.dianping.cache.remote;
 
 import com.dianping.cache.service.CacheConfigurationService;
 import com.dianping.cache.service.CacheKeyConfigurationService;
-import com.dianping.remote.cache.dto.CacheClearDTO;
+import com.dianping.squirrel.common.domain.CacheClearDTO;
 
 /**
  * 用于缓存的管理，如清除缓存等

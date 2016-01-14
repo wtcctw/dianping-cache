@@ -31,11 +31,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.dianping.cat.Cat;
-import com.dianping.remote.cache.dto.CacheKeyConfigurationDTO;
 import com.dianping.squirrel.client.config.zookeeper.CacheCuratorClient;
 import com.dianping.squirrel.client.util.DTOUtils;
 import com.dianping.squirrel.common.config.ConfigManager;
 import com.dianping.squirrel.common.config.ConfigManagerLoader;
+import com.dianping.squirrel.common.domain.CacheKeyConfigurationDTO;
 import com.dianping.squirrel.common.exception.StoreException;
 import com.dianping.squirrel.common.util.PathUtils;
 

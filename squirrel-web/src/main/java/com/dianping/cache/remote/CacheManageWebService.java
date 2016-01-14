@@ -15,7 +15,7 @@
  */
 package com.dianping.cache.remote;
 
-import com.dianping.remote.cache.dto.CacheClearDTO;
+import com.dianping.squirrel.common.domain.CacheClearDTO;
 
 /**
  * Cache Manage Web Service

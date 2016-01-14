@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.dianping.remote.cache.dto;
+package com.dianping.squirrel.common.domain;
 
 import java.util.List;
 

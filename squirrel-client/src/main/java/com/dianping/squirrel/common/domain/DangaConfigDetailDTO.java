@@ -1,4 +1,4 @@
-package com.dianping.remote.cache.dto;
+package com.dianping.squirrel.common.domain;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -6,16 +6,16 @@ import java.util.List;
 /**
  * Created by dp on 15/12/7.
  */
-public class DcacheConfigDetailDTO extends CacheConfigDetailDTO{
+public class DangaConfigDetailDTO  extends CacheConfigDetailDTO {
     /**
      *
      */
-    private static final long serialVersionUID = 5119818234771064933L;
+    private static final long serialVersionUID = 5119818771064933L;
 
     /**
      *
      */
-    private static final String DEFAULT_TRANSCODER_CLASS = "com.dianping.cache.dcache.HessianTranscoder";
+    private static final String DEFAULT_TRANSCODER_CLASS = "com.dianping.cache.danga.DangaTranscoder";
 
     /**
      * e.g. 10.10.1.1:8081
@@ -27,7 +27,7 @@ public class DcacheConfigDetailDTO extends CacheConfigDetailDTO{
     /**
      *
      */
-    public DcacheConfigDetailDTO() {
+    public DangaConfigDetailDTO() {
         this.clientClazz = "com.dianping.cache.danga.DangaClientImpl";
         this.className = this.getClass().getName();
     }
@@ -47,4 +47,5 @@ public class DcacheConfigDetailDTO extends CacheConfigDetailDTO{
     public void setTranscoderClazz(String transcoderClazz) {
         this.transcoderClazz = transcoderClazz;
     }
+
 }
