@@ -65,8 +65,6 @@ public class ScanJobController extends AbstractSidebarController {
         }
 
         Map<String, Object> result = new HashMap<String, Object>();
-//        result.put("size", scanDetails.size());
-//        result.put("entities", scanDetails);
 
         result.put("size", scanDetails.size());
         result.put("failDetails", failDetails);
@@ -93,11 +91,30 @@ public class ScanJobController extends AbstractSidebarController {
 
         Map<String, Object> result = new HashMap<String, Object>();
         result.put("size", scanDetails.size());
-        result.put("entities", scanDetails);
-//        result.put("failDetails", failDetails);
-//        result.put("delayDetails", delayDetails);
+        result.put("failDetails", failDetails);
+        result.put("delayDetails", delayDetails);
         return result;
     }
+
+    @RequestMapping(value = "/report/getWeekList", method = RequestMethod.GET)
+    @ResponseBody
+    public Object getWeekList() {
+        Date now = new Date();
+        String nowText = DateUtil.getCatDayString(now);
+
+        List<String>lastWeekList = new ArrayList<String>();
+
+        for(int i=1;i<=7;i++) {
+
+            Date yesterday = new Date(now.getTime() - (MS_PER_DAY)*i);
+            String yesterdayText = DateUtil.getCatDayString(yesterday);
+            lastWeekList.add(yesterdayText);
+
+        }
+
+        return lastWeekList;
+    }
+
 
 
     @RequestMapping(value = "/report/scanjob")

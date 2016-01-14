@@ -12,14 +12,21 @@
         </script>
         <ul class="breadcrumb">
             <li class="active"></li>
-            <!--<li><label ng-click="scanjob()">scanJob</label></li>-->
-            li><label>缓存异常统计报表</label></li>
+            <li><label ng-click="search('20160113')">seach</label></li>
+            <li><label>缓存异常统计报表</label></li>
         </ul>
     </div>
 
+
     <!-- page-content -->
     <div class="page-content">
-
+        <div class="col-xs-2">
+            <label>日期：</label>
+            <select class="col-xs-12" ng-model="history" ng-change="search(history)"
+                    name="history" ng-options="o as o for o in weekList"
+                    required>
+            </select>
+        </div>
         <div>
             <!--row  -->
             <div class="row col-lg-12 col-sm-12" style="margin-left:1px">
@@ -35,8 +42,8 @@
                     <tr ng-repeat="m in searchPaginator.currentPagefailDetails">
                         <td style="text-align: left;width:80px">{{m.cacheName}}</td>
                         <td style="text-align: left;width:80px">{{m.project}}</td>
-                        <td style="text-align: left;width:80px ;color: red">{{m.failPercent}}</td>
-                        <td style="text-align: left;width:80px">{{m.avgValue}}</td>
+                        <td style="text-align: center;width:80px ;color: red">{{m.failPercent}}</td>
+                        <td style="text-align: center;width:80px">{{m.avgValue}}</td>
                     </tr>
                 </table>
             </div>
@@ -54,8 +61,8 @@
                     <tr ng-repeat="m in searchPaginator.currentPagedelayDetails">
                         <td style="text-align: left;width:80px">{{m.cacheName}}</td>
                         <td style="text-align: left;width:80px">{{m.project}}</td>
-                        <td style="text-align: left;width:80px">{{m.failPercent}}</td>
-                        <td style="text-align: left;width:80px ;color: red";>{{m.avgValue}}</td>
+                        <td style="text-align: center;width:80px">{{m.failPercent}}</td>
+                        <td style="text-align: center;width:80px ;color: red";>{{m.avgValue}}</td>
                     </tr>
                 </table>
             </div>
