@@ -14,7 +14,7 @@ import java.util.List;
 public class AlarmConfigServiceImpl implements AlarmConfigService {
 
     @Autowired
-    AlarmConfigDao alarmConfigDao;
+    private AlarmConfigDao alarmConfigDao;
 
     @Override
     public boolean insert(AlarmConfig alarmConfig) {

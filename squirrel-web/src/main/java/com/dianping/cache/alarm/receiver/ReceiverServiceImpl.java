@@ -1,21 +1,5 @@
 package com.dianping.cache.alarm.receiver;
 
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
-import org.apache.http.client.utils.URIBuilder;
-import org.dom4j.Attribute;
-import org.dom4j.Document;
-import org.dom4j.DocumentException;
-import org.dom4j.DocumentHelper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
 import com.dianping.ba.hris.md.api.dto.EmployeeDto;
 import com.dianping.ba.hris.md.api.service.EmployeeService;
 import com.dianping.cache.alarm.utils.DateUtil;
@@ -27,6 +11,20 @@ import com.dianping.ops.http.HttpGetter;
 import com.dianping.ops.http.HttpResult;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
+import org.apache.http.client.utils.URIBuilder;
+import org.dom4j.Attribute;
+import org.dom4j.Document;
+import org.dom4j.DocumentException;
+import org.dom4j.DocumentHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
+
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 /**
  * Created by lvshiyun on 15/12/11.
@@ -36,7 +34,6 @@ public class ReceiverServiceImpl implements ReceiverService {
 
     protected final Logger logger = LoggerFactory.getLogger(getClass());
 
-    @Autowired
     private EmployeeService employeeService;
 
     public List<String> getSmsReceiver(String smsReceiver, String domain, boolean sendToBusiness) throws URISyntaxException, DocumentException, InterruptedException {

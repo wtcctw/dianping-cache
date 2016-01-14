@@ -1,0 +1,55 @@
+<html>
+
+<body>
+
+    <h3>缓存异常统计报表</h3>
+
+
+    <div class="row col-lg-12 col-sm-12" style="margin-center:1px">
+        <label>失败率 > 0.100% </label>
+        <table style="table-layout:fixed;"
+               class="table table-bordered table-striped table-condensed  table-hover">
+            <tr>
+                <th style="text-align: center; width:80px">CacheName</th>
+                <th style="text-align: center; width:80px">Project</th>
+                <th style="text-align: center; width:80px">FailPercent(%)</th>
+                <th style="text-align: center; width:80px">AvgDelay(ms)</th>
+            </tr>
+        #foreach( $info in $delayDetails)
+            <tr>
+                <td style="text-align: center;width:80px">$info.cacheName</td>
+                <td style="text-align: center;width:80px">$info.project</td>
+                <td style="text-align: center;width:80px ;color: red">$info.failPercent</td>
+                <td style="text-align: center;width:80px">$info.avgValue</td>
+            </tr>
+        #end
+        </table>
+    </div>
+
+    <div class="row col-lg-12 col-sm-12" style="margin-center:1px">
+        <label>平均时间 > 10ms </label>
+        <table style="table-layout:fixed;"
+               class="table table-bordered table-striped table-condensed  table-hover">
+            <tr>
+                <th style="text-align: center; width:80px">CacheName</th>
+                <th style="text-align: center; width:80px">Project</th>
+                <th style="text-align: center; width:80px">FailPercent(%)</th>
+                <th style="text-align: center; width:80px">AvgDelay(ms)</th>
+            </tr>
+            
+             #foreach( $info in $failDetails)
+             <tr>
+                <td style="text-align: center;width:80px">$info.cacheName</td>
+                <td style="text-align: center;width:80px">$info.project</td>
+                <td style="text-align: center;width:80px">$info.failPercent</td>
+                <td style="text-align: center;width:80px ;color: red";>$info.avgValue</td>
+            </tr>
+            #end
+        </table>
+    </div>
+    </div>
+
+    </body>
+
+
+</html>

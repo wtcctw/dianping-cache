@@ -1,6 +1,8 @@
 package com.dianping.cache.alarm.dataanalyse;
 
 
+import com.dianping.cache.alarm.dataanalyse.thread.BaselineThread;
+import com.dianping.cache.alarm.dataanalyse.thread.BaselineThreadFactory;
 import com.dianping.cache.alarm.threadmanager.ThreadManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
