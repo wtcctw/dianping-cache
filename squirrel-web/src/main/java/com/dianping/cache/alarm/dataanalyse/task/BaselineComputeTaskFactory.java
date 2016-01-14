@@ -1,4 +1,4 @@
-package com.dianping.cache.alarm.dataanalyse;
+package com.dianping.cache.alarm.dataanalyse.task;
 
 /**
  * Created by lvshiyun on 16/1/3.

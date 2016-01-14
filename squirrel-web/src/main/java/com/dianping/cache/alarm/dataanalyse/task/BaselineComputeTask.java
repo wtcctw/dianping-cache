@@ -1,4 +1,4 @@
-package com.dianping.cache.alarm.dataanalyse;
+package com.dianping.cache.alarm.dataanalyse.task;
 
 import com.dianping.cache.alarm.dataanalyse.mapper.MemcacheBaselineMapper;
 import com.dianping.cache.alarm.dataanalyse.mapper.RedisBaselineMapper;
