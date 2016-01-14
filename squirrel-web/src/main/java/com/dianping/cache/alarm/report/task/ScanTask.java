@@ -40,15 +40,15 @@ public class ScanTask {
 
 
     public void run() throws InterruptedException, DocumentException, URISyntaxException, MessagingException {
-        List<ScanDetail> scanDetails = AlarmScanDetails();
+//        List<ScanDetail> scanDetails = AlarmScanDetails();
 
 
-//        Date now = new Date();
-//        String nowText = DateUtil.getCatDayString(now);
-//
-//        Date yesterday = new Date(now.getTime() - MS_PER_DAY);
-//        String yesterdayText = DateUtil.getCatDayString(yesterday);
-//        List<ScanDetail> scanDetails = scanDetailService.findByCreateTime(yesterdayText);
+        Date now = new Date();
+        String nowText = DateUtil.getCatDayString(now);
+
+        Date yesterday = new Date(now.getTime() - MS_PER_DAY);
+        String yesterdayText = DateUtil.getCatDayString(yesterday);
+        List<ScanDetail> scanDetails = scanDetailService.findByCreateTime(yesterdayText);
 
         List<ScanDetail>failDetails = new ArrayList<ScanDetail>();
         List<ScanDetail>delayDetails = new ArrayList<ScanDetail>();
@@ -99,8 +99,7 @@ public class ScanTask {
             helper.setFrom(mailSender.getMailSender().getUsername());
             String[] receiver =new String[]{"shiyun.lv@dianping.com","xiaoxiong.dai@dianping.com","dp.wang@dianping.com"};
             helper.setTo(receiver);
-            helper.setSubject("Test mail");
-//            helper.setText(emailText, true);
+            helper.setSubject("缓存异常统计报表");
 
             msg.setContent(emailText, "text/html; charset=UTF-8");
 
