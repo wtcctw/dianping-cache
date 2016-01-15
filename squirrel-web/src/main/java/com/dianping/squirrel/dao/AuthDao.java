@@ -1,6 +1,6 @@
-package com.dianping.cache.dao;
+package com.dianping.squirrel.dao;
 
-import com.dianping.cache.entity.Auth;
+import com.dianping.squirrel.entity.Auth;
 
 import java.util.List;
 

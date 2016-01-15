@@ -1,4 +1,4 @@
-package com.dianping.cache.alarm.report;
+package com.dianping.cache.alarm.event;
 
 import com.dianping.cache.alarm.event.Event;
 

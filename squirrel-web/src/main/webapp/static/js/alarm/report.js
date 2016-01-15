@@ -22,7 +22,8 @@ module
                         this.currentOffset,
                         pageSize + 1,
                         function (data) {
-                            items = data.entities;
+                            failDetails = data.failDetails;
+                            delayDetails= data.delayDetails;
                             length = data.size;
                             self.totalPage = Math.ceil(length / pageSize);
                             self.endPage = self.totalPage;
@@ -44,8 +45,8 @@ module
                                     self.currentPage
                                 ];
                             }
-                            self.currentPageItems = items.slice(0, pageSize);
-                            self.hasNextVar = items.length === pageSize + 1;
+                            self.currentPagefailDetails = failDetails.slice(0, pageSize);
+                            self.currentPagedelayDetails = delayDetails.slice(0, pageSize);
                         }
                     );
                 },
@@ -80,7 +81,7 @@ module
 
 module
     .controller(
-    'AlarmRecordController',
+    'AlarmReportController',
     [
         '$rootScope',
         '$scope',
@@ -94,19 +95,24 @@ module
                     offset: offset,
                     limit: limit
                 };
-                console.log($scope.searchEntity);
                 $http.get(window.contextPath + $scope.suburl, {
                     params: $scope.searchEntity
                 }).success(callback);
             };
 
             var searchFunction = function (offset, limit, callback){
+                $scope.searchParam = {
+                    createTime:$scope.createTime
+                };
 
-                $http.post(window.contextPath + '/event/alarm/search', $scope.searchRecordEntity).success(callback);
+                $http.get(window.contextPath + '/report/search',
+                    {
+                        params:$scope.searchParam
+            }).success(callback);
             };
 
-            $scope.suburl = "/event/alarm/list";
-            $scope.PageSize = 30;
+            $scope.suburl = "/report/list";
+            $scope.PageSize = 300;
             $scope.queryCount = 0;
 
             $scope.query = function () {
@@ -118,36 +124,42 @@ module
             $scope.query();
 
 
-            $scope.search = function () {
-                if ($scope.queryCount != 0) {
-                    $scope.startTime = $("#starttime").val();
-                    $scope.endTime = $("#stoptime").val();
-                }
-                $scope.queryCount = $scope.queryCount + 1;
-
-
-                if ($scope.startTime != null && $scope.endTime != null) {
-
-                    startDate = new Date($scope.startTime);
-                    endDate = new Date($scope.endTime);
-                    if (endDate <= startDate) {
-                        alert("结束时间不能小于开始时间");
-                        return;
-                    }
-                }
-
-
-                $scope.searchRecordEntity.title = $scope.title;
-                $scope.searchRecordEntity.clusterName = $scope.clusterName;
-                $scope.searchRecordEntity.ip = $scope.ip;
-                $scope.searchRecordEntity.startDate = startDate;
-                $scope.searchRecordEntity.endDate = endDate;
-
+            $scope.search = function (createTime) {
+                $scope.createTime = createTime;
                 $scope.searchPaginator = Paginator(
                     searchFunction,
                     $scope.PageSize
                 );
             };
+
+            $scope.scanjob = function () {
+                $http
+                    .post(
+                    window.contextPath + "/report/scanjob"
+                )
+                    .success(
+                    function (data) {
+                        alert("扫描任务已启动……")
+                    }
+                );
+            };
+
+
+            $http(
+                {
+                    method: "GET",
+                    url: window.contextPath + '/report/getWeekList'
+                }
+            ).success(
+                function (datas, status, headers, config) {
+                    $scope.weekList = datas;
+                    $scope.history=datas[0];
+                }
+            ).error(
+                function (datas, status, headers, config) {
+                    console.log("weekList读取错误")
+                }
+            );
 
 
         }

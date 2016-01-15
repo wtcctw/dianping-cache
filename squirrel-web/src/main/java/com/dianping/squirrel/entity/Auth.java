@@ -1,4 +1,4 @@
-package com.dianping.cache.entity;
+package com.dianping.squirrel.entity;
 
 /**
  * Created by dp on 16/1/9.
