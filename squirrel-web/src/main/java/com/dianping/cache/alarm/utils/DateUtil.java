@@ -40,11 +40,23 @@ public class DateUtil {
     private static final SimpleDateFormat NUMBER_MS_SDF = new SimpleDateFormat(
             "yyyyMMddHHmmssSSS", Locale.US);
 
+    private static final SimpleDateFormat CAT_DAY_SDF = new SimpleDateFormat(
+            "yyyyMMdd", Locale.US);
+
     private static final SimpleDateFormat CAT_HOUR_SDF = new SimpleDateFormat(
             "yyyyMMddHH", Locale.US);
 
     private static final SimpleDateFormat CAT_MINUTE_SDF = new SimpleDateFormat(
             "mm", Locale.US);
+
+    public static String getCatDayString(Date date) {
+        if (date == null) {
+            return "";
+        }
+        synchronized (CAT_DAY_SDF) {
+            return CAT_DAY_SDF.format(date);
+        }
+    }
 
     public static String getCatHourString(Date date) {
         if (date == null) {
