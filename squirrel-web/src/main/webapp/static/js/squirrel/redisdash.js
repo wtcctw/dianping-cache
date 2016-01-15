@@ -1,8 +1,11 @@
 module.controller('RedisDashBoardController', [ '$scope', '$http','$document',
     '$timeout', function($scope, $http) {
         $scope.redisdata = [];
+        $scope.applications = [];
+        $scope.logs = [];
+        $scope.cluster;
         $scope.initDashBoard = function () {
-            $http.get(window.contextPath + '/redis/dashboard/data', {
+            $http.get(window.contextPath + '/redis/data/dashboard', {
                 params: {},
             }).success(function (response) {
                 response.datas.forEach(function (item) {
@@ -20,6 +23,63 @@ module.controller('RedisDashBoardController', [ '$scope', '$http','$document',
         $scope.transport = function(cacheKey){
             window.localStorage.cacheKey = cacheKey;
             window.localStorage.swimlane = '';
+        }
+
+        $scope.cat = function(cluster){
+            var domain = "redis";
+            var ipAddrs = "";
+            var nodes = cluster.nodes;
+            for(var i = 0; i < nodes.length; i++){
+                if(i == 0){
+                    domain += nodes[i].master.info.maxMem;
+                }else{
+                    ipAddrs += "_";
+                }
+                ipAddrs += nodes[i].master.address.split(/:/)[0];
+            }
+            var url = "http://cat.dp/cat/r/system?domain="+domain+"&type=paasSystem&ipAddrs=" + ipAddrs;
+            window.open(url);
+        }
+        $scope.getLogs = function(cluster){
+            $http.get(window.contextPath + '/auditlog/search/'+cluster, {params: {
+                }}
+            ).success(function (data) {
+                $scope.logs = data;
+            });
+        }
+
+        $scope.setContent = function(content){
+            $scope.logContent = content;
+        }
+
+        $scope.getApplications = function(cluster){
+            $http.get(window.contextPath + '/redis/data/applications', {params: {
+                    cluster:cluster,
+                }}
+            ).success(function (data) {
+                $scope.applications = data;
+                //$(document).ready(function () {
+                //    setTimeout(function () {
+                //       $('#appTable'+cluster).dataTable({
+                //            "bDestroy": true,
+                //            "bAutoWidth": true,
+                //            "bPaginate": true, //翻页功能
+                //            "bLengthChange": true, //改变每页显示数据数量
+                //            "bFilter": true, //过滤功能
+                //            "bSort": true, //排序功能
+                //            "bInfo": false,//页脚信息
+                //            "bStateSave": false,
+                //            "aaSorting": [],
+                //            "iDisplayLength": 10,
+                //            "aoColumns": [
+                //                {"bSortable": false},{"bSortable": false}, {"bSortable": false}, {"bSortable": false}
+                //            ],
+                //        });
+                //        var obj = document.getElementById("appTable_length");
+                //        obj.innerHTML=' ';
+                //    }, 100);
+                //});
+            });
         }
 
         $scope.initDashBoard();
@@ -49,4 +109,7 @@ module.controller('RedisDashBoardController', [ '$scope', '$http','$document',
                 }, 0);
             });
         };
+
+
+
     } ]);

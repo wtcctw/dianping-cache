@@ -1,6 +1,6 @@
 package com.dianping.cache.controller;
 
-import com.dianping.cache.controller.dto.MemcachedDashBoardData;
+import com.dianping.cache.controller.vo.MemcachedDashBoardData;
 import com.dianping.cache.entity.CacheConfiguration;
 import com.dianping.cache.entity.MemcacheStats;
 import com.dianping.cache.entity.Server;
@@ -70,6 +70,17 @@ public class MemcachedController extends AbstractSidebarController{
         Map<String, Map<String, Object>> currentServerStats = this.getCurrentServerStatsData();
         MemcachedDashBoardData data = new MemcachedDashBoardData(configList,currentServerStats);
         return data;
+    }
+
+    @RequestMapping(value = "/memcached/{cluster}/detaildata")
+    @ResponseBody
+    public MemcachedDashBoardData.SimpleAnalysisData getDetailData(@PathVariable("cluster")String cluster){
+        final CacheConfiguration config = cacheConfigurationService.find(cluster);
+        Map<String, Map<String, Object>> currentServerStats = this.getCurrentServerStatsData();
+        MemcachedDashBoardData data = new MemcachedDashBoardData(new ArrayList<CacheConfiguration>(){
+            {add(config);}
+        },currentServerStats);
+        return data.getDatas().get(0);
     }
 
     private  Map<String,Map<String,Object>> getCurrentServerStatsData(){

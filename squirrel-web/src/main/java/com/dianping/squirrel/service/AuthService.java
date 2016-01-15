@@ -10,7 +10,7 @@ public interface AuthService {
     
     public void setStrict(String resource, boolean strict) throws Exception;
     
-    public void getStrict(String resource) throws Exception;
+    public boolean getStrict(String resource) throws Exception;
     
     public void authorize(String application, String resource) throws Exception;
     

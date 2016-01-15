@@ -63,7 +63,7 @@
                                         <i class="ace-icon glyphicon glyphicon-th-large bigger-130"></i>
                                     </a>
 
-                                    <a class="grey" href="#">
+                                    <a class="grey" href="#log" data-toggle="modal" ng-click="getLogs(item.clusterName)">
                                         <i class="ace-icon fa fa-file-text-o bigger-130"></i>
                                     </a>
 
@@ -81,6 +81,80 @@
             </div>
         </div>
 
+    </div>
+
+
+    <div class="modal fade" id="log" tabindex="-1" role="dialog"
+         aria-labelledby="myModalLabel" aria-hidden="true" >
+        <div class="modal-dialog" >
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button class="close btn-xs" data-dismiss="modal"
+                            aria-hidden="true">&times;</button>
+                    <h4 class="modal-title">
+                        日志
+                    </h4>
+                </div>
+                <div class="modal-body  center">
+                    <div class="row">
+                        <table id="logTable" class="table table-striped" style="table-layout: fixed;">
+                            <thead>
+                            <tr>
+                                <th style="width: 10%;"><i class="ace-icon fa fa-angle-down icon-on-right"></i></th>
+                                <th style="width: 15%; text-align: left;">操作人</th>
+                                <th style="width: 20%;">操作内容</th>
+                                <th style="width: 35%; text-align: center">操作时间</th>
+                                <th style="width: 10%;">状态</th>
+                                <th style="width: 10%;#if(${isadmin})display: table-cell;#else display: none;#end;">操作
+                                </th>
+
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr ng-repeat="log in logs">
+
+                                <td >{{$index+1}}</td>
+                                <td style="text-align: left;">{{log.operator}}</td>
+                                <td style="overflow: hidden;text-overflow: ellipsis;">{{log.content.substring(0,log.content.indexOf("("))}}</td>
+                                <td>{{log.operateTime | date:'yyyy-MM-dd HH:mm:ss'}}</td>
+                                <td>{{log.succeed}}</td>
+                                <td style="#if(${isadmin})display: table-cell;#else display: none;#end;">
+                                    <div class="hidden-sm hidden-xs action-buttons">
+                                        <a class="grey" href="#logContent" data-toggle="modal" ng-click="setContent(log.content)">
+                                            <i class="ace-icon fa fa-search bigger-130"></i>
+                                        </a>
+                                    </div>
+                                </td>
+
+                            </tr>
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal -->
+    </div>
+
+    <div class="modal fade" id="logContent" tabindex="-1" role="dialog"
+         aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button class="close btn-xs" data-dismiss="modal"
+                            aria-hidden="true">&times;</button>
+                    <h4 class="modal-title" id="myModalLabel">操作内容</h4>
+                </div>
+                <div class="modal-body">
+                    <form method="post" class="form-horizontal" name="myForm">
+                        <textarea rows="18" class="col-sm-12" disabled>{{logContent}}</textarea>
+                        <p>&nbsp;</p>
+                    </form>
+                </div>
+
+            </div>
+        </div>
     </div>
 </div>
 

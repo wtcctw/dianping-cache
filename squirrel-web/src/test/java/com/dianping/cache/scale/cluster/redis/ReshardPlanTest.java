@@ -1,7 +1,12 @@
 package com.dianping.cache.scale.cluster.redis;
 
+import com.dianping.cache.dao.AuthDao;
+import com.dianping.cache.entity.Auth;
 import com.dianping.cache.entity.RedisStats;
 import com.dianping.cache.entity.ReshardRecord;
+import com.dianping.cache.util.SpringLocator;
+import com.dianping.squirrel.service.AuthService;
+import com.dianping.squirrel.service.impl.AuthServiceImpl;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
@@ -77,4 +82,34 @@ public class ReshardPlanTest {
         srcNode.clusterSetSlotStable(4098);
         destNode.clusterSetSlotStable(4098);
     }
+
+    @Test
+    public void testDao(){
+        AuthDao authDao = SpringLocator.getBean("authDao");
+        Auth auth = new Auth();
+        auth.setApplications("a,b,c,d,e,r,f");
+        auth.setStrict(false);
+        auth.setResource("redis");
+        auth.setPassword("1234566");
+        authDao.insert(auth);
+
+        Auth auth1 = authDao.findByResource("redis");
+        System.out.println(auth1);
+
+        auth1.setStrict(true);
+        authDao.update(auth1);
+        System.out.println(auth1);
+
+
+        authDao.delete(auth1);
+    }
+
+    @Test
+    public void testAuth() throws Exception {
+        AuthService authService = SpringLocator.getBean(AuthServiceImpl.class);
+        authService.authorize("application2","redis-wh");
+    }
+
+
+
 }

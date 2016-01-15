@@ -11,8 +11,8 @@ import java.util.concurrent.TimeUnit;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 
-import com.dianping.cache.controller.dto.CategoryParams;
-import com.dianping.cache.controller.dto.ConfigurationParams;
+import com.dianping.cache.controller.vo.CategoryParams;
+import com.dianping.cache.controller.vo.ConfigurationParams;
 import com.dianping.cache.dao.TaskDao;
 import jodd.util.StringUtil;
 import net.spy.memcached.AddrUtil;

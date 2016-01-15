@@ -28,6 +28,8 @@ public class RedisInfo {
 
     private double used_cpu_user_children;
 
+    private boolean fail;
+
     public long getUsedMemory() {
         return usedMemory;
     }
@@ -131,6 +133,14 @@ public class RedisInfo {
 
     public void setMaxMem(int maxMem) {
         this.maxMem = maxMem;
+    }
+
+    public boolean isFail() {
+        return fail;
+    }
+
+    public void setFail(boolean fail) {
+        this.fail = fail;
     }
 
     public void calculateUsed() {

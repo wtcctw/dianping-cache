@@ -159,6 +159,10 @@ module.controller('RedisController', [
             $scope.address = address;
         }
 
+        $scope.transport = function(address){
+            window.localStorage.address = address;
+        }
+
         $scope.transportEntity = function(config){
             $scope.configParas = [];
             $http.get(window.contextPath + '/config/cluster/findAll', {params: {}}
@@ -169,6 +173,8 @@ module.controller('RedisController', [
             });
             $scope.categoryEntity = config;
         }
+
+
 
         $scope.deleteSlave = function(cluster,address){
             $scope.redisScaleParams = {};
@@ -244,4 +250,5 @@ module.controller('RedisController', [
                 }, 0);
             });
         };
+
     } ]);

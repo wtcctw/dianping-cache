@@ -1,4 +1,4 @@
-package com.dianping.cache.controller.dto;
+package com.dianping.cache.controller.vo;
 
 /**
  * Created by dp on 16/1/4.

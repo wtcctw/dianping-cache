@@ -15,6 +15,7 @@
             th{
                font-size: 14px;  color: #404040;
             }
+
         </style>
         <div class="page-content">
             <div class="page-header">
@@ -70,13 +71,31 @@
                                         <a class="grey" href="#changeConfirm" data-toggle="modal" ng-click="setFailover(data.slave.address)">
                                             <i class="ace-icon fa fa-exchange bigger-130"></i>
                                         </a>
+                                        <a class="grey" href="${rc.contextPath}/redis/serverinfo" ng-click="transport(data.master.address)">
+                                            <i class="ace-icon fa fa-bar-chart-o bigger-130"></i>
+                                        </a>
                                         <a class="grey" href="#addModal" data-toggle="modal" ng-click="setParams(redisData.clusterName,data.master.address)" ng-show="{{data.slave.address==null}}">
                                             <i class="ace-icon bigger-130"> S+ </i>
                                         </a>
                                         <a class="grey" href="#deleteModal" data-toggle="modal" ng-click="setParams(redisData.clusterName,data.slave.address)" ng-show="{{data.slave.address!=null}}">
                                             <i class="ace-icon bigger-130"> S- </i>
                                         </a>
+                                        <a class="grey" href="">
 
+                                        </a>
+
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr ng-repeat = "data in redisData.failedServers">
+                                <td>Failed</td>
+                                <td>{{data.address}}</td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td style="margin-right: 20px;#if(${isadmin})display: table-cell;#else display: none;#end;">
+                                    <div class="hidden-sm hidden-xs action-buttons">
                                     </div>
                                 </td>
                             </tr>
@@ -110,7 +129,10 @@
                             <td>{{category.duration}}</td>
                             <td>{{category.indexTemplate}}</td>
                             <td>{{category.version}}</td>
-                            <td>{{category.hot}}</td>
+                            <td>
+                                <i class="ace-icon glyphicon glyphicon-ok grey" ng-show="{{category.hot}}"></i>
+                                <i class="ace-icon glyphicon glyphicon-remove grey" ng-show="!{{category.hot}}"></i>
+                            </td>
                             <td style="margin-right: 20px;#if(${isadmin})display: table-cell;#else display: none;#end;">
                                 <div class="hidden-sm hidden-xs action-buttons">
                                     <a class="grey" href="#modifyCategory" ng-click="transportEntity(category)" data-toggle="modal">
@@ -150,7 +172,7 @@
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal"
                             aria-hidden="true">&times;</button>
-                    <h4 class="modal-title" id="myModalLabel">Slot迁移</h4>
+                    <h4 class="modal-title">Slot迁移</h4>
                 </div>
                 <div class="modal-body">
                     <form method="post"
@@ -313,10 +335,10 @@
         <div class="modal-dialog" style="width: 300px; margin: 0 auto;">
             <div class="modal-content">
                 <div class="modal-header">
-                    <button type="button" class="close"
-                            data-dismiss="modal" aria-hidden="true">
-                        &times;
-                    </button>
+                    <!--<button type="button" class="close"-->
+                            <!--data-dismiss="modal" aria-hidden="true">-->
+                        <!--&times;-->
+                    <!--</button>-->
                     <h4 class="modal-title red">
                         警告
                     </h4>
@@ -342,10 +364,10 @@
         <div class="modal-dialog" style="width: 300px; margin: 0 auto;">
             <div class="modal-content">
                 <div class="modal-header">
-                    <button type="button" class="close"
-                            data-dismiss="modal" aria-hidden="true">
-                        &times;
-                    </button>
+                    <!--<button type="button" class="close"-->
+                            <!--data-dismiss="modal" aria-hidden="true">-->
+                        <!--&times;-->
+                    <!--</button>-->
                     <h4 class="modal-title red">
                         警告
                     </h4>
@@ -446,22 +468,9 @@
     </div>
 
 
+
 </div>
-<div id="BgDiv"></div>
-<div class="DialogDiv" style="display:none;position:fixed;">
-    <div class="U-guodu-box">
-        <div>
-            <table width="100%" cellpadding="0" cellspacing="0" border="0">
-                <tr>
-                    <td align="center"><img src="../static/js/mask/loading.gif"></td>
-                </tr>
-                <tr>
-                    <td valign="middle" align="center">处理中，请稍后！</td>
-                </tr>
-            </table>
-        </div>
-    </div>
-</div>
+
 <script type="application/javascript">
     $(document).on('click', 'th input:checkbox' , function(){
         var that = this;

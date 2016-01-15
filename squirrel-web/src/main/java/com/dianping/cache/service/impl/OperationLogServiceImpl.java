@@ -16,6 +16,7 @@
 package com.dianping.cache.service.impl;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -117,7 +118,12 @@ public class OperationLogServiceImpl implements OperationLogService {
 	public void setOperationLogDao(OperationLogDao operationLogDao) {
 		this.operationLogDao = operationLogDao;
 	}
-	
+
+	@Override
+	public List<OperationLog> searchByCluster(String cluster) {
+		return operationLogDao.findByCluster(cluster);
+	}
+
 	private boolean isLogRequired() {
 		//从cache-server-ui登陆用户操作的才记录日志
 		

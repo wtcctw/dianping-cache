@@ -1,19 +1,13 @@
 package com.dianping.cache.scale.cluster.redis;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import redis.clients.jedis.Jedis;
-
 import com.dianping.cache.scale.ScaleException;
 import com.dianping.cache.scale.cluster.Cluster;
 import com.dianping.cache.scale.cluster.Server;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import redis.clients.jedis.Jedis;
+
+import java.util.*;
 
 public class RedisCluster implements Cluster<RedisNode>{
 	
@@ -106,7 +100,7 @@ public class RedisCluster implements Cluster<RedisNode>{
         List<RedisServer> servers = new ArrayList<RedisServer>();
         for(String serverInfo : clusterInfo.split("\n")) {
             RedisServer server = parseServerInfo(serverInfo);
-			if(server.isFail()){
+			if(server.isFail() || server.isPartialFail()){
 				failedServers.add(server);
 			}else{
 				servers.add(server);

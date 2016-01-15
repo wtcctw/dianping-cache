@@ -1,6 +1,6 @@
 package com.dianping.cache.controller;
 
-import com.dianping.cache.controller.dto.ConfigurationParams;
+import com.dianping.cache.controller.vo.ConfigurationParams;
 import com.dianping.cache.entity.CacheConfiguration;
 import com.dianping.cache.entity.CacheKeyConfiguration;
 import com.dianping.cache.service.CacheConfigurationService;

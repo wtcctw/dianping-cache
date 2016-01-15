@@ -1,11 +1,11 @@
-package com.dianping.cache.controller.dto;
+package com.dianping.cache.controller.vo;
 
-import com.dianping.cache.entity.CacheConfiguration;
 import com.dianping.cache.scale.cluster.redis.RedisCluster;
 import com.dianping.cache.scale.cluster.redis.RedisInfo;
 import com.dianping.cache.scale.cluster.redis.RedisNode;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -17,7 +17,7 @@ public class RedisDashBoardData extends DashBoardData{
     public RedisDashBoardData(){
         super();
     }
-    public RedisDashBoardData(List<RedisCluster> clusters){
+    public RedisDashBoardData(Collection<RedisCluster> clusters){
         datas = new ArrayList<SimpleAnalysisData>();
         int dangerNum = 0;
         int totalNum = clusters.size();

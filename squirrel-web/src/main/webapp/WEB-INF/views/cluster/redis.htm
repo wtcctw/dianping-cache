@@ -54,17 +54,17 @@
                                         <i class="ace-icon fa fa-cog bigger-130"></i>
                                     </a>
 
-                                    <a class="grey" href="#">
+                                    <a class="grey" href="#" ng-click="cat(item.redisCluster)">
                                         <i class="ace-icon fa fa-bar-chart-o bigger-130"></i>
                                     </a>
 
-                                    <a class="grey" href="#">
+                                    <a class="grey" href="#app"  data-toggle="modal" ng-click="getApplications(item.clusterName)">
                                         <i class="ace-icon glyphicon glyphicon-th-large bigger-130"></i>
                                     </a>
-                                    <a class="grey" href="#">
+                                    <a class="grey" href="#password" data-toggle="modal">
                                         <i class="ace-icon fa fa-key bigger-130"></i>
                                     </a>
-                                    <a class="grey" href="#">
+                                    <a class="grey" href="#log" data-toggle="modal" ng-click="getLogs(item.clusterName)">
                                         <i class="ace-icon fa fa-file-text-o bigger-130"></i>
                                     </a>
 
@@ -83,5 +83,186 @@
         </div>
 
     </div>
+
+
+    <div class="modal fade" id="password" tabindex="-1" role="dialog"
+         aria-labelledby="myModalLabel" aria-hidden="true" style="width: 400px; margin: 0 auto;margin-top: 150px;">
+        <div class="modal-dialog" style="width: 400px; margin: 0 auto;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close"
+                            data-dismiss="modal" aria-hidden="true">
+
+                    </button>
+                    <h4 class="modal-title">
+                        Redis 密钥管理
+                    </h4>
+                </div>
+                <div class="modal-body  center">
+                    <div class="row">
+                        <br><br><br>
+                        <div class="col-sm-3">
+                         <span class="btn btn-app btn-xs">密钥</span>
+                        </div>
+                        <div class="col-sm-6">
+                            <input type="text" ng-modal="password">
+                        </div>
+                        <div class="col-sm-3">
+                        </div>
+                        <br><br>
+                    </div>
+                </div>
+                <div class="modal-footer wizard-actions">
+                    <button class="btn btn-success btn-sm pull-left"
+                            data-dismiss="modal">取消</button>
+                    <button class="btn btn-danger btn-sm pull-right"
+                            data-dismiss="modal"
+                            ng-click="changepassword()">提交</button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal -->
+    </div>
+
+    <div class="modal fade" id="app" tabindex="-1" role="dialog"
+         aria-labelledby="myModalLabel" aria-hidden="true" >
+        <div class="modal-dialog" >
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button class="close btn-xs" data-dismiss="modal"
+                            aria-hidden="true">&times;</button>
+                    <h4 class="modal-title">
+                        应用白名单
+                    </h4>
+                </div>
+                <div class="modal-body  center">
+                    <div class="row">
+                        <table id="appTable" class="table table-striped">
+                            <thead>
+                            <tr>
+                                <th style="width: 10%;"><i class="ace-icon fa fa-angle-down icon-on-right"></i></th>
+                                <th style="width: 40%; text-align: left;">应用</th>
+                                <th style="width: 30%;">负责人</th>
+                                <th style="width: 20%;#if(${isadmin})display: table-cell;#else display: none;#end;">操作
+                                    <a href="#" class="grey pull-right">
+                                        <i class="ace-icon fa fa-plus-square bigger-110"></i>
+                                    </a>
+                                </th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr ng-repeat="application in applications">
+
+                                <td >{{$index+1}}</td>
+                                <td style="text-align: left;">{{application}}</td>
+                                <td >null</td>
+                                <td style="#if(${isadmin})display: table-cell;#else display: none;#end;">
+                                    <div class="hidden-sm hidden-xs action-buttons">
+                                        <a class="grey" href="#">
+                                            <i class="ace-icon fa fa-trash-o bigger-140"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal -->
+    </div>
+
+
+    <div class="modal fade" id="log" tabindex="-1" role="dialog"
+         aria-labelledby="myModalLabel" aria-hidden="true" >
+        <div class="modal-dialog" >
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button class="close btn-xs" data-dismiss="modal"
+                            aria-hidden="true">&times;</button>
+                    <h4 class="modal-title">
+                        日志
+                    </h4>
+                </div>
+                <div class="modal-body  center">
+                    <div class="row">
+                        <table id="logTable" class="table table-striped" style="table-layout: fixed;">
+                            <thead>
+                            <tr>
+                                <th style="width: 10%;"><i class="ace-icon fa fa-angle-down icon-on-right"></i></th>
+                                <th style="width: 15%; text-align: left;">操作人</th>
+                                <th style="width: 20%;">操作内容</th>
+                                <th style="width: 35%; text-align: center">操作时间</th>
+                                <th style="width: 10%;">状态</th>
+                                <th style="width: 10%;#if(${isadmin})display: table-cell;#else display: none;#end;">操作
+                                </th>
+
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr ng-repeat="log in logs">
+
+                                <td >{{$index+1}}</td>
+                                <td style="text-align: left;">{{log.operator}}</td>
+                                <td style="overflow: hidden;text-overflow: ellipsis;">{{log.content.substring(0,log.content.indexOf("("))}}</td>
+                                <td>{{log.operateTime | date:'yyyy-MM-dd HH:mm:ss'}}</td>
+                                <td>{{log.succeed}}</td>
+                                <td style="#if(${isadmin})display: table-cell;#else display: none;#end;">
+                                    <div class="hidden-sm hidden-xs action-buttons">
+                                        <a class="grey" href="#logContent" data-toggle="modal" ng-click="setContent(log.content)">
+                                            <i class="ace-icon fa fa-search bigger-130"></i>
+                                        </a>
+                                    </div>
+                                </td>
+
+                            </tr>
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal -->
+    </div>
+
+    <div class="modal fade" id="logContent" tabindex="-1" role="dialog"
+         aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button class="close btn-xs" data-dismiss="modal"
+                            aria-hidden="true">&times;</button>
+                    <h4 class="modal-title" id="myModalLabel">操作内容</h4>
+                </div>
+                <div class="modal-body">
+                    <form method="post" class="form-horizontal" name="myForm">
+                        <textarea rows="18" class="col-sm-12" disabled>{{logContent}}</textarea>
+                        <p>&nbsp;</p>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+
+
+
+    <div class="modal fade" id="mask" tabindex="-1" role="dialog"
+         aria-labelledby="myModalLabel" aria-hidden="true" style="width: 100px; margin: 0 auto;margin-top: 250px;">
+        <div class="modal-dialog" style="width: 100px;margin: 0 auto;">
+            <div class="modal-content"  style="background-color: transparent;border: transparent;">
+
+                <div class="modal-body center">
+                    <i class="ace-icon fa fa-spinner fa-spin orange bigger-300 center"></i>
+
+                    <h4 class="red">处理中...</h4>
+                </div>
+
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal -->
+    </div>
+
 </div>
 
