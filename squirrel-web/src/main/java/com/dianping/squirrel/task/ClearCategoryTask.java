@@ -19,10 +19,10 @@ import java.util.concurrent.ExecutorService;
  */
 public class ClearCategoryTask extends AbstractTask {
 
+    private String TASKTYPE = "CLEAR_CATEGORY";
     private String category;
     private StoreClient storeClient;
 
-    private TaskDao taskDao = SpringLocator.getBean("taskDao");
 
     public ClearCategoryTask(){
     }
@@ -33,16 +33,18 @@ public class ClearCategoryTask extends AbstractTask {
     }
 
     @Override
-    public void startTask() {
-        Task task = new Task();
-        task.setCommitTime(System.currentTimeMillis());
-        task.setCommiter("nobody");
-        task.setType(TaskType.CLEAR_CATEGORY.ordinal());
-        task.setStatMax(2000);
-        task.setCommiter(RequestUtil.getUsername());
-        taskDao.insert(task);
+    String getTaskType() {
+        return TASKTYPE;
+    }
 
-        this.task = task;
+    @Override
+    int getTaskMinStat() {
+        return 0;
+    }
+
+    @Override
+    int getTaskMaxStat() {
+        return 2000;
     }
 
     @Override
@@ -73,22 +75,8 @@ public class ClearCategoryTask extends AbstractTask {
                 result = jedis.scan(result.getStringCursor(), scanParams);
             }
             stat += step;
-            Map<String, String> para = new HashMap<String, String>();
-            para.put("id", Integer.toString(this.task.getId()));
-            para.put("stat", Long.toString(stat));
-            taskDao.updateStat(para);
+            this.updateStat((int)stat);
         }
     }
 
-    @Override
-    public void endTask(){
-        Map<String, String> para = new HashMap<String, String>();
-        para.put("endTime", Long.toString(System.currentTimeMillis()));
-        para.put("id", Integer.toString(this.task.getId()));
-        taskDao.updateEndTime(para);
-    }
-    public static void main(String[] args) {
-        ClearCategoryTask task = new ClearCategoryTask("redis-del");
-        task.run();
-    }
 }
