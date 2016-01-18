@@ -1,22 +1,24 @@
 package com.dianping.cache.scale.cluster.redis;
 
+import com.dianping.cache.entity.CacheConfiguration;
+import com.dianping.cache.entity.ReshardRecord;
+import com.dianping.cache.scale.cluster.Server;
+import com.dianping.cache.service.CacheConfigurationService;
+import com.dianping.cache.util.ParseServersUtil;
+import com.dianping.cache.util.SpringLocator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import redis.clients.jedis.Jedis;
+import redis.clients.jedis.JedisPool;
+import redis.clients.jedis.Pipeline;
+import redis.clients.jedis.Response;
+import redis.clients.jedis.exceptions.JedisClusterException;
+import redis.clients.jedis.exceptions.JedisConnectionException;
+
 import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-
-import com.dianping.cache.entity.CacheConfiguration;
-import com.dianping.cache.entity.ReshardRecord;
-import com.dianping.cache.scale.cluster.Server;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import redis.clients.jedis.*;
-import redis.clients.jedis.exceptions.JedisClusterException;
-import com.dianping.cache.service.CacheConfigurationService;
-import com.dianping.cache.util.ParseServersUtil;
-import com.dianping.cache.util.SpringLocator;
-
-import redis.clients.jedis.exceptions.JedisConnectionException;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -488,7 +490,7 @@ public class RedisManager {
 				}
 				clusterCache = tempClusterCache;
 			}
-		},15,30,TimeUnit.SECONDS);
+		},3,30,TimeUnit.SECONDS);
 	}
 
 	private static boolean isMigating(RedisServer redisServer){

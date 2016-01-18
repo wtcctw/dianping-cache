@@ -1,4 +1,4 @@
-package com.dianping.cache.controller.dto;
+package com.dianping.cache.controller.vo;
 
 import com.dianping.cache.entity.CacheConfiguration;
 

@@ -62,8 +62,6 @@ public class RedisReshardTask extends AbstractTask {
                     }
                 } catch (Throwable e) {
                     logger.error("Some Error Occured In Migrating Task",e);
-                    //e.printStackTrace();
-                    //uptate resharRecord,set statuts = 400
                     reshardPlan.setStatus(400);
                     reshardService.updateReshardPlan(reshardPlan);
                     break;

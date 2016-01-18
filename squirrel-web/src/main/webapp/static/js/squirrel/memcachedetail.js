@@ -68,7 +68,7 @@ function makeGraph(divName,max,title,currentValue) {
                 name: title + ':' + currentValue,
                 data: [currentValue],
                 dataLabels: {
-                    format: '<div style="text-align:center"><span style="font-size:25px;color:' +
+                    format: '<div style="text-align:center"><span style="font-size:20px;color:' +
                     ((Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black') + '">{y}</span></div>'
                 },
                 tooltip: {
@@ -88,7 +88,7 @@ module.controller('MemcachedController', [
         $scope.mTranscoderClazz;
         $scope.configuration;
         $scope.servers;
-        $scope.scaleType="auto";
+        $scope.scaleType="manual";
         $scope.nodes = [];
         $scope.categoryList = [];
         $scope.configParas = [];
@@ -107,6 +107,17 @@ module.controller('MemcachedController', [
             $scope.mCacheKey = window.localStorage.cacheKey;
             $scope.mSwimLane = window.localStorage.swimlane;
             $scope.wrapperParams();
+
+            $http.post(window.contextPath + '/memcached/data/'+$scope.mCacheKey
+            ).success(function(response){
+                var used = response.memoryUsage;
+                var qps = response.qps;
+                makeGraph("container-memory",100,"内存使用率",used);
+                makeGraph("container-qps",140000,"QPS",qps);
+            });
+
+
+
             $http.post(window.contextPath + '/config/configuration/1',$scope.configurationParams
             ).success(function(response){
                 $scope.initValue(response);
@@ -172,8 +183,9 @@ module.controller('MemcachedController', [
                 setTimeout(function () {
                     $('#'+table).dataTable({
                         "bAutoWidth": true,
-                        "bPaginate": false, //翻页功能
+                        "bPaginate": true, //翻页功能
                         "bFilter": true, //过滤功能
+                        "bLengthChange": true,
                         "bInfo": false,//页脚信息
                         "bStateSave": false,
                         "aaSorting": [],
@@ -182,16 +194,14 @@ module.controller('MemcachedController', [
                             {"bSortable": false}, {"bSortable": false}
                         ],
                     });
+                    var obj = document.getElementById(table+"_length");
+                    obj.innerHTML = '';
+
                 }, 0);
-                var obj = document.getElementsByClassName("dataTables_length");
-                obj.innerHTML = 'AVSDVDFDF';
 
 
-                    //'<div>'+
-                    //'<label class="col-sm-3 no-padding-right">扩容</label>'+
-                    //'<div > auto</div>'+
-                    //'<div > manul</div>'+
-                    //'</div>';
+
+
             });
         };
         var initCategory = function () {
@@ -202,7 +212,7 @@ module.controller('MemcachedController', [
                         "bPaginate": true, //翻页功能
                         "bFilter": true, //过滤功能
                         "bStateSave": false,
-                        "bInfo": false,//页脚信息
+                        "bInfo": true,//页脚信息
                         "iDisplayLength": 50,
                         "aaSorting": [],
                         "aoColumns": [

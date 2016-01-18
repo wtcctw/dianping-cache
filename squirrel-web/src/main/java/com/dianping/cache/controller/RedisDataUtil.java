@@ -3,7 +3,7 @@ package com.dianping.cache.controller;
 import java.util.*;
 
 
-import com.dianping.cache.controller.dto.RedisDashBoardData;
+import com.dianping.cache.controller.vo.RedisDashBoardData;
 import com.dianping.cache.scale.cluster.redis.RedisCluster;
 import com.dianping.cache.scale.cluster.redis.RedisNode;
 import redis.clients.jedis.Jedis;

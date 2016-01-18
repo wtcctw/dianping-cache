@@ -15,21 +15,14 @@
  */
 package com.dianping.cache.dao;
 
-import java.util.Date;
-import java.util.List;
-
-import org.apache.ibatis.annotations.Param;
-
 import com.dianping.avatar.dao.GenericDao;
-import com.dianping.avatar.dao.annotation.DAOAction;
-import com.dianping.avatar.dao.annotation.DAOActionType;
-import com.dianping.avatar.dao.annotation.DAOParam;
-import com.dianping.avatar.dao.annotation.DAOParamType;
-import com.dianping.cache.entity.CacheKeyConfiguration;
 import com.dianping.cache.entity.OperationLog;
-import com.dianping.cache.service.condition.CacheKeyConfigSearchCondition;
 import com.dianping.cache.service.condition.OperationLogSearchCondition;
 import com.dianping.core.type.PageModel;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.Date;
+import java.util.List;
 
 /**
  * @author danson.liu
@@ -46,4 +39,5 @@ public interface OperationLogDao extends GenericDao {
 
 	void delete(Date before);
 
+	List<OperationLog> findByCluster(String cluster);
 }
