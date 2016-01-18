@@ -39,6 +39,6 @@ public interface OperationLogService {
 	
 	void delete(Date before);
 
-	List<OperationLog> searchByCluster(String cluster);
+	List<OperationLog> searchByContent(String content);
 
 }

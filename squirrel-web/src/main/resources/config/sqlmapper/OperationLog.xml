@@ -19,10 +19,10 @@
 		VALUES(#{operator}, NOW(), #{succeed}, #{content}, #{critical})
 	</insert>
 
-	<select id="findByCluster" parameterType="String" resultMap="OperationLogResult">
+	<select id="findByContent" parameterType="String" resultMap="OperationLogResult">
 		SELECT *
 		FROM CacheOperationLog
-		WHERE Content LIKE CONCAT('%', #{cluster}, '%')
+		WHERE Content LIKE CONCAT('%', #{content}, '%')
 		ORDER BY OperateTime DESC
 		Limit 10
 	</select>

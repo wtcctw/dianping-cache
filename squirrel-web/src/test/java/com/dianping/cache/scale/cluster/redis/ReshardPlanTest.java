@@ -6,6 +6,7 @@ import com.dianping.squirrel.dao.AuthDao;
 import com.dianping.squirrel.entity.Auth;
 import com.dianping.squirrel.service.AuthService;
 import com.dianping.squirrel.service.impl.AuthServiceImpl;
+import com.dianping.squirrel.task.ClearCategoryTask;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
@@ -29,6 +30,11 @@ public class ReshardPlanTest {
         add("192.168.211.63:7004");
     }};
 
+    @Test
+    public void testDelete() {
+        ClearCategoryTask task = new ClearCategoryTask("redis-del");
+        task.run();
+    }
 
     @Test
     public void testMakePlan() throws Exception {

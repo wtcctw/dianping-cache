@@ -15,14 +15,6 @@
  */
 package com.dianping.cache.service.impl;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.dianping.cache.dao.OperationLogDao;
 import com.dianping.cache.entity.OperationLog;
 import com.dianping.cache.service.OperationLogService;
@@ -30,6 +22,13 @@ import com.dianping.cache.service.condition.OperationLogSearchCondition;
 import com.dianping.cache.util.RequestUtil;
 import com.dianping.core.type.PageModel;
 import com.dianping.pigeon.util.ContextUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 /**
  * TODO Comment of OperationLogServiceImpl
@@ -120,8 +119,8 @@ public class OperationLogServiceImpl implements OperationLogService {
 	}
 
 	@Override
-	public List<OperationLog> searchByCluster(String cluster) {
-		return operationLogDao.findByCluster(cluster);
+	public List<OperationLog> searchByContent(String content) {
+		return operationLogDao.findByContent(content);
 	}
 
 	private boolean isLogRequired() {

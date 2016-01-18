@@ -39,5 +39,5 @@ public interface OperationLogDao extends GenericDao {
 
 	void delete(Date before);
 
-	List<OperationLog> findByCluster(String cluster);
+	List<OperationLog> findByContent(String content);
 }

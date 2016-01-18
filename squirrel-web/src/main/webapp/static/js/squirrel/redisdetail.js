@@ -253,4 +253,17 @@ module.controller('RedisController', [
             });
         };
 
+        $scope.getLogs = function(cluster){
+            $http.get(window.contextPath + '/auditlog/search/'+cluster, {params: {
+                }}
+            ).success(function (data) {
+                $scope.logs = data;
+            });
+        }
+
+        $scope.setContent = function(content){
+            $scope.logContent = content;
+        }
+
+
     } ]);

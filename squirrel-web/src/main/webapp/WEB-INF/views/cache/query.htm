@@ -44,7 +44,6 @@
 								</div>
 							</div>
 							
-							
 							<div class="space-4"></div>
 							<div class="form-group">
 								<label class="col-sm-3 control-label no-padding-right"> FinalKey </label>
@@ -60,28 +59,17 @@
 
 									<button class="btn btn-sm btn-success pull-right" type="submit"
 										ng-click="query()">查询</button>
-                                    <button class="btn btn-sm btn-success pull-right" type="submit"
-                                            ng-click="deleteCategory()">删除此category</button>
-
                                 </div>
 								<div class="col-sm-9">
 									address = {{address}} <br> result = {{result}}
 								</div>
-
 							</div>
-<!-- 							<div class="form-group">
-								<div class="col-sm-3 ">
-
-									<button class="btn btn-sm btn-success pull-right" type="submit"
-										ng-click="setKeyValue()">设值</button>
-								</div>
-								<div class="col-sm-9">
-									<input type="text" ng-model="value"> <label>状态:{{status}}</label>
-								</div>
-
-							</div> -->
-
-
+                            <div class="form-group" >
+                                <div class="col-sm-3" style="#if(${isadmin})display: table-cell;#else display: none;#end;">
+                                    <button class="btn btn-sm btn-success pull-right" type="submit"
+                                            ng-click="deleteCategory()">删除此category</button>
+                                </div>
+                            </div>
 						</form>
 
 

@@ -86,7 +86,7 @@ module.controller('CacheQueryController', [
 			};
 
             $scope.deleteCategory = function(){
-                $http.get(window.contextPath + '/cache/query/deleteCategory',{
+                $http.get(window.contextPath + '/data/delete',{
                     params : {
                         "category": $scope.category
                     }

@@ -81,10 +81,10 @@ public class AuditLogController extends AbstractSidebarController {
 
     }
 
-    @RequestMapping(value = "/auditlog/search/{cluster}")
+    @RequestMapping(value = "/auditlog/search/{content}")
     @ResponseBody
-    public List<OperationLog> getLogs(@PathVariable String cluster){
-        return operationLogService.searchByCluster(cluster);
+    public List<OperationLog> getLogs(@PathVariable String content){
+        return operationLogService.searchByContent(content);
     }
 
     private Date strToDate(String strTime) {
