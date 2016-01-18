@@ -1,34 +1,34 @@
 package com.dianping.cache.controller;
 
-import java.util.*;
-import java.util.concurrent.TimeUnit;
-
-
-import com.dianping.cache.controller.dto.RedisDashBoardData;
-import com.dianping.cache.controller.dto.RedisReshardParams;
-import com.dianping.cache.controller.dto.RedisScaleParams;
+import com.dianping.cache.controller.vo.*;
 import com.dianping.cache.entity.CacheConfiguration;
 import com.dianping.cache.entity.CacheKeyConfiguration;
-import com.dianping.cache.scale.ScaleException;
-import com.dianping.cache.scale.cluster.redis.RedisManager;
-import com.dianping.cache.scale.cluster.redis.RedisScaler;
-import com.dianping.cache.scale.cluster.redis.ReshardPlan;
-import com.dianping.cache.service.CacheConfigurationService;
-import com.dianping.cache.service.CacheKeyConfigurationService;
-import com.dianping.cache.service.ReshardService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.ModelAndView;
-
 import com.dianping.cache.entity.RedisStats;
 import com.dianping.cache.monitor.highcharts.ChartsBuilder;
 import com.dianping.cache.monitor.highcharts.HighChartsWrapper;
 import com.dianping.cache.monitor.statsdata.RedisClusterData;
 import com.dianping.cache.monitor.statsdata.RedisStatsData;
+import com.dianping.cache.scale.ScaleException;
+import com.dianping.cache.scale.cluster.redis.RedisCluster;
+import com.dianping.cache.scale.cluster.redis.RedisManager;
+import com.dianping.cache.scale.cluster.redis.RedisScaler;
+import com.dianping.cache.scale.cluster.redis.ReshardPlan;
+import com.dianping.cache.service.CacheConfigurationService;
+import com.dianping.cache.service.CacheKeyConfigurationService;
 import com.dianping.cache.service.RedisService;
-import com.dianping.squirrel.task.TaskManager;
+import com.dianping.cache.service.ReshardService;
+import com.dianping.squirrel.service.AuthService;
 import com.dianping.squirrel.task.RedisReshardTask;
+import com.dianping.squirrel.task.TaskManager;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 
 @Controller
@@ -47,6 +47,9 @@ public class RedisController extends AbstractSidebarController{
 	@Autowired
 	private CacheConfigurationService cacheConfigurationService;
 
+	@Autowired
+	private AuthService authService;
+
 	private String subside;
 
 	private String currentCluster;
@@ -55,25 +58,45 @@ public class RedisController extends AbstractSidebarController{
 	public ModelAndView viewClusterDashBoard(){
 		return new ModelAndView("monitor/redisdashboard",createViewMap());
 	}
-	
+
+	/**
+	 * @deprecated
+	 * @return
+     */
 	@RequestMapping(value = "/redis/dashboardinfo")
 	@ResponseBody
 	public List<RedisClusterData> getDashboard(){
 		return RedisDataUtil.getClusterData();
 	}
 
-	@RequestMapping(value = "/redis/dashboard/data")
+	@RequestMapping(value = "/redis/data/dashboard")
 	@ResponseBody
 	public RedisDashBoardData getRedisDashboard(){
-		return RedisDataUtil.getRedisDashBoardData();
+		return new RedisDashBoardData(RedisManager.getClusterCache().values());
 	}
-	
+	@RequestMapping(value = "/redis/data/history")
+	@ResponseBody
+	public List<HighChartsWrapper> getRedisHistory(String cluster,long endTime){
+		long start = (endTime - TimeUnit.MILLISECONDS.convert(120, TimeUnit.MINUTES))/1000;
+		long end = endTime/1000;
+		RedisCluster redisCluster = RedisManager.getRedisCluster(cluster);
+		List<RedisStats> data = redisService.findByServerWithInterval(cluster, start, end);
+		RedisStatsData statsData = new RedisStatsData(data);
+		return ChartsBuilder.buildRedisStatsCharts(statsData);
+	}
+	/**
+	 * @deprecated
+	 * @return
+	 */
 	@RequestMapping(value = "/redis/serverinfo")
 	public ModelAndView viewRedisServerInfo(){
 		subside = "dashboard";
 		return new ModelAndView("monitor/redisserverinfo",createViewMap());
 	}
-	
+	/**
+	 * @deprecated
+	 * @return
+	 */
 	@RequestMapping(value = "/redis/serverinfodata")
 	@ResponseBody
 	public Map<String, Object> getRedisServerInfo(String address){
@@ -100,6 +123,18 @@ public class RedisController extends AbstractSidebarController{
 		return new ModelAndView("cluster/edit",createViewMap());
 	}
 
+	@RequestMapping(value = "/redis/{cluster}/modifypassword")
+	public boolean password(){
+		//authService.
+		return true;
+	}
+
+	@RequestMapping(value = "/redis/{cluster}/authorize")
+	public boolean authorize(@PathVariable(value = "cluster") String cluster,@RequestParam String application) throws Exception {
+		authService.authorize(application,cluster);
+		return true;
+	}
+
 	@RequestMapping(value = "/redis/editdata")
 	@ResponseBody
 	public CacheConfiguration editRedis(@RequestParam String swimlane){
@@ -112,15 +147,25 @@ public class RedisController extends AbstractSidebarController{
 	public Map<String, Object> getRedisDetailData(){
 		List<CacheKeyConfiguration> categorys = cacheKeyConfigurationService.findByCacheType(currentCluster);
 		Map<String,Object> result = new HashMap<String, Object>();
-		result.put("data",RedisDataUtil.getRedisDetailData(currentCluster));
+		RedisCluster redisCluster =  RedisManager.getRedisCluster(currentCluster);
+		RedisDashBoardData data = new RedisDashBoardData();
+		RedisDashBoardData.SimpleAnalysisData simpleAnalysisData = data.new SimpleAnalysisData(redisCluster);
+		simpleAnalysisData.analysis();
+		result.put("data",simpleAnalysisData);
 		result.put("categorys",categorys);
 		return result;
 	}
 
-	@RequestMapping(value = "/redis/applications")
+	@RequestMapping(value = "/redis/data/applications")
 	@ResponseBody
-	public List<String> applications(){
-		return null;
+	public List<String> getApplications(String cluster) throws Exception {
+		return authService.getAuthorizedApplications(cluster);
+	}
+
+	@RequestMapping(value = "/redis/data/auth")
+	@ResponseBody
+	public void getAuth(String cluster) throws Exception {
+		// authService.getAuth(cluster);
 	}
 
 	@RequestMapping(value = "/redis/historydata")
@@ -133,6 +178,25 @@ public class RedisController extends AbstractSidebarController{
 		return ChartsBuilder.buildRedisStatsCharts(statsData);
 	}
 
+	@RequestMapping(value = "/redis/auth/setPassword")
+	@ResponseBody
+	public void setPassword(@RequestBody AuthParams authParams){
+
+	}
+
+
+	@RequestMapping(value = "/redis/auth/authorize")
+	@ResponseBody
+	public void authorize(@RequestBody AuthParams authParams) throws Exception {
+		authService.authorize(authParams.getApplication(),authParams.getResource());
+	}
+
+	@RequestMapping(value = "/redis/auth/unauthorize")
+	@ResponseBody
+	public void unauthorize(@RequestBody AuthParams authParams) throws Exception {
+		authService.unauthorize(authParams.getApplication(),authParams.getResource());
+	}
+
 	@RequestMapping(value = "/redis/reshard")
 	@ResponseBody
 	public void reshard(@RequestBody RedisReshardParams redisReshardParams) {
@@ -140,6 +204,7 @@ public class RedisController extends AbstractSidebarController{
 		ReshardPlan reshardPlan = reshardService.createReshardPlan(redisReshardParams.getCluster(), redisReshardParams.getSrcNodes(),
 				redisReshardParams.getDesNodes(), redisReshardParams.isAverage());
 		RedisReshardTask task = new RedisReshardTask(reshardPlan);
+
 		TaskManager.submit(task);
 	}
 
@@ -153,6 +218,13 @@ public class RedisController extends AbstractSidebarController{
 	@ResponseBody
 	public void addSlave(@RequestBody RedisScaleParams redisScaleParams){
 		RedisScaler.addSlave(redisScaleParams.getCluster(),redisScaleParams.getMasterAddress());
+	}
+
+	@RequestMapping(value = "/redis/new")
+	@ResponseBody
+	public boolean newCluster(@RequestBody NewClusterParams newClusterParams){
+		//RedisScaler.addSlave(redisScaleParams.getCluster(),redisScaleParams.getMasterAddress());
+		return false;
 	}
 
 

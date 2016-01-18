@@ -25,7 +25,6 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -52,9 +51,6 @@ import com.dianping.ops.cmdb.CmdbManager;
 import com.dianping.ops.cmdb.CmdbProject;
 import com.dianping.ops.cmdb.CmdbResult;
 import com.dianping.ops.cmdb.CmdbServer;
-import com.dianping.queue.SimpleQueueService;
-import com.dianping.queue.message.Message;
-import com.dianping.queue.message.TextMessage;
 import com.dianping.squirrel.client.StoreClient;
 import com.dianping.squirrel.client.core.StoreClientBuilder;
 import com.dianping.squirrel.client.impl.memcached.MemcachedClientConfig;
@@ -546,5 +542,12 @@ public class CacheConfigurationServiceImpl implements CacheConfigurationService,
 	public void migrate() {
 		migrator.migrate();
 	}
-    
+
+
+	@Override
+	public String getPassword(String cacheKey) {
+		CacheConfiguration configuration = configurationDao.find(cacheKey);
+		String servers = configuration.getServers();
+		return null;
+	}
 }

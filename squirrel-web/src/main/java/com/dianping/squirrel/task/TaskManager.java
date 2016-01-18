@@ -31,6 +31,7 @@ public class TaskManager {
     }
 
     public static void submit(AbstractTask task) {
+        task.startTask();
         Future f = executor.submit(task);
         futureMap.put(task.getTaskId(), f);
     }

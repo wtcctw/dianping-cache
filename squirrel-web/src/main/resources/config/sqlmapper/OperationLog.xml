@@ -18,6 +18,14 @@
 		INSERT INTO CacheOperationLog(Operator, OperateTime, Succeed, Content, IsCritical)
 		VALUES(#{operator}, NOW(), #{succeed}, #{content}, #{critical})
 	</insert>
+
+	<select id="findByContent" parameterType="String" resultMap="OperationLogResult">
+		SELECT *
+		FROM CacheOperationLog
+		WHERE Content LIKE CONCAT('%', #{content}, '%')
+		ORDER BY OperateTime DESC
+		Limit 10
+	</select>
 	
 	<sql id="search_fragment">
 		<trim prefix="WHERE" prefixOverrides="AND | OR">

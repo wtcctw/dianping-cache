@@ -15,12 +15,11 @@
  */
 package com.dianping.cache.service;
 
-import java.util.List;
-
-import org.springframework.transaction.annotation.Transactional;
-
 import com.dianping.avatar.exception.DuplicatedIdentityException;
 import com.dianping.cache.entity.CacheConfiguration;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 /**
  * CacheKeyConfigurationService
@@ -73,5 +72,6 @@ public interface CacheConfigurationService {
 	void pushCategoryConfig(String category, String serverOrGroup);
 	
 	void migrate();
-	
+
+	String getPassword(String cacheKey);
 }

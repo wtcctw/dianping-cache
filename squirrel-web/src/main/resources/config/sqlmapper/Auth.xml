@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.dianping.squirrel.dao.AuthDao">
+
+    <resultMap id="AuthResult" type="Auth">
+        <result column="id" property="id"/>
+        <result column="resource" property="resource"/>
+        <result column="password" property="password"/>
+        <result column="applications" property="applications"/>
+        <result column="strict" property="strict"/>
+    </resultMap>
+    
+    
+    <select id="findByResource" parameterType="String" resultType="Auth">
+        SELECT *
+        FROM auth
+        WHERE resource = #{resource}
+    </select>
+
+    <update id="update" parameterType="Auth">
+        UPDATE auth
+        SET password = #{password},applications = #{applications},strict = #{strict}
+        WHERE id = #{id} AND resource = #{resource}
+    </update>
+
+    <delete id="delete" parameterType="Auth">
+        DELETE FROM auth
+        WHERE id = #{id}
+    </delete>
+
+    <insert id="insert" parameterType="Auth">
+        INSERT INTO auth(resource,password,applications,strict)
+        VALUES (#{resource},#{password},#{applications},#{strict});
+    </insert>
+
+</mapper>

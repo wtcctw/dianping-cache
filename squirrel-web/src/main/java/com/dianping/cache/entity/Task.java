@@ -15,6 +15,8 @@ public class Task {
     long startTime;
     long endTime;
     String commiter;
+    String description;
+    String typeDescription;
 
     public String getCommiter() {
         return commiter;
@@ -24,8 +26,6 @@ public class Task {
         this.commiter = commiter;
     }
 
-    String description;
-    String typeDescription;
 
     public String getTypeDescription() {
         return TaskType.values()[type].name();

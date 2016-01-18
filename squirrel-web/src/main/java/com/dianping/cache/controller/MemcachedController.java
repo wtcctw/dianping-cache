@@ -1,6 +1,7 @@
 package com.dianping.cache.controller;
 
-import com.dianping.cache.controller.dto.MemcachedDashBoardData;
+import com.dianping.cache.controller.vo.MemcachedDashBoardData;
+import com.dianping.cache.controller.vo.NewClusterParams;
 import com.dianping.cache.entity.CacheConfiguration;
 import com.dianping.cache.entity.MemcacheStats;
 import com.dianping.cache.entity.Server;
@@ -11,6 +12,7 @@ import com.dianping.cache.service.ServerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
@@ -63,7 +65,7 @@ public class MemcachedController extends AbstractSidebarController{
     }
 
 
-    @RequestMapping(value = "/memcached/dashboard/data")
+    @RequestMapping(value = "/memcached/data/dashboard")
     @ResponseBody
     public MemcachedDashBoardData getDashboardData(){
         List<CacheConfiguration> configList = cacheConfigurationService.findAll();
@@ -71,6 +73,25 @@ public class MemcachedController extends AbstractSidebarController{
         MemcachedDashBoardData data = new MemcachedDashBoardData(configList,currentServerStats);
         return data;
     }
+
+    @RequestMapping(value = "/memcached/data/{cluster}")
+    @ResponseBody
+    public MemcachedDashBoardData.SimpleAnalysisData getDetailData(@PathVariable("cluster")String cluster){
+        final CacheConfiguration config = cacheConfigurationService.find(cluster);
+        Map<String, Map<String, Object>> currentServerStats = this.getCurrentServerStatsData();
+        MemcachedDashBoardData data = new MemcachedDashBoardData(new ArrayList<CacheConfiguration>(){
+            {add(config);}
+        },currentServerStats);
+        return data.getDatas().get(0);
+    }
+
+    @RequestMapping(value = "/memcached/new")
+    @ResponseBody
+    public boolean newCluster(@RequestBody NewClusterParams newClusterParams){
+
+        return false;
+    }
+
 
     private  Map<String,Map<String,Object>> getCurrentServerStatsData(){
         Map<String, List<MemcacheStats>> serverStats = getAllServerStats();
