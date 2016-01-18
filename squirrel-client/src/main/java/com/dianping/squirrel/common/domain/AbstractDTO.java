@@ -13,7 +13,7 @@
  * accordance with the terms of the license agreement you entered into
  * with Dianping.com.
  */
-package com.dianping.remote.cache.dto;
+package com.dianping.squirrel.common.domain;
 
 import java.io.Serializable;
 
@@ -25,8 +25,8 @@ import org.apache.commons.lang.builder.ToStringStyle;
 
 /**
  * AbstractDTO
- * @author danson.liu
  *
+ * @author danson.liu
  */
 public class AbstractDTO implements Serializable {
 
@@ -47,7 +47,7 @@ public class AbstractDTO implements Serializable {
 
     @Override
     public String toString() {
-        return ToStringBuilder.reflectionToString(this, ToStringStyle.MULTI_LINE_STYLE);
+        return ToStringBuilder.reflectionToString(this, ToStringStyle.SHORT_PREFIX_STYLE);
     }
 
     @Override

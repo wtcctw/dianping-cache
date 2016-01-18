@@ -1,22 +1,16 @@
 package com.dianping.squirrel.task;
 
-import com.dianping.cache.dao.TaskDao;
 import com.dianping.cache.entity.ReshardRecord;
-import com.dianping.cache.entity.Task;
 import com.dianping.cache.scale.cluster.redis.RedisCluster;
 import com.dianping.cache.scale.cluster.redis.RedisManager;
 import com.dianping.cache.scale.cluster.redis.RedisServer;
 import com.dianping.cache.scale.cluster.redis.ReshardPlan;
 import com.dianping.cache.service.ReshardService;
-import com.dianping.cache.util.RequestUtil;
 import com.dianping.cache.util.SpringLocator;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by dp on 16/1/6.
@@ -29,33 +23,24 @@ public class RedisReshardTask extends AbstractTask {
 
     private ReshardService reshardService;
 
-    private TaskDao taskDao;
-
     public RedisReshardTask(ReshardPlan reshardPlan) {
         this.reshardPlan = reshardPlan;
-        taskDao = SpringLocator.getBean("taskDao");
         reshardService = SpringLocator.getBean("reshardService");
     }
 
     @Override
-    protected void startTask() {
-        Task task = new Task();
-        task.setCommitTime(System.currentTimeMillis());
-        task.setCommiter("nobody");
-        task.setType(TaskType.RESHARD.ordinal());
-        task.setStatMax(2000);
-        task.setDescription("ReshardTask");
-        task.setCommiter(RequestUtil.getUsername());
-        taskDao.insert(task);
-        this.task = task;
+    String getTaskType() {
+        return "Reshard : " + reshardPlan.getCluster();
     }
 
     @Override
-    protected void endTask() {
-        Map<String, String> para = new HashMap<String, String>();
-        para.put("endTime", Long.toString(System.currentTimeMillis()));
-        para.put("id", Integer.toString(this.task.getId()));
-        taskDao.updateEndTime(para);
+    int getTaskMinStat() {
+        return 0;
+    }
+
+    @Override
+    int getTaskMaxStat() {
+        return reshardPlan.getReshardRecordList().size();
     }
 
     @Override
@@ -66,6 +51,7 @@ public class RedisReshardTask extends AbstractTask {
     private void reshard() {
         RedisCluster redisCluster = new RedisCluster(reshardPlan.getSrcNode());
         List<ReshardRecord> reshardRecordList = reshardPlan.getReshardRecordList();
+        int stat = 0;
         for (ReshardRecord reshardRecord : reshardRecordList) {
             while (!Thread.currentThread().isInterrupted() ) {
                 try {
@@ -96,6 +82,7 @@ public class RedisReshardTask extends AbstractTask {
                     break;
                 }
             }
+            updateStat(++stat);
         }
     }
 

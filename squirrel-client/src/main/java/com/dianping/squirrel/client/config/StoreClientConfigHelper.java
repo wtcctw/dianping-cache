@@ -21,7 +21,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.dianping.remote.cache.dto.CacheConfigurationDTO;
 import com.dianping.squirrel.client.impl.danga.DangaClientConfigParser;
 import com.dianping.squirrel.client.impl.danga.DangaStoreClientImpl;
 import com.dianping.squirrel.client.impl.dcache.DCacheClientConfigParser;
@@ -32,6 +31,7 @@ import com.dianping.squirrel.client.impl.memcached.MemcachedClientConfigParser;
 import com.dianping.squirrel.client.impl.memcached.MemcachedStoreClientImpl;
 import com.dianping.squirrel.client.impl.redis.RedisClientConfigParser;
 import com.dianping.squirrel.client.impl.redis.RedisStoreClientImpl;
+import com.dianping.squirrel.common.domain.CacheConfigurationDTO;
 import com.dianping.squirrel.common.exception.StoreInitializeException;
 
 /**

@@ -1,4 +1,4 @@
-package com.dianping.remote.cache.dto;
+package com.dianping.squirrel.common.domain;
 
 public class CacheConfigurationRemoveDTO extends AbstractDTO{
 	/**

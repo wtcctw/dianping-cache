@@ -18,6 +18,8 @@ package com.dianping.cache.remote;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
+
 import com.dianping.cache.entity.CacheConfiguration;
 import com.dianping.cache.entity.CacheKeyConfiguration;
 import com.dianping.cache.remote.translator.CacheConfiguration2DTOTranslator;
@@ -25,10 +27,9 @@ import com.dianping.cache.remote.translator.CacheKeyConfiguration2DTOTranslator;
 import com.dianping.cache.remote.translator.Translator;
 import com.dianping.cache.service.CacheConfigurationService;
 import com.dianping.cache.service.CacheKeyConfigurationService;
-import com.dianping.remote.cache.CacheConfigurationWebService;
-import com.dianping.remote.cache.dto.CacheConfigurationDTO;
-import com.dianping.remote.cache.dto.CacheConfigurationsDTO;
-import com.dianping.remote.cache.dto.CacheKeyConfigurationDTO;
+import com.dianping.squirrel.common.domain.CacheConfigurationDTO;
+import com.dianping.squirrel.common.domain.CacheConfigurationsDTO;
+import com.dianping.squirrel.common.domain.CacheKeyConfigurationDTO;
 
 /**
  * CacheConfiguration Web Service
@@ -68,7 +69,7 @@ public class CacheConfigurationWebServiceImpl implements CacheConfigurationWebSe
 		List<CacheConfiguration> configurations = configurationService.findAll();
 		CacheConfigurationsDTO configurationsDTO = new CacheConfigurationsDTO();
 		for (CacheConfiguration configuration : configurations) {
-			if("".equals(configuration.getSwimlane()))
+			if(StringUtils.isBlank(configuration.getSwimlane()))
 				configurationsDTO.addConfiguration(cacheTranslator.translate(configuration));
 		}
 		return configurationsDTO;

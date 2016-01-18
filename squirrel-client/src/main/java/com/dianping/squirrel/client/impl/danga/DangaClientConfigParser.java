@@ -4,11 +4,11 @@ import java.util.List;
 
 import org.apache.commons.lang.ClassUtils;
 
-import com.dianping.remote.cache.dto.CacheConfigurationDTO;
 import com.dianping.squirrel.client.config.StoreClientConfig;
 import com.dianping.squirrel.client.config.StoreClientConfigParser;
 import com.dianping.squirrel.client.config.zookeeper.CacheMessageManager;
 import com.dianping.squirrel.common.config.ConfigManagerLoader;
+import com.dianping.squirrel.common.domain.CacheConfigurationDTO;
 
 public class DangaClientConfigParser implements StoreClientConfigParser{
 

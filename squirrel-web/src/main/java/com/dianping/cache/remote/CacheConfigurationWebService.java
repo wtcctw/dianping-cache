@@ -13,13 +13,13 @@
  * accordance with the terms of the license agreement you entered into
  * with Dianping.com.
  */
-package com.dianping.remote.cache;
+package com.dianping.cache.remote;
 
 import java.util.List;
 
-import com.dianping.remote.cache.dto.CacheConfigurationDTO;
-import com.dianping.remote.cache.dto.CacheConfigurationsDTO;
-import com.dianping.remote.cache.dto.CacheKeyConfigurationDTO;
+import com.dianping.squirrel.common.domain.CacheConfigurationDTO;
+import com.dianping.squirrel.common.domain.CacheConfigurationsDTO;
+import com.dianping.squirrel.common.domain.CacheKeyConfigurationDTO;
 
 /**
  * CacheConfiguration poll interface

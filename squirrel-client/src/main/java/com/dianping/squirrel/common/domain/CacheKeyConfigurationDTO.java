@@ -13,7 +13,7 @@
  * accordance with the terms of the license agreement you entered into
  * with Dianping.com.
  */
-package com.dianping.remote.cache.dto;
+package com.dianping.squirrel.common.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 

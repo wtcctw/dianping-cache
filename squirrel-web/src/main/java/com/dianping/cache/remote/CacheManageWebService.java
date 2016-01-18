@@ -13,11 +13,9 @@
  * accordance with the terms of the license agreement you entered into
  * with dianping.com.
  */
-package com.dianping.remote.cache;
+package com.dianping.cache.remote;
 
-import com.dianping.remote.cache.dto.CacheClearDTO;
-import com.dianping.remote.cache.dto.CacheKeyConfigurationDTO;
-import com.dianping.remote.cache.dto.GenericCacheConfigurationDTO;
+import com.dianping.squirrel.common.domain.CacheClearDTO;
 
 /**
  * Cache Manage Web Service
@@ -48,14 +46,6 @@ public interface CacheManageWebService {
 	 * @param cacheClear
 	 */
 	void clearByKey(CacheClearDTO cacheClear);
-	
-	void createConfiguration(GenericCacheConfigurationDTO configuration);
-	
-	void updateConfiguration(GenericCacheConfigurationDTO configuration);
-	
-	void createCacheKeyConfig(CacheKeyConfigurationDTO config);
-	
-	void updateCacheKeyConfig(CacheKeyConfigurationDTO config);
 
     /**
      * @param category

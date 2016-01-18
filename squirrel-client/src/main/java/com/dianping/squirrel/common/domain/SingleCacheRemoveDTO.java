@@ -13,7 +13,7 @@
  * accordance with the terms of the license agreement you entered into
  * with dianping.com.
  */
-package com.dianping.remote.cache.dto;
+package com.dianping.squirrel.common.domain;
 
 
 /**
