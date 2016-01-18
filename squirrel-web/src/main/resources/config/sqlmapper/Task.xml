@@ -18,9 +18,9 @@
         <result column="commiter" property="commiter"/>
     </resultMap>
 
-    <insert id="insert" parameterType="Task">
-        INSERT INTO task(stat, statMin, statMax, type, commitTime, startTime, endTime, description)
-        VALUES(#{stat}, #{statMin}, #{statMax}, #{type}, #{commitTime}, #{startTime}, #{endTime}, #{description})
+    <insert id="insert" parameterType="Task" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO task (stat, statMin, statMax, type, commitTime, startTime, endTime, description, commiter)
+        VALUES(#{stat}, #{statMin}, #{statMax}, #{type}, #{commitTime}, #{startTime}, #{endTime}, #{description}, #{commiter})
     </insert>
 
     <select id="selectAll" resultMap="Task">

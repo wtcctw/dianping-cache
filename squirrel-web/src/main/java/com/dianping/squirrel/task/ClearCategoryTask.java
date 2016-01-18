@@ -2,6 +2,8 @@ package com.dianping.squirrel.task;
 
 import com.dianping.cache.dao.TaskDao;
 import com.dianping.cache.entity.Task;
+import com.dianping.cache.util.RequestUtil;
+import com.dianping.cache.util.SpringLocator;
 import com.dianping.squirrel.client.StoreClient;
 import com.dianping.squirrel.client.StoreClientFactory;
 import com.dianping.squirrel.client.impl.redis.RedisStoreClient;
@@ -19,8 +21,11 @@ public class ClearCategoryTask extends AbstractTask {
 
     private String category;
     private StoreClient storeClient;
-    @Resource(name = "taskDao")
-    private TaskDao taskDao;
+
+    private TaskDao taskDao = SpringLocator.getBean("taskDao");
+
+    public ClearCategoryTask(){
+    }
 
     public ClearCategoryTask(String category) {
         this.category = category;
@@ -33,8 +38,11 @@ public class ClearCategoryTask extends AbstractTask {
         task.setCommitTime(System.currentTimeMillis());
         task.setCommiter("nobody");
         task.setType(TaskType.CLEAR_CATEGORY.ordinal());
-        task.setStatMax(20000);
+        task.setStatMax(2000);
+        task.setCommiter(RequestUtil.getUsername());
         taskDao.insert(task);
+
+        this.task = task;
     }
 
     @Override
@@ -45,16 +53,23 @@ public class ClearCategoryTask extends AbstractTask {
         JedisCluster jedisCluster = ((RedisStoreClient) storeClient).getJedisClient();
         Set<HostAndPort> nodes = jedisCluster.getCluserNodesHostAndPort();
         long stat = 0;
-        int step = 2000;
+        int step = 50;
         for (HostAndPort node : nodes) {
+            System.out.println(node.getHost());
             Jedis jedis = new Jedis(node.getHost(), node.getPort());
             ScanParams scanParams = new ScanParams();
             scanParams.match(category + "*");
             scanParams.count(step);
             ScanResult<String> result;
-            result = jedis.scan("0", scanParams);
+            try {
+                result = jedis.scan("0", scanParams);
+            } catch (Throwable e) {
+                continue;
+            }
             while (!Thread.currentThread().isInterrupted() && !result.getStringCursor().equals("0")) {
-                jedis.del(result.getResult().toArray(new String[0]));
+                for(String key : result.getResult()) {
+                    jedis.del(key);
+                }
                 result = jedis.scan(result.getStringCursor(), scanParams);
             }
             stat += step;
@@ -71,5 +86,9 @@ public class ClearCategoryTask extends AbstractTask {
         para.put("endTime", Long.toString(System.currentTimeMillis()));
         para.put("id", Integer.toString(this.task.getId()));
         taskDao.updateEndTime(para);
+    }
+    public static void main(String[] args) {
+        ClearCategoryTask task = new ClearCategoryTask("redis-del");
+        task.run();
     }
 }

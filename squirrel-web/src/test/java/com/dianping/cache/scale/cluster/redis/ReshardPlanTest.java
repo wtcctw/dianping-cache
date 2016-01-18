@@ -2,6 +2,7 @@ package com.dianping.cache.scale.cluster.redis;
 
 import com.dianping.cache.entity.RedisStats;
 import com.dianping.cache.entity.ReshardRecord;
+import com.dianping.squirrel.task.ClearCategoryTask;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
@@ -31,6 +32,11 @@ public class ReshardPlanTest {
         add("192.168.211.63:7004");
     }};
 
+    @Test
+    public void testDelete() {
+        ClearCategoryTask task = new ClearCategoryTask("redis-del");
+        task.run();
+    }
 
     @Test
     public void testMakePlan() throws Exception {

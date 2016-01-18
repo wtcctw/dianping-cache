@@ -106,5 +106,5 @@
 
 
     <bean id="serviceMonitorService" class="com.dianping.cache.service.impl.ServiceMonitorServiceImpl" />
-
+    <bean id="ClearCategoryTask" class="com.dianping.squirrel.task.ClearCategoryTask" scope="prototype"/>
 </beans>
