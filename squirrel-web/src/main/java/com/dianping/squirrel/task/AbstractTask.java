@@ -7,7 +7,11 @@ import com.dianping.cache.entity.Task;
  */
 public abstract class AbstractTask<T> implements Runnable{
 
-    private Task deamonTask;
+    public int getTaskId() {
+        return this.task.getId();
+    }
+
+    protected Task task;
 
     protected void startTask() {
 

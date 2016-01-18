@@ -11,7 +11,7 @@ import com.dianping.cache.alarm.entity.AlarmRecord;
 import com.dianping.cache.alarm.entity.RedisTemplate;
 import com.dianping.cache.alarm.event.EventFactory;
 import com.dianping.cache.alarm.event.EventType;
-import com.dianping.cache.alarm.report.EventReporter;
+import com.dianping.cache.alarm.event.EventReporter;
 import com.dianping.cache.controller.RedisDataUtil;
 import com.dianping.cache.monitor.statsdata.RedisClusterData;
 import com.dianping.cache.scale.cluster.redis.RedisNode;

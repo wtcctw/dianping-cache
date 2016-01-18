@@ -1,0 +1,107 @@
+<div class="main-content" style="opacity: 1.0;"
+     ng-controller="ConfigController">
+    <div class="main-content-inner">
+        <script type="text/javascript"
+                src="${rc.contextPath}/static/js/avatar-cacheconfig.js"></script>
+
+        <!-- page-content -->
+        <div class="page-content">
+            <!--row  -->
+            <div class="row">
+                <div class="col-xs-12">
+                    <table id="taskTable" class="table table-hover progress-panel table-striped"
+                           style="table-layout: fixed;">
+                        <thead>
+                        <tr>
+                            <th>任务id</th>
+                            <th>任务类型</th>
+                            <th>任务描述</th>
+                            <th>当前状态</th>
+                            <th>发起时间</th>
+                            <th>发起人</th>
+                            <th>操作</th>
+                        </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="${rc.contextPath}/assets/js/date-time/jquery-ui-sliderAccess.js"></script>
+    <script type="application/javascript">
+        function drowPercent() {
+            $('.easy-pie-chart.percentage').each(function(){
+                var $box = $(this).closest('.infobox');
+                var barColor = $(this).data('color') || (!$box.hasClass('infobox-dark') ? $box.css('color') : 'rgba(255,255,255,0.95)');
+                var trackColor = barColor == 'rgba(255,255,255,0.95)' ? 'rgba(255,255,255,0.25)' : '#E2E2E2';
+                var size = parseInt($(this).data('size')) || 50;
+                $(this).easyPieChart({
+                    barColor: barColor,
+                    trackColor: trackColor,
+                    scaleColor: false,
+                    lineCap: 'butt',
+                    lineWidth: parseInt(size/10),
+                    animate: ace.vars['old_ie'] ? false : 1000,
+                    size: size
+                });
+            })
+        }
+        function cancelTask(id) {
+//            $.ajax({
+//                type: 'GET',
+//                url: '/qourumapi' ,
+//                success: function(data){
+//                    console.log(data);
+//                }
+//            });
+        }
+        $(document).ready(function () {
+            var quorumTable = $('#taskTable').DataTable( {
+                responsive: true,
+                "ajax": "${rc.contextPath}/task/list",
+                "columns": [
+                    { "data": "id" },
+                    { "data": "typeDescription" },
+                    { "data": "description" },
+                    { "data": "stat" },
+                    { "data": "startTime" },
+                    { "data": "commiter" }
+                ],
+                "columnDefs": [ {
+                    "targets": 3,
+                    "render": function ( data, type, full, meta ) {
+                        var data = full;
+                        var percent = Math.floor((data.stat / (data.statMax - data.statMin)) * 10000);
+                        percent = 50;
+                        if(isNaN(percent) || percent > 100)
+                            percent = 0;
+                        var percentPieChart = '<div class="infobox infobox-green infobox-small infobox-dark"><div class="infobox-progress"> <div class="easy-pie-chart percentage" data-percent="' +
+                                percent +
+                                '" data-size="39" style="height: 39px; width: 39px; line-height: 38px;"> <span class="percent"></span>' +
+                                percent +
+                                '% <canvas height="39" width="39"></canvas></div> </div> <div class="infobox-data"> <div class="infobox-content">Task</div> <div class="infobox-content">Completion</div> </div> </div>'
+                        return percentPieChart;
+                    }
+                }
+                    ,
+                {
+                    "targets": 6,
+                    "render": function ( data, type, full, meta ) {
+                        var data = full;
+                        var percent = Math.floor((data.stat / (data.statMax - data.statMin)) * 10000);
+                        if(isNaN(percent) || percent > 100)
+                            percent = 0;
+                        var id = data.id;
+//                        if(percent >= 0 && percent <= 100)
+                        return "<button class=\"btn btn-sm btn-primary\" onclick='cancelTask(" +
+                                    id + ")'>Cancel</button>";
+                    }
+                }
+                ],
+                "drawCallback" : function(setting) {
+                    drowPercent();
+                }
+            });
+        });
+    </script>
+

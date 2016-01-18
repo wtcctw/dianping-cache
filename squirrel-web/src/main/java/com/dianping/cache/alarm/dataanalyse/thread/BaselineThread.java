@@ -1,5 +1,7 @@
-package com.dianping.cache.alarm.dataanalyse;
+package com.dianping.cache.alarm.dataanalyse.thread;
 
+import com.dianping.cache.alarm.dataanalyse.task.BaselineComputeTask;
+import com.dianping.cache.alarm.dataanalyse.task.BaselineComputeTaskFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;

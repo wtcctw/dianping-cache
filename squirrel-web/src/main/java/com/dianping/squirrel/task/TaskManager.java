@@ -1,9 +1,8 @@
 package com.dianping.squirrel.task;
 
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -16,6 +15,7 @@ public class TaskManager {
     private static int MAX_POOL_SIZE = 20;
     private static int CORE_POOL_SIZE = 4;
     private static int KEEP_ALIVE_TIME = 20;
+    private static Map<Integer, Future> futureMap = new HashMap<Integer, Future>();
 
     static {
         executor = new ThreadPoolExecutor(CORE_POOL_SIZE, MAX_POOL_SIZE, KEEP_ALIVE_TIME
@@ -31,7 +31,14 @@ public class TaskManager {
     }
 
     public static void submit(AbstractTask task) {
-        executor.submit(task);
+        Future f = executor.submit(task);
+        futureMap.put(task.getTaskId(), f);
+    }
+
+    public static void cancelTask(int id) {
+        Future f = futureMap.get(id);
+        f.cancel(true);
+        futureMap.remove(id);
     }
 
 }

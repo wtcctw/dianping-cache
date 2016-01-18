@@ -11,7 +11,7 @@ import com.dianping.cache.alarm.entity.AlarmRecord;
 import com.dianping.cache.alarm.entity.MemcacheTemplate;
 import com.dianping.cache.alarm.event.EventFactory;
 import com.dianping.cache.alarm.event.EventType;
-import com.dianping.cache.alarm.report.EventReporter;
+import com.dianping.cache.alarm.event.EventReporter;
 import com.dianping.cache.entity.CacheConfiguration;
 import com.dianping.cache.monitor.MemcachedClientFactory;
 import com.dianping.cache.service.CacheConfigurationService;
@@ -512,14 +512,14 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
     }
 
 
-    private boolean fluctTooMuch(double v1, double v2) {
+    private boolean fluctTooMuch(double cur, double base) {
         boolean result = false;
 
-        if(0 == v2){
+        if(0 == base){
             return result;
         }
 
-        if (Math.abs((v1 - v2)) / v2 > 0.01) {
+        if (Math.abs((cur - base)) / base > 0.5) {
             result = true;
         }
 

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.dianping.cache.dao.CategoryStatsDao">
+
+    <resultMap id="CategoryStatResult" type="CategoryStats">
+        <result column="id" property="id"/>
+        <result column="category" property="category"/>
+        <result column="keyCount" property="keyCount"/>
+        <result column="keySize" property="keySize"/>
+        <result column="valueSize" property="valueSize"/>
+        <result column="updateTime" property="updateTime"/>
+        <result column="hostAndPort" property="hostAndPort"/>
+    </resultMap>
+
+    <select id="selectAll" resultMap="CategoryStatResult">
+    SELECT * FROM category_stats;
+    </select>
+
+</mapper>
