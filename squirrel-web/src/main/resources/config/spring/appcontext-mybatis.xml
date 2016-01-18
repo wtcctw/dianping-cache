@@ -124,7 +124,7 @@
 	</bean>
 
     <bean id="taskDao" class="org.mybatis.spring.mapper.MapperFactoryBean">
-        <property name="mapperInterface" value="com.dianping.cache.dao.TaskDao"/>
+        <property name="mapperInterface" value="com.dianping.squirrel.dao.TaskDao"/>
         <property name="sqlSessionFactory" ref="sqlSessionFactory"/>
     </bean>
 

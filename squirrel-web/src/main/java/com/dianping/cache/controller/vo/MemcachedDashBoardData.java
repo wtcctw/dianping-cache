@@ -93,7 +93,7 @@ public class MemcachedDashBoardData  extends DashBoardData {
                 memoryUsage = (float) memUsed / maxMemory;
                 maxMemory /= 1024;
             }else{
-                qps = -1;
+                qps = 0;
                 maxMemory = 0;
                 memUsed = 0;
                 memoryUsage = 0;
