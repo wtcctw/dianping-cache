@@ -1,9 +1,9 @@
 package com.dianping.squirrel.task;
 
-import com.dianping.cache.dao.TaskDao;
-import com.dianping.cache.entity.Task;
 import com.dianping.cache.util.RequestUtil;
 import com.dianping.cache.util.SpringLocator;
+import com.dianping.squirrel.dao.TaskDao;
+import com.dianping.squirrel.entity.Task;
 
 import java.util.HashMap;
 import java.util.Map;
