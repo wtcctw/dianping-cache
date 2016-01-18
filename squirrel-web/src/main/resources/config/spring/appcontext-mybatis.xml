@@ -7,86 +7,86 @@
             ">
             
 	<!-- The DataSource configuration for Monthly star System -->
-	<bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource" destroy-method="close"> 
+	<bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource" destroy-method="close">
 		<property name="jdbcUrl" value="${avatar-cache.jdbc.url}" />
-		<property name="user" value="${avatar-cache.jdbc.username}" /> 
-		<property name="password" value="${avatar-cache.jdbc.password}" /> 
-		<property name="driverClass" value="${avatar-cache.jdbc.driverClassName}" /> 
-		<property name="minPoolSize" value="${avatar-cache.c3p0.minSize}" /> 
-		<property name="maxPoolSize" value="${avatar-cache.c3p0.maxSize}" /> 
-		<property name="initialPoolSize" value="${avatar-cache.c3p0.initialSize}" /> 
-		<property name="idleConnectionTestPeriod" value="40" /> 
-		<property name="maxIdleTime" value="300" /> 
-		<property name="acquireRetryAttempts" value="10" /> 
-		<property name="acquireRetryDelay" value="500" /> 
-		<property name="checkoutTimeout" value="3000"/> 
-		<property name="maxStatements" value="0"/> 
+		<property name="user" value="${avatar-cache.jdbc.username}" />
+		<property name="password" value="${avatar-cache.jdbc.password}" />
+		<property name="driverClass" value="${avatar-cache.jdbc.driverClassName}" />
+		<property name="minPoolSize" value="${avatar-cache.c3p0.minSize}" />
+		<property name="maxPoolSize" value="${avatar-cache.c3p0.maxSize}" />
+		<property name="initialPoolSize" value="${avatar-cache.c3p0.initialSize}" />
+		<property name="idleConnectionTestPeriod" value="40" />
+		<property name="maxIdleTime" value="300" />
+		<property name="acquireRetryAttempts" value="10" />
+		<property name="acquireRetryDelay" value="500" />
+		<property name="checkoutTimeout" value="3000"/>
+		<property name="maxStatements" value="0"/>
 	</bean>
-		
+
 	<bean id = "sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
         <property name="dataSource" ref="dataSource"></property>
         <property name="mapperLocations" value="classpath*:config/sqlmapper/*.xml"/> <!-- 映射器xml文件位置-->
         <property name="typeAliasesPackage" value="com.dianping.cache.entity,com.dianping.squirrel.entity,com.dianping.cache.service.condition,com.dianping.cache.alarm.entity"/>  <!-- 自动为entity添加别名-->
 	</bean>
-	
-	<!-- 
-    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">自动发现 映射器 
+
+	<!--
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">自动发现 映射器
         <property name="basePackage" value="com.dp.mybatis.dao"/>
     </bean> -->
-    
-    <bean id="userDao" class="org.mybatis.spring.mapper.MapperFactoryBean">   
- 		<property name="mapperInterface" value="com.dianping.cache.dao.UserDao" />   
-		<property name="sqlSessionFactory" ref="sqlSessionFactory" /> 
+
+    <bean id="userDao" class="org.mybatis.spring.mapper.MapperFactoryBean">
+ 		<property name="mapperInterface" value="com.dianping.cache.dao.UserDao" />
+		<property name="sqlSessionFactory" ref="sqlSessionFactory" />
 	</bean>
-    
-     <bean id="operationLogDao" class="org.mybatis.spring.mapper.MapperFactoryBean">   
- 		<property name="mapperInterface" value="com.dianping.cache.dao.OperationLogDao" />   
-		<property name="sqlSessionFactory" ref="sqlSessionFactory" /> 
+
+     <bean id="operationLogDao" class="org.mybatis.spring.mapper.MapperFactoryBean">
+ 		<property name="mapperInterface" value="com.dianping.cache.dao.OperationLogDao" />
+		<property name="sqlSessionFactory" ref="sqlSessionFactory" />
 	</bean>
-	    
-     <bean id="cacheKeyConfigurationDao" class="org.mybatis.spring.mapper.MapperFactoryBean">   
- 		<property name="mapperInterface" value="com.dianping.cache.dao.CacheKeyConfigurationDao" />   
-		<property name="sqlSessionFactory" ref="sqlSessionFactory" /> 
+
+     <bean id="cacheKeyConfigurationDao" class="org.mybatis.spring.mapper.MapperFactoryBean">
+ 		<property name="mapperInterface" value="com.dianping.cache.dao.CacheKeyConfigurationDao" />
+		<property name="sqlSessionFactory" ref="sqlSessionFactory" />
 	</bean>
-	
-	 <bean id="cacheConfigurationDao" class="org.mybatis.spring.mapper.MapperFactoryBean">   
- 		<property name="mapperInterface" value="com.dianping.cache.dao.CacheConfigurationDao" />   
-		<property name="sqlSessionFactory" ref="sqlSessionFactory" /> 
+
+	 <bean id="cacheConfigurationDao" class="org.mybatis.spring.mapper.MapperFactoryBean">
+ 		<property name="mapperInterface" value="com.dianping.cache.dao.CacheConfigurationDao" />
+		<property name="sqlSessionFactory" ref="sqlSessionFactory" />
 	</bean>
-	 <bean id="serverGroupDao" class="org.mybatis.spring.mapper.MapperFactoryBean">   
- 		<property name="mapperInterface" value="com.dianping.cache.dao.ServerGroupDao" />   
-		<property name="sqlSessionFactory" ref="sqlSessionFactory" /> 
+	 <bean id="serverGroupDao" class="org.mybatis.spring.mapper.MapperFactoryBean">
+ 		<property name="mapperInterface" value="com.dianping.cache.dao.ServerGroupDao" />
+		<property name="sqlSessionFactory" ref="sqlSessionFactory" />
 	</bean>
 	<bean id="memcacheStatsDao" class="org.mybatis.spring.mapper.MapperFactoryBean">
-		<property name="mapperInterface" value="com.dianping.cache.dao.MemcacheStatsDao" />   
-		<property name="sqlSessionFactory" ref="sqlSessionFactory" /> 
+		<property name="mapperInterface" value="com.dianping.cache.dao.MemcacheStatsDao" />
+		<property name="sqlSessionFactory" ref="sqlSessionFactory" />
 	</bean>
 	<bean id="serverDao" class="org.mybatis.spring.mapper.MapperFactoryBean">
-		<property name="mapperInterface" value="com.dianping.cache.dao.ServerDao" />   
-		<property name="sqlSessionFactory" ref="sqlSessionFactory" /> 
+		<property name="mapperInterface" value="com.dianping.cache.dao.ServerDao" />
+		<property name="sqlSessionFactory" ref="sqlSessionFactory" />
 	</bean>
 	<bean id="serverClusterDao" class="org.mybatis.spring.mapper.MapperFactoryBean">
-		<property name="mapperInterface" value="com.dianping.cache.dao.ServerClusterDao" />   
-		<property name="sqlSessionFactory" ref="sqlSessionFactory" /> 
+		<property name="mapperInterface" value="com.dianping.cache.dao.ServerClusterDao" />
+		<property name="sqlSessionFactory" ref="sqlSessionFactory" />
 	</bean>
 	<bean id="serverStatsDao" class="org.mybatis.spring.mapper.MapperFactoryBean">
-		<property name="mapperInterface" value="com.dianping.cache.dao.ServerStatsDao" />   
-		<property name="sqlSessionFactory" ref="sqlSessionFactory" /> 
+		<property name="mapperInterface" value="com.dianping.cache.dao.ServerStatsDao" />
+		<property name="sqlSessionFactory" ref="sqlSessionFactory" />
 	</bean>
 	<bean id="categoryToAppDao" class="org.mybatis.spring.mapper.MapperFactoryBean">
-		<property name="mapperInterface" value="com.dianping.cache.dao.CategoryToAppDao" />   
-		<property name="sqlSessionFactory" ref="sqlSessionFactory" /> 
+		<property name="mapperInterface" value="com.dianping.cache.dao.CategoryToAppDao" />
+		<property name="sqlSessionFactory" ref="sqlSessionFactory" />
 	</bean>
 	<bean id="redisStatsDao" class="org.mybatis.spring.mapper.MapperFactoryBean">
-		<property name="mapperInterface" value="com.dianping.cache.dao.RedisStatsDao" />   
-		<property name="sqlSessionFactory" ref="sqlSessionFactory" /> 
+		<property name="mapperInterface" value="com.dianping.cache.dao.RedisStatsDao" />
+		<property name="sqlSessionFactory" ref="sqlSessionFactory" />
 	</bean>
 
 	<bean id="alarmRecordsDao" class="org.mybatis.spring.mapper.MapperFactoryBean">
 		<property name="mapperInterface" value="com.dianping.cache.alarm.dao.AlarmRecordDao"/>
 		<property name="sqlSessionFactory" ref="sqlSessionFactory"/>
 	</bean>
-    
+
 	<bean id="alarmConfigDao" class="org.mybatis.spring.mapper.MapperFactoryBean">
 		<property name="mapperInterface" value="com.dianping.cache.alarm.dao.AlarmConfigDao"/>
 		<property name="sqlSessionFactory" ref="sqlSessionFactory"/>
@@ -124,7 +124,7 @@
 	</bean>
 
     <bean id="taskDao" class="org.mybatis.spring.mapper.MapperFactoryBean">
-        <property name="mapperInterface" value="com.dianping.squirrel.dao.TaskDao"/>
+        <property name="mapperInterface" value="com.dianping.cache.dao.TaskDao"/>
         <property name="sqlSessionFactory" ref="sqlSessionFactory"/>
     </bean>
 
