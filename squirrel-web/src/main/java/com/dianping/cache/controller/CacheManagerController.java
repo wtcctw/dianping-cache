@@ -1,33 +1,12 @@
 package com.dianping.cache.controller;
 
-import java.net.InetAddress;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.TimeUnit;
-
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletResponse;
-
-import com.dianping.cache.controller.dto.CategoryParams;
-import com.dianping.cache.controller.dto.ConfigurationParams;
-import com.dianping.cache.dao.TaskDao;
-import jodd.util.StringUtil;
-import net.spy.memcached.AddrUtil;
-import net.spy.memcached.MemcachedClient;
-import net.spy.memcached.internal.OperationFuture;
-
-import org.codehaus.plexus.util.StringUtils;
-import org.springframework.dao.DuplicateKeyException;
-import org.springframework.http.MediaType;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.ModelAndView;
-
 import com.dianping.avatar.exception.DuplicatedIdentityException;
-import com.dianping.cache.entity.*;
+import com.dianping.cache.controller.vo.CategoryParams;
+import com.dianping.cache.controller.vo.ConfigurationParams;
+import com.dianping.cache.entity.CacheConfiguration;
+import com.dianping.cache.entity.CacheKeyConfiguration;
+import com.dianping.cache.entity.CategoryToApp;
+import com.dianping.cache.entity.Server;
 import com.dianping.cache.monitor.storage.MemcacheStatsDataStorage;
 import com.dianping.cache.monitor.storage.ServerStatsDataStorage;
 import com.dianping.cache.service.*;
@@ -38,8 +17,25 @@ import com.dianping.squirrel.client.StoreClient;
 import com.dianping.squirrel.client.StoreClientFactory;
 import com.dianping.squirrel.client.StoreKey;
 import com.dianping.squirrel.common.lifecycle.Locatable;
-import com.dianping.squirrel.task.TaskManager;
+import com.dianping.squirrel.dao.TaskDao;
 import com.dianping.squirrel.task.ClearCategoryTask;
+import com.dianping.squirrel.task.TaskManager;
+import jodd.util.StringUtil;
+import net.spy.memcached.AddrUtil;
+import net.spy.memcached.MemcachedClient;
+import net.spy.memcached.internal.OperationFuture;
+import org.codehaus.plexus.util.StringUtils;
+import org.springframework.dao.DuplicateKeyException;
+import org.springframework.http.MediaType;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletResponse;
+import java.net.InetAddress;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 @Controller
 public class CacheManagerController extends AbstractSidebarController {
@@ -129,26 +125,22 @@ public class CacheManagerController extends AbstractSidebarController {
         return paras;
     }
 
-    @RequestMapping(value = "/cache/config/update", method = RequestMethod.POST)
-    public void configUpdate(@RequestParam("key") String cacheKey,
-                             @RequestParam("clientClazz") String clientClazz,
-                             @RequestParam("servers") String servers,
-                             @RequestParam("swimlane") String swimlane,
-                             @RequestParam("transcoderClazz") String transcoderClazz) {
+    @RequestMapping(value = "/cache/config/update")
+    @ResponseBody
+    public void configUpdate(@RequestBody ConfigurationParams configuration){
         CacheConfiguration newConfig = new CacheConfiguration();
-
-        newConfig.setCacheKey(cacheKey);
-        newConfig.setClientClazz(clientClazz);
-        newConfig.setServers(servers);
-        newConfig.setTranscoderClazz(transcoderClazz);
-        newConfig.setSwimlane(swimlane);
+        newConfig.setCacheKey(configuration.getCacheKey());
+        newConfig.setClientClazz(configuration.getClientClazz());
+        newConfig.setServers(configuration.getServers());
+        newConfig.setTranscoderClazz(configuration.getTranscoderClazz());
+        newConfig.setSwimlane(configuration.getSwimlane());
         cacheConfigurationService.update(newConfig);
 
     }
 
     @RequestMapping(value = "/cache/config/updateServers")
     @ResponseBody
-    public Object configUpdateServers(@RequestParam("key") String cacheKey,
+    public Map<String, Object> configUpdateServers(@RequestParam("key") String cacheKey,
                                       @RequestParam("newservers") String newservers,
                                       @RequestParam("oldservers") String oldservers,
                                       HttpServletResponse response) {

@@ -7,7 +7,6 @@ import com.dianping.cache.scale.cluster.redis.RedisServer;
 import com.dianping.cache.scale.cluster.redis.ReshardPlan;
 import com.dianping.cache.service.ReshardService;
 import com.dianping.cache.util.SpringLocator;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,6 +29,21 @@ public class RedisReshardTask extends AbstractTask {
     }
 
     @Override
+    String getTaskType() {
+        return "Reshard : " + reshardPlan.getCluster();
+    }
+
+    @Override
+    int getTaskMinStat() {
+        return 0;
+    }
+
+    @Override
+    int getTaskMaxStat() {
+        return reshardPlan.getReshardRecordList().size();
+    }
+
+    @Override
     public void taskRun() {
         reshard();
     }
@@ -37,8 +51,9 @@ public class RedisReshardTask extends AbstractTask {
     private void reshard() {
         RedisCluster redisCluster = new RedisCluster(reshardPlan.getSrcNode());
         List<ReshardRecord> reshardRecordList = reshardPlan.getReshardRecordList();
+        int stat = 0;
         for (ReshardRecord reshardRecord : reshardRecordList) {
-            while (true) {
+            while (!Thread.currentThread().isInterrupted() ) {
                 try {
                     redisCluster.loadClusterInfo();
                     RedisServer src = redisCluster.getServer(reshardRecord.getSrcNode());
@@ -62,13 +77,12 @@ public class RedisReshardTask extends AbstractTask {
                     }
                 } catch (Throwable e) {
                     logger.error("Some Error Occured In Migrating Task",e);
-                    //e.printStackTrace();
-                    //uptate resharRecord,set statuts = 400
                     reshardPlan.setStatus(400);
                     reshardService.updateReshardPlan(reshardPlan);
                     break;
                 }
             }
+            updateStat(++stat);
         }
     }
 

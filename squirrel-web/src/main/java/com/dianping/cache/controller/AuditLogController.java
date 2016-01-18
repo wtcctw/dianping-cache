@@ -1,11 +1,13 @@
 package com.dianping.cache.controller;
 
+import com.dianping.cache.entity.OperationLog;
 import com.dianping.cache.service.OperationLogService;
 import com.dianping.cache.service.condition.OperationLogSearchCondition;
 import com.dianping.core.type.PageModel;
 import org.codehaus.plexus.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -79,6 +81,11 @@ public class AuditLogController extends AbstractSidebarController {
 
     }
 
+    @RequestMapping(value = "/auditlog/search/{content}")
+    @ResponseBody
+    public List<OperationLog> getLogs(@PathVariable String content){
+        return operationLogService.searchByContent(content);
+    }
 
     private Date strToDate(String strTime) {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");

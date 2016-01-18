@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.dianping.cache.dao.TaskDao">
+
+    <resultMap id="Task" type="com.dianping.cache.entity.Task">
+        <result column="id" property="id"/>
+        <result column="stat" property="stat"/>
+        <result column="statMin" property="statMin"/>
+        <result column="statMax" property="statMax"/>
+        <result column="type" property="type"/>
+        <result column="commitTime" property="commitTime"/>
+        <result column="startTime" property="startTime"/>
+        <result column="endTime" property="endTime"/>
+        <result column="description" property="description"/>
+        <result column="commiter" property="commiter"/>
+    </resultMap>
+
+    <insert id="insert" parameterType="Task" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO task (stat, statMin, statMax, type, commitTime, startTime, endTime, description, commiter)
+        VALUES(#{stat}, #{statMin}, #{statMax}, #{type}, #{commitTime}, #{startTime}, #{endTime}, #{description}, #{commiter})
+    </insert>
+
+    <select id="selectAll" resultMap="Task">
+        SELECT * from task
+    </select>
+
+
+    <select id="getTask" resultMap="Task" parameterType="int">
+        SELECT * from task WHERE id = #{id}
+    </select>
+
+    <!--<update id="update" parameterType="Server">-->
+        <!--UPDATE servers-->
+        <!--SET type = #{type},address = #{address},appId=#{appId},instanceId=#{instanceId},hostIp=#{hostIp}-->
+        <!--WHERE #{id} = id-->
+    <!--</update>-->
+
+    <update id="updateStat" parameterType="Map">
+        UPDATE task SET stat = #{stat} WHERE id = #{id}
+    </update>
+
+    <update id="updateStartTime" parameterType="Map">
+        UPDATE task SET startTime = #{startTime} WHERE id = #{id}
+    </update>
+
+    <update id="updateEndTime" parameterType="Map">
+        UPDATE task SET endTime = #{endTime} WHERE id = #{id}
+    </update>
+
+
+</mapper>

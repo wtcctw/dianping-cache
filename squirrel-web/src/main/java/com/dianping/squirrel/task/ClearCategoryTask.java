@@ -1,11 +1,17 @@
 package com.dianping.squirrel.task;
 
+import com.dianping.cache.util.RequestUtil;
+import com.dianping.cache.util.SpringLocator;
 import com.dianping.squirrel.client.StoreClient;
 import com.dianping.squirrel.client.StoreClientFactory;
 import com.dianping.squirrel.client.impl.redis.RedisStoreClient;
+import com.dianping.squirrel.dao.TaskDao;
+import com.dianping.squirrel.entity.Task;
 
 import redis.clients.jedis.*;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -13,25 +19,33 @@ import java.util.Set;
  */
 public class ClearCategoryTask extends AbstractTask {
 
+    private String TASKTYPE = "CLEAR_CATEGORY";
     private String category;
     private StoreClient storeClient;
 
 
-    public ClearCategoryTask(String category) {
+    public ClearCategoryTask(){
+    }
 
-//        CacheKeyConfiguration key = cacheKeyConfigurationService.find(finalKey.substring(0, finalKey.indexOf(".")));
-//        Map<String, Object> paras = super.createViewMap();
-//        Object o = storeClient.get(finalKey);
-//        paras.put("result", o);
-//        StoreClient cc = StoreClientFactory.getStoreClient(key.getCacheType());
-//        if(cc instanceof Locatable){
-//            String location = ((Locatable)cc).locate(finalKey);
-//            paras.put("address", location);
-//        }
+    public ClearCategoryTask(String category) {
         this.category = category;
         this.storeClient = StoreClientFactory.getStoreClientByCategory(category);
     }
 
+    @Override
+    String getTaskType() {
+        return TASKTYPE;
+    }
+
+    @Override
+    int getTaskMinStat() {
+        return 0;
+    }
+
+    @Override
+    int getTaskMaxStat() {
+        return 2000;
+    }
 
     @Override
     public void taskRun() {
@@ -40,18 +54,29 @@ public class ClearCategoryTask extends AbstractTask {
         }
         JedisCluster jedisCluster = ((RedisStoreClient) storeClient).getJedisClient();
         Set<HostAndPort> nodes = jedisCluster.getCluserNodesHostAndPort();
+        long stat = 0;
+        int step = 50;
         for (HostAndPort node : nodes) {
+            System.out.println(node.getHost());
             Jedis jedis = new Jedis(node.getHost(), node.getPort());
             ScanParams scanParams = new ScanParams();
             scanParams.match(category + "*");
-            scanParams.count(50);
+            scanParams.count(step);
             ScanResult<String> result;
-            result = jedis.scan("0", scanParams);
-            while (!result.getStringCursor().equals("0")) {
-                System.out.println(result.getStringCursor());
-                jedis.del(result.getResult().toArray(new String[0]));
+            try {
+                result = jedis.scan("0", scanParams);
+            } catch (Throwable e) {
+                continue;
+            }
+            while (!Thread.currentThread().isInterrupted() && !result.getStringCursor().equals("0")) {
+                for(String key : result.getResult()) {
+                    jedis.del(key);
+                }
                 result = jedis.scan(result.getStringCursor(), scanParams);
             }
+            stat += step;
+            this.updateStat((int)stat);
         }
     }
+
 }

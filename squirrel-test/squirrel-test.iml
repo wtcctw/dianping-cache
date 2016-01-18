@@ -64,11 +64,11 @@
     <orderEntry type="library" name="Maven: org.apache.commons:commons-pool2:2.3" level="project" />
     <orderEntry type="library" name="Maven: com.danga:memcached:2.5.1-SNAPSHOT" level="project" />
     <orderEntry type="library" name="Maven: net.sf.ehcache:ehcache-core:2.5.2" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Maven: com.dianping.lion:lion-client:0.5.4" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: com.dianping.lion:lion-client:0.5.7" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.apache.curator:curator-recipes:2.7.1" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.jodd:jodd-bean:3.4.9" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.jodd:jodd-core:3.4.9" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Maven: com.dianping.cat:cat-client:1.3.4" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: com.dianping.cat:cat-client:1.3.8" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: io.netty:netty-all:4.0.24.Final" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: com.dianping.cat:cat-core:1.3.8" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.unidal.framework:web-framework:2.2.1" level="project" />

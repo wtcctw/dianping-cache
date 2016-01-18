@@ -1,8 +1,12 @@
 module.controller('MemcachedDashBoardController', [ '$scope', '$http','$document',
     '$timeout', function($scope, $http) {
         $scope.data = [];
+        $scope.clusterEntity = {
+            clusterName:"memcached-",
+            appId:"memcached30"
+        };
         $scope.initDashBoard = function () {
-            $http.get(window.contextPath + '/memcached/dashboard/data', {
+            $http.get(window.contextPath + '/memcached/data/dashboard', {
                 params: {},
             }).success(function (response) {
                 response.datas.forEach(function (item) {
@@ -23,6 +27,24 @@ module.controller('MemcachedDashBoardController', [ '$scope', '$http','$document
             window.localStorage.cacheKey = cachekey;
         }
 
+        $scope.getLogs = function(cluster){
+            $http.get(window.contextPath + '/auditlog/search/'+cluster, {params: {
+                }}
+            ).success(function (data) {
+                $scope.logs = data;
+            });
+        }
+
+        $scope.setContent = function(content){
+            $scope.logContent = content;
+        }
+
+        $scope.newCluster = function(){
+            $http.post('/memcached/new',$scope.clusterEntity)
+                .success(function(data){
+
+                });
+        }
 
         $scope.initDashBoard();
         var init = function (num1,num2,width1,width2) {

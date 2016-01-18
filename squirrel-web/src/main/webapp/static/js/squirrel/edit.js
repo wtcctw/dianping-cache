@@ -357,13 +357,11 @@ module.controller('EditController', [
 			$scope.updateConfig = function(){
 				
 				 $scope.submiticon = true;
-				 $http.post(window.contextPath + '/cache/config/update',
-			        		{"key":$scope.mCacheKey,"clientClazz":$scope.mClientClazz,
-			        		"servers":$scope.mServers,"transcoderClazz":$scope.mTranscoderClazz,
-								"swimlane":$scope.mSwimLane
-			        		}).success(function(response){
+				 $scope.wrapperParams();
+				 $http.post(window.contextPath + '/cache/config/update',$scope.configurationParams)
+						 .success(function(response){
 
-			        		});
+						 });
 
 				$timeout(function() {
 					$scope.submiticon = false;

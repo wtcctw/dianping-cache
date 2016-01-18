@@ -26,7 +26,7 @@
 	<bean id = "sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
         <property name="dataSource" ref="dataSource"></property>
         <property name="mapperLocations" value="classpath*:config/sqlmapper/*.xml"/> <!-- 映射器xml文件位置-->
-        <property name="typeAliasesPackage" value="com.dianping.cache.entity,com.dianping.cache.service.condition,com.dianping.cache.alarm.entity"/>  <!-- 自动为entity添加别名-->
+        <property name="typeAliasesPackage" value="com.dianping.cache.entity,com.dianping.squirrel.entity,com.dianping.cache.service.condition,com.dianping.cache.alarm.entity"/>  <!-- 自动为entity添加别名-->
 	</bean>
 	
 	<!-- 
@@ -127,5 +127,15 @@
         <property name="mapperInterface" value="com.dianping.cache.dao.TaskDao"/>
         <property name="sqlSessionFactory" ref="sqlSessionFactory"/>
     </bean>
+
+    <bean id="categoryStatsDao" class="org.mybatis.spring.mapper.MapperFactoryBean">
+        <property name="mapperInterface" value="com.dianping.cache.dao.CategoryStatsDao"/>
+        <property name="sqlSessionFactory" ref="sqlSessionFactory"/>
+    </bean>
+
+	<bean id="authDao" class="org.mybatis.spring.mapper.MapperFactoryBean">
+		<property name="mapperInterface" value="com.dianping.squirrel.dao.AuthDao"/>
+		<property name="sqlSessionFactory" ref="sqlSessionFactory"/>
+	</bean>
 
 </beans>

@@ -15,13 +15,14 @@
  */
 package com.dianping.cache.service;
 
-import java.util.Date;
-import java.util.Map;
-
-import org.springframework.transaction.annotation.Transactional;
-
+import com.dianping.cache.entity.OperationLog;
 import com.dianping.cache.service.condition.OperationLogSearchCondition;
 import com.dianping.core.type.PageModel;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author danson.liu
@@ -37,5 +38,7 @@ public interface OperationLogService {
 	PageModel paginate(PageModel paginater, OperationLogSearchCondition searchCondition);
 	
 	void delete(Date before);
+
+	List<OperationLog> searchByContent(String content);
 
 }

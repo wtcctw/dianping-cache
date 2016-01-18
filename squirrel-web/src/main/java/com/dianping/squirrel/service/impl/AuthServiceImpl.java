@@ -1,19 +1,26 @@
 package com.dianping.squirrel.service.impl;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
-import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import com.dianping.cache.entity.CacheConfiguration;
+import com.dianping.cache.service.CacheConfigurationService;
+import com.dianping.cache.util.ParseServersUtil;
 import com.dianping.squirrel.common.config.ConfigManager;
 import com.dianping.squirrel.common.config.ConfigManagerLoader;
 import com.dianping.squirrel.common.zookeeper.PathProvider;
 import com.dianping.squirrel.common.zookeeper.ZookeeperClient;
+import com.dianping.squirrel.dao.AuthDao;
+import com.dianping.squirrel.entity.Auth;
 import com.dianping.squirrel.service.AuthService;
+import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+@Service
 public class AuthServiceImpl implements AuthService {
 
     private static Logger logger = LoggerFactory.getLogger(AuthServiceImpl.class);
@@ -24,6 +31,12 @@ public class AuthServiceImpl implements AuthService {
     
     private PathProvider pathProvider;
     private ZookeeperClient zkClient;
+
+    @Autowired
+    private AuthDao authDao;
+
+    @Autowired
+    private CacheConfigurationService cacheConfigurationService;
     
     public AuthServiceImpl() throws Exception {
         String zkAddress = configManager.getStringValue(KEY_ZOOKEEPER_ADDRESS);
@@ -54,12 +67,14 @@ public class AuthServiceImpl implements AuthService {
     public void setStrict(String resource, boolean strict) throws Exception {
         String path = pathProvider.getPath("resource", resource);
         zkClient.set(path, String.valueOf(strict));
+        syncAuthFromZK(resource);
     }
 
     @Override   
-    public void getStrict(String resource) throws Exception {
+    public boolean getStrict(String resource) throws Exception {
         String path = pathProvider.getPath("resource", resource);
-        zkClient.get(path);
+        String strict = zkClient.get(path);
+        return Boolean.valueOf(strict);
     }
 
     @Override
@@ -71,6 +86,8 @@ public class AuthServiceImpl implements AuthService {
         String path = pathProvider.getPath("applications", resource);
         String apps = StringUtils.join(appList, ',');
         zkClient.set(path, apps);
+
+        syncAuthFromZK(resource);
     }
 
     @Override
@@ -81,7 +98,9 @@ public class AuthServiceImpl implements AuthService {
             String path = pathProvider.getPath("applications", resource);
             String apps = StringUtils.join(appList, ',');
             zkClient.set(path, apps);
+            syncAuthFromZK(resource);
         }
+
     }
 
     @Override
@@ -99,7 +118,7 @@ public class AuthServiceImpl implements AuthService {
             }
             return appList;
         }
-        return Collections.emptyList();
+        return new ArrayList<String>();
     }
 
     @Override
@@ -108,4 +127,34 @@ public class AuthServiceImpl implements AuthService {
         return null;
     }
 
+    private void syncAuthFromDB(String resource){
+        Auth auth;
+        auth = authDao.findByResource(resource);
+        if(auth == null){
+            return;
+        }
+    }
+
+    private void syncAuthFromZK(String resource) throws Exception {
+        Auth auth;
+        auth = authDao.findByResource(resource);
+        boolean strict = getStrict(resource);
+        List<String> appList = getAuthorizedApplications(resource);
+        CacheConfiguration cacheConfiguration = cacheConfigurationService.find(resource);
+        Map<String,String> info = ParseServersUtil.parseRedisUrlInfo(cacheConfiguration.getServers());
+        String password = info.get("password");
+        String apps = StringUtils.join(appList, ',');
+        if(null == auth){
+            auth = new Auth(resource);
+            auth.setApplications(apps);
+            auth.setStrict(strict);
+            auth.setPassword(password);
+            authDao.insert(auth);
+        }else{
+            auth.setApplications(apps);
+            auth.setStrict(strict);
+            auth.setPassword(password);
+            authDao.update(auth);
+        }
+    }
 }

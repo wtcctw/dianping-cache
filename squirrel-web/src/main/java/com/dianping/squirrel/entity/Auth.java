@@ -5,10 +5,17 @@ package com.dianping.squirrel.entity;
  */
 public class Auth {
     int id;
-    String cluster;
+    String resource;
     String applications;
     String password;
     boolean strict;
+
+    public Auth(){
+
+    }
+    public Auth(String resource){
+        this.resource = resource;
+    }
 
     public int getId() {
         return id;
@@ -16,14 +23,6 @@ public class Auth {
 
     public void setId(int id) {
         this.id = id;
-    }
-
-    public String getCluster() {
-        return cluster;
-    }
-
-    public void setCluster(String cluster) {
-        this.cluster = cluster;
     }
 
     public String getPassword() {
@@ -48,5 +47,24 @@ public class Auth {
 
     public void setStrict(boolean strict) {
         this.strict = strict;
+    }
+
+    public String getResource() {
+        return resource;
+    }
+
+    public void setResource(String resource) {
+        this.resource = resource;
+    }
+
+    @Override
+    public String toString() {
+        return "Auth{" +
+                "id=" + id +
+                ", resource='" + resource + '\'' +
+                ", applications='" + applications + '\'' +
+                ", password='" + password + '\'' +
+                ", strict=" + strict +
+                '}';
     }
 }

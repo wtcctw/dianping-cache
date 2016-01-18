@@ -15,7 +15,7 @@
  */
 package com.dianping.squirrel.client.config;
 
-import com.dianping.remote.cache.dto.CacheConfigurationDTO;
+import com.dianping.squirrel.common.domain.CacheConfigurationDTO;
 
 /**
  * Parse store client configuration

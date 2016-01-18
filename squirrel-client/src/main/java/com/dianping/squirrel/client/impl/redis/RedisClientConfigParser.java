@@ -3,10 +3,10 @@ package com.dianping.squirrel.client.impl.redis;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.dianping.remote.cache.dto.CacheConfigurationDTO;
 import com.dianping.squirrel.client.config.StoreClientConfig;
 import com.dianping.squirrel.client.config.StoreClientConfigParser;
 import com.dianping.squirrel.client.util.ParamHelper;
+import com.dianping.squirrel.common.domain.CacheConfigurationDTO;
 
 /**
  * Redis cluster URL: redis-cluster://ip1:port1,ip2:port2?param1=value1&param2=value2

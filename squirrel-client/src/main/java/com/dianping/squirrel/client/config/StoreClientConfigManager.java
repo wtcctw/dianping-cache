@@ -30,7 +30,6 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.dianping.remote.cache.dto.CacheConfigurationDTO;
 import com.dianping.squirrel.client.StoreClient;
 import com.dianping.squirrel.client.config.zookeeper.CacheCuratorClient;
 import com.dianping.squirrel.client.core.CacheConfiguration;
@@ -42,6 +41,7 @@ import com.dianping.squirrel.client.impl.memcached.MemcachedStoreClientImpl;
 import com.dianping.squirrel.client.impl.redis.RedisStoreClientImpl;
 import com.dianping.squirrel.common.config.ConfigManager;
 import com.dianping.squirrel.common.config.ConfigManagerLoader;
+import com.dianping.squirrel.common.domain.CacheConfigurationDTO;
 import com.dianping.squirrel.common.exception.StoreException;
 import com.dianping.squirrel.common.exception.StoreInitializeException;
 import com.dianping.squirrel.common.util.PathUtils;

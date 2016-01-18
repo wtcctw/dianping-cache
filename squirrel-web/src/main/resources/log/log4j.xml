@@ -68,11 +68,6 @@
 		<level value="ERROR"/>
         <appender-ref  ref="ibatisAppender"/>
 	</logger>
-	
-	<logger name="com.dianping.cache.scale" additivity="false">
-		<level value="ERROR"/>
-		<appender-ref  ref="scaleAppender"/>
-	</logger>
 
 	<root>
 		<level value="INFO" />
