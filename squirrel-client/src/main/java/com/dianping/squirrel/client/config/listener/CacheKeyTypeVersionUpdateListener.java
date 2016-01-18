@@ -20,10 +20,10 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.dianping.remote.cache.dto.CacheKeyTypeVersionUpdateDTO;
 import com.dianping.squirrel.client.config.StoreCategoryConfig;
 import com.dianping.squirrel.client.config.StoreCategoryConfigManager;
 import com.dianping.squirrel.client.util.IPUtils;
+import com.dianping.squirrel.common.domain.CacheKeyTypeVersionUpdateDTO;
 
 /**
  * CacheKeyTypeVersionUpdateListener is used to listen message that to Update

@@ -47,7 +47,7 @@
     </update>
 
     <update id="updateEndTime" parameterType="Map">
-        UPDATE task SET startTime = #{endTime} WHERE id = #{id}
+        UPDATE task SET endTime = #{endTime} WHERE id = #{id}
     </update>
 
 

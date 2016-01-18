@@ -86,4 +86,11 @@ public class ZookeeperClient implements Lifecycle {
         }
     }
     
+    public void delete(String path) throws Exception {
+        try {
+            zkClient.delete().forPath(path);
+        } catch(NoNodeException e) {
+        }
+    }
+    
 }

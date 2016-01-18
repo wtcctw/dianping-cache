@@ -21,6 +21,12 @@ import com.dianping.remote.cache.dto.*;
 //import com.dianping.remote.cache.dto.XMemcachedConfigDetailDTO;
 //import com.dianping.remote.cache.dto.DCacheConfigDetailDTO;
 import com.dianping.squirrel.client.util.DTOUtils;
+import com.dianping.squirrel.common.domain.CacheConfigDetailDTO;
+import com.dianping.squirrel.common.domain.CacheConfigurationDTO;
+import com.dianping.squirrel.common.domain.DangaConfigDetailDTO;
+import com.dianping.squirrel.common.domain.DcacheConfigDetailDTO;
+import com.dianping.squirrel.common.domain.EhcacheConfigDetailDTO;
+import com.dianping.squirrel.common.domain.MemcachedConfigDetailDTO;
  
 /**
  * CacheConfiguration2DTO Translator

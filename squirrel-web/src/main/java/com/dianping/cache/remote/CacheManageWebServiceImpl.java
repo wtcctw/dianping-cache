@@ -15,16 +15,9 @@
  */
 package com.dianping.cache.remote;
 
-import com.dianping.avatar.exception.DuplicatedIdentityException;
-import com.dianping.cache.entity.CacheConfiguration;
-import com.dianping.cache.entity.CacheKeyConfiguration;
 import com.dianping.cache.service.CacheConfigurationService;
 import com.dianping.cache.service.CacheKeyConfigurationService;
-import com.dianping.remote.cache.CacheManageWebService;
-import com.dianping.remote.cache.dto.CacheClearDTO;
-import com.dianping.remote.cache.dto.CacheKeyConfigurationDTO;
-import com.dianping.remote.cache.dto.GenericCacheConfigurationDTO;
-import com.dianping.squirrel.client.util.DTOUtils;
+import com.dianping.squirrel.common.domain.CacheClearDTO;
 
 /**
  * 用于缓存的管理，如清除缓存等
@@ -57,72 +50,6 @@ public class CacheManageWebServiceImpl implements CacheManageWebService {
 	public void clearByKey(CacheClearDTO cacheClear) {
 		cacheConfigurationService.clearByKey(cacheClear.getCacheType(), cacheClear.getKey());
 	}
-
-	@Override
-	public void createConfiguration(GenericCacheConfigurationDTO configuration) {
-		try {
-			CacheConfiguration config = new CacheConfiguration();
-			DTOUtils.copyProperties(config, configuration);
-			cacheConfigurationService.create(config);
-		} catch (DuplicatedIdentityException e) {
-			throw new RuntimeException(e.getMessage());
-		}
-	}
-
-	@Override
-	public void updateConfiguration(GenericCacheConfigurationDTO configuration) {
-		CacheConfiguration config = new CacheConfiguration();
-		DTOUtils.copyProperties(config, configuration);
-		cacheConfigurationService.update(config);
-	}
-
-	@Override
-	public void createCacheKeyConfig(CacheKeyConfigurationDTO configuration) {
-	    validateCacheKeyConfig(configuration);
-		try {
-			CacheKeyConfiguration config = new CacheKeyConfiguration();
-			DTOUtils.copyProperties(config, configuration);
-			cacheKeyConfigurationService.create(config);
-		} catch (DuplicatedIdentityException e) {
-			throw new RuntimeException(e.getMessage());
-		}
-	}
-
-	@Override
-	public void updateCacheKeyConfig(CacheKeyConfigurationDTO configuration) {
-	    validateCacheKeyConfig(configuration);
-		CacheKeyConfiguration config = new CacheKeyConfiguration();
-		DTOUtils.copyProperties(config, configuration);
-		cacheKeyConfigurationService.update(config);
-	}
-
-	private void validateCacheKeyConfig(CacheKeyConfigurationDTO configuration) {
-        if(configuration == null) {
-            throw new RuntimeException("cache category config is null");
-        }
-        validateCacheKeyCategory(configuration.getCategory());
-        validateCacheKeyDuration(configuration.getDuration());
-    }
-
-    private void validateCacheKeyCategory(String category) {
-        if(category == null || category.trim().length() == 0) {
-            throw new RuntimeException("cache category name is empty");
-        }
-    }
-
-    private void validateCacheKeyDuration(String duration) {
-        if(duration == null) {
-            throw new RuntimeException("cache category duration is null");
-        }
-        if(duration.endsWith("m") || duration.endsWith("h") || duration.endsWith("s")) {
-            duration = duration.substring(0, duration.length() - 1);
-        }
-        try {
-            Integer.parseInt(duration);
-        } catch(NumberFormatException e) {
-            throw new RuntimeException("cache category duration is invalid: " + duration);
-        }
-    }
 
     /**
 	 * @param cacheConfigurationService

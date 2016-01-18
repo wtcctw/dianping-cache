@@ -18,8 +18,8 @@ package com.dianping.squirrel.client.config.listener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.dianping.remote.cache.dto.CacheKeyConfigurationDTO;
 import com.dianping.squirrel.client.config.StoreCategoryConfigManager;
+import com.dianping.squirrel.common.domain.CacheKeyConfigurationDTO;
 
 /**
  * Cache Key Configuration Update Listener

@@ -1,8 +1,9 @@
 package com.dianping.squirrel.client.config.listener;
 
-import com.dianping.remote.cache.dto.CacheConfigurationRemoveDTO;
 import com.dianping.squirrel.client.config.StoreClientConfigManager;
 import com.dianping.squirrel.client.core.StoreClientBuilder;
+import com.dianping.squirrel.common.domain.CacheConfigurationRemoveDTO;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

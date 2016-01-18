@@ -6,13 +6,13 @@ import java.util.concurrent.ConcurrentMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.dianping.remote.cache.dto.CacheConfigurationDTO;
-import com.dianping.remote.cache.dto.CacheKeyConfigurationDTO;
-import com.dianping.remote.cache.dto.CacheKeyTypeVersionUpdateDTO;
-import com.dianping.remote.cache.dto.SingleCacheRemoveDTO;
 import com.dianping.squirrel.client.config.StoreClientConfigManager;
 import com.dianping.squirrel.client.config.StoreCategoryConfigManager;
 import com.dianping.squirrel.client.core.CacheConfigurationListener;
+import com.dianping.squirrel.common.domain.CacheConfigurationDTO;
+import com.dianping.squirrel.common.domain.CacheKeyConfigurationDTO;
+import com.dianping.squirrel.common.domain.CacheKeyTypeVersionUpdateDTO;
+import com.dianping.squirrel.common.domain.SingleCacheRemoveDTO;
 import com.dianping.squirrel.common.util.PathUtils;
 
 public class CacheMessageManager implements CacheConfigurationListener {

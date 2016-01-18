@@ -15,6 +15,7 @@
             th{
                font-size: 14px;  color: #404040;
             }
+
         </style>
         <div class="page-content">
             <div class="page-header">
@@ -70,13 +71,31 @@
                                         <a class="grey" href="#changeConfirm" data-toggle="modal" ng-click="setFailover(data.slave.address)">
                                             <i class="ace-icon fa fa-exchange bigger-130"></i>
                                         </a>
+                                        <a class="grey" href="${rc.contextPath}/redis/serverinfo" ng-click="transport(data.master.address)">
+                                            <i class="ace-icon fa fa-bar-chart-o bigger-130"></i>
+                                        </a>
                                         <a class="grey" href="#addModal" data-toggle="modal" ng-click="setParams(redisData.clusterName,data.master.address)" ng-show="{{data.slave.address==null}}">
                                             <i class="ace-icon bigger-130"> S+ </i>
                                         </a>
                                         <a class="grey" href="#deleteModal" data-toggle="modal" ng-click="setParams(redisData.clusterName,data.slave.address)" ng-show="{{data.slave.address!=null}}">
                                             <i class="ace-icon bigger-130"> S- </i>
                                         </a>
+                                        <a class="grey" href="">
 
+                                        </a>
+
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr ng-repeat = "data in redisData.failedServers">
+                                <td>Failed</td>
+                                <td>{{data.address}}</td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td style="margin-right: 20px;#if(${isadmin})display: table-cell;#else display: none;#end;">
+                                    <div class="hidden-sm hidden-xs action-buttons">
                                     </div>
                                 </td>
                             </tr>
@@ -110,7 +129,10 @@
                             <td>{{category.duration}}</td>
                             <td>{{category.indexTemplate}}</td>
                             <td>{{category.version}}</td>
-                            <td>{{category.hot}}</td>
+                            <td>
+                                <i class="ace-icon glyphicon glyphicon-ok grey" ng-show="{{category.hot}}"></i>
+                                <i class="ace-icon glyphicon glyphicon-remove grey" ng-show="!{{category.hot}}"></i>
+                            </td>
                             <td style="margin-right: 20px;#if(${isadmin})display: table-cell;#else display: none;#end;">
                                 <div class="hidden-sm hidden-xs action-buttons">
                                     <a class="grey" href="#modifyCategory" ng-click="transportEntity(category)" data-toggle="modal">
@@ -124,7 +146,7 @@
                                     <a class="grey" href="#">
                                         <i class="ace-icon glyphicon glyphicon-th-large bigger-130"></i>
                                     </a>
-                                    <a class="grey" href="#">
+                                    <a class="grey" href="#log" data-toggle="modal" ng-click="getLogs(category.category)">
                                         <i class="ace-icon fa fa-file-text-o bigger-130"></i>
                                     </a>
 
@@ -150,7 +172,7 @@
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal"
                             aria-hidden="true">&times;</button>
-                    <h4 class="modal-title" id="myModalLabel">Slot迁移</h4>
+                    <h4 class="modal-title">Slot迁移</h4>
                 </div>
                 <div class="modal-body">
                     <form method="post"
@@ -233,7 +255,7 @@
                                 </div>
                                 <br>
                                 <br>
-                                <label class="col-xs-3 control-label control-label no-padding-right">2.选择目标实例：</label>
+                                <label class="col-xs-3 control-label no-padding-right">2.选择目标实例：</label>
                                 <div class="col-xs-9">
                                     <table class="table" id="desTable">
                                         <thead >
@@ -266,10 +288,11 @@
 
                             <div class="control-group" style="margin-top: 20px;text-align: center;">
                                 <div class="controls">
-                                    <button type="button" class="btn btn-default"
+                                    <button type="button" class="btn btn-sm btn-default" style="float: left;margin-left: 10%;"
                                             data-dismiss="modal">关闭
                                     </button>
-                                    <button type="submit" class="btn btn-success">提交</button>
+                                    <button type="submit" class="btn btn-sm btn-success" style="float: right;margin-left: 10%;"
+                                            >提交</button>
                                 </div>
                             </div>
                         </div>
@@ -313,10 +336,10 @@
         <div class="modal-dialog" style="width: 300px; margin: 0 auto;">
             <div class="modal-content">
                 <div class="modal-header">
-                    <button type="button" class="close"
-                            data-dismiss="modal" aria-hidden="true">
-                        &times;
-                    </button>
+                    <!--<button type="button" class="close"-->
+                            <!--data-dismiss="modal" aria-hidden="true">-->
+                        <!--&times;-->
+                    <!--</button>-->
                     <h4 class="modal-title red">
                         警告
                     </h4>
@@ -342,10 +365,10 @@
         <div class="modal-dialog" style="width: 300px; margin: 0 auto;">
             <div class="modal-content">
                 <div class="modal-header">
-                    <button type="button" class="close"
-                            data-dismiss="modal" aria-hidden="true">
-                        &times;
-                    </button>
+                    <!--<button type="button" class="close"-->
+                            <!--data-dismiss="modal" aria-hidden="true">-->
+                        <!--&times;-->
+                    <!--</button>-->
                     <h4 class="modal-title red">
                         警告
                     </h4>
@@ -445,23 +468,83 @@
         </div>
     </div>
 
+    <div class="modal fade" id="log" tabindex="-1" role="dialog"
+         aria-labelledby="myModalLabel" aria-hidden="true" >
+        <div class="modal-dialog" >
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button class="close btn-xs" data-dismiss="modal"
+                            aria-hidden="true">&times;</button>
+                    <h4 class="modal-title">
+                        日志
+                    </h4>
+                </div>
+                <div class="modal-body  center">
+                    <div class="row">
+                        <table id="logTable" class="table table-striped" style="table-layout: fixed;">
+                            <thead>
+                            <tr>
+                                <th style="width: 10%;"><i class="ace-icon fa fa-angle-down icon-on-right"></i></th>
+                                <th style="width: 15%; text-align: left;">操作人</th>
+                                <th style="width: 20%;">操作内容</th>
+                                <th style="width: 35%; text-align: center">操作时间</th>
+                                <th style="width: 10%;">状态</th>
+                                <th style="width: 10%;#if(${isadmin})display: table-cell;#else display: none;#end;">操作
+                                </th>
 
-</div>
-<div id="BgDiv"></div>
-<div class="DialogDiv" style="display:none;position:fixed;">
-    <div class="U-guodu-box">
-        <div>
-            <table width="100%" cellpadding="0" cellspacing="0" border="0">
-                <tr>
-                    <td align="center"><img src="../static/js/mask/loading.gif"></td>
-                </tr>
-                <tr>
-                    <td valign="middle" align="center">处理中，请稍后！</td>
-                </tr>
-            </table>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr ng-repeat="log in logs">
+
+                                <td >{{$index+1}}</td>
+                                <td style="text-align: left;">{{log.operator}}</td>
+                                <td style="overflow: hidden;text-overflow: ellipsis;">{{log.content.substring(0,log.content.indexOf("("))}}</td>
+                                <td>{{log.operateTime | date:'yyyy-MM-dd HH:mm:ss'}}</td>
+                                <td>{{log.succeed}}</td>
+                                <td style="#if(${isadmin})display: table-cell;#else display: none;#end;">
+                                    <div class="hidden-sm hidden-xs action-buttons">
+                                        <a class="grey" href="#logContent" data-toggle="modal" ng-click="setContent(log.content)">
+                                            <i class="ace-icon fa fa-search bigger-130"></i>
+                                        </a>
+                                    </div>
+                                </td>
+
+                            </tr>
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal -->
+    </div>
+
+
+    <div class="modal fade" id="logContent" tabindex="-1" role="dialog"
+         aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button class="close btn-xs" data-dismiss="modal"
+                            aria-hidden="true">&times;</button>
+                    <h4 class="modal-title" id="myModalLabel">操作内容</h4>
+                </div>
+                <div class="modal-body">
+                    <form method="post" class="form-horizontal" name="myForm">
+                        <textarea rows="18" class="col-sm-12" disabled>{{logContent}}</textarea>
+                        <p>&nbsp;</p>
+                    </form>
+                </div>
+
+            </div>
         </div>
     </div>
+
+
 </div>
+
 <script type="application/javascript">
     $(document).on('click', 'th input:checkbox' , function(){
         var that = this;

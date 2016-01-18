@@ -33,7 +33,7 @@ import com.dianping.cache.service.CacheKeyConfigurationService;
 import com.dianping.cache.service.OperationLogService;
 import com.dianping.cache.service.condition.CacheKeyConfigSearchCondition;
 import com.dianping.core.type.PageModel;
-import com.dianping.remote.cache.dto.CacheKeyConfigurationDTO;
+import com.dianping.squirrel.common.domain.CacheKeyConfigurationDTO;
 
 /**
  * CacheKeyConfiguration service implementation

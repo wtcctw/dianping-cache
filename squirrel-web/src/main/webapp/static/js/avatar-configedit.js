@@ -4,7 +4,7 @@ module.controller('ConfigEditController', [
 		'$http',
 		'$timeout',
 		function($scope, $http,$timeout) {
-			
+			$scope.configurationParams = {};
 			$scope.mCacheKey = "";
 			$scope.mClientClazz = "";
 			$scope.mServers = "";
@@ -49,7 +49,14 @@ module.controller('ConfigEditController', [
 			$scope.showDcache = false;
 			$scope.showRedis = false;
 			$scope.showWeb = false;
-			
+			$scope.wrapperParams = function () {
+				$scope.configurationParams = {};
+				$scope.configurationParams.cacheKey = $scope.mCacheKey;
+				$scope.configurationParams.clientClazz = $scope.mClientClazz;
+				$scope.configurationParams.servers = $scope.mServers;
+				$scope.configurationParams.swimlane = $scope.mSwimLane;
+				$scope.configurationParams.transcoderClazz = $scope.mTranscoderClazz;
+			}
 			$scope.initpage = function(){
 				var localstore = window.localStorage;
 				$scope.mCacheKey = localstore.cacheKey;
@@ -363,13 +370,11 @@ module.controller('ConfigEditController', [
 			$scope.updateConfig = function(){
 				
 				 $scope.submiticon = true;
-				 $http.post(window.contextPath + '/cache/config/update',
-			        		{"key":$scope.mCacheKey,"clientClazz":$scope.mClientClazz,
-			        		"servers":$scope.mServers,"transcoderClazz":$scope.mTranscoderClazz,
-								"swimlane":$scope.mSwimLane
-			        		}).success(function(response){
+				$scope.wrapperParams();
+				$http.post(window.contextPath + '/cache/config/update',$scope.configurationParams)
+						.success(function(response){
 
-			        		});
+						});
 
 				$timeout(function() {
 					$scope.submiticon = false;
