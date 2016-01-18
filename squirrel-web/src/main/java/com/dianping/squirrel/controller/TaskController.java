@@ -1,7 +1,9 @@
-package com.dianping.cache.controller;
+package com.dianping.squirrel.controller;
 
-import com.dianping.cache.dao.TaskDao;
-import com.dianping.cache.entity.Task;
+import com.dianping.cache.controller.AbstractSidebarController;
+import com.dianping.squirrel.dao.TaskDao;
+import com.dianping.squirrel.entity.Task;
+
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;

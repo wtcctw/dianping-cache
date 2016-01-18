@@ -1,6 +1,6 @@
 package com.dianping.squirrel.task;
 
-import com.dianping.cache.entity.Task;
+import com.dianping.squirrel.entity.Task;
 
 /**
  * Created by thunder on 16/1/5.

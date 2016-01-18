@@ -1,6 +1,6 @@
-package com.dianping.cache.dao;
+package com.dianping.squirrel.dao;
 
-import com.dianping.cache.entity.Task;
+import com.dianping.squirrel.entity.Task;
 
 import java.util.List;
 import java.util.Map;

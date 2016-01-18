@@ -1,12 +1,13 @@
 package com.dianping.squirrel.task;
 
-import com.dianping.cache.dao.TaskDao;
-import com.dianping.cache.entity.Task;
 import com.dianping.cache.util.RequestUtil;
 import com.dianping.cache.util.SpringLocator;
 import com.dianping.squirrel.client.StoreClient;
 import com.dianping.squirrel.client.StoreClientFactory;
 import com.dianping.squirrel.client.impl.redis.RedisStoreClient;
+import com.dianping.squirrel.dao.TaskDao;
+import com.dianping.squirrel.entity.Task;
+
 import redis.clients.jedis.*;
 
 import java.util.HashMap;

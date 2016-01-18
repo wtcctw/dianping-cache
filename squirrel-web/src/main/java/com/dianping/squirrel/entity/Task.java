@@ -1,4 +1,4 @@
-package com.dianping.cache.entity;
+package com.dianping.squirrel.entity;
 
 import com.dianping.squirrel.task.TaskType;
 

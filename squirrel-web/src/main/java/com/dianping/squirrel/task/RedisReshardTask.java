@@ -1,8 +1,6 @@
 package com.dianping.squirrel.task;
 
-import com.dianping.cache.dao.TaskDao;
 import com.dianping.cache.entity.ReshardRecord;
-import com.dianping.cache.entity.Task;
 import com.dianping.cache.scale.cluster.redis.RedisCluster;
 import com.dianping.cache.scale.cluster.redis.RedisManager;
 import com.dianping.cache.scale.cluster.redis.RedisServer;
@@ -10,6 +8,8 @@ import com.dianping.cache.scale.cluster.redis.ReshardPlan;
 import com.dianping.cache.service.ReshardService;
 import com.dianping.cache.util.RequestUtil;
 import com.dianping.cache.util.SpringLocator;
+import com.dianping.squirrel.dao.TaskDao;
+import com.dianping.squirrel.entity.Task;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
