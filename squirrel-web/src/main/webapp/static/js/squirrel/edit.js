@@ -60,7 +60,7 @@ module.controller('EditController', [
 			}
 
 			$scope.initpage = function(){
-				$scope.mCacheKey = window.localStorage.cacheKey;
+				$scope.mCacheKey = window.localStorage.cluster;
 				$scope.mSwimLane = window.localStorage.swimlane;
 				$scope.wrapperParams();
 				$scope.servers = [];

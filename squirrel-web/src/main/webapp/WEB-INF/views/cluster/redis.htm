@@ -2,7 +2,7 @@
      ng-controller="RedisDashBoardController">
     <div class=" main-content-inner">
         <script type="text/javascript"
-                src="${rc.contextPath}/static/js/squirrel/redisdash.js"></script>
+                src="${rc.contextPath}/static/js/squirrel/redis.js"></script>
         <style>
             th{
                 font-size: 14px;  color: #404040;
@@ -38,10 +38,10 @@
                         </thead>
                         <tbody>
                         <tr ng-repeat="item in redisdata">
-                            <td><i class="red" ng-show="item.clusterAlarm">●</i>
-                                <i class="green" ng-show="!item.clusterAlarm">●</i></td>
+                            <td><img src="${rc.contextPath}/static/images/red.png" ng-show="item.clusterAlarm" >
+                                <img src="${rc.contextPath}/static/images/green.png" ng-show="!item.clusterAlarm" ></td>
                             <td style="text-align: left;font: 14px Open Sans ;color: #3764a0" >
-                                <a href="${rc.contextPath}/redis/{{item.clusterName}}">
+                                <a href="${rc.contextPath}/redis/{{item.clusterName}}" ng-click="transport(item.clusterName)">
                                     {{item.clusterName}}
                                 </a>
                             </td>

@@ -50,7 +50,7 @@ public class RedisDashBoardData extends DashBoardData{
         float memoryUsage;
         int masterNum;
         int slaveNum;
-        boolean QPSAlarm;
+        boolean qpsAlarm;
         boolean usageAlarm;
         boolean msAlarm;
         boolean clusterAlarm;
@@ -84,7 +84,7 @@ public class RedisDashBoardData extends DashBoardData{
             int tmp = Math.round(memoryUsage * 10000);
             memoryUsage =  (float) (tmp / 100.0);
             if(qps > 100000){
-                QPSAlarm = true;
+                qpsAlarm = true;
             }
             if(memoryUsage > 70.0f || maxMemory == 0){
                 usageAlarm = true;
@@ -92,7 +92,7 @@ public class RedisDashBoardData extends DashBoardData{
             if(masterNum != slaveNum  || masterNum == 0){
                 msAlarm = true;
             }
-            if(QPSAlarm || usageAlarm || msAlarm){
+            if(qpsAlarm || usageAlarm || msAlarm){
                 clusterAlarm = true;
             }
             return clusterAlarm;
@@ -138,12 +138,12 @@ public class RedisDashBoardData extends DashBoardData{
             this.slaveNum = slaveNum;
         }
 
-        public boolean isQPSAlarm() {
-            return QPSAlarm;
+        public boolean isQpsAlarm() {
+            return qpsAlarm;
         }
 
-        public void setQPSAlarm(boolean QPSAlarm) {
-            this.QPSAlarm = QPSAlarm;
+        public void setQpsAlarm(boolean qpsAlarm) {
+            this.qpsAlarm = qpsAlarm;
         }
 
         public boolean isUsageAlarm() {

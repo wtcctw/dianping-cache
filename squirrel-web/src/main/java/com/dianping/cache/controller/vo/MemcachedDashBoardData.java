@@ -74,7 +74,7 @@ public class MemcachedDashBoardData  extends DashBoardData {
         List<String> servers;
         int alive;
         float hitrate;
-        boolean QPSAlarm;
+        boolean qpsAlarm;
         boolean usageAlarm;
         boolean aliveAlarm;
         boolean clusterAlarm;
@@ -97,19 +97,19 @@ public class MemcachedDashBoardData  extends DashBoardData {
                 maxMemory = 0;
                 memUsed = 0;
                 memoryUsage = 0;
-                clusterAlarm = true;
+                clusterAlarm = qpsAlarm = aliveAlarm = usageAlarm=true;
             }
             int tmp = Math.round(memoryUsage * 10000);
             memoryUsage =  (float) (tmp / 100.0);
             tmp = Math.round(hitrate * 10000);
             hitrate = (float) (tmp / 100.0);
             if(qps > 50000){
-                QPSAlarm = true;
+                qpsAlarm = true;
             }
             if(memoryUsage > 90.0f){
                 usageAlarm = true;
             }
-            clusterAlarm |= QPSAlarm | aliveAlarm | usageAlarm;
+            clusterAlarm |= qpsAlarm | aliveAlarm | usageAlarm;
             return clusterAlarm;
         }
 
@@ -161,12 +161,12 @@ public class MemcachedDashBoardData  extends DashBoardData {
             this.hitrate = hitrate;
         }
 
-        public boolean isQPSAlarm() {
-            return QPSAlarm;
+        public boolean getQpsAlarm() {
+            return qpsAlarm;
         }
 
-        public void setQPSAlarm(boolean QPSAlarm) {
-            this.QPSAlarm = QPSAlarm;
+        public void setQpsAlarm(boolean qpsAlarm) {
+            this.qpsAlarm = qpsAlarm;
         }
 
         public boolean isUsageAlarm() {
