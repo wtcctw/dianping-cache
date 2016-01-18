@@ -30,6 +30,21 @@ public class RedisReshardTask extends AbstractTask {
     }
 
     @Override
+    public int getTaskId() {
+        return 1;
+    }
+
+    @Override
+    protected void startTask() {
+        super.startTask();
+    }
+
+    @Override
+    protected void endTask() {
+        super.endTask();
+    }
+
+    @Override
     public void taskRun() {
         reshard();
     }

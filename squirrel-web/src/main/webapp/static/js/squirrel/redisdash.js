@@ -2,9 +2,11 @@ module.controller('RedisDashBoardController', [ '$scope', '$http','$document',
     '$timeout', function($scope, $http) {
         $scope.redisdata = [];
         $scope.applications = [];
+        $scope.application;
         $scope.logs = [];
         $scope.cluster;
         $scope.password;
+        $scope.authEntity = {};
         $scope.clusterEntity = {
             clusterName:"redis-",
             nodesNumber:3,
@@ -71,6 +73,7 @@ module.controller('RedisDashBoardController', [ '$scope', '$http','$document',
         }
 
         $scope.getApplications = function(cluster){
+            $scope.cluster = cluster;
             $http.get(window.contextPath + '/redis/data/applications', {params: {
                     cluster:cluster,
                 }}
@@ -100,7 +103,40 @@ module.controller('RedisDashBoardController', [ '$scope', '$http','$document',
             });
         }
 
+        $scope.authorize = function(cluster,application){
+            $scope.authEntity.resource = cluster;
+            $scope.authEntity.application = application;
+            $http.post('/redis/auth/authorize',$scope.authEntity)
+                .success(function(data){
 
+                });
+        }
+        $scope.unauthorize = function(cluster,application){
+            $scope.authEntity.resource = cluster;
+            $scope.authEntity.application = application;
+            $http.post('/redis/auth/unauthorize',$scope.authEntity)
+                .success(function(data){
+
+                });
+        }
+
+        $scope.getPassword = function(cluster){
+            $http.get(window.contextPath + '/redis/data/password', {params: {
+                    cluster:cluster,
+                }}
+            ).success(function (data) {
+                $scope.password = data;
+            });
+        }
+
+        $scope.setStrictAndPassword = function(strict,password){
+            $http.get(window.contextPath + '/redis/data/password', {params: {
+                    cluster:cluster,
+                }}
+            ).success(function (data) {
+                $scope.password = data;
+            });
+        }
 
         $scope.initDashBoard();
         var init = function (num1,num2,width1,width2) {

@@ -1,16 +1,12 @@
 package com.dianping.cache.controller;
 
-import java.util.*;
-
-
-import com.dianping.cache.controller.vo.RedisDashBoardData;
+import com.dianping.cache.monitor.statsdata.RedisClusterData;
 import com.dianping.cache.scale.cluster.redis.RedisCluster;
+import com.dianping.cache.scale.cluster.redis.RedisManager;
 import com.dianping.cache.scale.cluster.redis.RedisNode;
 import redis.clients.jedis.Jedis;
 
-import com.dianping.cache.monitor.statsdata.RedisClusterData;
-
-import com.dianping.cache.scale.cluster.redis.RedisManager;
+import java.util.*;
 
 /**
  * @deprecated
@@ -61,15 +57,6 @@ public class RedisDataUtil {
         return data;
     }
 
-    public static RedisDashBoardData getRedisDashBoardData(){
-        Map<String,RedisCluster> clusterCache = RedisManager.getClusterCache();
-        List<RedisCluster> clusters = new ArrayList<RedisCluster>();
-        for(Map.Entry<String, RedisCluster> cluster : clusterCache.entrySet()){
-            clusters.add(cluster.getValue());
-        }
-        RedisDashBoardData redisDashBoardData = new RedisDashBoardData(clusters);
-        return redisDashBoardData;
-    }
 
     public static Map<String, Object> getRedisServerData(String address) {
         String[] server = address.split(":");
@@ -96,12 +83,4 @@ public class RedisDataUtil {
         return (float) (tmp / 100.0);
     }
 
-    public static RedisDashBoardData.SimpleAnalysisData getRedisDetailData(String currentCluster) {
-
-        RedisCluster redisCluster =  RedisManager.getRedisCluster(currentCluster);
-        RedisDashBoardData data = new RedisDashBoardData();
-        RedisDashBoardData.SimpleAnalysisData simpleAnalysisData = data.new SimpleAnalysisData(redisCluster);
-        simpleAnalysisData.analysis();
-        return simpleAnalysisData;
-    }
 }

@@ -116,6 +116,8 @@ module.controller('RedisController', [
 
 
         $scope.reshard = function(){
+            $('#reshardModal').modal('hide');
+
             $scope.avgsrc = [];
             $scope.exportsrc = [];
             $scope.exportdes = [];

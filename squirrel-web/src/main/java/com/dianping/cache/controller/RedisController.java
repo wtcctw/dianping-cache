@@ -1,9 +1,6 @@
 package com.dianping.cache.controller;
 
-import com.dianping.cache.controller.vo.NewClusterParams;
-import com.dianping.cache.controller.vo.RedisDashBoardData;
-import com.dianping.cache.controller.vo.RedisReshardParams;
-import com.dianping.cache.controller.vo.RedisScaleParams;
+import com.dianping.cache.controller.vo.*;
 import com.dianping.cache.entity.CacheConfiguration;
 import com.dianping.cache.entity.CacheKeyConfiguration;
 import com.dianping.cache.entity.RedisStats;
@@ -165,6 +162,12 @@ public class RedisController extends AbstractSidebarController{
 		return authService.getAuthorizedApplications(cluster);
 	}
 
+	@RequestMapping(value = "/redis/data/auth")
+	@ResponseBody
+	public void getAuth(String cluster) throws Exception {
+		// authService.getAuth(cluster);
+	}
+
 	@RequestMapping(value = "/redis/historydata")
 	@ResponseBody
 	public List<HighChartsWrapper> getRedisHistoryData(String address,long endTime){
@@ -175,6 +178,25 @@ public class RedisController extends AbstractSidebarController{
 		return ChartsBuilder.buildRedisStatsCharts(statsData);
 	}
 
+	@RequestMapping(value = "/redis/auth/setPassword")
+	@ResponseBody
+	public void setPassword(@RequestBody AuthParams authParams){
+
+	}
+
+
+	@RequestMapping(value = "/redis/auth/authorize")
+	@ResponseBody
+	public void authorize(@RequestBody AuthParams authParams) throws Exception {
+		authService.authorize(authParams.getApplication(),authParams.getResource());
+	}
+
+	@RequestMapping(value = "/redis/auth/unauthorize")
+	@ResponseBody
+	public void unauthorize(@RequestBody AuthParams authParams) throws Exception {
+		authService.unauthorize(authParams.getApplication(),authParams.getResource());
+	}
+
 	@RequestMapping(value = "/redis/reshard")
 	@ResponseBody
 	public void reshard(@RequestBody RedisReshardParams redisReshardParams) {
@@ -182,6 +204,7 @@ public class RedisController extends AbstractSidebarController{
 		ReshardPlan reshardPlan = reshardService.createReshardPlan(redisReshardParams.getCluster(), redisReshardParams.getSrcNodes(),
 				redisReshardParams.getDesNodes(), redisReshardParams.isAverage());
 		RedisReshardTask task = new RedisReshardTask(reshardPlan);
+
 		TaskManager.submit(task);
 	}
 
