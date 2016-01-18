@@ -24,13 +24,14 @@ public class ScanJob {
     ScanThreadFactory scanThreadFactory;
 
 
-    @Scheduled(cron = "0 0 1 ? * *")//每天的1点触发定时任务
+    @Scheduled(cron = "0 0 1 * * ?")//每天的1点触发定时任务
+//    @Scheduled(cron = "0 */1 * * * ?")
     public void baselineWeeklyJob() throws InterruptedException, DocumentException, URISyntaxException {
 
         logger.info("scanTaskDailyJob", getClass().getSimpleName());
 
         ScanThread scanThread = scanThreadFactory.createScanThread();
-
+//
         ThreadManager.getInstance().execute(scanThread);
 
     }
