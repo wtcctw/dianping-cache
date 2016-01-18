@@ -52,8 +52,6 @@ public class RedisController extends AbstractSidebarController{
 
 	private String subside;
 
-	private String currentCluster;
-
 	@RequestMapping(value = "/redis/dashboard")
 	public ModelAndView viewClusterDashBoard(){
 		return new ModelAndView("monitor/redisdashboard",createViewMap());
@@ -112,14 +110,12 @@ public class RedisController extends AbstractSidebarController{
 	@RequestMapping(value = "/redis/{cluster}")
 	public ModelAndView getRedisDetail(@PathVariable("cluster") String cluster){
 		subside = "redis";
-		currentCluster = cluster;
 		return new ModelAndView("cluster/redisdetail",createViewMap());
 	}
 
 	@RequestMapping(value = "/redis/{cluster}/edit")
 	public ModelAndView edit(@PathVariable("cluster") String cluster){
 		subside = "redis";
-		currentCluster = cluster;
 		return new ModelAndView("cluster/edit",createViewMap());
 	}
 
@@ -137,17 +133,17 @@ public class RedisController extends AbstractSidebarController{
 
 	@RequestMapping(value = "/redis/editdata")
 	@ResponseBody
-	public CacheConfiguration editRedis(@RequestParam String swimlane){
-		CacheConfiguration configuration = cacheConfigurationService.findWithSwimLane(currentCluster,swimlane);
+	public CacheConfiguration editRedis(@RequestParam String cluster,@RequestParam String swimlane){
+		CacheConfiguration configuration = cacheConfigurationService.findWithSwimLane(cluster,swimlane);
 		return configuration;
 	}
 
 	@RequestMapping(value = "/redis/detail")
 	@ResponseBody
-	public Map<String, Object> getRedisDetailData(){
-		List<CacheKeyConfiguration> categorys = cacheKeyConfigurationService.findByCacheType(currentCluster);
+	public Map<String, Object> getRedisDetailData(@RequestParam String cluster){
+		List<CacheKeyConfiguration> categorys = cacheKeyConfigurationService.findByCacheType(cluster);
 		Map<String,Object> result = new HashMap<String, Object>();
-		RedisCluster redisCluster =  RedisManager.getRedisCluster(currentCluster);
+		RedisCluster redisCluster =  RedisManager.getRedisCluster(cluster);
 		RedisDashBoardData data = new RedisDashBoardData();
 		RedisDashBoardData.SimpleAnalysisData simpleAnalysisData = data.new SimpleAnalysisData(redisCluster);
 		simpleAnalysisData.analysis();

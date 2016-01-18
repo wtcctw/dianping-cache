@@ -81,7 +81,8 @@ function makeGraph(divName,max,title,currentValue) {
 module.controller('RedisController', [
     '$scope',
     '$http',
-    function($scope, $http) {
+    '$rootScope',
+    function($scope, $http,$rootScope) {
         $scope.redisData = {};
         $scope.reshardParams = {};
         $scope.redisScaleParams = {};
@@ -98,8 +99,11 @@ module.controller('RedisController', [
 
 
         $scope.initPage = function(){
+
             $http.get(window.contextPath + '/redis/detail',{
-                params : {}
+                params : {
+                    cluster : window.localStorage.cluster
+                }
             }).success(function(response){
                 $scope.redisData = response.data.redisCluster;
                 $scope.categoryList = response.categorys;
