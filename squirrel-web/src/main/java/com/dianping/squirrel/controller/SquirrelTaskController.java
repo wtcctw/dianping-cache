@@ -19,7 +19,7 @@ import java.util.Map;
  * Created by thunder on 16/1/13.
  */
 @Controller
-public class TaskController extends AbstractSidebarController {
+public class SquirrelTaskController extends AbstractSidebarController {
 
     @Resource(name = "taskDao")
     TaskDao taskDao;
