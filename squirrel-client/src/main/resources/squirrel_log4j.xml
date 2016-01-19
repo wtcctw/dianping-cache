@@ -2,7 +2,7 @@
 <!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
 <log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/">
 
-	<appender name="ConsoleAppender" class="org.apache.log4j.ConsoleAppender">
+	<appender name="SquirrelConsoleAppender" class="org.apache.log4j.ConsoleAppender">
 		<param name="Target" value="System.err" />
 		<param name="Threshold" value="ERROR" />
 		<layout class="org.apache.log4j.PatternLayout">
@@ -10,7 +10,7 @@
 		</layout>
 	</appender>
 
-	<appender name="FileAppender" class="org.apache.log4j.DailyRollingFileAppender">
+	<appender name="SquirrelFileAppender" class="org.apache.log4j.DailyRollingFileAppender">
 		<param name="Threshold" value="INFO" />
 		<param name="file" value="/data/applogs/squirrel/squirrel.log" />
 		<param name="append" value="true" />
@@ -20,14 +20,14 @@
 		</layout>
 	</appender>
 
-	<logger name="com.dianping.squirrel" additivity="true">
-		<appender-ref ref="FileAppender" />
-		<appender-ref ref="ConsoleAppender" />
+	<logger name="com.dianping.squirrel" additivity="false">
+		<appender-ref ref="SquirrelFileAppender" />
+		<appender-ref ref="SquirrelConsoleAppender" />
 	</logger>
 
-	<logger name="redis.clients.jedis" additivity="true">
-		<appender-ref ref="FileAppender" />
-		<appender-ref ref="ConsoleAppender" />
+	<logger name="redis.clients.jedis" additivity="false">
+		<appender-ref ref="SquirrelFileAppender" />
+		<appender-ref ref="SquirrelConsoleAppender" />
 	</logger>
 
 </log4j:configuration>

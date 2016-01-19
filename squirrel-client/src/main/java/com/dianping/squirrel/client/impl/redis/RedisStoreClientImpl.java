@@ -1028,7 +1028,7 @@ public class RedisStoreClientImpl extends AbstractStoreClient implements RedisSt
     @Override
     public Boolean lset(StoreKey key, final long index, final Object object) {
         checkNotNull(key, "store key is null");
-        checkNotNull(key, "value is null");
+        checkNotNull(object, "value is null");
         final StoreCategoryConfig categoryConfig = configManager.findCacheKeyType(key.getCategory());
         checkNotNull(categoryConfig, "%s's category config is null", key.getCategory());
         final String finalKey = categoryConfig.getKey(key.getParams());
@@ -1110,6 +1110,29 @@ public class RedisStoreClientImpl extends AbstractStoreClient implements RedisSt
         }, categoryConfig, finalKey, "ltrim");
     }
 
+    @Override
+    public Long lrem(StoreKey key, final long count, final Object object) {
+        checkNotNull(key, "store key is null");
+        checkNotNull(object, "value is null");
+        final StoreCategoryConfig categoryConfig = configManager.findCacheKeyType(key.getCategory());
+        checkNotNull(categoryConfig, "%s's category config is null", key.getCategory());
+        final String finalKey = categoryConfig.getKey(key.getParams());
+        
+        return executeWithMonitor(new Command() {
+
+            @Override
+            public Object execute() throws Exception {
+                String value = transcoder.encode(object);
+                if (value != null) {
+                    Long result = clientManager.getClient().lrem(finalKey, count, value);
+                    return result;
+                }
+                return 0L;
+            }
+            
+        }, categoryConfig, finalKey, "lrem");
+    }
+    
     @Override
     public Long sadd(StoreKey key, final Object... objects) {
         checkNotNull(key, "store key is null");
