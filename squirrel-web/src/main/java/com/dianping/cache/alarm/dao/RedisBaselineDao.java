@@ -8,8 +8,10 @@ import java.util.List;
 public interface RedisBaselineDao {
 	
 	List<RedisBaseline> findAll();
+
+	List<RedisBaseline>findByTaskId(int taskId);
 	
-	List<RedisBaseline> findByServer(String server);
+	List<RedisBaseline> findByName(String baseline_name);
 	
 	List<RedisBaseline> findByServerWithInterval(@Param("address") String address, @Param("start") long start, @Param("end") long end);
 	

@@ -4,6 +4,15 @@
         <script type="text/javascript"
                 src="${rc.contextPath}/static/js/avatar-cacheconfig.js"></script>
         <!-- page-content -->
+        <style>
+            th{
+                font-size: 14px;  color: #404040;
+            }
+            .bold{
+                font-weight: bolder;
+            }
+        </style>
+
         <div class="page-content">
             <!--row  -->
             <div class="row">
@@ -13,23 +22,21 @@
                         <thead>
                         <tr>
                             <th style="width: 15%; text-align: left">服务名称</th>
-                            <th style="width: 10%; text-align: center">客户端实现类</th>
+                            <th style="width: 15%; text-align: center">客户端实现类</th>
                             <th style="width: 10%; text-align: center">泳道</th>
-                            <th style="width: 30%; text-align: left">服务地址</th>
+                            <th style="width: 25%; text-align: left">服务地址</th>
                             <th style="width: 20%; text-align: center">transcoder</th>
                             <th
                                     style="width: 15%; text-align: left;#if(${isadmin})display: table-cell;#else display: none;#end;">
                                 操作
-                                <a href="${rc.contextPath}/cache/config/new">
-                                    <button type="button" class="btn btn-success btn-xs ">
-                                        <i class="ace-icon fa fa-plus"></i>
-                                    </button>
+                                <a href="${rc.contextPath}/cache/config/new"class="grey pull-right">
+                                    <i class="ace-icon fa fa-plus bigger-110"></i>
                                 </a>
                             </th>
                         </tr>
                         </thead>
                         <tbody>
-                        <tr ng-repeat="info in searchPaginator.currentPageItems">
+                        <tr ng-repeat="info in currentPageItems">
                             <td
                                     style="text-align: left; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">
                                 {{info.cacheKey}}
@@ -158,27 +165,27 @@
 
     </div>
 </div>
-<script type="application/javascript">
-    $(document).ready(function () {
-        setTimeout(function() {
-            $('#configTable').dataTable({
-                "bAutoWidth": true,
-                "bPaginate": true, //翻页功能
-                "bLengthChange": true, //改变每页显示数据数量
-                "bFilter": true, //过滤功能
-                "bSort": true, //排序功能
-                "bInfo": true,//页脚信息
-                "bStateSave": false,
-                "aaSorting": [],
-                "iDisplayLength": 10,
-                "aoColumns": [
-                    null, null,null, null, null,
-                    { "bSortable": false }
-                ],
-            });
-        }, 300);
-    });
-</script>
+<!--<script type="application/javascript">-->
+    <!--$(document).ready(function () {-->
+        <!--setTimeout(function () {-->
+            <!--$('#configTable').dataTable({-->
+                <!--"bAutoWidth": true,-->
+                <!--"bPaginate": true, //翻页功能-->
+                <!--"bLengthChange": true, //改变每页显示数据数量-->
+                <!--"bFilter": true, //过滤功能-->
+                <!--"bSort": true, //排序功能-->
+                <!--"bInfo": true,//页脚信息-->
+                <!--"bStateSave": false,-->
+                <!--"aaSorting": [],-->
+                <!--"iDisplayLength": 10,-->
+                <!--"aoColumns": [-->
+                    <!--null, null, null, null, null,-->
+                    <!--{"bSortable": false}-->
+                <!--],-->
+            <!--});-->
+        <!--}, 0);-->
+    <!--});-->
+<!--</script>-->
 
 
 

@@ -16,6 +16,8 @@ public class RedisClientConfig implements StoreClientConfig {
     
     private List<String> serverList = new ArrayList<String>();
     
+    private String password;
+    
     private int connTimeout;
     
     private int readTimeout;
@@ -38,6 +40,14 @@ public class RedisClientConfig implements StoreClientConfig {
         this.serverList = serverList;
     }
 
+    public String getPassword() {
+        return password;
+    }
+    
+    public void setPassword(String password) {
+        this.password = password;
+    }
+    
     public int getConnTimeout() {
         return connTimeout;
     }
@@ -69,6 +79,7 @@ public class RedisClientConfig implements StoreClientConfig {
     public String toString() {
         return new ToStringBuilder(this).
                 append(serverList).
+                append(password).
                 append(connTimeout).
                 append(readTimeout).
                 append(maxRedirects).

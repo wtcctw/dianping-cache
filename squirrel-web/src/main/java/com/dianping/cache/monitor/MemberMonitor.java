@@ -9,6 +9,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.zookeeper.CreateMode;
 import org.apache.zookeeper.WatchedEvent;
@@ -16,7 +17,6 @@ import org.apache.zookeeper.Watcher.Event.EventType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.dianping.cache.util.CollectionUtils;
 import com.dianping.squirrel.client.util.IPUtils;
 
 public class MemberMonitor implements CuratorHandler {
@@ -57,7 +57,7 @@ public class MemberMonitor implements CuratorHandler {
             memberId = registerMembership();
             logger.info("registered membership, member id: " + memberId);
             memberMap = loadMembers();
-            logger.info("loaded members: " + CollectionUtils.toString(memberMap.values()));
+            logger.info("loaded members: " + StringUtils.join(memberMap.values(), ','));
             isMaster = checkMaster();
             state = STATE_SUCC;
         } catch (Exception e) {
@@ -82,7 +82,7 @@ public class MemberMonitor implements CuratorHandler {
         wlock.lock();
         try {
             memberMap = loadMembers();
-            logger.info("loaded members: " + CollectionUtils.toString(memberMap.values()));
+            logger.info("loaded members: " + StringUtils.join(memberMap.values(), ','));
             isMaster = checkMaster();
             state = STATE_SUCC;
         } catch (Exception e) {

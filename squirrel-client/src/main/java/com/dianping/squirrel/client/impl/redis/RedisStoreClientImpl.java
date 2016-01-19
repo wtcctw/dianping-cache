@@ -32,6 +32,8 @@ import com.dianping.cat.Cat;
 import com.dianping.cat.message.Message;
 import com.dianping.cat.message.Transaction;
 import com.dianping.squirrel.client.StoreKey;
+import com.dianping.squirrel.client.auth.AuthException;
+import com.dianping.squirrel.client.auth.AuthManager;
 import com.dianping.squirrel.client.config.StoreCategoryConfig;
 import com.dianping.squirrel.client.config.StoreClientConfig;
 import com.dianping.squirrel.client.core.StoreCallback;
@@ -43,8 +45,9 @@ import com.dianping.squirrel.client.monitor.KeyCountMonitor;
 import com.dianping.squirrel.client.monitor.StatusHolder;
 import com.dianping.squirrel.common.exception.StoreException;
 import com.dianping.squirrel.common.exception.StoreTimeoutException;
+import com.dianping.squirrel.common.lifecycle.Authorizable;
 
-public class RedisStoreClientImpl extends AbstractStoreClient implements RedisStoreClient {
+public class RedisStoreClientImpl extends AbstractStoreClient implements RedisStoreClient, Authorizable {
 
     private static Logger logger = LoggerFactory.getLogger(RedisStoreClientImpl.class);
 
@@ -86,6 +89,11 @@ public class RedisStoreClientImpl extends AbstractStoreClient implements RedisSt
         clientManager.closeClient();
     }
 
+    @Override
+    public void authorize(String client, String resource) throws AuthException {
+        AuthManager.getInstance().authorize(client, resource);
+    }
+    
     protected <T> T executeWithMonitor(Command command, StoreCategoryConfig categoryConfig, String finalKey, String action) {
         String storeType = categoryConfig.getCacheType();
         String category = categoryConfig.getCategory();

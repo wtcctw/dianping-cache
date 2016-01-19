@@ -3,13 +3,14 @@ package com.dianping.cache.alarm.receiver;
 import com.dianping.ba.hris.md.api.dto.EmployeeDto;
 import com.dianping.ba.hris.md.api.service.EmployeeService;
 import com.dianping.cache.alarm.utils.DateUtil;
-import com.dianping.cache.util.CollectionUtils;
 import com.dianping.ops.cmdb.CmdbManager;
 import com.dianping.ops.cmdb.CmdbProject;
 import com.dianping.ops.cmdb.CmdbResult;
 import com.dianping.ops.http.HttpConfig;
 import com.dianping.ops.http.HttpGetter;
 import com.dianping.ops.http.HttpResult;
+import com.google.common.base.Splitter;
+import com.google.common.collect.Lists;
 import org.apache.http.client.utils.URIBuilder;
 import org.dom4j.Attribute;
 import org.dom4j.Document;
@@ -17,7 +18,6 @@ import org.dom4j.DocumentException;
 import org.dom4j.DocumentHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.net.URI;
@@ -34,7 +34,6 @@ public class ReceiverServiceImpl implements ReceiverService {
 
     protected final Logger logger = LoggerFactory.getLogger(getClass());
 
-    @Autowired
     private EmployeeService employeeService;
 
     public List<String> getSmsReceiver(String smsReceiver, String domain, boolean sendToBusiness) throws URISyntaxException, DocumentException, InterruptedException {
@@ -44,7 +43,7 @@ public class ReceiverServiceImpl implements ReceiverService {
             defalutReceiver = getDefaultReceiver(domain);
         }
 
-        List<String> adReceiverList = CollectionUtils.toList(smsReceiver, ",");
+        List<String> adReceiverList = Lists.newArrayList(Splitter.on(",").trimResults().split(smsReceiver));
         if ((null != defalutReceiver)&&sendToBusiness) {
             adReceiverList.addAll(defalutReceiver);
         }
@@ -72,7 +71,7 @@ public class ReceiverServiceImpl implements ReceiverService {
             defalutReceiver = getDefaultReceiver(domain);
         }
 
-        List<String> adReceiverList = CollectionUtils.toList(weiXinReceiver, ",");
+        List<String> adReceiverList = Lists.newArrayList(Splitter.on(",").trimResults().split(weiXinReceiver));
 
         if ((null != defalutReceiver)&&sendToBusiness) {
             adReceiverList.addAll(defalutReceiver);
@@ -99,8 +98,7 @@ public class ReceiverServiceImpl implements ReceiverService {
         if (sendToBusiness) {
             defalutReceiver = getDefaultReceiver(domain);
         }
-
-        List<String> adReceiverList = CollectionUtils.toList(mailReceiver, ",");
+        List<String> adReceiverList = Lists.newArrayList(Splitter.on(",").trimResults().split(mailReceiver));
 
         if ((null != defalutReceiver)&&sendToBusiness) {
             adReceiverList.addAll(defalutReceiver);

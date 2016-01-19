@@ -16,8 +16,8 @@
 package com.dianping.cache.remote.translator;
 
 import com.dianping.cache.entity.CacheKeyConfiguration;
-import com.dianping.remote.cache.dto.CacheKeyConfigurationDTO;
 import com.dianping.squirrel.client.util.DTOUtils;
+import com.dianping.squirrel.common.domain.CacheKeyConfigurationDTO;
 
 /**
  * Translator from {@link CacheKeyConfiguration} to

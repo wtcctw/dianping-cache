@@ -1,0 +1,50 @@
+<div class="main-content" style="opacity: 1.0;"
+     ng-controller="TaskController">
+    <div class="main-content-inner">
+        <script type="text/javascript"
+                src="${rc.contextPath}/static/js/squirrel/task.js"></script>
+
+        <!-- page-content -->
+        <div class="page-content">
+            <!--row  -->
+            <div class="row">
+                <div class="col-xs-12">
+                    <table id="taskTable" class="table table-hover progress-panel table-striped"
+                           style="table-layout: fixed;">
+                        <thead>
+                        <tr>
+                            <th>任务id</th>
+                            <th>任务类型</th>
+                            <th>任务描述</th>
+                            <th>当前状态</th>
+                            <th>发起时间</th>
+                            <th>发起人</th>
+                            <th>操作</th>
+                        </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+    <script src="${rc.contextPath}/assets/js/date-time/jquery-ui-sliderAccess.js"></script>
+    <script type="application/javascript">
+        function drowPercent() {
+            $('.easy-pie-chart.percentage').each(function(){
+                var $box = $(this).closest('.infobox');
+                var barColor = $(this).data('color') || (!$box.hasClass('infobox-dark') ? $box.css('color') : 'rgba(255,255,255,0.95)');
+                var trackColor = barColor == 'rgba(255,255,255,0.95)' ? 'rgba(255,255,255,0.25)' : '#E2E2E2';
+                var size = parseInt($(this).data('size')) || 50;
+                $(this).easyPieChart({
+                    barColor: barColor,
+                    trackColor: trackColor,
+                    scaleColor: false,
+                    lineCap: 'butt',
+                    lineWidth: parseInt(size/10),
+                    animate: ace.vars['old_ie'] ? false : 1000,
+                    size: size
+                });
+            })
+        }
+    </script>

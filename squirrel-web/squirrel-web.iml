@@ -15,22 +15,6 @@
         </sourceRoots>
       </configuration>
     </facet>
-    <facet type="Spring" name="Spring">
-      <configuration>
-        <fileset id="fileset" name="Spring Application Context" removed="false">
-          <file>file://$MODULE_DIR$/src/main/resources/config/spring/appcontext-cache-jms-sender.xml</file>
-          <file>file://$MODULE_DIR$/src/main/resources/config/spring/appcontext-core.xml</file>
-          <file>file://$MODULE_DIR$/src/main/resources/config/spring/appcontext-server.xml</file>
-          <file>file://$MODULE_DIR$/src/main/resources/servlet-context.xml</file>
-          <file>file://$MODULE_DIR$/src/main/resources/config/spring/appcontext-service.xml</file>
-          <file>file://$MODULE_DIR$/src/main/resources/config/spring/appcontext-security.xml</file>
-          <file>file://$MODULE_DIR$/src/main/resources/config/spring/appcontext-sms.xml</file>
-          <file>file://$MODULE_DIR$/src/main/resources/config/spring/appcontext-mybatis.xml</file>
-          <file>file://$MODULE_DIR$/src/main/resources/config/spring/appcontext-context.xml</file>
-          <file>file://$MODULE_DIR$/src/main/resources/config/spring/appcontext-aop-core.xml</file>
-        </fileset>
-      </configuration>
-    </facet>
   </component>
   <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_1_6" inherit-compiler-output="false">
     <output url="file://$MODULE_DIR$/target/classes" />
@@ -84,7 +68,7 @@
     <orderEntry type="library" name="Maven: commons-fileupload:commons-fileupload:1.2.2" level="project" />
     <orderEntry type="library" name="Maven: org.unidal.framework:dal-jdbc:2.2.0" level="project" />
     <orderEntry type="library" name="Maven: com.google.code.gson:gson:1.6" level="project" />
-    <orderEntry type="library" name="Maven: com.dianping.lion:lion-client:0.5.6" level="project" />
+    <orderEntry type="library" name="Maven: com.dianping.lion:lion-client:0.5.7" level="project" />
     <orderEntry type="library" name="Maven: org.apache.curator:curator-recipes:2.7.1" level="project" />
     <orderEntry type="library" name="Maven: org.jodd:jodd-bean:3.4.9" level="project" />
     <orderEntry type="library" name="Maven: org.jodd:jodd-core:3.4.9" level="project" />
@@ -140,7 +124,6 @@
     <orderEntry type="library" name="Maven: org.codehaus.jackson:jackson-mapper-asl:1.9.4" level="project" />
     <orderEntry type="library" name="Maven: com.fasterxml.jackson.core:jackson-databind:2.1.4" level="project" />
     <orderEntry type="library" name="Maven: org.springframework.security:spring-security-core:2.0.4" level="project" />
-    <orderEntry type="library" name="Maven: commons-collections:commons-collections:3.2" level="project" />
     <orderEntry type="library" name="Maven: org.springframework:spring-flex:1.0.2.RELEASE" level="project" />
     <orderEntry type="library" name="Maven: backport-util-concurrent:backport-util-concurrent:2.2" level="project" />
     <orderEntry type="library" name="Maven: cglib:cglib-nodep:2.1_3" level="project" />
@@ -214,6 +197,7 @@
     <orderEntry type="library" name="Maven: com.dianping.cas.server:cas-server-api:0.0.5" level="project" />
     <orderEntry type="library" name="Maven: com.dianping:ops-remote-host:1.0.14" level="project" />
     <orderEntry type="library" name="Maven: commons-codec:commons-codec:1.4" level="project" />
+    <orderEntry type="library" name="Maven: commons-collections:commons-collections:3.2.1" level="project" />
     <orderEntry type="library" name="Maven: org.opensaml:opensaml:1.1" level="project" />
     <orderEntry type="library" name="Maven: org.apache.santuario:xmlsec:1.4.0" level="project" />
     <orderEntry type="library" name="Maven: com.dianping.ba:masterdata-api:0.1.7" level="project" />

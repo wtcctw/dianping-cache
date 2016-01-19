@@ -7,8 +7,10 @@ import java.util.List;
 public interface MemcacheBaselineService {
 
 	List<MemcacheBaseline> findAll();
+
+	List<MemcacheBaseline> findByTaskId(int taskId);
 	
-	List<MemcacheBaseline> findByServer(String server);
+	List<MemcacheBaseline> findByName(String baseline_name);
 	
 	void insert(MemcacheBaseline stat);
 	

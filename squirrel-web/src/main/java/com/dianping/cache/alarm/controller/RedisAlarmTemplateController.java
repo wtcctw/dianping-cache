@@ -44,6 +44,7 @@ public class RedisAlarmTemplateController extends AbstractSidebarController {
                     .setId(0)
                     .setTemplateName("Default");
             redisTemplate.setIsDown(true)
+                    .setCheckHistory(false)
                     .setMemThreshold(80)
                     .setQpsThreshold(80000)
                     .setCreateTime(new Date())
@@ -96,8 +97,4 @@ public class RedisAlarmTemplateController extends AbstractSidebarController {
         return "template";
     }
 
-    @Override
-    protected String getMenu() {
-        return "tool";
-    }
 }

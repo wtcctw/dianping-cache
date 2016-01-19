@@ -1,0 +1,559 @@
+<div class="main-content" style="opacity: 1.0;"
+     ng-controller="RedisController">
+    <div class=" main-content-inner">
+        <script type="text/javascript"
+                src="${rc.contextPath}/static/js/highcharts/highcharts.js"></script>
+        <script type="text/javascript"
+                src="${rc.contextPath}/static/js/highcharts/highcharts-more.js"></script>
+        <script type="text/javascript"
+                src="${rc.contextPath}/static/js/highcharts/solid-gauge.js"></script>
+        <script type="text/javascript"
+                src="${rc.contextPath}/static/js/squirrel/redisdetail.js"></script>
+        <script type="text/javascript"
+                src="${rc.contextPath}/static/js/mask/loadmask.js"></script>
+        <style>
+            th{
+               font-size: 14px;  color: #404040;
+            }
+
+        </style>
+        <div class="page-content">
+            <div class="page-header">
+                <h1>集群
+                    <i class="ace-icon fa fa-angle-double-right"></i>
+                    Redis  <i class="ace-icon fa fa-angle-right"></i>
+                    {{redisData.clusterName}}
+                </h1>
+            </div>
+
+            <div class="row">
+                <div class="col-xs-12">
+                <h4 class="col-xs-12 header blue">性能概览</h4>
+                <div style="width: 600px; height: 200px; margin: 0 auto">
+                    <div id="container-memory" style="width: 300px; height: 200px; float: left">
+                    </div>
+                     <div id="container-qps" style="width: 300px; height: 200px; float: left"></div>
+                </div>
+                <h4 class="col-xs-12 header blue">节点信息</h4>
+                <div class=" col-xs-12">
+                        <table class="table table-striped table-hover" id="node">
+                            <thead>
+                            <tr>
+                                <th style="width: 5%">ID</th>
+                                <th style="width: 25%">Master</th>
+                                <th style="width: 20%">Slave</th>
+                                <th style="width: 10%">内存</th>
+                                <th style="width: 10%">Slots</th>
+                                <th style="width: 10%">QPS</th>
+                                <th style="width: 20%;#if(${isadmin})display: table-cell;#else display: none;#end;">操作
+                                    <a href="#" class="grey pull-right">
+                                        <i class="ace-icon fa fa-plus-square bigger-110"></i>
+                                    </a>
+                                </th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr ng-repeat = "data in redisData.nodes">
+                                <td>{{$index+1}}</td>
+                                <td>{{data.master.address}}
+                                    <a href="#" class="warning" ng-show="data.master.migrating"><i class="ace-icon fa fa-upload bigger-130"></i></a>
+                                    <a href="#" class="warning" ng-show="data.master.importing"><i class="ace-icon fa fa-download bigger-130"></i></a>
+                                </td>
+                                <td>{{data.slave.address}}</td>
+                                <td>{{data.master.info.used}}%/{{data.master.info.maxMem}}G</td>
+                                <td>{{data.master.slotSize}}</td>
+                                <td>{{data.master.info.qps}}</td>
+                                <td style="margin-right: 20px;#if(${isadmin})display: table-cell;#else display: none;#end;">
+                                    <div class="hidden-sm hidden-xs action-buttons">
+                                        <a class="grey" href="#reshardModal" data-toggle="modal">
+                                            <i class="ace-icon fa fa-share bigger-130"></i>
+                                        </a>
+                                        <a class="grey" href="#changeConfirm" data-toggle="modal" ng-click="setFailover(data.slave.address)">
+                                            <i class="ace-icon fa fa-exchange bigger-130"></i>
+                                        </a>
+                                        <a class="grey" href="${rc.contextPath}/redis/serverinfo" ng-click="transport(data.master.address)">
+                                            <i class="ace-icon fa fa-bar-chart-o bigger-130"></i>
+                                        </a>
+                                        <a class="grey" href="#addModal" data-toggle="modal" ng-click="setParams(redisData.clusterName,data.master.address)" ng-show="{{data.slave.address==null}}">
+                                            <i class="ace-icon bigger-130"> S+ </i>
+                                        </a>
+                                        <a class="grey" href="#deleteModal" data-toggle="modal" ng-click="setParams(redisData.clusterName,data.slave.address)" ng-show="{{data.slave.address!=null}}">
+                                            <i class="ace-icon bigger-130"> S- </i>
+                                        </a>
+                                        <a class="grey" href="">
+
+                                        </a>
+
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr ng-repeat = "data in redisData.failedServers">
+                                <td>Failed</td>
+                                <td>{{data.address}}</td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td style="margin-right: 20px;#if(${isadmin})display: table-cell;#else display: none;#end;">
+                                    <div class="hidden-sm hidden-xs action-buttons">
+                                    </div>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                </div>
+                    <br>
+                    <br>
+                <h4 class="col-xs-12 header blue">Category信息</h4>
+                <div class=" col-xs-12">
+                    <table class="table table-striped table-hover" id="category">
+                        <thead>
+                        <tr>
+                            <th style="width: 5%">ID</th>
+                            <th style="width: 25%">Category</th>
+                            <th style="width: 10%">过期时间</th>
+                            <th style="width: 20%">命名模版</th>
+                            <th style="width: 10%">版本</th>
+                            <th style="width: 10%">是否热点</th>
+                            <th style="width: 20%;#if(${isadmin})display: table-cell;#else display: none;#end;">操作
+                                <a href="#" class="grey pull-right">
+                                    <i class="ace-icon fa fa-plus-square bigger-110"></i>
+                                </a>
+                            </th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr ng-repeat="category in categoryList">
+                            <td>{{$index+1}}</td>
+                            <td>{{category.category}}</td>
+                            <td>{{category.duration}}</td>
+                            <td>{{category.indexTemplate}}</td>
+                            <td>{{category.version}}</td>
+                            <td>
+                                <i class="ace-icon glyphicon glyphicon-ok grey" ng-show="{{category.hot}}"></i>
+                                <i class="ace-icon glyphicon glyphicon-remove grey" ng-show="!{{category.hot}}"></i>
+                            </td>
+                            <td style="margin-right: 20px;#if(${isadmin})display: table-cell;#else display: none;#end;">
+                                <div class="hidden-sm hidden-xs action-buttons">
+                                    <a class="grey" href="#modifyCategory" ng-click="transportEntity(category)" data-toggle="modal">
+                                        <i class="ace-icon fa fa-cog bigger-130"></i>
+                                    </a>
+
+                                    <a class="grey" href="#">
+                                        <i class="ace-icon fa fa-search bigger-130"></i>
+                                    </a>
+
+                                    <a class="grey" href="#">
+                                        <i class="ace-icon glyphicon glyphicon-th-large bigger-130"></i>
+                                    </a>
+                                    <a class="grey" href="#log" data-toggle="modal" ng-click="getLogs(category.category)">
+                                        <i class="ace-icon fa fa-file-text-o bigger-130"></i>
+                                    </a>
+
+                                    <a class="grey" href="#">
+                                        <i class="ace-icon fa fa-trash-o bigger-140"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="modal fade" id="reshardModal" tabindex="-1" role="dialog"
+         aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"
+                            aria-hidden="true">&times;</button>
+                    <h4 class="modal-title">Slot迁移</h4>
+                </div>
+                <div class="modal-body">
+                    <form method="post"
+                          class="form-horizontal bs-example bs-example-form" role="form"
+                          name="myForm" ng-submit="reshard()">
+                        <div class="input-group col-xs-12"  ng-switch="reshardType">
+                            <div class="col-xs-12 form-group">
+                                <label class="col-xs-3 control-label control-label no-padding-right">1.选择迁移模式</label>
+                                <div class="col-xs-9">
+                                    <select class="col-xs-12" ng-model="reshardType"
+                                            name="type"required>
+                                        <option value="average">配平</option>
+                                        <option value="export">导出</option>
+                                    </select>
+                                    <span ng-switch-when="average">(注:配平模式下将平衡所选实例的slot)</span>
+                                    <span ng-switch-when="export">(注:导出模式下会把选中源实例中所有的slot导出)</span>
+                                </div>
+                            </div>
+                            <div class="space-4"></div>
+                            <div class="col-xs-12 form-group" ng-switch-when="average">
+                                <label class="col-xs-3 control-label control-label no-padding-right">2.选择实例：</label>
+                                <div class="col-xs-9">
+                                    <table class="table" id="avgTable">
+                                        <thead >
+                                        <tr >
+                                            <th class="center">
+                                                <label class="position-relative">
+                                                    <input type="checkbox" class="ace"/>
+                                                    <span class="lbl"></span>
+                                                </label>
+                                            </th>
+                                            <th>Address</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <tr ng-repeat="address in redisData.nodes">
+                                            <td class="center">
+                                                <label class="position-relative">
+                                                    <input type="checkbox" class="ace avg"/>
+                                                    <span class="lbl"></span>
+                                                </label>
+                                            </td>
+                                            <td>
+                                                <a>{{address.master.address}} slots : {{address.master.slotSize}}</a>
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="col-xs-12 form-group" ng-switch-when="export">
+                                <label class="col-xs-3 control-label control-label no-padding-right">1.选择源实例：</label>
+                                <div class="col-xs-9">
+                                    <table class="table" id="srcTable">
+                                        <thead >
+                                            <tr >
+                                                <th class="center">
+                                                    <label class="position-relative">
+                                                        <input type="checkbox" class="ace "/>
+                                                        <span class="lbl"></span>
+                                                    </label>
+                                                </th>
+                                                <th>Address</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr ng-repeat="address in redisData.nodes">
+                                                <td class="center">
+                                                    <label class="position-relative">
+                                                        <input type="checkbox" class="ace exsrc" />
+                                                        <span class="lbl"></span>
+                                                    </label>
+                                                </td>
+                                                <td>
+                                                    <a>{{address.master.address}} slots : {{address.master.slotSize}}</a>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <br>
+                                <br>
+                                <label class="col-xs-3 control-label no-padding-right">2.选择目标实例：</label>
+                                <div class="col-xs-9">
+                                    <table class="table" id="desTable">
+                                        <thead >
+                                        <tr >
+                                            <th class="center">
+                                                <label class="position-relative">
+                                                    <input type="checkbox" class="ace"/>
+                                                    <span class="lbl"></span>
+                                                </label>
+                                            </th>
+                                            <th>Address</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <tr ng-repeat="address in redisData.nodes">
+                                            <td class="center">
+                                                <label class="position-relative">
+                                                    <input type="checkbox" class="ace exdes" />
+                                                    <span class="lbl"></span>
+                                                </label>
+                                            </td>
+                                            <td>
+                                                <a>{{address.master.address}} slots : {{address.master.slotSize}}</a>
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <div class="control-group" style="margin-top: 20px;text-align: center;">
+                                <div class="controls">
+                                    <button type="button" class="btn btn-sm btn-default" style="float: left;margin-left: 10%;"
+                                            data-dismiss="modal">关闭
+                                    </button>
+                                    <button type="submit" class="btn btn-sm btn-success" style="float: right;margin-left: 10%;"
+                                            >提交</button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <!--/.modal-content-->
+    </div>
+
+    <div class="modal fade" id="changeConfirm" tabindex="-1" role="dialog"
+         aria-labelledby="myModalLabel" aria-hidden="true" style="width: 300px; margin: 0 auto;margin-top: 150px;">
+        <div class="modal-dialog" style="width: 300px; margin: 0 auto;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close"
+                            data-dismiss="modal" aria-hidden="true">
+                        &times;
+                    </button>
+                    <h4 class="modal-title red">
+                        警告
+                    </h4>
+                </div>
+                <div class="modal-body bolder center">
+                    确认主从切换 ?<br>从 : {{failover}} <br>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-sm btn-default pull-left"
+                            data-dismiss="modal">取消
+                    </button>
+                    <button type="button" class="btn btn-sm btn-danger pull-right" ng-click="execFailover()" data-dismiss="modal">
+                        确认
+                    </button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal -->
+    </div>
+
+    <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog"
+         aria-labelledby="myModalLabel" aria-hidden="true" style="width: 300px; margin: 0 auto;margin-top: 150px;">
+        <div class="modal-dialog" style="width: 300px; margin: 0 auto;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <!--<button type="button" class="close"-->
+                            <!--data-dismiss="modal" aria-hidden="true">-->
+                        <!--&times;-->
+                    <!--</button>-->
+                    <h4 class="modal-title red">
+                        警告
+                    </h4>
+                </div>
+                <div class="modal-body bolder center">
+                    确认删除Slave ?<br>从 : {{address}} <br>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-sm btn-default pull-left"
+                            data-dismiss="modal">取消
+                    </button>
+                    <button type="button" class="btn btn-sm btn-danger pull-right" ng-click="deleteSlave(cluster,address)" data-dismiss="modal">
+                        确认
+                    </button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal -->
+    </div>
+
+
+    <div class="modal fade" id="addModal" tabindex="-1" role="dialog"
+         aria-labelledby="myModalLabel" aria-hidden="true" style="width: 300px; margin: 0 auto;margin-top: 150px;">
+        <div class="modal-dialog" style="width: 300px; margin: 0 auto;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <!--<button type="button" class="close"-->
+                            <!--data-dismiss="modal" aria-hidden="true">-->
+                        <!--&times;-->
+                    <!--</button>-->
+                    <h4 class="modal-title red">
+                        警告
+                    </h4>
+                </div>
+                <div class="modal-body bolder center">
+                    确认为该节点添加Slave?<br>主 : {{address}} <br>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-sm btn-default pull-left"
+                            data-dismiss="modal">取消
+                    </button>
+                    <button type="button" class="btn btn-sm btn-danger pull-right" ng-click="addSlave(cluster,address)" data-dismiss="modal">
+                        确认
+                    </button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal -->
+    </div>
+
+
+    <div class="modal fade" id="modifyCategory" tabindex="-1"
+         role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content" style="border: none">
+                <div class="modal-body">
+                    <form class="form-horizontal" role="form" method="post" ng-submit="updateCategory()">
+                        <div class="form-group">
+                            <h4>修改 Category</h4>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-4">category</label>
+                            <div class="col-sm-8">
+                                <input class="col-sm-12" type="text" name="category"
+                                       ng-model="categoryEntity.category" readonly="readonly">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-4">duration</label>
+                            <div class="col-sm-8">
+                                <input class="col-sm-12" type="text" name="duration"
+                                       ng-model="categoryEntity.duration">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-4">indexTemplate</label>
+                            <div class="col-sm-8">
+                                <input class="col-sm-12" type="text" name="indexTemplate"
+                                       ng-model="categoryEntity.indexTemplate">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-4 ">indexDesc</label>
+                            <div class="col-sm-8">
+                                <input class="col-sm-12" type="text" name="indexDesc"
+                                       ng-model="categoryEntity.indexDesc">
+                            </div>
+                        </div>
+
+                        <div class="form-group ">
+                            <label class="col-sm-4">cacheType</label>
+                            <div class="col-sm-8">
+                                <select class="col-sm-12" ng-model="categoryEntity.cacheType"
+                                        ng-options="p for p in configParas">
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-4 ">extension</label>
+                            <div class="col-sm-8">
+                                <input class="col-sm-12" type="text" name="extension"
+                                       ng-model="categoryEntity.extension">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-4">version</label>
+                            <div class="col-sm-8">
+                                <input class="col-sm-12" type="text" readonly="readonly"  ng-model="categoryEntity.version">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-4 ">是否热点</label>
+                            <div class="col-sm-8">
+                                <input type="checkbox" name="hot" ng-model="categoryEntity.hot">
+                            </div>
+                        </div>
+                        <div class="form-group ">
+                            <button type="button" class="btn btn-sm" style="float: left"
+                                    data-dismiss="modal">关闭</button>
+                            <button type="submit" style="float: right"
+                                    class="btn btn-sm btn-success">提交</button>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="log" tabindex="-1" role="dialog"
+         aria-labelledby="myModalLabel" aria-hidden="true" >
+        <div class="modal-dialog" >
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button class="close btn-xs" data-dismiss="modal"
+                            aria-hidden="true">&times;</button>
+                    <h4 class="modal-title">
+                        日志
+                    </h4>
+                </div>
+                <div class="modal-body  center">
+                    <div class="row">
+                        <table id="logTable" class="table table-striped" style="table-layout: fixed;">
+                            <thead>
+                            <tr>
+                                <th style="width: 10%;"><i class="ace-icon fa fa-angle-down icon-on-right"></i></th>
+                                <th style="width: 15%; text-align: left;">操作人</th>
+                                <th style="width: 20%;">操作内容</th>
+                                <th style="width: 35%; text-align: center">操作时间</th>
+                                <th style="width: 10%;">状态</th>
+                                <th style="width: 10%;#if(${isadmin})display: table-cell;#else display: none;#end;">操作
+                                </th>
+
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr ng-repeat="log in logs">
+
+                                <td >{{$index+1}}</td>
+                                <td style="text-align: left;">{{log.operator}}</td>
+                                <td style="overflow: hidden;text-overflow: ellipsis;">{{log.content.substring(0,log.content.indexOf("("))}}</td>
+                                <td>{{log.operateTime | date:'yyyy-MM-dd HH:mm:ss'}}</td>
+                                <td>{{log.succeed}}</td>
+                                <td style="#if(${isadmin})display: table-cell;#else display: none;#end;">
+                                    <div class="hidden-sm hidden-xs action-buttons">
+                                        <a class="grey" href="#logContent" data-toggle="modal" ng-click="setContent(log.content)">
+                                            <i class="ace-icon fa fa-search bigger-130"></i>
+                                        </a>
+                                    </div>
+                                </td>
+
+                            </tr>
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal -->
+    </div>
+
+
+    <div class="modal fade" id="logContent" tabindex="-1" role="dialog"
+         aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button class="close btn-xs" data-dismiss="modal"
+                            aria-hidden="true">&times;</button>
+                    <h4 class="modal-title" id="myModalLabel">操作内容</h4>
+                </div>
+                <div class="modal-body">
+                    <form method="post" class="form-horizontal" name="myForm">
+                        <textarea rows="18" class="col-sm-12" disabled>{{logContent}}</textarea>
+                        <p>&nbsp;</p>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+
+</div>
+
+<script type="application/javascript">
+    $(document).on('click', 'th input:checkbox' , function(){
+        var that = this;
+        $(this).closest('table').find('tr > td:first-child input:checkbox')
+                .each(function(){
+                    this.checked = that.checked;
+                    $(this).closest('tr').toggleClass('selected');
+                });
+    });
+</script>
+
+

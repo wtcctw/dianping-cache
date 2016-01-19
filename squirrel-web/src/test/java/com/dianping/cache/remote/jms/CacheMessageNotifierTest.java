@@ -17,7 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import com.dianping.remote.cache.dto.SingleCacheRemoveDTO;
+import com.dianping.squirrel.common.domain.SingleCacheRemoveDTO;
 
 import edu.emory.mathcs.backport.java.util.Collections;
 

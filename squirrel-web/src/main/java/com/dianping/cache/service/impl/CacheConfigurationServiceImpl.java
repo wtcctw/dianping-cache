@@ -25,7 +25,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import com.dianping.remote.cache.dto.CacheConfigurationRemoveDTO;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,24 +45,23 @@ import com.dianping.cache.service.CacheConfigurationService;
 import com.dianping.cache.service.CacheKeyConfigurationService;
 import com.dianping.cache.service.OperationLogService;
 import com.dianping.cache.service.ServerGroupService;
-import com.dianping.cache.util.CollectionUtils;
 import com.dianping.cache.util.Migrator;
 import com.dianping.lion.Environment;
 import com.dianping.ops.cmdb.CmdbManager;
 import com.dianping.ops.cmdb.CmdbProject;
 import com.dianping.ops.cmdb.CmdbResult;
 import com.dianping.ops.cmdb.CmdbServer;
-import com.dianping.queue.SimpleQueueService;
-import com.dianping.queue.message.Message;
-import com.dianping.queue.message.TextMessage;
-import com.dianping.remote.cache.dto.CacheConfigurationDTO;
-import com.dianping.remote.cache.dto.CacheKeyTypeVersionUpdateDTO;
-import com.dianping.remote.cache.dto.SingleCacheRemoveDTO;
 import com.dianping.squirrel.client.StoreClient;
 import com.dianping.squirrel.client.core.StoreClientBuilder;
 import com.dianping.squirrel.client.impl.memcached.MemcachedClientConfig;
 import com.dianping.squirrel.common.config.ConfigChangeListener;
 import com.dianping.squirrel.common.config.ConfigManagerLoader;
+import com.dianping.squirrel.common.domain.CacheConfigurationDTO;
+import com.dianping.squirrel.common.domain.CacheConfigurationRemoveDTO;
+import com.dianping.squirrel.common.domain.CacheKeyTypeVersionUpdateDTO;
+import com.dianping.squirrel.common.domain.SingleCacheRemoveDTO;
+import com.google.common.base.Splitter;
+import com.google.common.collect.Lists;
 
 /**
  * CacheConfigurationService to provide cache configuration data
@@ -94,8 +93,6 @@ public class CacheConfigurationServiceImpl implements CacheConfigurationService,
 
 	private CacheMessageNotifier cacheMessageNotifier;
 
-	private SimpleQueueService smsMessageSender;
-
 	private Migrator migrator;
 
 	private ExecutorService executorService = new ThreadPoolExecutor(3, 10, 10L, TimeUnit.MINUTES,
@@ -109,14 +106,14 @@ public class CacheConfigurationServiceImpl implements CacheConfigurationService,
 	    try {
 	        String disabledCategories = ConfigManagerLoader.getConfigManager().getStringValue(
 	                KEY_DISABLE_CLEAR_CATEGORIES, DEFAULT_DISABLE_CLEAR_CATEGORIES);
-	        disabledCategoryList = CollectionUtils.toList(disabledCategories, ",");
+	        disabledCategoryList = Lists.newArrayList(Splitter.on(" , ").trimResults().split(disabledCategories));
             ConfigManagerLoader.getConfigManager().registerConfigChangeListener(new ConfigChangeListener() {
 
                 @Override
                 public void onChange(String key, String value) {
                     if(KEY_DISABLE_CLEAR_CATEGORIES.equals(key)) {
                         if(value != null) {
-                            disabledCategoryList = CollectionUtils.toList(value, ",");
+                            disabledCategoryList = Lists.newArrayList(Splitter.on(" , ").trimResults().split(value));
                         }
                     }
                 }
@@ -276,12 +273,6 @@ public class CacheConfigurationServiceImpl implements CacheConfigurationService,
 	}
 
 	@Override
-	public void clearByCategoryBothSide(String category) {
-		clearByCategory(category);
-		sendBatchClearMsg2DotNet(category);
-	}
-
-	@Override
 	public void clearByKey(String cacheType, String key) {
 		clearByKey(cacheType, key, true);
 	}
@@ -320,56 +311,6 @@ public class CacheConfigurationServiceImpl implements CacheConfigurationService,
 			}
 		} else {
 			logger.error("Clear cache by key failed, cacheType[" + cacheType + "] not found.");
-		}
-	}
-
-	/*
-	 * 具体应用调用的API，所以无需重复清除分布式缓存，应用已经清除过
-	 */
-	@Override
-	public void clearByKeyBothSide(String cacheType, String key, String category, List<Object> params) {
-		clearByKey(cacheType, key, false);
-		if (category != null) {
-			sendClearMsg2DotNet(category, params);
-		}
-	}
-
-	private void sendBatchClearMsg2DotNet(final String category) {
-		CacheKeyConfiguration cacheKeyConfig = cacheKeyConfigurationService.find(category);
-		if (cacheKeyConfig.isSync2Dnet()) {
-			executorService.execute(new Runnable() {
-				@Override
-				public void run() {
-					try {
-						smsMessageSender.enqueue(new TextMessage("*" + category));
-					} catch (Throwable e) {
-						logger.error("Send cache batch-clear msg to .net failed with category[" + category + "].", e);
-					}
-				}
-			});
-		}
-	}
-
-	private void sendClearMsg2DotNet(final String category, final List<Object> params) {
-		CacheKeyConfiguration cacheKeyConfig = cacheKeyConfigurationService.find(category);
-		if (cacheKeyConfig.isSync2Dnet()) {
-			executorService.execute(new Runnable() {
-				@Override
-				public void run() {
-					StringBuilder msgBuilder = new StringBuilder(category);
-					if (params != null) {
-						for (Object param : params) {
-							msgBuilder.append("|").append(param);
-						}
-					}
-					Message message = new TextMessage(msgBuilder.toString());
-					try {
-						smsMessageSender.enqueue(message);
-					} catch (Throwable e) {
-						logger.error("Send cache clear msg to .net failed with content[" + msgBuilder + "].", e);
-					}
-				}
-			});
 		}
 	}
 
@@ -450,10 +391,6 @@ public class CacheConfigurationServiceImpl implements CacheConfigurationService,
 
 	public void setCacheMessageNotifier(CacheMessageNotifier cacheMessageNotifier) {
 		this.cacheMessageNotifier = cacheMessageNotifier;
-	}
-
-	public void setSmsMessageSender(SimpleQueueService smsMessageSender) {
-		this.smsMessageSender = smsMessageSender;
 	}
 
 	public void setServerGroupService(ServerGroupService serverGroupService) {
@@ -604,5 +541,13 @@ public class CacheConfigurationServiceImpl implements CacheConfigurationService,
     @Override
 	public void migrate() {
 		migrator.migrate();
+	}
+
+
+	@Override
+	public String getPassword(String cacheKey) {
+		CacheConfiguration configuration = configurationDao.find(cacheKey);
+		String servers = configuration.getServers();
+		return null;
 	}
 }

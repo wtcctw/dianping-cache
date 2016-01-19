@@ -1,0 +1,92 @@
+<div class="main-content" ng-controller="AlarmReportController"
+     id="AlarmReportController">
+
+    <div class="breadcrumbs" id="breadcrumbs">
+        <script type="text/javascript"
+                src="${rc.contextPath}/static/js/alarm/report.js"></script>
+        <script type="text/javascript">
+            try {
+                ace.settings.check('breadcrumbs', 'fixed')
+            } catch (e) {
+            }
+        </script>
+        <ul class="breadcrumb">
+            <li class="active"></li>
+            <!--<li><label ng-click="scanjob()">scanjob</label></li>-->
+            <li><label>缓存红黑榜</label></li>
+        </ul>
+    </div>
+
+
+    <!-- page-content -->
+    <div class="page-content">
+        <div class="col-xs-2">
+            <label>日期：</label>
+            <select class="col-xs-12" ng-model="history" ng-change="search(history)"
+                    name="history" ng-options="o as o for o in weekList"
+                    required>
+            </select>
+        </div>
+        <div>
+            <!--row  -->
+            <div class="row col-lg-12 col-sm-12" style="margin-left:1px">
+                <label>失败率 > 0.100% </label>
+                <table
+                       class="table table-bordered table-striped table-condensed  table-hover">
+                    <tr>
+                        <th>Type</th>
+                        <th>Name</th>
+                        <th>Total</th>
+                        <th>Failure</th>
+                        <th>Failure(%)</th>
+                        <th>Min(ms)</th>
+                        <th>Max(ms)</th>
+                        <th>Avg(ms)</th>
+                    </tr>
+                    <tr ng-repeat="m in searchPaginator.currentPagefailDetails">
+
+                        <td style="text-align: left" ng-if="m.rowspan!=0" rowspan="{{m.rowspan}}">{{m.cacheName}}</td>
+                        <td style="text-align: left">{{m.project}}</td>
+                        <td style="text-align: left" >{{m.totalCount}}</td>
+                        <td style="text-align: left">{{m.failCount}}</td>
+                        <td style="text-align: left" style="color: red">{{m.failPercent}}</td>
+                        <td style="text-align: left">{{m.minValue}}</td>
+                        <td style="text-align: left">{{m.maxValue}}</td>
+                        <td style="text-align: left">{{m.avgValue}}</td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="row col-lg-12 col-sm-12" style="margin-left:1px">
+                <label>平均时间 > 10ms </label>
+                <table
+                       class="table table-bordered table-striped table-condensed  table-hover">
+                    <tr>
+                        <th>Type</th>
+                        <th>Name</th>
+                        <th>Total</th>
+                        <th>Failure</th>
+                        <th>Failure(%)</th>
+                        <th>Min(ms)</th>
+                        <th>Max(ms)</th>
+                        <th>Avg(ms)</th>
+                    </tr>
+                    <tr ng-repeat="m in searchPaginator.currentPagedelayDetails">
+                        <td style="text-align: left" ng-if="m.rowspan!=0" rowspan="{{m.rowspan}}">{{m.cacheName}}</td>
+                        <td style="text-align: left">{{m.project}}</td>
+                        <td style="text-align: left">{{m.totalCount}}</td>
+                        <td style="text-align: left">{{m.failCount}}</td>
+                        <td style="text-align: left">{{m.failPercent}}</td>
+                        <td style="text-align: left">{{m.minValue}}</td>
+                        <td style="text-align: left">{{m.maxValue}}</td>
+                        <td style="text-align: left" style="color: red ">{{m.avgValue}}</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <!--end page-header  -->
+    </div>
+    <!-- end page-content -->
+</div>
+</div>

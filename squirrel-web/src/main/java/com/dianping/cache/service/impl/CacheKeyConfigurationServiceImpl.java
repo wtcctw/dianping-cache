@@ -33,7 +33,7 @@ import com.dianping.cache.service.CacheKeyConfigurationService;
 import com.dianping.cache.service.OperationLogService;
 import com.dianping.cache.service.condition.CacheKeyConfigSearchCondition;
 import com.dianping.core.type.PageModel;
-import com.dianping.remote.cache.dto.CacheKeyConfigurationDTO;
+import com.dianping.squirrel.common.domain.CacheKeyConfigurationDTO;
 
 /**
  * CacheKeyConfiguration service implementation
@@ -118,6 +118,11 @@ public class CacheKeyConfigurationServiceImpl implements CacheKeyConfigurationSe
 			logger.error("Update CacheKey config failed.", e);
 			throw e;
 		}
+	}
+
+	@Override
+	public List<CacheKeyConfiguration> findByCacheType(String cacheType) {
+		return configurationDao.findByCacheType(cacheType);
 	}
 
 	@Override

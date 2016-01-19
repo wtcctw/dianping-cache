@@ -18,8 +18,6 @@ import com.dianping.squirrel.client.StoreKey;
 import com.dianping.squirrel.client.config.StoreCategoryConfig;
 import com.dianping.squirrel.client.config.StoreCategoryConfigManager;
 import com.dianping.squirrel.client.config.StoreClientConfigListener;
-import com.dianping.squirrel.client.core.Configurable;
-import com.dianping.squirrel.client.core.Lifecycle;
 import com.dianping.squirrel.client.core.StoreCallback;
 import com.dianping.squirrel.client.core.StoreTypeAware;
 import com.dianping.squirrel.client.log.LoggerLoader;
@@ -30,6 +28,8 @@ import com.dianping.squirrel.client.monitor.TimeMonitor;
 import com.dianping.squirrel.client.util.KeyHolder;
 import com.dianping.squirrel.common.exception.StoreException;
 import com.dianping.squirrel.common.exception.StoreTimeoutException;
+import com.dianping.squirrel.common.lifecycle.Configurable;
+import com.dianping.squirrel.common.lifecycle.Lifecycle;
 import com.dianping.squirrel.common.util.PathUtils;
 
 public abstract class AbstractStoreClient implements StoreClient, StoreTypeAware, Configurable, Lifecycle,

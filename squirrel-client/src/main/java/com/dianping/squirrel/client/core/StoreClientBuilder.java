@@ -23,11 +23,16 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.dianping.lion.Environment;
 import com.dianping.squirrel.client.StoreClient;
+import com.dianping.squirrel.client.auth.AuthException;
 import com.dianping.squirrel.client.config.StoreClientConfig;
 import com.dianping.squirrel.client.config.StoreClientConfigListener;
 import com.dianping.squirrel.client.config.StoreClientConfigManager;
 import com.dianping.squirrel.common.exception.StoreException;
+import com.dianping.squirrel.common.lifecycle.Authorizable;
+import com.dianping.squirrel.common.lifecycle.Configurable;
+import com.dianping.squirrel.common.lifecycle.Lifecycle;
 
 /**
  * Build cache client from configuration file. Each cache key will be built only
@@ -114,6 +119,14 @@ public class StoreClientBuilder {
 		            ((StoreClientConfigListener)storeClient));
 		}
 
+		if(storeClient instanceof Authorizable) {
+	        try {
+                ((Authorizable) storeClient).authorize(Environment.getAppName(), storeType);
+            } catch (AuthException e) {
+                throw new StoreException(e);
+            }
+		}
+		
 		if (storeClient instanceof Lifecycle) {
 			((Lifecycle) storeClient).start();
 		}

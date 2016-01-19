@@ -43,6 +43,7 @@ public class MemcacheAlarmTemplateController extends AbstractSidebarController {
                     .setTemplateName("Default");
             memcacheTemplate
                     .setIsDown(true)
+                    .setCheckHistory(false)
                     .setMemThreshold(95)
                     .setQpsThreshold(80000)
                     .setConnThreshold(28000)
@@ -96,8 +97,4 @@ public class MemcacheAlarmTemplateController extends AbstractSidebarController {
         return "template";
     }
 
-    @Override
-    protected String getMenu() {
-        return "tool";
-    }
 }

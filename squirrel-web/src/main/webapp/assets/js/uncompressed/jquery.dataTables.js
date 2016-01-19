@@ -11000,6 +11000,7 @@
 		},
 	
 	
+
 		/**
 		 * This parameter allows you to have define the global filtering state at
 		 * initialisation time. As an object the `search` parameter must be

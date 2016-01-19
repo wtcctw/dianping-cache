@@ -12,7 +12,6 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.apache.commons.lang.StringUtils;
 import redis.clients.jedis.Jedis;
 import com.dianping.cache.scale.cluster.Server;
-import redis.clients.jedis.JedisPool;
 
 @JsonIgnoreProperties({"slotList"})
 public class RedisServer extends Server {
@@ -33,7 +32,9 @@ public class RedisServer extends Server {
 
     private boolean migrating;
 
-    private JedisPool jedisPool;
+    private boolean importing;
+
+    private int openSlot;
 
     public RedisServer(String address) {
         super(address);
@@ -67,7 +68,7 @@ public class RedisServer extends Server {
     }
 
     public boolean isFail() {
-        return flags.contains("fail") && !flags.contains("fail?");
+        return flags.contains("fail");
     }
 
     public boolean isHandShake() {
@@ -191,7 +192,7 @@ public class RedisServer extends Server {
         return ss.length() > 0 ? ss.substring(0, ss.length() - 1) : "";
     }
 
-    public void loadRedisInfo() {
+    public RedisInfo loadRedisInfo() {
         Jedis jedis = new Jedis(getIp(), getPort());
         info = new RedisInfo();
         try {
@@ -212,12 +213,29 @@ public class RedisServer extends Server {
             info.setUsed_cpu_sys_children(Double.parseDouble(redisInfoMap.get("used_cpu_sys_children")));
             info.setUsed_cpu_user(Double.parseDouble(redisInfoMap.get("used_cpu_user_children")));
             info.setUsed_cpu_user_children(Double.parseDouble(redisInfoMap.get("used_cpu_user_children")));
-            this.migrating = redisInfoMap.get("migrate_cached_sockets").equals("1");
+            //this.migrating = redisInfoMap.get("migrate_cached_sockets").equals("1");
+
+            String nodesStr = jedis.clusterNodes();
+            String[] nodes = nodesStr.split("\n");
+            for(String node : nodes){
+                if(node.contains("myself")){
+                    if(node.contains("<")){
+                        importing = true;
+                        String open = node.substring(node.indexOf("[")+1,node.indexOf("-<-"));
+                        openSlot = Integer.parseInt(open);
+                    }else if(node.contains(">")){
+                        migrating = true;
+                        String open = node.substring(node.indexOf("[")+1,node.indexOf("->-"));
+                        openSlot = Integer.parseInt(open);
+                    }
+                }
+            }
 
         } catch (Exception e) {
         } finally {
             jedis.close();
         }
+        return info;
     }
 
     public String getId() {
@@ -284,13 +302,19 @@ public class RedisServer extends Server {
         this.migrating = migrating;
     }
 
-    public JedisPool getJedisPool() {
-        if(jedisPool == null)
-            synchronized (this){
-                if(jedisPool == null){
-                    jedisPool = new JedisPool(getIp(),getPort());
-                }
-            }
-        return jedisPool;
+    public boolean getImporting() {
+        return importing;
+    }
+
+    public void setImporting(boolean importing) {
+        this.importing = importing;
+    }
+
+    public int getOpenSlot() {
+        return openSlot;
+    }
+
+    public void setOpenSlot(int openSlot) {
+        this.openSlot = openSlot;
     }
 }

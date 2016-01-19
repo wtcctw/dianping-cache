@@ -29,6 +29,12 @@
 		LIMIT 1
 	</select>
 
+	<select id="findByCacheType" parameterType="String" resultMap="CacheKeyConfigurationResult">
+		SELECT *
+		FROM DP_CacheKeyConfiguration
+		WHERE CacheType = #{cacheType}
+	</select>
+
 	<update id="incVersion" parameterType="String">
     		UPDATE DP_CacheKeyConfiguration
 			SET VERSION = VERSION + 1

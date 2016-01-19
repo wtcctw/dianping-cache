@@ -84,7 +84,7 @@ module.controller('OperatorController', [
 			var fetchFunction = function(pageId, operator, content, startTime,
 					endTime, callback) {
 
-				$http.get(window.contextPath + $scope.suburl, {
+				$http.get(window.contextPath + "/auditlog/search", {
 					params : {
 						pageId : pageId,
 						operator : operator,
@@ -102,7 +102,7 @@ module.controller('OperatorController', [
 			$scope.endTime = "";
 			$scope.suburl = "/cache/operator/search";
 			$scope.pageId = 1;
-			$scope.pageSize = 20;
+			$scope.PageSize = 20;
 			$scope.queryCount = 0;
 			$scope.query = function() {
 				if ($scope.queryCount != 0) {

@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.dianping.cache.alarm.dao.ScanDetailDao">
+
+    <resultMap id="ScanDetailResult" type="ScanDetail">
+        <result column="id" property="id"/>
+        <result column="cacheName" property="cacheName"/>
+        <result column="project" property="project"/>
+        <result column="totalCount" property="totalCount"/>
+        <result column="failCount" property="failCount"/>
+        <result column="failPercent" property="failPercent"/>
+        <result column="minValue" property="minValue"/>
+        <result column="maxValue" property="maxValue"/>
+        <result column="avgValue" property="avgValue"/>
+        <result column="sumValue" property="sumValue"/>
+        <result column="sum2" property="sum2"/>
+        <result column="std" property="std"/>
+        <result column="tps" property="tps"/>
+        <result column="line95Value" property="line95Value"/>
+        <result column="line99Value" property="line99Value"/>
+        <result column="createTime" property="createTime"/>
+        <result column="updateTime" property="updateTime"/>
+    </resultMap>
+
+    <insert id="insert" parameterType="ScanDetail">
+        INSERT INTO scan_detail(cacheName, project,totalCount,failCount,failPercent,minValue,maxValue,avgValue,sumValue,sum2,std,tps,line95Value,line99Value,createTime,updateTime)
+        VALUES(#{cacheName}, #{project},#{totalCount},#{failCount},#{failPercent},#{minValue},#{maxValue},#{avgValue},#{sumValue},#{sum2},#{std},#{tps},#{line95Value},#{line99Value},#{createTime},#{updateTime})
+    </insert>
+
+    <select id="findByCreateTime" resultMap="ScanDetailResult" parameterType="String">
+        SELECT id,cacheName, project,totalCount,failCount,failPercent,minValue,maxValue,avgValue,sumValue,sum2,std,tps,line95Value,line99Value,createTime,updateTime
+        FROM scan_detail
+        WHERE createTime = #{createTime}
+        ORDER BY id DESC
+    </select>
+
+    <select id="findAll" resultMap="ScanDetailResult">
+        SELECT id,cacheName, project,totalCount,failCount,failPercent,minValue,maxValue,avgValue,sumValue,sum2,std,tps,line95Value,line99Value,createTime,updateTime
+        FROM scan_detail
+        ORDER BY cacheName DESC
+    </select>
+
+    <select id="findByPage" resultMap="ScanDetailResult" parameterType="map">
+        SELECT id,cacheName, project,totalCount,failCount,failPercent,minValue,maxValue,avgValue,sumValue,sum2,std,tps,line95Value,line99Value,createTime,updateTime
+        FROM scan_detail
+        ORDER BY id DESC
+        LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+    
+
+    <select id="search" resultType="ScanDetail">
+        ${paramSQL}
+    </select>
+
+</mapper>

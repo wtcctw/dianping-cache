@@ -1,12 +1,9 @@
 package com.dianping.cache.monitor;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.fail;
 
-import java.io.IOException;
-
+import org.apache.commons.lang.StringUtils;
 import org.junit.Test;
-
-import com.dianping.cache.util.CollectionUtils;
 
 public class MemberMonitorTest {
 
@@ -16,12 +13,12 @@ public class MemberMonitorTest {
         System.out.println(memberMonitor.getMemberId());
         System.out.println(memberMonitor.isMaster());
         System.out.println(memberMonitor.getMemberCount());
-        System.out.println(CollectionUtils.toString(memberMonitor.getAllMembers()));
+        System.out.println(StringUtils.join(memberMonitor.getAllMembers(), ','));
         memberMonitor.refreshAll();
         System.out.println(memberMonitor.getMemberId());
         System.out.println(memberMonitor.isMaster());
         System.out.println(memberMonitor.getMemberCount());
-        System.out.println(CollectionUtils.toString(memberMonitor.getAllMembers()));
+        System.out.println(StringUtils.join(memberMonitor.getAllMembers(), ','));
         System.in.read();
     }
 

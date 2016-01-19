@@ -25,9 +25,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.dianping.avatar.util.IPUtils;
-import com.dianping.cache.support.spring.SpringLocator;
+import com.dianping.cache.remote.CacheManageWebService;
+import com.dianping.cache.util.SpringLocator;
 import com.dianping.pigeon.util.ContextUtils;
-import com.dianping.remote.cache.CacheManageWebService;
 
 public class RestCacheManagementServlet extends HttpServlet {
 

@@ -4,7 +4,7 @@ import redis.clients.jedis.JedisCluster;
 
 import com.dianping.squirrel.client.StoreClient;
 import com.dianping.squirrel.client.StoreKey;
-import com.dianping.squirrel.client.core.Locatable;
+import com.dianping.squirrel.common.lifecycle.Locatable;
 
 public interface RedisStoreClient extends StoreClient, Locatable, 
         RedisListCommands, RedisHashCommands, RedisSetCommands, RedisZSetCommands {

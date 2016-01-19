@@ -2,9 +2,9 @@ package com.dianping.squirrel.client.impl.dcache;
 
 import org.codehaus.plexus.util.StringUtils;
 
-import com.dianping.remote.cache.dto.CacheConfigurationDTO;
 import com.dianping.squirrel.client.config.StoreClientConfig;
 import com.dianping.squirrel.client.config.StoreClientConfigParser;
+import com.dianping.squirrel.common.domain.CacheConfigurationDTO;
 
 public class DCacheClientConfigParser implements StoreClientConfigParser {
 

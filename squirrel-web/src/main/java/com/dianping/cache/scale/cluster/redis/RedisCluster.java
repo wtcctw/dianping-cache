@@ -1,26 +1,22 @@
 package com.dianping.cache.scale.cluster.redis;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import redis.clients.jedis.Jedis;
-
+import com.dianping.cache.scale.ScaleException;
 import com.dianping.cache.scale.cluster.Cluster;
 import com.dianping.cache.scale.cluster.Server;
-import com.dianping.cache.scale.exceptions.ScaleException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import redis.clients.jedis.Jedis;
+
+import java.util.*;
 
 public class RedisCluster implements Cluster<RedisNode>{
 	
 	private static Logger logger = LoggerFactory.getLogger(RedisCluster.class);
-	
+
+	private String clusterName;
+
     private List<String> serverList;
-    
+
     private List<RedisNode> nodes = new ArrayList<RedisNode>();
 
 	private List<RedisServer> failedServers = new ArrayList<RedisServer>();
@@ -29,6 +25,11 @@ public class RedisCluster implements Cluster<RedisNode>{
         this.serverList = serverList;
         loadClusterInfo();
     }
+	public RedisCluster(String clusterName,List<String> serverList){
+		this.clusterName = clusterName;
+		this.serverList = serverList;
+		loadClusterInfo();
+	}
 
 	@Override
 	public List<RedisNode> getNodes() {
@@ -99,7 +100,7 @@ public class RedisCluster implements Cluster<RedisNode>{
         List<RedisServer> servers = new ArrayList<RedisServer>();
         for(String serverInfo : clusterInfo.split("\n")) {
             RedisServer server = parseServerInfo(serverInfo);
-			if(server.isFail()){
+			if(server.isFail() || server.isPartialFail()){
 				failedServers.add(server);
 			}else{
 				servers.add(server);
@@ -156,5 +157,13 @@ public class RedisCluster implements Cluster<RedisNode>{
 				return true;
 		}
 		return false;
+	}
+
+	public String getClusterName() {
+		return clusterName;
+	}
+
+	public void setClusterName(String clusterName) {
+		this.clusterName = clusterName;
 	}
 }

@@ -6,13 +6,14 @@ import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.zookeeper.WatchedEvent;
 import org.apache.zookeeper.Watcher.Event.EventType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.dianping.cache.util.CollectionUtils;
 import com.dianping.cat.Cat;
 import com.dianping.lion.Environment;
 import com.dianping.squirrel.common.config.ConfigChangeListener;
@@ -132,14 +133,14 @@ public class TaskMonitor implements CuratorHandler {
         case Alive:
             if (prevState == State.Dead) {
                 logger.info("effective server status change: " + server + ", monitors: "
-                        + CollectionUtils.toString(status));
+                        + StringUtils.join(status, ','));
                 fireServerAlive(server, status);
             }
             break;
         case Dead:
             if (prevState != State.Dead) {
                 logger.info("effective server status change: " + server + ", monitors: "
-                        + CollectionUtils.toString(status));
+                        + StringUtils.join(status, ','));
                 fireServerDead(server, status);
             }
             break;
@@ -177,7 +178,7 @@ public class TaskMonitor implements CuratorHandler {
                     if (status != null) {
                         serverStatus.put(server, status);
                         logger.info("server status added: " + server + ", monitors: "
-                                + CollectionUtils.toString(status));
+                                + StringUtils.join(status, ','));
                         State state = getServerState(status);
                         State prevState = this.serverStates.get(server);
                         checkStateChange(server, prevState, state, status);
@@ -187,7 +188,7 @@ public class TaskMonitor implements CuratorHandler {
                 for (String server : removedServers) {
                     List<String> prevStatus = serverStatus.remove(server);
                     logger.info("server status removed: " + server + ", previous monitors: "
-                            + CollectionUtils.toString(prevStatus));
+                            + StringUtils.join(prevStatus, ','));
                     State state = getServerState(Collections.EMPTY_LIST);
                     State prevState = this.serverStates.get(server);
                     checkStateChange(server, prevState, state, Collections.EMPTY_LIST);
@@ -204,8 +205,8 @@ public class TaskMonitor implements CuratorHandler {
                 if (status != null) {
                     List<String> prevStatus = serverStatus.put(server, status);
                     logger.info("server status changed: " + server + ", previous monitors: "
-                            + CollectionUtils.toString(prevStatus) + ", current monitors: "
-                            + CollectionUtils.toString(status));
+                            + StringUtils.join(prevStatus, ',') + ", current monitors: "
+                            + StringUtils.join(status, ','));
                     State state = getServerState(status);
                     State prevState = this.serverStates.get(server);
                     checkStateChange(server, prevState, state, status);
@@ -217,7 +218,7 @@ public class TaskMonitor implements CuratorHandler {
     }
 
     private void fireServerDead(String server, List<String> status) {
-        logger.info("server " + server + " is confirmed dead by " + CollectionUtils.toString(status));
+        logger.info("server " + server + " is confirmed dead by " + StringUtils.join(status, ','));
         Cat.logEvent("Squirrel.monitor", server + ":dead");
         serverStates.put(server, State.Dead);
         if (memberMonitor.isMaster()) {
@@ -278,7 +279,7 @@ public class TaskMonitor implements CuratorHandler {
         StringBuilder buf = new StringBuilder(256);
         buf.append("memcached server ").append(server);
         buf.append(" in env ").append(Environment.getEnv());
-        buf.append(" in cluster ").append(CollectionUtils.toString(taskManager == null ? null : taskManager.getClusters(server)));
+        buf.append(" in cluster ").append(StringUtils.join(taskManager == null ? null : taskManager.getClusters(server), ','));
         buf.append(" is confirmed to be dead");
         NotifyManager.getInstance().notify("memcached server " + server + " is dead", buf.toString());
     }
@@ -287,7 +288,7 @@ public class TaskMonitor implements CuratorHandler {
         StringBuilder buf = new StringBuilder(256);
         buf.append("memcached server ").append(server);
         buf.append(" in env ").append(Environment.getEnv());
-        buf.append(" in cluster ").append(CollectionUtils.toString(taskManager == null ? null : taskManager.getClusters(server)));
+        buf.append(" in cluster ").append(StringUtils.join(taskManager == null ? null : taskManager.getClusters(server), ','));
         buf.append(" is confirmed to be alive");
         NotifyManager.getInstance().notify("memcached server " + server + " is alive", buf.toString());
     }
