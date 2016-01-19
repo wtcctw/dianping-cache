@@ -35,14 +35,14 @@
                     <div class="page-content" id="container">
                         <div class="row">
                             <div class="col-xs-12">
-                                <table id="configTable" class="table table-striped table-bordered table-hover">
+                                <table id="configTable" class="table table-bordered">
                                     <thead>
                                     <tr>
                                         <!--<td><input type="checkbox" id="check-all"></td>-->
                                         <!--<th>告警集群类型</th>-->
                                         <th>告警集群类型及名称</th>
                                         <th>模板名称</th>
-                                        <th>收件人</th>
+                                        <th >收件人</th>
                                         <th>是否发送业务线</th>
                                         <th>操作
                                             <a class="breadcrumbs-btn" href="#configModal" ng-click="clearModal()"
@@ -54,11 +54,11 @@
                                     </thead>
                                     <tbody>
                                     <tr ng-repeat="e in alarmRuleSearchPaginator.currentPageItems">
-                                        <!--<td style="text-align: center"><input type="checkbox" name="check-list" value="{{e.id}}"></td>-->
-                                        <td style="text-align: center">{{e.clusterType}}:{{e.clusterName}}</td>
-                                        <td style="text-align: center">{{e.alarmTemplate}}</td>
-                                        <td style="text-align: center">{{e.receiver}}</td>
-                                        <td style="text-align: center">
+                                        <!--<td style="text-align: center;"><input type="checkbox" name="check-list" value="{{e.id}}"></td>-->
+                                        <td width="30%" style="text-align:left;">{{e.clusterType}}:{{e.clusterName}}</td>
+                                        <td width="15%" style="text-align:center;">{{e.alarmTemplate}}</td>
+                                        <td width="30%" style="text-align:center;word-break:break-all">{{e.receiver}}</td>
+                                        <td width="10%" style="text-align:center;">
                                 <span class="sticker">
                                     <span class="label arrowed-in"
                                           ng-class="{'label-success':e.toBusiness==true,'label-danger':e.toBusiness==false}">
@@ -68,9 +68,7 @@
 
                                 </span>
                                         </td>
-
-
-                                        <td style="text-align: center">
+                                        <td width="15%" style="text-align: center;overflow: hidden;">
                                             <a href="#configModal" ng-click="setModalInput($index);" data-toggle="modal"
                                                class="edit-config-btn">编辑
                                                 <i class="ace-icon fa fa-edit" rel="tooltip"
@@ -114,14 +112,14 @@
                                     </thead>
                                     <tbody>
                                     <tr ng-repeat="e in memcacheTemplateSearchPaginator.currentPageItems">
-                                        <!--<td style="text-align: center"><input type="checkbox" name="check-list" value="{{e.id}}"></td>-->
-                                        <td style="text-align: center width:100px">{{e.templateName}}</td>
-                                        <td style="text-align: center width:100px">{{e.down}}</td>
-                                        <td style="text-align: center width:100px">{{e.checkHistory}}</td>
-                                        <td style="text-align: center width:100px">{{e.memThreshold}}</td>
-                                        <td style="text-align: center width:100px">{{e.qpsThreshold}}</td>
-                                        <td style="text-align: center width:100px">{{e.connThreshold}}</td>
-                                        <td style="text-align: center width:100px">
+                                        <!--<td style="text-align: center;"><input type="checkbox" name="check-list" value="{{e.id}}"></td>-->
+                                        <td style="text-align: center;">{{e.templateName}}</td>
+                                        <td style="text-align: center;">{{e.down}}</td>
+                                        <td style="text-align: center;">{{e.checkHistory}}</td>
+                                        <td style="text-align: center;">{{e.memThreshold}}</td>
+                                        <td style="text-align: center;">{{e.qpsThreshold}}</td>
+                                        <td style="text-align: center;">{{e.connThreshold}}</td>
+                                        <td style="text-align: center;">
                                 <span class="sticker">
                                     <span class="label arrowed-in"
                                           ng-class="{'label-success':e.mailMode==true,'label-danger':e.mailMode==false}">
@@ -141,7 +139,7 @@
                                 </span>
                                         </td>
 
-                                        <td style="text-align: center">
+                                        <td style="text-align: center;">
                                             <a href="#memcacheTemplateModal" ng-click="memcachesetModalInput($index);"
                                                data-toggle="modal"
                                                class="edit-config-btn">编辑
@@ -187,13 +185,13 @@
                                     </thead>
                                     <tbody>
                                     <tr ng-repeat="e in redisTemplateSearchPaginator.currentPageItems">
-                                        <!--<td style="text-align: center"><input type="checkbox" name="check-list" value="{{e.id}}"></td>-->
-                                        <td style="text-align: center width:100px">{{e.templateName}}</td>
-                                        <td style="text-align: center width:100px">{{e.down}}</td>
-                                        <td style="text-align: center width:100px">{{e.checkHistory}}</td>
-                                        <td style="text-align: center width:100px">{{e.memThreshold}}</td>
-                                        <td style="text-align: center width:100px">{{e.qpsThreshold}}</td>
-                                        <td style="text-align: center width:100px">
+                                        <!--<td style="text-align: center;"><input type="checkbox" name="check-list" value="{{e.id}}"></td>-->
+                                        <td style="text-align: center;">{{e.templateName}}</td>
+                                        <td style="text-align: center;">{{e.down}}</td>
+                                        <td style="text-align: center;">{{e.checkHistory}}</td>
+                                        <td style="text-align: center;">{{e.memThreshold}}</td>
+                                        <td style="text-align: center;">{{e.qpsThreshold}}</td>
+                                        <td style="text-align: center;">
                                 <span class="sticker">
                                     <span class="label arrowed-in"
                                           ng-class="{'label-success':e.mailMode==true,'label-danger':e.mailMode==false}">
@@ -213,7 +211,7 @@
 
                                 </span>
                                         </td>
-                                        <td style="text-align: center">
+                                        <td style="text-align: center;">
                                             <a href="#redisTemplateModal" ng-click="redissetModalInput($index);"
                                                data-toggle="modal"
                                                class="edit-config-btn">编辑
