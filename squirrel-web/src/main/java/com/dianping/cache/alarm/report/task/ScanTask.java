@@ -40,15 +40,15 @@ public class ScanTask {
 
 
     public void run() throws InterruptedException, DocumentException, URISyntaxException, MessagingException {
-//        List<ScanDetail> scanDetails = AlarmScanDetails();
-
-
-        Date now = new Date();
-        String nowText = DateUtil.getCatDayString(now);
-
-        Date yesterday = new Date(now.getTime() - MS_PER_DAY);
-        String yesterdayText = DateUtil.getCatDayString(yesterday);
-        List<ScanDetail> scanDetails = scanDetailService.findByCreateTime(yesterdayText);
+        List<ScanDetail> scanDetails = AlarmScanDetails();
+//
+//
+//        Date now = new Date();
+//        String nowText = DateUtil.getCatDayString(now);
+//
+//        Date yesterday = new Date(now.getTime() - MS_PER_DAY);
+//        String yesterdayText = DateUtil.getCatDayString(yesterday);
+//        List<ScanDetail> scanDetails = scanDetailService.findByCreateTime(yesterdayText);
 
         List<ScanDetail>failDetails = new ArrayList<ScanDetail>();
         List<ScanDetail>delayDetails = new ArrayList<ScanDetail>();
@@ -97,7 +97,7 @@ public class ScanTask {
 
             MimeMessageHelper helper = new MimeMessageHelper(msg, true);
             helper.setFrom(mailSender.getMailSender().getUsername());
-            String[] receiver =new String[]{"shiyun.lv@dianping.com","xiaoxiong.dai@dianping.com","dp.wang@dianping.com"};
+            String[] receiver =new String[]{"shiyun.lv@dianping.com","xiaoxiong.dai@dianping.com","dp.wang@dianping.com","enlight.chen@dianping.com","xiang.wu@dianping.com","faping.miao@dianping.com"};
             helper.setTo(receiver);
             helper.setSubject("缓存异常统计报表");
 

@@ -39,6 +39,8 @@ public class ScanDetail {
 
     private String updateTime;
 
+    private int rowspan = 0;
+
     public int getId() {
         return id;
     }
@@ -190,6 +192,15 @@ public class ScanDetail {
 
     public ScanDetail setUpdateTime(String updateTime) {
         this.updateTime = updateTime;
+        return this;
+    }
+
+    public int getRowspan() {
+        return rowspan;
+    }
+
+    public ScanDetail setRowspan(int rowspan) {
+        this.rowspan = rowspan;
         return this;
     }
 }

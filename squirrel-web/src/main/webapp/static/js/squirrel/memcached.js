@@ -22,9 +22,9 @@ module.controller('MemcachedDashBoardController', [ '$scope', '$http','$document
         }
 
 
-        $scope.transport = function(cachekey,swimlane){
+        $scope.transport = function(cluster,swimlane){
             window.localStorage.swimlane = swimlane;
-            window.localStorage.cacheKey = cachekey;
+            window.localStorage.cluster = cluster;
         }
 
         $scope.getLogs = function(cluster){

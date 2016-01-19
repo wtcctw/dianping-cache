@@ -1,5 +1,5 @@
-module.controller('RedisDashBoardController', [ '$scope', '$http','$document',
-    '$timeout', function($scope, $http) {
+module.controller('RedisDashBoardController', [ '$scope', '$http','$document','$rootScope',
+    '$timeout', function($scope, $http,$rootScope) {
         $scope.redisdata = [];
         $scope.applications = [];
         $scope.application;
@@ -30,8 +30,8 @@ module.controller('RedisDashBoardController', [ '$scope', '$http','$document',
             });
         }
 
-        $scope.transport = function(cacheKey){
-            window.localStorage.cacheKey = cacheKey;
+        $scope.transport = function(cluster){
+            window.localStorage.cluster = cluster;
             window.localStorage.swimlane = '';
         }
 

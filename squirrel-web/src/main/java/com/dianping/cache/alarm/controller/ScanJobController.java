@@ -53,22 +53,52 @@ public class ScanJobController extends AbstractSidebarController {
 
         List<ScanDetail> scanDetails = scanDetailService.findByCreateTime(yesterdayText);
 
-        List<ScanDetail>failDetails = new ArrayList<ScanDetail>();
-        List<ScanDetail>delayDetails = new ArrayList<ScanDetail>();
+        Map<String,List<ScanDetail>>failDetails = new HashMap<String, List<ScanDetail>>();
+        Map<String,List<ScanDetail>>delayDetails = new HashMap<String, List<ScanDetail>>();
 
         for(ScanDetail scanDetail:scanDetails){
             if(scanDetail.getAvgValue()>10){
-               delayDetails.add(scanDetail);
+                if(null != delayDetails.get(scanDetail.getCacheName())){
+                    delayDetails.get(scanDetail.getCacheName()).add(scanDetail);
+                }else {
+                    List<ScanDetail> list = new ArrayList<ScanDetail>();
+                    list.add(scanDetail);
+                    delayDetails.put(scanDetail.getCacheName(),list);
+                }
+
             }else if(scanDetail.getFailPercent()>0.1){
-                failDetails.add(scanDetail);
+                if(null != failDetails.get(scanDetail.getCacheName())){
+                    failDetails.get(scanDetail.getCacheName()).add(scanDetail);
+                }else {
+                    List<ScanDetail> list = new ArrayList<ScanDetail>();
+                    list.add(scanDetail);
+                    failDetails.put(scanDetail.getCacheName(), list);
+                }
             }
         }
+
+        List<ScanDetail>failDetailList = new ArrayList<ScanDetail>();
+        List<ScanDetail>delayDetailList = new ArrayList<ScanDetail>();
+
+        for(Map.Entry<String, List<ScanDetail>> entry:failDetails.entrySet()){
+            List<ScanDetail> list =failDetails.get(entry.getKey());
+            list.get(0).setRowspan(list.size());
+            failDetailList.addAll(list);
+        }
+
+        for(Map.Entry<String, List<ScanDetail>> entry:delayDetails.entrySet()){
+            List<ScanDetail> list =delayDetails.get(entry.getKey());
+            list.get(0).setRowspan(list.size());
+            delayDetailList.addAll(list);
+        }
+
+
 
         Map<String, Object> result = new HashMap<String, Object>();
 
         result.put("size", scanDetails.size());
-        result.put("failDetails", failDetails);
-        result.put("delayDetails", delayDetails);
+        result.put("failDetails", failDetailList);
+        result.put("delayDetails", delayDetailList);
         return result;
     }
 
@@ -78,21 +108,52 @@ public class ScanJobController extends AbstractSidebarController {
 
         List<ScanDetail> scanDetails = scanDetailService.findByCreateTime(createTime);
 
-        List<ScanDetail>failDetails = new ArrayList<ScanDetail>();
-        List<ScanDetail>delayDetails = new ArrayList<ScanDetail>();
+        Map<String,List<ScanDetail>>failDetails = new HashMap<String, List<ScanDetail>>();
+        Map<String,List<ScanDetail>>delayDetails = new HashMap<String, List<ScanDetail>>();
 
         for(ScanDetail scanDetail:scanDetails){
             if(scanDetail.getAvgValue()>10){
-                delayDetails.add(scanDetail);
+                if(null != delayDetails.get(scanDetail.getCacheName())){
+                    delayDetails.get(scanDetail.getCacheName()).add(scanDetail);
+                }else {
+                    List<ScanDetail> list = new ArrayList<ScanDetail>();
+                    list.add(scanDetail);
+                    delayDetails.put(scanDetail.getCacheName(),list);
+                }
+
             }else if(scanDetail.getFailPercent()>0.1){
-                failDetails.add(scanDetail);
+                if(null != failDetails.get(scanDetail.getCacheName())){
+                    failDetails.get(scanDetail.getCacheName()).add(scanDetail);
+                }else {
+                    List<ScanDetail> list = new ArrayList<ScanDetail>();
+                    list.add(scanDetail);
+                    failDetails.put(scanDetail.getCacheName(), list);
+                }
             }
         }
 
+        List<ScanDetail>failDetailList = new ArrayList<ScanDetail>();
+        List<ScanDetail>delayDetailList = new ArrayList<ScanDetail>();
+
+        for(Map.Entry<String, List<ScanDetail>> entry:failDetails.entrySet()){
+            List<ScanDetail> list =failDetails.get(entry.getKey());
+            list.get(0).setRowspan(list.size());
+            failDetailList.addAll(list);
+        }
+
+        for(Map.Entry<String, List<ScanDetail>> entry:delayDetails.entrySet()){
+            List<ScanDetail> list =delayDetails.get(entry.getKey());
+            list.get(0).setRowspan(list.size());
+            delayDetailList.addAll(list);
+        }
+
+
+
         Map<String, Object> result = new HashMap<String, Object>();
+
         result.put("size", scanDetails.size());
-        result.put("failDetails", failDetails);
-        result.put("delayDetails", delayDetails);
+        result.put("failDetails", failDetailList);
+        result.put("delayDetails", delayDetailList);
         return result;
     }
 
@@ -137,4 +198,5 @@ public class ScanJobController extends AbstractSidebarController {
     public String getSubSide() {
         return "event";
     }
+
 }
