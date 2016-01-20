@@ -17,7 +17,9 @@ module.controller('TaskController', [ '$scope', '$http','$document', function($s
 
 
     $(document).ready(function () {
-        var quorumTable = $('#taskTable').DataTable( {
+
+
+        var taskTable = $('#taskTable').DataTable( {
             responsive: true,
             "ajax": "/task/list",
             "columns": [
@@ -33,15 +35,29 @@ module.controller('TaskController', [ '$scope', '$http','$document', function($s
                 "render": function ( data, type, full, meta ) {
                     var data = full;
                     var percent = Math.floor((data.stat / (data.statMax - data.statMin)) * 10000);
-                    console.log(data.stat);
-                    console.log(data.statMax);
                     if(isNaN(percent) || percent > 100)
                         percent = 0;
-                    var percentPieChart = '<div class="infobox infobox-green infobox-small infobox-dark"><div class="infobox-progress"> <div class="easy-pie-chart percentage" data-percent="' +
+                    var color = "blue";
+                    var stat = "running";
+                    if(percent == 100) {
+                        color = "green";
+                        stat = "complete";
+                    }
+                    console.log(data.cancel);
+                    if(data.cancel) {
+                        stat = "canceled";
+                        color = "red";
+                    }
+                    var percentPieChart = '<div class="infobox infobox-' +
+                        color +
+                        ' infobox-small infobox-dark"><div class="infobox-progress"> <div class="easy-pie-chart percentage" data-percent="' +
                         percent +
                         '" data-size="39" style="height: 39px; width: 39px; line-height: 38px;"> <span class="percent"></span>' +
                         percent +
-                        '% <canvas height="39" width="39"></canvas></div> </div> <div class="infobox-data"> <div class="infobox-content">Task</div> <div class="infobox-content">Completion</div> </div> </div>'
+                        '% <canvas height="39" width="39"></canvas></div> </div> <div class="infobox-data"> <div class="infobox-content">Task</div> <div class="infobox-content">' +
+                        stat +
+                        '</div> </div> </div>';
+
                     return percentPieChart;
                 }
             }
@@ -61,15 +77,38 @@ module.controller('TaskController', [ '$scope', '$http','$document', function($s
                         var percent = Math.floor((data.stat / (data.statMax - data.statMin)) * 10000);
                         if(isNaN(percent) || percent > 100)
                             percent = 0;
+                        var data = full;
                         var id = data.id;
-//                        if(percent >= 0 && percent <= 100)
-                        return "<button class=\"btn btn-sm btn-primary\" onclick='cancelTask(" +
-                            id + ")'>Cancel</button>";
+
+                        if(percent >= 0 && percent < 100 && !data.cancel)
+                            return "<button class=\"btn btn-sm btn-primary cancel-confirm\" id=" +
+                                id + ">Cancel</button>";
+                        else
+                            return '<br>';
                     }
                 }
             ],
             "drawCallback" : function(setting) {
                 drowPercent();
+                var flag = true;
+                $(".cancel-confirm").on(ace.click_event, function() {
+                    var id = $(this).attr("id");
+                    if(flag) {
+                        flag = false;
+                        bootbox.confirm("确定要取消任务吗?", function (result) {
+                            if (result) {
+                                $.ajax({
+                                    type : 'GET',
+                                    url: "/task/cancel?id=" + id,
+                                    success : function(data){
+                                        taskTable.ajax.reload();
+                                    }
+                                })
+                            }
+                        });
+                        flag = true;
+                    }
+                });
             }
         });
     });
