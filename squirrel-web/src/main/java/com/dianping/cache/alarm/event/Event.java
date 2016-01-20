@@ -26,10 +26,19 @@ public abstract class Event {
         add("192.168.227.113");//beta
         add("10.128.121.42");//my host
     }};
-    
+
+
 
     protected ReceiverService receiverService;
 
+    public abstract void setReceiverService(ReceiverService receiverService);
+
+    protected Event() {
+
+    }
+
+
+    protected long checkInterval = 30 * 1000;
 
     private Date createTime;
 
