@@ -97,10 +97,20 @@ module.controller('CacheQueryController', [
 
             };
 
+            $scope.deleteKey = function(){
+                $http.get(window.contextPath + '/data/deleteKey',{
+                    params : {
+                        "category": $scope.category,
+                        "key": $scope.key
+                    }
+                }).success(function(response){
+                    //$scope.result = response.result;
+                    //$scope.address = response.address;
+                });
 
+            };
 
-
-			$scope.setKeyValue = function(){
+            $scope.setKeyValue = function(){
 				var tmpParams = [];
 				for(var i = 0; i < $scope.params.length; i++){
 					tmpParams.push($scope.params[i][1]);

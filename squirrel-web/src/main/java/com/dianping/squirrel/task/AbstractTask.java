@@ -21,7 +21,7 @@ public abstract class AbstractTask<T> implements Runnable{
 
     abstract String getTaskType();
     abstract int getTaskMinStat();
-    abstract int getTaskMaxStat();
+    abstract long getTaskMaxStat();
 
     private TaskDao taskDao = SpringLocator.getBean("taskDao");
 
@@ -29,7 +29,7 @@ public abstract class AbstractTask<T> implements Runnable{
         Task task = new Task();
         task.setCommitTime(System.currentTimeMillis());
         task.setType(getTaskType());
-        task.setStatMax(getTaskMaxStat());
+        task.setStatMax((int)getTaskMaxStat());
         task.setCommiter(RequestUtil.getUsername());
         task.setStatMin(getTaskMinStat());
         this.task = task;

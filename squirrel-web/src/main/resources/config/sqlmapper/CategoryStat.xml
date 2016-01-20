@@ -19,9 +19,12 @@
       SELECT * FROM category_stats;
     </select>
 
-    <select id="selectAllByTime" resultMap="CategoryStatResult" parameterType="long">
+    <select id="selectAllByTime" resultMap="CategoryStatResult" parameterType="Map">
         SELECT * FROM category_stats WHERE updateTime > #{start} AND updateTime &lt; #{end};
     </select>
 
+    <select id="selectCategoryStat" resultMap="CategoryStatResult" parameterType="String">
+       SELECT * FROM category_stats WHERE category = #{category} AND updateTime &lt; CURRENT_TIMESTAMP - 3600 * 24 * 1000;
+    </select>
 
 </mapper>

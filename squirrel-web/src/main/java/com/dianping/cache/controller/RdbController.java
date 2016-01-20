@@ -3,6 +3,7 @@ package com.dianping.cache.controller;
 import com.dianping.cache.dao.CategoryStatsDao;
 import com.dianping.cache.entity.CategoryStats;
 import com.dianping.cache.service.RdbService;
+import com.dianping.cache.util.CommonUtil;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -44,12 +45,24 @@ public class RdbController extends AbstractSidebarController{
     }
 
 
+    @RequestMapping(value = "/rdb/categoryDayData")
+    @ResponseBody
+    public Object getClusterCategoryDayData(@RequestParam("category")String category) {
+        RdbService.TotalStat data = rdbService.getCategoryMergeStat(category);
+        Map<String, Object> para = new HashMap<String, Object>();
+        para.put("data", data);
+        return para;
+    }
 
     @RequestMapping(value = "/rdb/data")
     @ResponseBody
     public Object getCategoryData() {
         Map<String, Object> para = new HashMap<String, Object>();
         List<CategoryStats> data = categoryStatsDao.selectAll();
+        for(CategoryStats c : data) {
+            c.setKeySizeRead(CommonUtil.ConvertBytesName(c.getKeySize()));
+            c.setValueSizeRead(CommonUtil.ConvertBytesName(c.getValueSize()));
+        }
         para.put("data", data);
         return para;
     }

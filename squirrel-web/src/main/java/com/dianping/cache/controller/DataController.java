@@ -38,6 +38,17 @@ public class DataController extends AbstractSidebarController {
         return true;
     }
 
+    @RequestMapping(value = "/data/deleteKey", method = RequestMethod.GET)
+    @ResponseBody
+    public Object deleteKey(@RequestParam("category")String category,
+                            @RequestParam("key")String key) {
+        StoreClient storeClient = StoreClientFactory.getStoreClientByCategory(category);
+        StoreKey storeKey = new StoreKey(key);
+        storeClient.delete(storeKey);
+        return true;
+    }
+
+
     public static void main(String[] args) {
         StoreClient storeClient = StoreClientFactory.getStoreClientByCategory("redis-del");
         for(int i = 0; i < 1000; i++) {

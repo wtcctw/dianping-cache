@@ -39,7 +39,7 @@ public class RedisReshardTask extends AbstractTask {
     }
 
     @Override
-    int getTaskMaxStat() {
+    long getTaskMaxStat() {
         return reshardPlan.getReshardRecordList().size();
     }
 

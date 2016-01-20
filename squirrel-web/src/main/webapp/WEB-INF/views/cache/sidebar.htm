@@ -49,6 +49,11 @@
                         href="${rc.contextPath}/data/clean"> <i
                         class="icon-globe"></i> 缓存清理
                 </a></li>
+                <li class="#if($subside == 'task') active #end"><a
+                        href="${rc.contextPath}/rdb/stat"> <i
+                        class="icon-globe"></i> 空间统计
+                </a></li>
+
             </ul>
         </li>
 
@@ -98,11 +103,6 @@
                 <li class="#if($subside == 'task') active #end"><a
                         href="${rc.contextPath}/report"> <i
                         class="icon-globe"></i> 报表
-                </a></li>
-
-                <li class="#if($subside == 'task') active #end"><a
-                        href="${rc.contextPath}/rdb/stat"> <i
-                        class="icon-globe"></i> category统计查询
                 </a></li>
             </ul>
         </li>

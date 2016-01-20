@@ -3,6 +3,7 @@ package com.dianping.cache.service.impl;
 import com.dianping.cache.dao.CategoryStatsDao;
 import com.dianping.cache.entity.CategoryStats;
 import com.dianping.cache.service.RdbService;
+import com.dianping.cache.util.CommonUtil;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
@@ -26,16 +27,55 @@ public class RdbServiceImpl implements RdbService{
             long currentMill = System.currentTimeMillis();
             long end = currentMill - i * DAYMILL ;
             long start = currentMill - (i + 1) * DAYMILL;
-            List<CategoryStats> list = categoryStatsDao.selectAllByTime(start, end);
+            HashMap<String, Object> para = new HashMap<String, Object>();
+            para.put("start", start);
+            para.put("end", end);
+            List<CategoryStats> list = categoryStatsDao.selectAllByTime(para);
+            for(CategoryStats c : list) {
+                c.setKeySizeRead(CommonUtil.ConvertBytesName(c.getKeySize()));
+                c.setValueSizeRead(CommonUtil.ConvertBytesName(c.getValueSize()));
+            }
             List<CategoryStats> dayResult = mergeByCategory(list);
             result.addAll(dayResult);
         }
         return result;
     }
 
-    List<CategoryStats> mergeByCategory(List<CategoryStats> list) {
+
+    @Override
+    public TotalStat getCategoryMergeStat(String category) {
+        List<CategoryStats> data = categoryStatsDao.selectCategoryStat(category);
+        List<CategoryStats> result = mergeByCategory(data);
+        TotalStat totalStat = new TotalStat();
+        for(CategoryStats cs : result) {
+            totalStat.count += cs.getKeyCount();
+            totalStat.volumn += cs.getKeySize();
+            totalStat.volumn += cs.getValueSize();
+        }
+        return totalStat;
+    }
+
+    List<CategoryStats> filterOldData(List<CategoryStats> data) {
         Map<String, CategoryStats> map = new HashMap<String, CategoryStats>();
-        for(CategoryStats c : list) {
+        for(CategoryStats c : data) {
+            String category = c.getCategory();
+            if(map.get(category) == null) {
+                map.put(c.getCategory() + c.getHostAndPort(), c);
+            } else {
+                CategoryStats old = map.get(c.getCategory() + c.getHostAndPort());
+                if(old.getUpdateTime() < c.getUpdateTime())
+                    map.put(c.getCategory() + c.getHostAndPort(), c);
+            }
+        }
+        List<CategoryStats> result = new ArrayList<CategoryStats>();
+        result.addAll(map.values());
+        return result;
+    }
+
+    List<CategoryStats> mergeByCategory(List<CategoryStats> data) {
+        Map<String, CategoryStats> map = new HashMap<String, CategoryStats>();
+        data = filterOldData(data);
+        for(CategoryStats c : data) {
             if(map.get(c.getCategory()) == null) {
                 map.put(c.getCategory(), c);
             } else {
@@ -51,4 +91,7 @@ public class RdbServiceImpl implements RdbService{
         }
         return result;
     }
+
+
+
 }
