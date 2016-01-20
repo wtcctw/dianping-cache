@@ -69,7 +69,7 @@
                                     <button class="btn btn-sm btn-success pull-right" type="submit"
                                             ng-click="deleteCategory()">删除此category</button>
                                 </div>
-                                <div class="col-sm-3">
+                                <div class="col-sm-3" style="#if(${isadmin})display: table-cell;#else display: none;#end;">
                                     <button class="btn btn-sm btn-success " type="submit"
                                             ng-click="deleteKey()">删除此Key</button>
                                 </div>
