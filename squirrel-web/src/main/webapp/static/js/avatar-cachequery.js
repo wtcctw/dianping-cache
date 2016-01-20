@@ -85,27 +85,66 @@ module.controller('CacheQueryController', [
 				
 			};
 
+            $(".cancel-confirm").on(ace.click_event, function() {
+                var id = $(this).attr("id");
+                if(flag) {
+                    flag = false;
+                    bootbox.confirm("确定要取消任务吗?", function (result) {
+                        if (result) {
+                            $.ajax({
+                                type : 'GET',
+                                url: "/task/cancel?id=" + id,
+                                success : function(data){
+                                    taskTable.ajax.reload();
+                                }
+                            })
+                        }
+                    });
+                    flag = true;
+                }
+            });
+
             $scope.deleteCategory = function(){
-                $http.get(window.contextPath + '/data/delete',{
-                    params : {
-                        "category": $scope.category
+                bootbox.confirm("确定要删除此 category 吗?", function (result) {
+                    if (result) {
+                        $.ajax({
+                            type : 'GET',
+                            url: "/task/cancel?id=" + id,
+                            success : function(data){
+                                $http.get(window.contextPath + '/data/delete',{
+                                    params : {
+                                        "category": $scope.category
+                                    }
+                                }).success(function(response){
+                                    //$scope.result = response.result;
+                                    //$scope.address = response.address;
+                                });
+                            }
+                        })
                     }
-                }).success(function(response){
-                    //$scope.result = response.result;
-                    //$scope.address = response.address;
                 });
 
             };
 
             $scope.deleteKey = function(){
-                $http.get(window.contextPath + '/data/deleteKey',{
-                    params : {
-                        "category": $scope.category,
-                        "key": $scope.key
+                bootbox.confirm("确定要删除这个 key 吗?", function (result) {
+                    if (result) {
+                        $.ajax({
+                            type : 'GET',
+                            url: "/task/cancel?id=" + id,
+                            success : function(data){
+                                $http.get(window.contextPath + '/data/deleteKey',{
+                                    params : {
+                                        "category": $scope.category,
+                                        "key": $scope.key
+                                    }
+                                }).success(function(response){
+                                    //$scope.result = response.result;
+                                    //$scope.address = response.address;
+                                });
+                            }
+                        })
                     }
-                }).success(function(response){
-                    //$scope.result = response.result;
-                    //$scope.address = response.address;
                 });
 
             };
