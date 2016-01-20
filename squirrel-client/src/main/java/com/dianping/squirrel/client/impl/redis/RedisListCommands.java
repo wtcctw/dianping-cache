@@ -51,4 +51,6 @@ public interface RedisListCommands {
      */
     Boolean ltrim(StoreKey key, long start, long end);
 
+    Long lrem(StoreKey key, long count, Object value);
+    
 }

@@ -16,7 +16,12 @@
     </resultMap>
 
     <select id="selectAll" resultMap="CategoryStatResult">
-    SELECT * FROM category_stats;
+      SELECT * FROM category_stats;
     </select>
+
+    <select id="selectAllByTime" resultMap="CategoryStatResult" parameterType="long">
+        SELECT * FROM category_stats WHERE updateTime > #{start} AND updateTime &lt; #{end};
+    </select>
+
 
 </mapper>
