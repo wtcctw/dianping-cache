@@ -55,7 +55,7 @@ public abstract class AbstractTask<T> implements Runnable{
     public abstract void taskRun();
 
     public void run() {
-        startTask();
+        //startTask();
         taskRun();
         endTask();
     }

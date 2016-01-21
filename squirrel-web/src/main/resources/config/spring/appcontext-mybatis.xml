@@ -57,8 +57,8 @@
  		<property name="mapperInterface" value="com.dianping.cache.dao.ServerGroupDao" />
 		<property name="sqlSessionFactory" ref="sqlSessionFactory" />
 	</bean>
-	<bean id="memcacheStatsDao" class="org.mybatis.spring.mapper.MapperFactoryBean">
-		<property name="mapperInterface" value="com.dianping.cache.dao.MemcacheStatsDao" />
+	<bean id="memcachedStatsDao" class="org.mybatis.spring.mapper.MapperFactoryBean">
+		<property name="mapperInterface" value="com.dianping.cache.dao.MemcachedStatsDao" />
 		<property name="sqlSessionFactory" ref="sqlSessionFactory" />
 	</bean>
 	<bean id="serverDao" class="org.mybatis.spring.mapper.MapperFactoryBean">
@@ -124,7 +124,7 @@
 	</bean>
 
     <bean id="taskDao" class="org.mybatis.spring.mapper.MapperFactoryBean">
-        <property name="mapperInterface" value="com.dianping.cache.dao.TaskDao"/>
+        <property name="mapperInterface" value="com.dianping.squirrel.dao.TaskDao"/>
         <property name="sqlSessionFactory" ref="sqlSessionFactory"/>
     </bean>
 

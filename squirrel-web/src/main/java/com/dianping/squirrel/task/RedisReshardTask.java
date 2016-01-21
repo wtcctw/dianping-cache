@@ -45,11 +45,17 @@ public class RedisReshardTask extends AbstractTask {
 
     @Override
     public void taskRun() {
-        reshard();
+        try {
+            if(RedisManager.checkClusterStatus(reshardPlan)){
+                reshard();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private void reshard() {
-        RedisCluster redisCluster = new RedisCluster(reshardPlan.getSrcNode());
+        RedisCluster redisCluster = new RedisCluster(reshardPlan.getCluster(),reshardPlan.getSrcNode());
         List<ReshardRecord> reshardRecordList = reshardPlan.getReshardRecordList();
         int stat = 0;
         for (ReshardRecord reshardRecord : reshardRecordList) {

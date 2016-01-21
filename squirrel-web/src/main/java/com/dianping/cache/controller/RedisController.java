@@ -181,17 +181,7 @@ public class RedisController extends AbstractSidebarController{
 	}
 
 
-	@RequestMapping(value = "/redis/auth/authorize")
-	@ResponseBody
-	public void authorize(@RequestBody AuthParams authParams) throws Exception {
-		authService.authorize(authParams.getApplication(),authParams.getResource());
-	}
 
-	@RequestMapping(value = "/redis/auth/unauthorize")
-	@ResponseBody
-	public void unauthorize(@RequestBody AuthParams authParams) throws Exception {
-		authService.unauthorize(authParams.getApplication(),authParams.getResource());
-	}
 
 	@RequestMapping(value = "/redis/reshard")
 	@ResponseBody

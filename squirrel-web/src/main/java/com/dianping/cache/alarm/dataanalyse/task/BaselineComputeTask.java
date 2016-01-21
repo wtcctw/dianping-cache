@@ -7,10 +7,10 @@ import com.dianping.cache.alarm.dataanalyse.service.MemcacheBaselineService;
 import com.dianping.cache.alarm.dataanalyse.service.RedisBaselineService;
 import com.dianping.cache.alarm.entity.MemcacheBaseline;
 import com.dianping.cache.alarm.entity.RedisBaseline;
-import com.dianping.cache.entity.MemcacheStats;
+import com.dianping.cache.entity.MemcachedStats;
 import com.dianping.cache.entity.RedisStats;
 import com.dianping.cache.entity.Server;
-import com.dianping.cache.service.MemcacheStatsService;
+import com.dianping.cache.service.MemcachedStatsService;
 import com.dianping.cache.service.RedisService;
 import com.dianping.cache.service.ServerService;
 import org.slf4j.Logger;
@@ -34,7 +34,7 @@ public class BaselineComputeTask {
 
 
     @Autowired
-    MemcacheStatsService memcacheStatsService;
+    MemcachedStatsService memcacheStatsService;
 
     @Autowired
     RedisService redisService;
@@ -84,18 +84,18 @@ public class BaselineComputeTask {
         List<String> startTime = getStartTime();
         String endTime = df.format(new Date());
 
-        Map<String, MemcacheStats> memcacheStatses = getMemcacheState(startTime, endTime);
+        Map<String, MemcachedStats> memcacheStatses = getMemcacheState(startTime, endTime);
 
         memcacheBaslineStoreToDb(taskId, memcacheStatses);
 
 
     }
 
-    private void memcacheBaslineStoreToDb(int taskId, Map<String, MemcacheStats> memcacheStatses) {
+    private void memcacheBaslineStoreToDb(int taskId, Map<String, MemcachedStats> memcacheStatses) {
 
         Map<String, MemcacheBaseline> memcacheBaselineMap = new HashMap<String, MemcacheBaseline>();
 
-        for (Map.Entry<String, MemcacheStats> entry : memcacheStatses.entrySet()) {
+        for (Map.Entry<String, MemcachedStats> entry : memcacheStatses.entrySet()) {
             MemcacheBaseline memcacheBaseline = MemcacheBaselineMapper.convertToMemcacheBaseline(entry.getValue());
             memcacheBaseline.setBaseline_name(entry.getKey());
             memcacheBaseline.setTaskId(taskId);
@@ -134,11 +134,11 @@ public class BaselineComputeTask {
     }
 
 
-    private Map<String, MemcacheStats> getMemcacheState(List<String> startTimeList, String endDate) throws ParseException {
+    private Map<String, MemcachedStats> getMemcacheState(List<String> startTimeList, String endDate) throws ParseException {
 
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss",Locale.ENGLISH);
 
-        Map<String, MemcacheStats> memcacheStatsMap = new HashMap<String, MemcacheStats>();
+        Map<String, MemcachedStats> memcacheStatsMap = new HashMap<String, MemcachedStats>();
 
         for (int i = 0; i < startTimeList.size(); i++) {
             String startTime = startTimeList.get(i);
@@ -171,13 +171,13 @@ public class BaselineComputeTask {
                             "FROM memcache_stats " +
                             " WHERE curr_time > " + tmp + " AND curr_time <= " + end + " AND serverId =" + server.getId();
 
-                    List<MemcacheStats> memcacheStatsestmp = memcacheStatsService.search(sql);
+                    List<MemcachedStats> memcacheStatsestmp = memcacheStatsService.search(sql);
                     if (0 != memcacheStatsestmp.size()) {
                         SimpleDateFormat sdf = new SimpleDateFormat("EEEE:HH:mm",Locale.ENGLISH);
                         Date nameDate = new Date(tmp * 1000);
                         String name = "Memcache_" + sdf.format(nameDate) + "_" + server.getAddress();
 
-                        MemcacheStats memcacheStatsDelta = getMemcacheDelta(memcacheStatsestmp);
+                        MemcachedStats memcacheStatsDelta = getMemcacheDelta(memcacheStatsestmp);
 
                         if (null == memcacheStatsDelta) {
                             continue;
@@ -186,7 +186,7 @@ public class BaselineComputeTask {
                         if (null == memcacheStatsMap.get(name)) {
                             memcacheStatsMap.put(name, memcacheStatsDelta);
                         } else {
-                            MemcacheStats memcacheStats = dealMemcacheStats(memcacheStatsDelta, memcacheStatsMap.get(name));
+                            MemcachedStats memcacheStats = dealMemcacheStats(memcacheStatsDelta, memcacheStatsMap.get(name));
 
                             memcacheStatsMap.remove(name);
                             memcacheStatsMap.put(name, memcacheStats);
@@ -202,19 +202,19 @@ public class BaselineComputeTask {
                         " bytes_read, bytes_written, delete_hits, delete_misses, evictions,limit_maxbytes, bytes " +
                         "FROM memcache_stats " +
                         " WHERE curr_time > " + tmp + " AND curr_time <= " + endLong + " AND serverId =" + server.getId();
-                List<MemcacheStats> memcacheStatsestmp = memcacheStatsService.search(sql);
+                List<MemcachedStats> memcacheStatsestmp = memcacheStatsService.search(sql);
                 if (0 != memcacheStatsestmp.size()) {
                     SimpleDateFormat sdf = new SimpleDateFormat("EEEE:HH:mm",Locale.ENGLISH);
                     Date nameDate = new Date(tmp * 1000);
                     String name = "Memcache_" + sdf.format(nameDate) + "_" + server.getAddress();
-                    MemcacheStats memcacheStatsDelta = getMemcacheDelta(memcacheStatsestmp);
+                    MemcachedStats memcacheStatsDelta = getMemcacheDelta(memcacheStatsestmp);
                     if (null == memcacheStatsDelta) {
                         continue;
                     }
                     if (null == memcacheStatsMap.get(name)) {
                         memcacheStatsMap.put(name, memcacheStatsDelta);
                     } else {
-                        MemcacheStats memcacheStats = dealMemcacheStats(memcacheStatsDelta, memcacheStatsMap.get(name));
+                        MemcachedStats memcacheStats = dealMemcacheStats(memcacheStatsDelta, memcacheStatsMap.get(name));
 
                         memcacheStatsMap.remove(name);
                         memcacheStatsMap.put(name, memcacheStats);
@@ -228,9 +228,9 @@ public class BaselineComputeTask {
 
     }
 
-    private MemcacheStats getMemcacheDelta(List<MemcacheStats> memcacheStatsestmp) {
+    private MemcachedStats getMemcacheDelta(List<MemcachedStats> memcacheStatsestmp) {
 
-        MemcacheStats memcacheStats = new MemcacheStats();
+        MemcachedStats memcacheStats = new MemcachedStats();
         if (memcacheStatsestmp.size() < 2) {
             return null;
         }
@@ -268,8 +268,8 @@ public class BaselineComputeTask {
         return memcacheStats;
     }
 
-    private MemcacheStats dealMemcacheStats(MemcacheStats curr, MemcacheStats base) {
-        MemcacheStats memcacheStats = new MemcacheStats();
+    private MemcachedStats dealMemcacheStats(MemcachedStats curr, MemcachedStats base) {
+        MemcachedStats memcacheStats = new MemcachedStats();
 
         memcacheStats.setId(curr.getId());
         memcacheStats.setServerId(curr.getServerId());

@@ -11,5 +11,4 @@ public class CollectorManager {
     public void registerCollector(AbstractCollector collector, String cron, ExecutorService executer) {
         
     }
-    
 }

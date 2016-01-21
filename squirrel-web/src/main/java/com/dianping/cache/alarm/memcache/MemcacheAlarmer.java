@@ -15,7 +15,7 @@ import com.dianping.cache.alarm.event.EventReporter;
 import com.dianping.cache.entity.CacheConfiguration;
 import com.dianping.cache.monitor.MemcachedClientFactory;
 import com.dianping.cache.service.CacheConfigurationService;
-import com.dianping.cache.service.MemcacheStatsService;
+import com.dianping.cache.service.MemcachedStatsService;
 import com.dianping.cache.service.ServerService;
 import net.spy.memcached.MemcachedClient;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,7 +54,7 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
     private ServerService serverService;
 
     @Autowired
-    private MemcacheStatsService memcacheStatsService;
+    private MemcachedStatsService memcacheStatsService;
 
     @Autowired
     private CacheConfigurationService cacheConfigurationService;

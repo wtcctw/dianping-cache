@@ -28,7 +28,7 @@
 	</bean>
 	
 	<bean id="memcacheStatsService" class="com.dianping.cache.service.impl.MemcacheStatsServiceImpl">
-		<property name="memcacheStatsDao" ref="memcacheStatsDao"/>
+		<property name="memcachedStatsDao" ref="memcachedStatsDao"/>
 	</bean>
 	
 	<bean id="serverStatsService" class="com.dianping.cache.service.impl.ServerStatsServiceImpl">

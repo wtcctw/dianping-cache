@@ -1,7 +1,7 @@
 package com.dianping.cache.alarm.dataanalyse.mapper;
 
 import com.dianping.cache.alarm.entity.MemcacheBaseline;
-import com.dianping.cache.entity.MemcacheStats;
+import com.dianping.cache.entity.MemcachedStats;
 
 import java.util.Date;
 
@@ -10,7 +10,7 @@ import java.util.Date;
  */
 public class MemcacheBaselineMapper {
 
-    public static MemcacheBaseline convertToMemcacheBaseline(MemcacheStats memcacheStats) {
+    public static MemcacheBaseline convertToMemcacheBaseline(MemcachedStats memcacheStats) {
         MemcacheBaseline memcacheBaseline = new MemcacheBaseline();
 
         memcacheBaseline.setGet_hits(memcacheStats.getGet_hits())

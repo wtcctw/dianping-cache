@@ -1,22 +1,20 @@
 package com.dianping.cache.monitor.storage;
 
+import com.dianping.cache.alarm.memcache.MemcacheAlarmer;
+import com.dianping.cache.entity.MemcachedStats;
+import com.dianping.cache.entity.Server;
+import com.dianping.cache.monitor.MemcachedClientFactory;
+import com.dianping.cache.service.MemcachedStatsService;
+import com.dianping.cache.service.ServerService;
+import com.dianping.cache.util.SpringLocator;
+import net.spy.memcached.MemcachedClient;
+
 import java.net.InetSocketAddress;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-
-import com.dianping.cache.util.SpringLocator;
-import net.spy.memcached.MemcachedClient;
-
-import com.dianping.cache.alarm.memcache.MemcacheAlarmer;
-
-import com.dianping.cache.entity.MemcacheStats;
-import com.dianping.cache.entity.Server;
-import com.dianping.cache.monitor.MemcachedClientFactory;
-import com.dianping.cache.service.MemcacheStatsService;
-import com.dianping.cache.service.ServerService;
 
 public class MemcacheStatsDataStorage extends AbstractStatsDataStorage{
 	
@@ -26,7 +24,7 @@ public class MemcacheStatsDataStorage extends AbstractStatsDataStorage{
 
 	private ServerService serverService;
 	
-	private MemcacheStatsService memcacheStatsService;
+	private MemcachedStatsService memcacheStatsService;
 	
 	private ExecutorService pool;
 
@@ -61,7 +59,7 @@ public class MemcacheStatsDataStorage extends AbstractStatsDataStorage{
 		}
 	}
 	
-	private MemcacheStats processStats(Map<String, String> stats) {
+	private MemcachedStats processStats(Map<String, String> stats) {
 		int uptime = Integer.parseInt(stats.get("uptime"));
 		long curr_time = System.currentTimeMillis()/1000;
 		int total_connections = Integer.parseInt(stats.get("total_connections"));
@@ -78,7 +76,7 @@ public class MemcacheStatsDataStorage extends AbstractStatsDataStorage{
 		long bytes_written = Long.parseLong(stats.get("bytes_written"));
 		long bytes = Long.parseLong(stats.get("bytes"));
 		
-		MemcacheStats msData = new MemcacheStats();
+		MemcachedStats msData = new MemcachedStats();
 		msData.setUptime(uptime);
 		msData.setCurr_time(curr_time);
 		msData.setTotal_conn(total_connections);
@@ -142,7 +140,7 @@ public class MemcacheStatsDataStorage extends AbstractStatsDataStorage{
 				 Map<String, String> stats = mc.getStats().get(new InetSocketAddress(serverInfo.ip, serverInfo.port));
 				 
 				 //process data
-				 MemcacheStats msData = processStats(stats);
+				 MemcachedStats msData = processStats(stats);
 				 msData.setServerId(server.getId());
 				 //insert
 				 memcacheStatsService.insert(msData);

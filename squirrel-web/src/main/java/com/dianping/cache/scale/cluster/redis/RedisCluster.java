@@ -1,19 +1,25 @@
 package com.dianping.cache.scale.cluster.redis;
 
+import com.dianping.cache.entity.CacheConfiguration;
 import com.dianping.cache.scale.ScaleException;
 import com.dianping.cache.scale.cluster.Cluster;
 import com.dianping.cache.scale.cluster.Server;
+import com.dianping.cache.util.ConfigUrlUtil;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import redis.clients.jedis.Jedis;
 
 import java.util.*;
 
+@JsonIgnoreProperties({"password"})
 public class RedisCluster implements Cluster<RedisNode>{
 	
 	private static Logger logger = LoggerFactory.getLogger(RedisCluster.class);
 
 	private String clusterName;
+
+	private String password;
 
     private List<String> serverList;
 
@@ -26,10 +32,23 @@ public class RedisCluster implements Cluster<RedisNode>{
         loadClusterInfo();
     }
 	public RedisCluster(String clusterName,List<String> serverList){
+		this(clusterName,serverList,ConfigUrlUtil.getPassword(clusterName));
+	}
+
+	public RedisCluster(CacheConfiguration configuration){
+		this.clusterName = configuration.getCacheKey();
+		this.serverList = ConfigUrlUtil.serverList(configuration);
+		this.password = ConfigUrlUtil.getProperty(configuration,"password");
+		loadClusterInfo();
+	}
+
+	public RedisCluster(String clusterName,List<String> serverList,String password){
 		this.clusterName = clusterName;
+		this.password = password;
 		this.serverList = serverList;
 		loadClusterInfo();
 	}
+
 
 	@Override
 	public List<RedisNode> getNodes() {
@@ -77,12 +96,17 @@ public class RedisCluster implements Cluster<RedisNode>{
 			try {
 				retry++;
 				jedis = new Jedis(server.getIp(), server.getPort());
+				if(password != null && !"".equals(password)) {
+					jedis.auth(password);
+				}
 				String clusterInfo = jedis.clusterNodes();
 				nodes = parseClusterInfo(clusterInfo);
 				break;
 			} catch (Exception e) {
-				if(retry >= 3)
+				if(retry >= 3){
+					logger.error("can't load cluster info,",e);
 					break;
+				}
 				continue;
 			} finally{
 				if(jedis != null){
@@ -100,6 +124,7 @@ public class RedisCluster implements Cluster<RedisNode>{
         List<RedisServer> servers = new ArrayList<RedisServer>();
         for(String serverInfo : clusterInfo.split("\n")) {
             RedisServer server = parseServerInfo(serverInfo);
+			server.setRedisCluster(this);
 			if(server.isFail() || server.isPartialFail()){
 				failedServers.add(server);
 			}else{
@@ -165,5 +190,9 @@ public class RedisCluster implements Cluster<RedisNode>{
 
 	public void setClusterName(String clusterName) {
 		this.clusterName = clusterName;
+	}
+
+	public String getPassword() {
+		return password;
 	}
 }

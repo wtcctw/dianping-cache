@@ -3,9 +3,9 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.dianping.cache.dao.MemcacheStatsDao">
+<mapper namespace="com.dianping.cache.dao.MemcachedStatsDao">
 	
-	<resultMap id="MemcacheStatsResult" type="MemcacheStats">
+	<resultMap id="MemcachedStatsResult" type="MemcachedStats">
 		<result column="id" property="id"/>
 		<result column="serverId" property="serverId"/>
 		<result column="uptime" property="uptime"/>
@@ -25,7 +25,7 @@
 		<result column="bytes" property="bytes"/>
 	</resultMap>
 
-	<insert id="insert" parameterType="MemcacheStats">
+	<insert id="insert" parameterType="MemcachedStats">
 		INSERT INTO memcache_stats(serverId, uptime, curr_time, total_conn, curr_conn, curr_items, cmd_set, get_hits, get_misses,
 		 					bytes_read, bytes_written, delete_hits, delete_misses, evictions,limit_maxbytes, bytes)
 		VALUES(#{serverId}, #{uptime}, #{curr_time}, #{total_conn}, #{curr_conn}, #{curr_items}, #{cmd_set}, #{get_hits}, #{get_misses}, 
@@ -33,7 +33,7 @@
 	</insert>
 	
 	
-	<select id="findByServer" resultMap="MemcacheStatsResult" parameterType="String">
+	<select id="findByServer" resultMap="MemcachedStatsResult" parameterType="String">
    		SELECT id, serverId, uptime, curr_time, total_conn, curr_conn, curr_items, cmd_set, get_hits, get_misses,
 				 bytes_read, bytes_written, delete_hits, delete_misses, evictions,limit_maxbytes, bytes
    		FROM memcache_stats
@@ -41,14 +41,14 @@
    		ORDER BY id DESC
 	</select>
 	
-	<select id="findAll" resultMap="MemcacheStatsResult">
+	<select id="findAll" resultMap="MemcachedStatsResult">
 		SELECT id, serverId, uptime, curr_time, total_conn, curr_conn, curr_items, cmd_set, get_hits, get_misses,
 				 bytes_read, bytes_written, delete_hits, delete_misses, evictions,limit_maxbytes, bytes
    		FROM memcache_stats
    		ORDER BY id DESC
 	</select>
 
-	<select id="findLast" resultMap="MemcacheStatsResult" >
+	<select id="findLast" resultMap="MemcachedStatsResult" >
 		SELECT id, serverId, uptime, curr_time, total_conn, curr_conn, curr_items, cmd_set, get_hits, get_misses,
 				 bytes_read, bytes_written, delete_hits, delete_misses, evictions,limit_maxbytes, bytes
    		FROM memcache_stats
@@ -57,7 +57,7 @@
    		limit 1
 	</select>	
 	
-	<select id="findByServerWithInterval" resultMap="MemcacheStatsResult" parameterType="map">
+	<select id="findByServerWithInterval" resultMap="MemcachedStatsResult" parameterType="map">
 		<![CDATA[
 		SELECT id,serverId, uptime, curr_time, total_conn, curr_conn, curr_items, cmd_set, get_hits, get_misses,
 				 bytes_read, bytes_written, delete_hits, delete_misses, evictions,limit_maxbytes, bytes
@@ -73,7 +73,7 @@
 	</delete>
 
 
-	<select id="search" resultType="MemcacheStats">
+	<select id="search" resultType="MemcachedStats">
 		${paramSQL}
 	</select>
 	
