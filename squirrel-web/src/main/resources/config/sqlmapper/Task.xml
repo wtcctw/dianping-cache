@@ -16,6 +16,7 @@
         <result column="endTime" property="endTime"/>
         <result column="description" property="description"/>
         <result column="commiter" property="commiter"/>
+        <result column="cancel" property="cancel"/>
     </resultMap>
 
     <insert id="insert" parameterType="Task" useGeneratedKeys="true" keyProperty="id">
@@ -48,6 +49,10 @@
 
     <update id="updateEndTime" parameterType="Map">
         UPDATE task SET endTime = #{endTime} WHERE id = #{id}
+    </update>
+
+    <update id="cancelTask" parameterType="int">
+        UPDATE task SET cancel = TRUE WHERE id = #{id}
     </update>
 
 

@@ -45,14 +45,14 @@
                     </tr>
                     <tr ng-repeat="m in searchPaginator.currentPagefailDetails">
 
-                        <td ng-if="m.rowspan!=0" rowspan="{{m.rowspan}}">{{m.cacheName}}</td>
-                        <td>{{m.project}}</td>
-                        <td >{{m.totalCount}}</td>
-                        <td>{{m.failCount}}</td>
-                        <td style="color: red">{{m.failPercent}}</td>
-                        <td>{{m.minValue}}</td>
-                        <td>{{m.maxValue}}</td>
-                        <td>{{m.avgValue}}</td>
+                        <td style="text-align: left" ng-if="m.rowspan!=0" rowspan="{{m.rowspan}}">{{m.cacheName}}</td>
+                        <td style="text-align: left">{{m.project}}</td>
+                        <td style="text-align: left" >{{m.totalCount}}</td>
+                        <td style="text-align: left">{{m.failCount}}</td>
+                        <td style="text-align: left" style="color: red">{{m.failPercent}}</td>
+                        <td style="text-align: left">{{m.minValue}}</td>
+                        <td style="text-align: left">{{m.maxValue}}</td>
+                        <td style="text-align: left">{{m.avgValue}}</td>
                     </tr>
                 </table>
             </div>
@@ -72,14 +72,14 @@
                         <th>Avg(ms)</th>
                     </tr>
                     <tr ng-repeat="m in searchPaginator.currentPagedelayDetails">
-                        <td ng-if="m.rowspan!=0" rowspan="{{m.rowspan}}">{{m.cacheName}}</td>
-                        <td>{{m.project}}</td>
-                        <td>{{m.totalCount}}</td>
-                        <td>{{m.failCount}}</td>
-                        <td>{{m.failPercent}}</td>
-                        <td>{{m.minValue}}</td>
-                        <td>{{m.maxValue}}</td>
-                        <td style="color: red ">{{m.avgValue}}</td>
+                        <td style="text-align: left" ng-if="m.rowspan!=0" rowspan="{{m.rowspan}}">{{m.cacheName}}</td>
+                        <td style="text-align: left">{{m.project}}</td>
+                        <td style="text-align: left">{{m.totalCount}}</td>
+                        <td style="text-align: left">{{m.failCount}}</td>
+                        <td style="text-align: left">{{m.failPercent}}</td>
+                        <td style="text-align: left">{{m.minValue}}</td>
+                        <td style="text-align: left">{{m.maxValue}}</td>
+                        <td style="text-align: left" style="color: red ">{{m.avgValue}}</td>
                     </tr>
                 </table>
             </div>

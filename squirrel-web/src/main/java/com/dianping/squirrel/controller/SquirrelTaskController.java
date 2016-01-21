@@ -4,9 +4,11 @@ import com.dianping.cache.controller.AbstractSidebarController;
 import com.dianping.squirrel.dao.TaskDao;
 import com.dianping.squirrel.entity.Task;
 
+import com.dianping.squirrel.task.TaskManager;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -19,7 +21,7 @@ import java.util.Map;
  * Created by thunder on 16/1/13.
  */
 @Controller
-public class TaskController extends AbstractSidebarController {
+public class SquirrelTaskController extends AbstractSidebarController {
 
     @Resource(name = "taskDao")
     TaskDao taskDao;
@@ -35,6 +37,15 @@ public class TaskController extends AbstractSidebarController {
         List<Task> tasks = taskDao.selectAll();
         Map<String, Object> result = new HashMap<String, Object>();
         result.put("data", tasks);
+        return result;
+    }
+
+    @RequestMapping(value = "/task/cancel")
+    @ResponseBody
+    public Object cancelTask(@RequestParam(value = "id")int id) {
+        TaskManager.cancelTask(id);
+        Map<String, Object> result = new HashMap<String, Object>();
+        result.put("data", true);
         return result;
     }
 

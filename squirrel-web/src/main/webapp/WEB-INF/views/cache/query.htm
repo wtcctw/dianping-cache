@@ -60,7 +60,7 @@
 									<button class="btn btn-sm btn-success pull-right" type="submit"
 										ng-click="query()">查询</button>
                                 </div>
-								<div class="col-sm-9">
+								<div class="col-sm-5">
 									address = {{address}} <br> result = {{result}}
 								</div>
 							</div>
@@ -69,6 +69,11 @@
                                     <button class="btn btn-sm btn-success pull-right" type="submit"
                                             ng-click="deleteCategory()">删除此category</button>
                                 </div>
+                                <div class="col-sm-3" style="#if(${isadmin})display: table-cell;#else display: none;#end;">
+                                    <button class="btn btn-sm btn-success " type="submit"
+                                            ng-click="deleteKey()">删除此Key</button>
+                                </div>
+
                             </div>
 						</form>
 

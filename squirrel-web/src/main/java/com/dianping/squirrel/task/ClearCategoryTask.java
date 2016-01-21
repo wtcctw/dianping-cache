@@ -1,17 +1,14 @@
 package com.dianping.squirrel.task;
 
-import com.dianping.cache.util.RequestUtil;
-import com.dianping.cache.util.SpringLocator;
+import com.dianping.cache.service.RdbService;
 import com.dianping.squirrel.client.StoreClient;
 import com.dianping.squirrel.client.StoreClientFactory;
+import com.dianping.squirrel.client.StoreKey;
 import com.dianping.squirrel.client.impl.redis.RedisStoreClient;
-import com.dianping.squirrel.dao.TaskDao;
-import com.dianping.squirrel.entity.Task;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import redis.clients.jedis.*;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -23,6 +20,8 @@ public class ClearCategoryTask extends AbstractTask {
     private String category;
     private StoreClient storeClient;
 
+    @Autowired
+    private RdbService rdbService;
 
     public ClearCategoryTask(){
     }
@@ -43,8 +42,9 @@ public class ClearCategoryTask extends AbstractTask {
     }
 
     @Override
-    int getTaskMaxStat() {
-        return 2000;
+    long getTaskMaxStat() {
+        RdbService.TotalStat totalStat = rdbService.getCategoryMergeStat(category);
+        return totalStat.count;
     }
 
     @Override
@@ -76,6 +76,14 @@ public class ClearCategoryTask extends AbstractTask {
             }
             stat += step;
             this.updateStat((int)stat);
+        }
+    }
+
+    public static void main(String[] args) {
+        StoreClient storeClient = StoreClientFactory.getStoreClientByCategory("redistemp");
+        for(int i = 0; i < 1000; i++) {
+            StoreKey storeKey = new StoreKey(Integer.toString(i));
+            storeClient.add(storeKey, "123");
         }
     }
 

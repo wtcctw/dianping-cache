@@ -20,5 +20,5 @@ public interface TaskDao {
 
     boolean updateStartTime(Map<String ,String> map);
     boolean updateEndTime(Map<String ,String> map);
-
+    boolean cancelTask(int id);
 }

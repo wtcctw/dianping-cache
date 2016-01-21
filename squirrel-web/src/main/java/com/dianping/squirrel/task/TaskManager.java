@@ -1,5 +1,10 @@
 package com.dianping.squirrel.task;
 
+import com.dianping.cache.util.SpringLocator;
+import com.dianping.squirrel.dao.TaskDao;
+import net.spy.memcached.compat.log.Logger;
+import net.spy.memcached.compat.log.LoggerFactory;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.*;
@@ -9,8 +14,10 @@ import java.util.concurrent.atomic.AtomicInteger;
  * Created by thunder on 16/1/5.
  */
 public class TaskManager {
-    private static ThreadPoolExecutor executor;
 
+    private static TaskDao taskDao = SpringLocator.getBean("taskDao");
+    private static Logger logger = LoggerFactory.getLogger(TaskManager.class);
+    private static ThreadPoolExecutor executor;
     private static int DEFAULT_WATING_QUEUE_SIZE = 16384;
     private static int MAX_POOL_SIZE = 20;
     private static int CORE_POOL_SIZE = 4;
@@ -38,8 +45,13 @@ public class TaskManager {
 
     public static void cancelTask(int id) {
         Future f = futureMap.get(id);
-        f.cancel(true);
-        futureMap.remove(id);
+        if(f != null) {
+            f.cancel(true);
+            futureMap.remove(id);
+        } else {
+            logger.warn("task id {} is null", id);
+        }
+        taskDao.cancelTask(id);
     }
 
 }

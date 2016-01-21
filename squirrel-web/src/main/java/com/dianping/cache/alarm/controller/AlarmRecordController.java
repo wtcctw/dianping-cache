@@ -30,7 +30,7 @@ public class AlarmRecordController extends AbstractSidebarController {
 
     @RequestMapping(value = "/event")
     public ModelAndView topicSetting(HttpServletRequest request, HttpServletResponse response) {
-        return new ModelAndView("alarm/alarmrecord", createViewMap());
+        return new ModelAndView("event/alarmrecord", createViewMap());
     }
 
     @RequestMapping(value = "/event/list", method = RequestMethod.GET)

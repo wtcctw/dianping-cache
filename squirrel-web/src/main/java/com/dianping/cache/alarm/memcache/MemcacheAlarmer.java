@@ -147,7 +147,7 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
 
         AlarmConfig alarmConfig = alarmConfigService.findByClusterTypeAndName(ALARMTYPE, item.getCacheKey());
 
-        if (null == alarmConfig) {
+        if ((null == alarmConfig)&&(null!=item.getCacheKey())) {
             alarmConfig = new AlarmConfig("Memcache", item.getCacheKey());
             alarmConfigService.insert(alarmConfig);
         }
@@ -182,7 +182,7 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
 
         AlarmConfig alarmConfig = alarmConfigService.findByClusterTypeAndName(ALARMTYPE, item.getCacheKey());
 
-        if (null == alarmConfig) {
+        if ((null == alarmConfig)&&(null!=item.getCacheKey())) {
             alarmConfig = new AlarmConfig("Memcache", item.getCacheKey());
             alarmConfigService.insert(alarmConfig);
         }
@@ -243,7 +243,7 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
 
         AlarmConfig alarmConfig = alarmConfigService.findByClusterTypeAndName(ALARMTYPE, item.getCacheKey());
 
-        if (null == alarmConfig) {
+        if ((null == alarmConfig)&&(null!=item.getCacheKey())) {
             alarmConfig = new AlarmConfig("Memcache", item.getCacheKey());
             alarmConfigService.insert(alarmConfig);
         }
@@ -294,7 +294,7 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
 
         AlarmConfig alarmConfig = alarmConfigService.findByClusterTypeAndName(ALARMTYPE, item.getCacheKey());
 
-        if (null == alarmConfig) {
+        if ((null == alarmConfig)&&(null!=item.getCacheKey())) {
             alarmConfig = new AlarmConfig("Memcache", item.getCacheKey());
             alarmConfigService.insert(alarmConfig);
         }
@@ -346,7 +346,7 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
 
         AlarmConfig alarmConfig = alarmConfigService.findByClusterTypeAndName(ALARMTYPE, item.getCacheKey());
 
-        if (null == alarmConfig) {
+        if ((null == alarmConfig)&&(null!=item.getCacheKey())) {
             alarmConfig = new AlarmConfig("Memcache", item.getCacheKey());
             alarmConfigService.insert(alarmConfig);
         }

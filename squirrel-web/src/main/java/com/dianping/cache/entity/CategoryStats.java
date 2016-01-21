@@ -11,6 +11,25 @@ public class CategoryStats {
     long valueSize;
     long updateTime;
     String hostAndPort;
+    String keySizeRead;
+    String valueSizeRead;
+
+    public String getValueSizeRead() {
+        return valueSizeRead;
+    }
+
+    public void setValueSizeRead(String valueSizeRead) {
+        this.valueSizeRead = valueSizeRead;
+    }
+
+    public String getKeySizeRead() {
+
+        return keySizeRead;
+    }
+
+    public void setKeySizeRead(String keySizeRead) {
+        this.keySizeRead = keySizeRead;
+    }
 
     public String getHostAndPort() {
         return hostAndPort;

@@ -16,6 +16,15 @@ public class Task {
     String commiter;
     String description;
     String typeDescription;
+    boolean cancel;
+
+    public boolean isCancel() {
+        return cancel;
+    }
+
+    public void setCancel(boolean cancel) {
+        this.cancel = cancel;
+    }
 
     public String getCommiter() {
         return commiter;
