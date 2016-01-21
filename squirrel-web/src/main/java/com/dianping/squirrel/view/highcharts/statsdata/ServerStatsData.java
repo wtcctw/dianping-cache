@@ -1,4 +1,4 @@
-package com.dianping.cache.monitor.statsdata;
+package com.dianping.squirrel.view.highcharts.statsdata;
 
 import java.util.List;
 

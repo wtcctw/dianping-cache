@@ -7,8 +7,6 @@ import com.dianping.cache.entity.CacheConfiguration;
 import com.dianping.cache.entity.CacheKeyConfiguration;
 import com.dianping.cache.entity.CategoryToApp;
 import com.dianping.cache.entity.Server;
-import com.dianping.cache.monitor.storage.MemcacheStatsDataStorage;
-import com.dianping.cache.monitor.storage.ServerStatsDataStorage;
 import com.dianping.cache.service.*;
 import com.dianping.cache.service.condition.CacheKeyConfigSearchCondition;
 import com.dianping.cache.util.NetUtil;
@@ -33,7 +31,6 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
-import java.net.InetAddress;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
@@ -159,7 +156,6 @@ public class CacheManagerController extends AbstractSidebarController {
             newConfig.setTranscoderClazz(oldConfig.getTranscoderClazz());
 
             cacheConfigurationService.update(newConfig);
-            ServerStatsDataStorage.REFRESH = true;
             flag = true;
         } else {
             // 数据库信息有变化 不执行更新
@@ -196,7 +192,6 @@ public class CacheManagerController extends AbstractSidebarController {
                 // do nothing
             } finally {
                 serverClusterService.insert(server, cacheKey);
-                ServerStatsDataStorage.REFRESH = true;
             }
             flag = true;
         } else {
@@ -490,34 +485,6 @@ public class CacheManagerController extends AbstractSidebarController {
         serverClusterService.delete(server, cluster);
     }
 
-    @RequestMapping(value = "/start", method = RequestMethod.GET)
-    public void startStorage(){
-        MemcacheStatsDataStorage.START_MS = true;
-        ServerStatsDataStorage.START_SS = true;
-    }
-
-    @RequestMapping(value = "/close", method = RequestMethod.GET)
-    public void closeStorage(){
-        MemcacheStatsDataStorage.START_MS = false;
-        ServerStatsDataStorage.START_SS = false;
-    }
-
-
-    @RequestMapping(value = "/cache/query/getip", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseBody
-    public Object ip() {
-
-
-        InetAddress ia=null;
-        String localip = "";
-        try {
-            ia=InetAddress.getLocalHost();
-            localip=ia.getHostAddress();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return localip;
-    }
     @RequestMapping(value = "/cache/query/getipNet", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public Object ipNet() {
@@ -566,7 +533,6 @@ public class CacheManagerController extends AbstractSidebarController {
         // 如果 对server  已经没有集群使用  删除servers 表中对应数据
         if(requireCacheClose(server,cacheKey)){
             serverService.delete(server);
-            ServerStatsDataStorage.REFRESH = true;
         }
     }
 

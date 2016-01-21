@@ -5,7 +5,7 @@ import com.dianping.cache.controller.vo.NewClusterParams;
 import com.dianping.cache.entity.CacheConfiguration;
 import com.dianping.cache.entity.MemcachedStats;
 import com.dianping.cache.entity.Server;
-import com.dianping.cache.monitor.statsdata.MemcachedStatsData;
+import com.dianping.squirrel.view.highcharts.statsdata.MemcachedStatsData;
 import com.dianping.cache.service.CacheConfigurationService;
 import com.dianping.cache.service.MemcachedStatsService;
 import com.dianping.cache.service.ServerService;

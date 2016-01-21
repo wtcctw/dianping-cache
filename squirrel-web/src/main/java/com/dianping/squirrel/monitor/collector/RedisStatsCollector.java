@@ -23,7 +23,7 @@ public class RedisStatsCollector extends AbstractCollector {
     @Autowired
     private ServerService serverService;
 
-    @Scheduled(cron = "5/35 * * * * *")
+    @Scheduled(cron = "5/30 * * * * *")
     public void scheduled(){
         if(isLeader() && isProductEnv()){
             for(Map.Entry<String,RedisCluster> value : RedisManager.getClusterCache().entrySet()){

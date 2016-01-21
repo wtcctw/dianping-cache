@@ -1,4 +1,4 @@
-package com.dianping.cache.monitor.statsdata;
+package com.dianping.squirrel.view.highcharts.statsdata;
 
 import com.dianping.cache.scale.cluster.redis.RedisNode;
 import com.dianping.cache.scale.cluster.redis.RedisServer;

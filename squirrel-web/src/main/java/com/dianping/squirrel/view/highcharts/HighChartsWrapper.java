@@ -1,4 +1,4 @@
-package com.dianping.cache.monitor.highcharts;
+package com.dianping.squirrel.view.highcharts;
 
 
 public class HighChartsWrapper {

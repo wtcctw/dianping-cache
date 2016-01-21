@@ -1,16 +1,15 @@
-package com.dianping.cache.monitor.highcharts;
+package com.dianping.squirrel.view.highcharts;
+
+import com.dianping.squirrel.view.highcharts.HighChartsWrapper.PlotOption;
+import com.dianping.squirrel.view.highcharts.HighChartsWrapper.PlotOptionSeries;
+import com.dianping.squirrel.view.highcharts.HighChartsWrapper.Series;
+import com.dianping.squirrel.view.highcharts.statsdata.MemcachedStatsData;
+import com.dianping.squirrel.view.highcharts.statsdata.RedisStatsData;
+import com.dianping.squirrel.view.highcharts.statsdata.ServerStatsData;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import com.dianping.cache.monitor.highcharts.HighChartsWrapper.PlotOption;
-import com.dianping.cache.monitor.highcharts.HighChartsWrapper.PlotOptionSeries;
-import com.dianping.cache.monitor.highcharts.HighChartsWrapper.Series;
-import com.dianping.cache.monitor.statsdata.MemcachedStatsData;
-import com.dianping.cache.monitor.statsdata.RedisStatsData;
-import com.dianping.cache.monitor.statsdata.ServerStatsData;
 
 public class ChartsBuilder {
 	

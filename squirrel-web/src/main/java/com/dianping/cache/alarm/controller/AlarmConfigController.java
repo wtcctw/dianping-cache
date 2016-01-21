@@ -15,7 +15,7 @@ import com.dianping.cache.alarm.threadmanager.ThreadManager;
 import com.dianping.cache.controller.AbstractSidebarController;
 import com.dianping.cache.controller.RedisDataUtil;
 import com.dianping.cache.entity.CacheConfiguration;
-import com.dianping.cache.monitor.statsdata.RedisClusterData;
+import com.dianping.squirrel.view.highcharts.statsdata.RedisClusterData;
 import com.dianping.cache.service.CacheConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;

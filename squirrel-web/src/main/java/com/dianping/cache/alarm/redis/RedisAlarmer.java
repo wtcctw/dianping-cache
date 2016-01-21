@@ -13,7 +13,7 @@ import com.dianping.cache.alarm.event.EventFactory;
 import com.dianping.cache.alarm.event.EventType;
 import com.dianping.cache.alarm.event.EventReporter;
 import com.dianping.cache.controller.RedisDataUtil;
-import com.dianping.cache.monitor.statsdata.RedisClusterData;
+import com.dianping.squirrel.view.highcharts.statsdata.RedisClusterData;
 import com.dianping.cache.scale.cluster.redis.RedisNode;
 import com.dianping.cache.scale.cluster.redis.RedisServer;
 import org.springframework.beans.factory.annotation.Autowired;

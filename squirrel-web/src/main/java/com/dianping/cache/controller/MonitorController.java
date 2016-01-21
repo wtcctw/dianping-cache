@@ -1,25 +1,30 @@
 package com.dianping.cache.controller;
 
-import java.util.*;
-import java.util.concurrent.TimeUnit;
-
-import javax.annotation.Resource;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.ModelAndView;
-
 import com.dianping.cache.entity.CacheConfiguration;
 import com.dianping.cache.entity.MemcachedStats;
 import com.dianping.cache.entity.Server;
 import com.dianping.cache.entity.ServerStats;
-import com.dianping.cache.monitor.highcharts.HighChartsWrapper;
 import com.dianping.cache.service.CacheConfigurationService;
 import com.dianping.cache.service.MemcachedStatsService;
 import com.dianping.cache.service.ServerService;
 import com.dianping.cache.service.ServerStatsService;
-import com.dianping.cache.monitor.highcharts.ChartsBuilder;
-import com.dianping.cache.monitor.statsdata.MemcachedStatsData;
-import com.dianping.cache.monitor.statsdata.ServerStatsData;
+import com.dianping.squirrel.view.highcharts.ChartsBuilder;
+import com.dianping.squirrel.view.highcharts.HighChartsWrapper;
+import com.dianping.squirrel.view.highcharts.statsdata.MemcachedStatsData;
+import com.dianping.squirrel.view.highcharts.statsdata.ServerStatsData;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.ModelAndView;
+
+import javax.annotation.Resource;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 @Controller
 public class MonitorController  extends AbstractSidebarController {
