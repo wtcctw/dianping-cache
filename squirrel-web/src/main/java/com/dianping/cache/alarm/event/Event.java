@@ -24,7 +24,7 @@ public abstract class Event {
         add("10.1.14.104");//线上
         add("10.2.7.129");//ppe
         add("192.168.227.113");//beta
-        add("10.128.121.42");//my host
+        add("172.24.121.42");//my host
     }};
 
 
