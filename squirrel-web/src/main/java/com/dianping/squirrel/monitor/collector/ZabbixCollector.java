@@ -103,9 +103,6 @@ public class ZabbixCollector extends AbstractCollector {
             AuthenResult authenResult = JsonUtils.fromStr(zbReply,AuthenResult.class);
             authToken = authenResult.getResult();
             List<Server> serverList = serverService.findAllMemcachedServers();
-            Server s= new Server();
-            s.setAddress("10.1.1.116:11211");
-            serverList.add(s);
             for (Server server : serverList) {
                 try {
                     String[] hostAndPort = server.getAddress().split(":");
