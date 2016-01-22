@@ -18,8 +18,4 @@ public class CommonUtil {
         double last2f = ((int)(( (amount * 1024 + last) / 1024.0) * 100 + 0.5)) / 100.0;
         return last2f + suffixs[i];
     }
-
-    public static void main(String[] args) {
-        long l = 1024 * 1024;
-    }
 }
