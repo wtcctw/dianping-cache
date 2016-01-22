@@ -20,6 +20,4 @@ public interface RdbService {
         public String volumnSuffix;
     }
 
-
-
 }
