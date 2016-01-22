@@ -4,6 +4,7 @@ package com.dianping.cache.alarm.report;
 import com.dianping.cache.alarm.report.thread.ScanThread;
 import com.dianping.cache.alarm.report.thread.ScanThreadFactory;
 import com.dianping.cache.alarm.threadmanager.ThreadManager;
+import com.dianping.cache.util.NetUtil;
 import org.dom4j.DocumentException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,6 +13,8 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by lvshiyun on 15/12/31.
@@ -19,6 +22,13 @@ import java.net.URISyntaxException;
 @Component("scanJob")
 public class ScanJob {
     protected static Logger logger = LoggerFactory.getLogger(ScanJob.class);
+
+    private static final ArrayList<String> IPLIST = new ArrayList<String>(){{
+        add("10.1.14.104");//线上
+        add("10.2.7.129");//ppe
+        add("192.168.227.113");//beta
+        add("172.24.121.42");//my host
+    }};
 
     @Autowired
     ScanThreadFactory scanThreadFactory;
@@ -30,10 +40,26 @@ public class ScanJob {
 
         logger.info("scanTaskDailyJob", getClass().getSimpleName());
 
-        ScanThread scanThread = scanThreadFactory.createScanThread();
-//
-        ThreadManager.getInstance().execute(scanThread);
+        if(isMaster()) {
+            ScanThread scanThread = scanThreadFactory.createScanThread();
+            ThreadManager.getInstance().execute(scanThread);
+        }
+    }
 
+
+    public boolean isMaster(){
+        boolean isMaster = false;
+        try {
+            List<String> ip= NetUtil.getAllLocalIp();
+            ip.retainAll(IPLIST);
+            if(ip.size() > 0)
+                isMaster = true;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return isMaster;
     }
 
 }
