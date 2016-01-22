@@ -112,7 +112,6 @@ public class IndexData {
 
     private String convertT(int capacity){
         if(capacity > 1024){
-            capacity /= 1024;
             double cap = (double) capacity / 1024 ;
             long tmp = Math.round(cap * 100);
             cap =  tmp / 100.0;
