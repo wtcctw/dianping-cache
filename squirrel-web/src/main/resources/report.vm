@@ -71,19 +71,27 @@
            class="table table-bordered table-striped table-condensed  table-hover">
         <thead>
         <tr>
-            <th style="text-align:left; width:150px">CacheName</th>
-            <th style="text-align:left; width:80px">Project</th>
-            <th style="text-align:left; width:80px">FailPercent(%)</th>
-            <th style="text-align:left; width:80px">AvgDelay(ms)</th>
+            <th>Type</th>
+            <th>Name</th>
+            <th>Total</th>
+            <th>Failure</th>
+            <th>Failure(%)</th>
+            <th>Min(ms)</th>
+            <th>Max(ms)</th>
+            <th>Avg(ms)</th>
         </tr>
         </thead>
         #foreach( $info in $delayDetails)
             <tbody>
             <tr>
-                <td style="text-align:left;width:150px">$info.cacheName</td>
-                <td style="text-align:left;width:80px">$info.project</td>
-                <td style="text-align:left;width:80px ;color: red">$info.failPercent</td>
-                <td style="text-align:left;width:80px">$info.avgValue</td>
+                <td style="text-align: left" ng-if="m.rowspan!=0" rowspan="$info.rowspan">$info.cacheName</td>
+                <td style="text-align: left">$info.project</td>
+                <td style="text-align: center" >$info.totalCount</td>
+                <td style="text-align: center">$info.failCount</td>
+                <td style="text-align: center;color: red">$info.failPercent</td>
+                <td style="text-align: center">$info.minValue</td>
+                <td style="text-align: center">$info.maxValue</td>
+                <td style="text-align: center">$info.avgValue</td>
             </tr>
             </tbody>
         #end
@@ -96,20 +104,28 @@
            class="table table-bordered table-striped table-condensed  table-hover">
         <thead>
         <tr>
-            <th style="text-align:left; width:150px">CacheName</th>
-            <th style="text-align:left; width:80px">Project</th>
-            <th style="text-align:left; width:80px">FailPercent(%)</th>
-            <th style="text-align:left; width:80px">AvgDelay(ms)</th>
+            <th>Type</th>
+            <th>Name</th>
+            <th>Total</th>
+            <th>Failure</th>
+            <th>Failure(%)</th>
+            <th>Min(ms)</th>
+            <th>Max(ms)</th>
+            <th>Avg(ms)</th>
         </tr>
         </thead>
 
         #foreach( $info in $failDetails)
             <tbody>
             <tr>
-                <td style="text-align:left;width:150px">$info.cacheName</td>
-                <td style="text-align:left;width:80px">$info.project</td>
-                <td style="text-align:left;width:80px">$info.failPercent</td>
-                <td style="text-align:left;width:80px ;color: red" ;>$info.avgValue</td>
+                <td style="text-align: left" ng-if="m.rowspan!=0" rowspan="$info.rowspan">$info.cacheName</td>
+                <td style="text-align: left">$info.project</td>
+                <td style="text-align: center">$info.totalCount</td>
+                <td style="text-align: center">$info.failCount</td>
+                <td style="text-align: center">$info.failPercent</td>
+                <td style="text-align: center">$info.minValue</td>
+                <td style="text-align: center">$info.maxValue</td>
+                <td style="text-align: center;color: red ">$info.avgValue</td>
             </tr>
             </tbody>
         #end
