@@ -18,6 +18,7 @@ import org.dom4j.DocumentException;
 import org.dom4j.DocumentHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.net.URI;
@@ -34,6 +35,7 @@ public class ReceiverServiceImpl implements ReceiverService {
 
     protected final Logger logger = LoggerFactory.getLogger(getClass());
 
+    @Autowired
     private EmployeeService employeeService;
 
     public List<String> getSmsReceiver(String smsReceiver, String domain, boolean sendToBusiness) throws URISyntaxException, DocumentException, InterruptedException {

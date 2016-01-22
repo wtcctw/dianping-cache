@@ -57,7 +57,7 @@ public class ScanJobController extends AbstractSidebarController {
         Map<String,List<ScanDetail>>delayDetails = new HashMap<String, List<ScanDetail>>();
 
         for(ScanDetail scanDetail:scanDetails){
-            if(scanDetail.getAvgValue()>10){
+            if(scanDetail.getAvgVal()>10){
                 if(null != delayDetails.get(scanDetail.getCacheName())){
                     delayDetails.get(scanDetail.getCacheName()).add(scanDetail);
                 }else {
@@ -112,7 +112,7 @@ public class ScanJobController extends AbstractSidebarController {
         Map<String,List<ScanDetail>>delayDetails = new HashMap<String, List<ScanDetail>>();
 
         for(ScanDetail scanDetail:scanDetails){
-            if(scanDetail.getAvgValue()>10){
+            if(scanDetail.getAvgVal()>10){
                 if(null != delayDetails.get(scanDetail.getCacheName())){
                     delayDetails.get(scanDetail.getCacheName()).add(scanDetail);
                 }else {

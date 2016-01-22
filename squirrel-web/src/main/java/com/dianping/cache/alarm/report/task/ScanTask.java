@@ -11,6 +11,8 @@ import org.apache.http.client.utils.URIBuilder;
 import org.apache.velocity.app.VelocityEngine;
 import org.apache.velocity.exception.VelocityException;
 import org.dom4j.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -35,32 +37,28 @@ public class ScanTask {
     private static final long MS_PER_HOUR = 1000 * 60 * 60;
     private static final long MS_PER_DAY = MS_PER_HOUR * 24;
 
+    protected static Logger logger = LoggerFactory.getLogger(ScanTask.class);
+
     @Autowired
     ScanDetailService scanDetailService;
 
 
     public void run() throws InterruptedException, DocumentException, URISyntaxException, MessagingException {
+        logger.info("ScanTask run");
+
         List<ScanDetail> scanDetails = AlarmScanDetails();
-//
-//
-//        Date now = new Date();
-//        String nowText = DateUtil.getCatDayString(now);
-//
-//        Date yesterday = new Date(now.getTime() - MS_PER_DAY);
-//        String yesterdayText = DateUtil.getCatDayString(yesterday);
-//        List<ScanDetail> scanDetails = scanDetailService.findByCreateTime(yesterdayText);
 
         List<ScanDetail>failDetails = new ArrayList<ScanDetail>();
         List<ScanDetail>delayDetails = new ArrayList<ScanDetail>();
 
         for(ScanDetail scanDetail:scanDetails){
-            if(scanDetail.getAvgValue()>10){
+            if(scanDetail.getAvgVal()>10){
                 delayDetails.add(scanDetail);
             }else if(scanDetail.getFailPercent()>0.1){
                 failDetails.add(scanDetail);
             }
         }
-
+        logger.info("ScanTask SendEmail");
         sendMail(delayDetails,failDetails);
     }
 
@@ -97,7 +95,8 @@ public class ScanTask {
 
             MimeMessageHelper helper = new MimeMessageHelper(msg, true);
             helper.setFrom(mailSender.getMailSender().getUsername());
-            String[] receiver =new String[]{"shiyun.lv@dianping.com","xiaoxiong.dai@dianping.com","dp.wang@dianping.com","enlight.chen@dianping.com","xiang.wu@dianping.com","faping.miao@dianping.com"};
+//            String[] receiver =new String[]{"shiyun.lv@dianping.com","xiaoxiong.dai@dianping.com","dp.wang@dianping.com","enlight.chen@dianping.com","xiang.wu@dianping.com","faping.miao@dianping.com"};
+            String[] receiver =new String[]{"shiyun.lv@dianping.com"};
             helper.setTo(receiver);
             helper.setSubject("缓存异常统计报表");
 
@@ -174,10 +173,10 @@ public class ScanTask {
                                     .setTotalCount(Integer.parseInt(e.attribute("totalCount").getValue()))
                                     .setFailCount(Integer.parseInt(e.attribute("failCount").getValue()))
                                     .setFailPercent(Double.parseDouble(e.attribute("failPercent").getValue()))
-                                    .setMinValue(Double.parseDouble(e.attribute("min").getValue()))
-                                    .setMaxValue(Double.parseDouble(e.attribute("max").getValue()))
-                                    .setAvgValue(Double.parseDouble(e.attribute("avg").getValue()))
-                                    .setSumValue(Double.parseDouble(e.attribute("sum").getValue()))
+                                    .setMinVal(Double.parseDouble(e.attribute("min").getValue()))
+                                    .setMaxVal(Double.parseDouble(e.attribute("max").getValue()))
+                                    .setAvgVal(Double.parseDouble(e.attribute("avg").getValue()))
+                                    .setSumVal(Double.parseDouble(e.attribute("sum").getValue()))
                                     .setSum2(Double.parseDouble(e.attribute("sum2").getValue()))
                                     .setStd(Double.parseDouble(e.attribute("std").getValue()))
                                     .setTps(Double.parseDouble(e.attribute("tps").getValue()))
