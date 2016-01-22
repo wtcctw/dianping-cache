@@ -1,10 +1,12 @@
 package com.dianping.cache.controller;
 
+import com.dianping.cache.controller.vo.CategoryWrapperData;
 import com.dianping.cache.controller.vo.ConfigurationParams;
 import com.dianping.cache.entity.CacheConfiguration;
 import com.dianping.cache.entity.CacheKeyConfiguration;
 import com.dianping.cache.service.CacheConfigurationService;
 import com.dianping.cache.service.CacheKeyConfigurationService;
+import com.dianping.cache.service.RdbService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -13,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -26,6 +29,9 @@ public class ConfigController extends AbstractSidebarController {
 
     @Autowired
     private CacheConfigurationService cacheConfigurationService;
+
+    @Autowired
+    private RdbService rdbService;
 
     private String subside;
 
@@ -64,6 +70,23 @@ public class ConfigController extends AbstractSidebarController {
     public List<CacheKeyConfiguration> getCategoryByCluster(@RequestParam String cluster) {
         return cacheKeyConfigurationService.findByCacheType(cluster);
     }
+
+    @RequestMapping(value = "/config/category/findbycluster/rdb")
+    @ResponseBody
+    public List<CategoryWrapperData> getCategoryWithRDB(@RequestParam String cluster) {
+        List<CacheKeyConfiguration> categorylist = cacheKeyConfigurationService.findByCacheType(cluster);
+        List<CategoryWrapperData> result = new ArrayList<CategoryWrapperData>(categorylist.size());
+        for(CacheKeyConfiguration category : categorylist){
+            CategoryWrapperData data = new CategoryWrapperData();
+            data.setCategory(category);
+            RdbService.TotalStat stat = rdbService.getCategoryMergeStat(category.getCategory());
+            data.setCount(stat.count);
+            data.setSize(stat.volumn/1024/1024);
+            result.add(data);
+        }
+        return result;
+    }
+
 
     @RequestMapping(value = "/config/cluster/update")
     @ResponseBody

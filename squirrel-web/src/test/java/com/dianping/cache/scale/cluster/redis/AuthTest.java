@@ -41,7 +41,18 @@ public class AuthTest {
     @Test
     public void testAuth() throws Exception {
         AuthService authService = SpringLocator.getBean(AuthServiceImpl.class);
-        authService.setPassword("redis-wh","123");
+        authService.setPassword("redis-wh","");
     }
+
+    @Test
+    public void R(){
+        Jedis jedis = new Jedis("127.0.0.1",7000);
+       // jedis.auth("123qwe0");
+        System.out.print(jedis.getHost() + ":" + jedis.getPort());;
+        ;
+    }
+
+
+
 
 }

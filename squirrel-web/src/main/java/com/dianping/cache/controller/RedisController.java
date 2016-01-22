@@ -140,16 +140,12 @@ public class RedisController extends AbstractSidebarController{
 
 	@RequestMapping(value = "/redis/detail")
 	@ResponseBody
-	public Map<String, Object> getRedisDetailData(@RequestParam String cluster){
-		List<CacheKeyConfiguration> categorys = cacheKeyConfigurationService.findByCacheType(cluster);
-		Map<String,Object> result = new HashMap<String, Object>();
+	public RedisDashBoardData.SimpleAnalysisData getRedisDetailData(@RequestParam String cluster){
 		RedisCluster redisCluster =  RedisManager.getRedisCluster(cluster);
 		RedisDashBoardData data = new RedisDashBoardData();
 		RedisDashBoardData.SimpleAnalysisData simpleAnalysisData = data.new SimpleAnalysisData(redisCluster);
 		simpleAnalysisData.analysis();
-		result.put("data",simpleAnalysisData);
-		result.put("categorys",categorys);
-		return result;
+		return simpleAnalysisData;
 	}
 
 	@RequestMapping(value = "/redis/data/applications")

@@ -1,5 +1,6 @@
 package com.dianping.cache.scale.cluster.redis;
 
+import org.apache.commons.lang.StringUtils;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 
@@ -53,9 +54,14 @@ public class JedisAuthWapper {
     public static void returnResource(Jedis jedis){
         if(jedis != null){
             try {
-                jedis.close();
+                if(StringUtils.isNotBlank(jedis.getHost())){
+                    String address = jedis.getHost()+":"+jedis.getPort();
+                    getJedisPool(address).returnResource(jedis);
+                }else {
+                    jedis.close();
+                }
             } catch (Exception e) {
-
+                e.printStackTrace();
             }
         }
     }

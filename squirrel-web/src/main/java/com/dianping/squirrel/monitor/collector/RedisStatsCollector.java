@@ -20,12 +20,16 @@ import java.util.Map;
 public class RedisStatsCollector extends AbstractCollector {
     private static final Logger logger = LoggerFactory.getLogger(RedisStatsCollector.class);
 
+    private String COLLECTOR_ENABLE = "squirrel-web.collector.enable.redis";
+
+    private boolean collector_enable = configManager.getBooleanValue(COLLECTOR_ENABLE,false);
+
     @Autowired
     private ServerService serverService;
 
     @Scheduled(cron = "5/30 * * * * *")
     public void scheduled(){
-        if(isLeader() && isProductEnv()){
+        if(isLeader() && isProductEnv() && collector_enable){
             for(Map.Entry<String,RedisCluster> value : RedisManager.getClusterCache().entrySet()){
 			    for(RedisServer server : value.getValue().getAllAliveServer()){
                     Data data = collectData(server);

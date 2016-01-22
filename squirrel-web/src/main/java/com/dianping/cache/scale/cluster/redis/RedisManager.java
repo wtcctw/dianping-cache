@@ -29,7 +29,7 @@ public class RedisManager {
 	public static final String SLOT_IMPORTING_IDENTIFIER = "--<--";
 	public static final String SLOT_MIGRATING_IDENTIFIER = "-->--";
 	public static final long CLUSTER_SLEEP_INTERVAL = 50;
-	public static final int CLUSTER_DEFAULT_TIMEOUT = 15000;
+	public static final int CLUSTER_DEFAULT_TIMEOUT = 20000;
 	public static final int CLUSTER_MIGRATE_NUM = 10;
 	public static final int DEFAULT_CHECKPORT_TIMEOUT = 60000;
 	public static final int CLUSTER_DEFAULT_DB = 0;
@@ -125,20 +125,20 @@ public class RedisManager {
                 }
 				pipeline.sync();
 				for(Map.Entry<String,Response<String>> item : responseMap.entrySet()){
-					try {
+					//try {
 						item.getValue().get();
-					}catch (Exception e){
-						if(e.toString().contains("BUSYKEY")){
-							logger.error("BUSYKEY key:{}",item.getKey());
-							//srcNode.del(item.getKey());
-							throw e;
-						}else if(e.toString().contains("IOERR")){
-							timeout *= 2;
-							if(timeout > 60000){
-								throw e;
-							}
-						}
-					}
+//					}catch (Exception e){
+//						if(e.toString().contains("BUSYKEY")){
+//							logger.error("BUSYKEY key:{}",item.getKey());
+//							//srcNode.del(item.getKey());
+//							throw e;
+//						}else if(e.toString().contains("IOERR")){
+//							timeout *= 2;
+//							if(timeout > 60000){
+//								throw e;
+//							}
+//						}
+//					}
 				}
 			} catch (Throwable e) {
 				logger.warn("Migrate process may be down.",e);
@@ -182,7 +182,7 @@ public class RedisManager {
 		while (wait < timeout){
 			try {
 				if (jedis.ping().contains("PONG")){
-					getResource(redisServer.getIp(),redisServer.getPort()).returnResource(jedis);
+					JedisAuthWapper.returnResource(jedis);
 					return true;
 				}
 			}catch (JedisConnectionException e){
@@ -467,20 +467,6 @@ public class RedisManager {
 	private static boolean isMigrating(String address){
 		RedisServer redisServer = new RedisServer(address);
 		return isMigating(redisServer);
-	}
-
-	private static JedisPool getResource(String ip, int port){
-		String address = ip + ":" + port;
-		JedisPool jedisPool = JEDIS_POOL_MAP.get(address);
-		if(jedisPool == null){
-			synchronized (JEDIS_POOL_MAP){
-				if(jedisPool == null){
-					jedisPool = new JedisPool(ip,port);
-					JEDIS_POOL_MAP.put(address,jedisPool);
-				}
-			}
-		}
-		return jedisPool;
 	}
 
 

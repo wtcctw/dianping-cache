@@ -13,7 +13,6 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.net.InetSocketAddress;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -24,12 +23,16 @@ public class MemcachedStatsCollector extends AbstractCollector {
 
     private static final Logger logger = LoggerFactory.getLogger(MemcachedStatsCollector.class);
 
+    protected String COLLECTOR_ENABLE = "squirrel-web.collector.enable.memcached";
+
+    private boolean collector_enable = configManager.getBooleanValue(COLLECTOR_ENABLE,false);
+
     @Autowired
     private ServerService serverService;
 
     @Scheduled(cron = "0/30 * * * * *")
     public void scheduled(){
-        if(isLeader()){
+        if(isLeader() && collector_enable){
             List<Server> serverlist = serverService.findAllMemcachedServers();
             for(Server server : serverlist){
                 Data data = collectData(server);

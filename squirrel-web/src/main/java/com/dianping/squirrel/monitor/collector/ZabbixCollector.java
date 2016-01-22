@@ -26,6 +26,10 @@ public class ZabbixCollector extends AbstractCollector {
 
     private final String AUTH_PASSWORD = "vivi520882";
 
+    protected String COLLECTOR_ENABLE = "squirrel-web.collector.enable.zabbix";
+
+    private boolean collector_enable = configManager.getBooleanValue(COLLECTOR_ENABLE,false);
+
     @Autowired
     private ServerService serverService;
 
@@ -44,7 +48,7 @@ public class ZabbixCollector extends AbstractCollector {
 
     @Scheduled(cron = "10/30 * * * * *")
     public void scheduled(){
-        if(isLeader() && isProductEnv()){
+        if(isLeader() && isProductEnv() && collector_enable){
             for(Map.Entry<String,String> hostIdEntity : hostIdMap.entrySet()){
                 Data data = collectData(hostIdEntity.getKey(),hostIdEntity.getValue());
                 dataManager.addData(data);
