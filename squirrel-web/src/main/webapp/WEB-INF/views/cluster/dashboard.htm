@@ -1,0 +1,76 @@
+<div class="main-content" style="opacity: 1.0;"
+     ng-controller="IndexController">
+    <div class=" main-content-inner">
+        <script type="text/javascript"
+                src="${rc.contextPath}/static/js/squirrel/dash.js"></script>
+        <link rel="stylesheet" type="text/css" href="${rc.contextPath}/static/css/sbibox.css"/>
+        <div class="page-content gray-bg">
+            <div class="page-header">
+
+                <div class="row">
+                    <!--<div class="col-lg-3 col-sm-3">-->
+                        <!--<div class="ibox float-e-margins">-->
+                            <!--<div class="ibox-title">-->
+                                <!--<span class="label label-success pull-right">Weekly</span>-->
+                                <!--<h5>新增集群</h5>-->
+                            <!--</div>-->
+                            <!--<div class="ibox-content">-->
+                                <!--<h1 class="no-margins">{{indexData.countInc}}</h1>-->
+                                <!--<div class="stat-percent font-bold text-success">10% <i class="fa fa-bolt"></i></div>-->
+                            <!--</div>-->
+                        <!--</div>-->
+                    <!--</div>-->
+
+                    <div class="col-lg-3 col-sm-3">
+                        <div class="ibox float-e-margins">
+                            <div class="ibox-title">
+                                <span class="label label-primary pull-right">当前</span>
+                                <h5>集群总数</h5>
+                            </div>
+                            <div class="ibox-content">
+                                <h1 class="no-margins">{{indexData.totalNum}}</h1>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-sm-3">
+                        <div class="ibox float-e-margins">
+                            <div class="ibox-title">
+                                <span class="label label-danger pull-right">当前</span>
+                                <h5>Memcached容量</h5>
+                            </div>
+                            <div class="ibox-content">
+                                <h1 class="no-margins">{{indexData.memcahedCapacityString}}</h1>
+                                <!--<div class="stat-percent font-bold text-danger">38% <i class="fa fa-level-down"></i></div>-->
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-sm-3">
+                        <div class="ibox float-e-margins">
+                            <div class="ibox-title">
+                                <span class="label label-danger pull-right">当前</span>
+                                <h5>Redis容量</h5>
+                            </div>
+                            <div class="ibox-content">
+                                <h1 class="no-margins">{{indexData.redisCapacityString}}</h1>
+                                <!--<div class="stat-percent font-bold text-danger">38% <i class="fa fa-level-down"></i></div>-->
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-sm-3">
+                        <div class="ibox float-e-margins">
+                            <div class="ibox-title">
+                                <span class="label label-info pull-right">Weekly</span>
+                                <h5>新增数据量</h5>
+                            </div>
+                            <div class="ibox-content">
+                                <h1 class="no-margins">{{indexData.dataInc}}</h1>
+                                <!--<div class="stat-percent font-bold text-info">20% <i class="fa fa-level-up"></i></div>-->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
