@@ -52,7 +52,7 @@ public class ScanTask {
         List<ScanDetail>delayDetails = new ArrayList<ScanDetail>();
 
         for(ScanDetail scanDetail:scanDetails){
-            if(scanDetail.getAvgValue()>10){
+            if(scanDetail.getAvgVal()>10){
                 delayDetails.add(scanDetail);
             }else if(scanDetail.getFailPercent()>0.1){
                 failDetails.add(scanDetail);
@@ -173,10 +173,10 @@ public class ScanTask {
                                     .setTotalCount(Integer.parseInt(e.attribute("totalCount").getValue()))
                                     .setFailCount(Integer.parseInt(e.attribute("failCount").getValue()))
                                     .setFailPercent(Double.parseDouble(e.attribute("failPercent").getValue()))
-                                    .setMinValue(Double.parseDouble(e.attribute("min").getValue()))
-                                    .setMaxValue(Double.parseDouble(e.attribute("max").getValue()))
-                                    .setAvgValue(Double.parseDouble(e.attribute("avg").getValue()))
-                                    .setSumValue(Double.parseDouble(e.attribute("sum").getValue()))
+                                    .setMinVal(Double.parseDouble(e.attribute("min").getValue()))
+                                    .setMaxVal(Double.parseDouble(e.attribute("max").getValue()))
+                                    .setAvgVal(Double.parseDouble(e.attribute("avg").getValue()))
+                                    .setSumVal(Double.parseDouble(e.attribute("sum").getValue()))
                                     .setSum2(Double.parseDouble(e.attribute("sum2").getValue()))
                                     .setStd(Double.parseDouble(e.attribute("std").getValue()))
                                     .setTps(Double.parseDouble(e.attribute("tps").getValue()))

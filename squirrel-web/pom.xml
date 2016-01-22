@@ -391,7 +391,6 @@
 			<artifactId>masterdata-api</artifactId>
 			<version>0.1.7</version>
 		</dependency>
-
 	</dependencies>
 
 	<build>

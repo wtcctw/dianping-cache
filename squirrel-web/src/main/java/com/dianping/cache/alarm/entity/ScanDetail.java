@@ -17,13 +17,13 @@ public class ScanDetail {
 
     private double failPercent;
 
-    private double minValue;
+    private double minVal;
 
-    private double maxValue;
+    private double maxVal;
 
-    private double avgValue;
+    private double avgVal;
 
-    private double sumValue;
+    private double sumVal;
 
     private double sum2;
 
@@ -50,39 +50,39 @@ public class ScanDetail {
         return this;
     }
 
-    public double getMinValue() {
-        return minValue;
+    public double getMinVal() {
+        return minVal;
     }
 
-    public ScanDetail setMinValue(double minValue) {
-        this.minValue = minValue;
+    public ScanDetail setMinVal(double minVal) {
+        this.minVal = minVal;
         return this;
     }
 
-    public double getMaxValue() {
-        return maxValue;
+    public double getMaxVal() {
+        return maxVal;
     }
 
-    public ScanDetail setMaxValue(double maxValue) {
-        this.maxValue = maxValue;
+    public ScanDetail setMaxVal(double maxVal) {
+        this.maxVal = maxVal;
         return this;
     }
 
-    public double getAvgValue() {
-        return avgValue;
+    public double getAvgVal() {
+        return avgVal;
     }
 
-    public ScanDetail setAvgValue(double avgValue) {
-        this.avgValue = avgValue;
+    public ScanDetail setAvgVal(double avgVal) {
+        this.avgVal = avgVal;
         return this;
     }
-    
-    public double getSumValue() {
-        return sumValue;
+
+    public double getSumVal() {
+        return sumVal;
     }
 
-    public ScanDetail setSumValue(double sumValue) {
-        this.sumValue = sumValue;
+    public ScanDetail setSumVal(double sumVal) {
+        this.sumVal = sumVal;
         return this;
     }
 
