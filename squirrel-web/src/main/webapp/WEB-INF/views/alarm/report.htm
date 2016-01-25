@@ -34,25 +34,25 @@
                 <table
                        class="table table-bordered table-striped table-condensed  table-hover">
                     <tr>
-                        <th>Type</th>
-                        <th>Name</th>
-                        <th>Total</th>
-                        <th>Failure</th>
-                        <th>Failure(%)</th>
-                        <th>Min(ms)</th>
-                        <th>Max(ms)</th>
-                        <th>Avg(ms)</th>
+                        <th style="border:1px solid black;">Type</th>
+                        <th style="border:1px solid black;">Name</th>
+                        <th style="border:1px solid black;">Total</th>
+                        <th style="border:1px solid black;">Failure</th>
+                        <th style="border:1px solid black;">Failure(%)</th>
+                        <th style="border:1px solid black;">Min(ms)</th>
+                        <th style="border:1px solid black;">Max(ms)</th>
+                        <th style="border:1px solid black;">Avg(ms)</th>
                     </tr>
                     <tr ng-repeat="m in searchPaginator.currentPagefailDetails">
 
-                        <td style="text-align: left" ng-if="m.rowspan!=0" rowspan="{{m.rowspan}}">{{m.cacheName}}</td>
-                        <td style="text-align: left">{{m.project}}</td>
-                        <td style="text-align: left" >{{m.totalCount}}</td>
-                        <td style="text-align: left">{{m.failCount}}</td>
-                        <td style="text-align: left;color: red">{{m.failPercent}}</td>
-                        <td style="text-align: left">{{m.minVal}}</td>
-                        <td style="text-align: left">{{m.maxVal}}</td>
-                        <td style="text-align: left">{{m.avgVal}}</td>
+                        <td style="border:1px solid black;text-align: left" ng-if="m.rowspan!=0" rowspan="{{m.rowspan}}">{{m.cacheName}}</td>
+                        <td style="border:1px solid black;text-align: left">{{m.project}}</td>
+                        <td style="border:1px solid black;text-align: left" >{{m.totalCount}}</td>
+                        <td style="border:1px solid black;text-align: left">{{m.failCount}}</td>
+                        <td style="border:1px solid black;text-align: left;color: red">{{m.failPercent}}</td>
+                        <td style="border:1px solid black;text-align: left">{{m.minVal}}</td>
+                        <td style="border:1px solid black;text-align: left">{{m.maxVal}}</td>
+                        <td style="border:1px solid black;text-align: left">{{m.avgVal}}</td>
                     </tr>
                 </table>
             </div>
@@ -62,24 +62,24 @@
                 <table
                        class="table table-bordered table-striped table-condensed  table-hover">
                     <tr>
-                        <th>Type</th>
-                        <th>Name</th>
-                        <th>Total</th>
-                        <th>Failure</th>
-                        <th>Failure(%)</th>
-                        <th>Min(ms)</th>
-                        <th>Max(ms)</th>
-                        <th>Avg(ms)</th>
+                        <th style="border:1px solid black;">Type</th>
+                        <th style="border:1px solid black;">Name</th>
+                        <th style="border:1px solid black;">Total</th>
+                        <th style="border:1px solid black;">Failure</th>
+                        <th style="border:1px solid black;">Failure(%)</th>
+                        <th style="border:1px solid black;">Min(ms)</th>
+                        <th style="border:1px solid black;">Max(ms)</th>
+                        <th style="border:1px solid black;">Avg(ms)</th>
                     </tr>
                     <tr ng-repeat="m in searchPaginator.currentPagedelayDetails">
-                        <td style="text-align: left" ng-if="m.rowspan!=0" rowspan="{{m.rowspan}}">{{m.cacheName}}</td>
-                        <td style="text-align: left">{{m.project}}</td>
-                        <td style="text-align: left">{{m.totalCount}}</td>
-                        <td style="text-align: left">{{m.failCount}}</td>
-                        <td style="text-align: left">{{m.failPercent}}</td>
-                        <td style="text-align: left">{{m.minVal}}</td>
-                        <td style="text-align: left">{{m.maxVal}}</td>
-                        <td style="text-align: left;color: red ">{{m.avgVal}}</td>
+                        <td style="border:1px solid black;text-align: left" ng-if="m.rowspan!=0" rowspan="{{m.rowspan}}">{{m.cacheName}}</td>
+                        <td style="border:1px solid black;text-align: left">{{m.project}}</td>
+                        <td style="border:1px solid black;text-align: left">{{m.totalCount}}</td>
+                        <td style="border:1px solid black;text-align: left">{{m.failCount}}</td>
+                        <td style="border:1px solid black;text-align: left">{{m.failPercent}}</td>
+                        <td style="border:1px solid black;text-align: left">{{m.minVal}}</td>
+                        <td style="border:1px solid black;text-align: left">{{m.maxVal}}</td>
+                        <td style="border:1px solid black;text-align: left;color: red ">{{m.avgVal}}</td>
                     </tr>
                 </table>
             </div>

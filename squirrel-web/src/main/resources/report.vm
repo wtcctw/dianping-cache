@@ -54,7 +54,7 @@
             left: 0;
             display: block;
             /* 宽度 */
-            text-align:left;
+            text-align: left;
             font-weight: bold;
         }
     </style>
@@ -62,13 +62,12 @@
 
 <body>
 
-<h3>缓存异常统计报表</h3>
+<h3>缓存红黑榜</h3>
 
 
-<div class="row col-lg-12 col-sm-12" style="margin-center:1px">
+<div class="row" style="margin-center:1px">
     <label>失败率 > 0.100% </label>
-    <table style="table-layout:fixed;"
-           class="table table-bordered table-striped table-condensed  table-hover">
+    <table class="table table-bordered table-striped table-condensed  table-hover">
         <thead>
         <tr>
             <th>Type</th>
@@ -81,27 +80,28 @@
             <th>Avg(ms)</th>
         </tr>
         </thead>
-        #foreach( $info in $delayDetails)
-            <tbody>
+        <tbody>
+            #foreach( $info in $delayDetails)
             <tr>
-                <td style="text-align: left" ng-if="m.rowspan!=0" rowspan="$info.rowspan">$info.cacheName</td>
-                <td style="text-align: left">$info.project</td>
-                <td style="text-align: center" >$info.totalCount</td>
-                <td style="text-align: center">$info.failCount</td>
-                <td style="text-align: center;color: red">$info.failPercent</td>
-                <td style="text-align: center">$info.minVal</td>
-                <td style="text-align: center">$info.maxVal</td>
-                <td style="text-align: center">$info.avgVal</td>
+                #if($info.rowspan>0)
+                    <td style="border:1px solid black;text-align: left" rowspan="$info.rowspan">$info.cacheName</td>
+                #end
+                <td style="border:1px solid black;text-align: left">$info.project</td>
+                <td style="border:1px solid black;text-align: center">$info.totalCount</td>
+                <td style="border:1px solid black;text-align: center">$info.failCount</td>
+                <td style="border:1px solid black;text-align: center;color: red">$info.failPercent</td>
+                <td style="border:1px solid black;text-align: center">$info.minVal</td>
+                <td style="border:1px solid black;text-align: center">$info.maxVal</td>
+                <td style="border:1px solid black;text-align: center">$info.avgVal</td>
             </tr>
-            </tbody>
-        #end
+            #end
+        </tbody>
     </table>
 </div>
 
-<div class="row col-lg-12 col-sm-12" style="margin-center:1px">
+<div class="row" style="margin-center:1px">
     <label>平均时间 > 10ms </label>
-    <table style="table-layout:fixed;"
-           class="table table-bordered table-striped table-condensed  table-hover">
+    <table class="table table-bordered table-striped table-condensed  table-hover">
         <thead>
         <tr>
             <th>Type</th>
@@ -114,21 +114,22 @@
             <th>Avg(ms)</th>
         </tr>
         </thead>
-
-        #foreach( $info in $failDetails)
-            <tbody>
+        <tbody>
+            #foreach( $info in $failDetails)
             <tr>
-                <td style="text-align: left" ng-if="m.rowspan!=0" rowspan="$info.rowspan">$info.cacheName</td>
-                <td style="text-align: left">$info.project</td>
-                <td style="text-align: center">$info.totalCount</td>
-                <td style="text-align: center">$info.failCount</td>
-                <td style="text-align: center">$info.failPercent</td>
-                <td style="text-align: center">$info.minVal</td>
-                <td style="text-align: center">$info.maxVal</td>
-                <td style="text-align: center;color: red ">$info.avgVal</td>
+                #if($info.rowspan>0)
+                    <td style="border:1px solid black;;text-align: left" rowspan="$info.rowspan">$info.cacheName</td>
+                #end
+                <td style="border:1px solid black;text-align: left">$info.project</td>
+                <td style="border:1px solid black;text-align: center">$info.totalCount</td>
+                <td style="border:1px solid black;text-align: center">$info.failCount</td>
+                <td style="border:1px solid black;text-align: center">$info.failPercent</td>
+                <td style="border:1px solid black;text-align: center">$info.minVal</td>
+                <td style="border:1px solid black;text-align: center">$info.maxVal</td>
+                <td style="border:1px solid black;text-align: center;color: red ">$info.avgVal</td>
             </tr>
-            </tbody>
-        #end
+            #end
+        </tbody>
     </table>
 </div>
 </div>

@@ -48,18 +48,49 @@ public class ScanTask {
 
         List<ScanDetail> scanDetails = AlarmScanDetails();
 
-        List<ScanDetail>failDetails = new ArrayList<ScanDetail>();
-        List<ScanDetail>delayDetails = new ArrayList<ScanDetail>();
+        Map<String,List<ScanDetail>>failDetails = new HashMap<String, List<ScanDetail>>();
+        Map<String,List<ScanDetail>>delayDetails = new HashMap<String, List<ScanDetail>>();
 
         for(ScanDetail scanDetail:scanDetails){
             if(scanDetail.getAvgVal()>10){
-                delayDetails.add(scanDetail);
+                if(null != delayDetails.get(scanDetail.getCacheName())){
+                    delayDetails.get(scanDetail.getCacheName()).add(scanDetail);
+                }else {
+                    List<ScanDetail> list = new ArrayList<ScanDetail>();
+                    list.add(scanDetail);
+                    delayDetails.put(scanDetail.getCacheName(),list);
+                }
+
             }else if(scanDetail.getFailPercent()>0.1){
-                failDetails.add(scanDetail);
+                if(null != failDetails.get(scanDetail.getCacheName())){
+                    failDetails.get(scanDetail.getCacheName()).add(scanDetail);
+                }else {
+                    List<ScanDetail> list = new ArrayList<ScanDetail>();
+                    list.add(scanDetail);
+                    failDetails.put(scanDetail.getCacheName(), list);
+                }
             }
         }
+
+        List<ScanDetail>failDetailList = new ArrayList<ScanDetail>();
+        List<ScanDetail>delayDetailList = new ArrayList<ScanDetail>();
+
+        for(Map.Entry<String, List<ScanDetail>> entry:failDetails.entrySet()){
+            List<ScanDetail> list =failDetails.get(entry.getKey());
+            list.get(0).setRowspan(list.size());
+            failDetailList.addAll(list);
+        }
+
+        for(Map.Entry<String, List<ScanDetail>> entry:delayDetails.entrySet()){
+            List<ScanDetail> list =delayDetails.get(entry.getKey());
+            list.get(0).setRowspan(list.size());
+            delayDetailList.addAll(list);
+        }
+
+
         logger.info("ScanTask SendEmail");
-        sendMail(delayDetails,failDetails);
+
+        sendMail(delayDetailList,failDetailList);
     }
 
 
@@ -98,7 +129,7 @@ public class ScanTask {
 //            String[] receiver =new String[]{"shiyun.lv@dianping.com","xiaoxiong.dai@dianping.com","dp.wang@dianping.com","enlight.chen@dianping.com","xiang.wu@dianping.com","faping.miao@dianping.com"};
             String[] receiver =new String[]{"shiyun.lv@dianping.com"};
             helper.setTo(receiver);
-            helper.setSubject("缓存异常统计报表");
+            helper.setSubject("缓存红黑榜");
 
             msg.setContent(emailText, "text/html; charset=UTF-8");
 
