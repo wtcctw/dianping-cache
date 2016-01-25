@@ -107,10 +107,6 @@ module.controller('CacheQueryController', [
             $scope.deleteCategory = function(){
                 bootbox.confirm("确定要删除此 category 吗?", function (result) {
                     if (result) {
-                        $.ajax({
-                            type : 'GET',
-                            url: "/task/cancel?id=" + id,
-                            success : function(data){
                                 $http.get(window.contextPath + '/data/delete',{
                                     params : {
                                         "category": $scope.category
@@ -120,8 +116,6 @@ module.controller('CacheQueryController', [
                                     //$scope.address = response.address;
                                 });
                             }
-                        })
-                    }
                 });
 
             };
@@ -129,21 +123,15 @@ module.controller('CacheQueryController', [
             $scope.deleteKey = function(){
                 bootbox.confirm("确定要删除这个 key 吗?", function (result) {
                     if (result) {
-                        $.ajax({
-                            type : 'GET',
-                            url: "/task/cancel?id=" + id,
-                            success : function(data){
-                                $http.get(window.contextPath + '/data/deleteKey',{
-                                    params : {
-                                        "category": $scope.category,
-                                        "key": $scope.key
-                                    }
-                                }).success(function(response){
-                                    //$scope.result = response.result;
-                                    //$scope.address = response.address;
-                                });
+                        $http.get(window.contextPath + '/data/deleteKey',{
+                            params : {
+                                "category": $scope.category,
+                                "key": $scope.key
                             }
-                        })
+                        }).success(function(response){
+                            //$scope.result = response.result;
+                            //$scope.address = response.address;
+                        });
                     }
                 });
 

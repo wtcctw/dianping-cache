@@ -34,16 +34,18 @@ module.controller('TaskController', [ '$scope', '$http','$document', function($s
                 "targets": 3,
                 "render": function ( data, type, full, meta ) {
                     var data = full;
-                    var percent = Math.floor((data.stat / (data.statMax - data.statMin)) * 10000);
-                    if(isNaN(percent) || percent > 100)
+                    var percent = Math.floor((data.stat / (data.statMax - data.statMin)) * 100);
+
+                    if(isNaN(percent))
                         percent = 0;
+                    if(percent > 100)
+                        percent = 100;
                     var color = "blue";
                     var stat = "running";
                     if(percent == 100) {
                         color = "green";
                         stat = "complete";
                     }
-                    console.log(data.cancel);
                     if(data.cancel) {
                         stat = "canceled";
                         color = "red";
@@ -74,9 +76,12 @@ module.controller('TaskController', [ '$scope', '$http','$document', function($s
                     "targets": 6,
                     "render": function ( data, type, full, meta ) {
                         var data = full;
-                        var percent = Math.floor((data.stat / (data.statMax - data.statMin)) * 10000);
-                        if(isNaN(percent) || percent > 100)
+                        var percent = Math.floor((data.stat / (data.statMax - data.statMin)) * 100);
+                        if(isNaN(percent))
                             percent = 0;
+                        if(percent > 100)
+                            percent = 100;
+
                         var data = full;
                         var id = data.id;
 
