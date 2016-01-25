@@ -54,7 +54,10 @@
 		<level value="INFO"/>
 		<appender-ref  ref="scaleAppender"/>
 	</logger>
-    
+	<logger name="com.dianping.squirrel.monitor" additivity="false">
+		<level value="INFO"/>
+		<appender-ref  ref="monitorAppender"/>
+	</logger>
 	<logger name="com.dianping.avatar" additivity="false">
 		<appender-ref ref="avatarAppender" />
 	</logger>

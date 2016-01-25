@@ -30,6 +30,7 @@ public class RedisStatsCollector extends AbstractCollector {
     @Scheduled(cron = "5/30 * * * * *")
     public void scheduled(){
         if(isLeader() && isProductEnv() && collector_enable){
+            logger.info("redisStatsCollector  collect.");
             for(Map.Entry<String,RedisCluster> value : RedisManager.getClusterCache().entrySet()){
 			    for(RedisServer server : value.getValue().getAllAliveServer()){
                     Data data = collectData(server);

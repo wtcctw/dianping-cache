@@ -1,6 +1,9 @@
 package com.dianping.cache.scale.cluster.redis;
 
 import com.dianping.cache.util.SpringLocator;
+import com.dianping.squirrel.client.StoreClient;
+import com.dianping.squirrel.client.StoreClientFactory;
+import com.dianping.squirrel.client.StoreKey;
 import com.dianping.squirrel.service.AuthService;
 import com.dianping.squirrel.service.impl.AuthServiceImpl;
 import org.junit.Test;
@@ -48,11 +51,19 @@ public class AuthTest {
     public void R(){
         Jedis jedis = new Jedis("127.0.0.1",7000);
        // jedis.auth("123qwe0");
-        System.out.print(jedis.getHost() + ":" + jedis.getPort());;
-        ;
+        System.out.print(jedis.getHost() + ":" + jedis.getPort());
     }
 
+    @Test
+    public void sss(){
+        StoreClient storeClient = StoreClientFactory.getStoreClient();
+        storeClient.set(new StoreKey("redis-ab",123),"ok");
+        storeClient.set(new StoreKey("redis-abc",123),"ok");
+        //storeClient.get(new StoreKey("redis-abc",123));
+        storeClient.set(new StoreKey("redis-ab",123),"failed");
+        storeClient.set(new StoreKey("redis-abc",123),"failed");
 
+    }
 
 
 }

@@ -29,7 +29,7 @@
 			<mvc:mapping path="/redis"/>
 			<mvc:mapping path="/redis/redis-*"/>
 			<mvc:mapping path="/memcached"/>
-			<mvc:mapping path="/memcached/memcached-*"/>
+			<mvc:mapping path="/memcached/memcache*"/>
 			<mvc:mapping path="/auditlog"/>
 			<mvc:mapping path="/event"/>
 			<mvc:mapping path="/task"/>
