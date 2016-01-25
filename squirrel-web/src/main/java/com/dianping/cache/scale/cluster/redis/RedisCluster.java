@@ -73,7 +73,7 @@ public class RedisCluster implements Cluster<RedisNode>{
 	}
 	
 	public List<RedisServer> getAllAliveServer(){
-		loadClusterInfo();
+		//loadClusterInfo();
 		List<RedisServer> servers = new ArrayList<RedisServer>();
 		for(RedisNode node : nodes){
 			if(node.getMaster().isAlive())
