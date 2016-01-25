@@ -182,7 +182,7 @@ public class RedisManager {
 		while (wait < timeout){
 			try {
 				if (jedis.ping().contains("PONG")){
-					JedisAuthWapper.returnResource(jedis);
+					//JedisAuthWapper.returnResource(jedis);
 					return true;
 				}
 			}catch (JedisConnectionException e){
@@ -302,10 +302,12 @@ public class RedisManager {
 		String[] clusterNodesOutput = node.clusterNodes().split(
 				UNIX_LINE_SEPARATOR);
 		for (String infoLine : clusterNodesOutput) {
-			String[] hostAndPort = infoLine.split(" ")[1].split(":");
-			RedisServer rs = new RedisServer(hostAndPort[0],
-					Integer.valueOf(hostAndPort[1]));
-			clusterNodeList.add(rs);
+			if(!infoLine.contains("fail")){
+				String[] hostAndPort = infoLine.split(" ")[1].split(":");
+				RedisServer rs = new RedisServer(hostAndPort[0],
+						Integer.valueOf(hostAndPort[1]));
+				clusterNodeList.add(rs);
+			}
 		}
 		JedisAuthWapper.returnResource(node);
 		return clusterNodeList;
