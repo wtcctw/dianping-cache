@@ -19,5 +19,7 @@ public interface AuthService {
     public List<String> getAuthorizedApplications(String resource) throws Exception;
     
     public List<String> getAuthorizedResources(String application) throws Exception;
-    
+
+    public boolean setPassword(String resource,String password) throws Exception;
+
 }

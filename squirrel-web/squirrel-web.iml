@@ -95,7 +95,7 @@
     <orderEntry type="library" name="Maven: commons-beanutils:commons-beanutils:1.9.2" level="project" />
     <orderEntry type="library" name="Maven: net.sf.ehcache:ehcache-core:2.5.2" level="project" />
     <orderEntry type="library" name="Maven: net.spy:spymemcached:2.11.6" level="project" />
-    <orderEntry type="library" name="Maven: redis.clients:jedis:2.7.4.DP-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: redis.clients:jedis:2.7.5.DP-SNAPSHOT" level="project" />
     <orderEntry type="library" name="Maven: org.apache.commons:commons-pool2:2.3" level="project" />
     <orderEntry type="library" name="Maven: com.danga:memcached:2.5.1-SNAPSHOT" level="project" />
     <orderEntry type="library" name="Maven: qq-central:dcache_client_api:1.0.0-SNAPSHOT" level="project" />

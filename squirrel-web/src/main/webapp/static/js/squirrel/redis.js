@@ -106,7 +106,7 @@ module.controller('RedisDashBoardController', [ '$scope', '$http','$document','$
         $scope.authorize = function(cluster,application){
             $scope.authEntity.resource = cluster;
             $scope.authEntity.application = application;
-            $http.post('/redis/auth/authorize',$scope.authEntity)
+            $http.post('/auth/authorize',$scope.authEntity)
                 .success(function(data){
 
                 });
@@ -114,7 +114,7 @@ module.controller('RedisDashBoardController', [ '$scope', '$http','$document','$
         $scope.unauthorize = function(cluster,application){
             $scope.authEntity.resource = cluster;
             $scope.authEntity.application = application;
-            $http.post('/redis/auth/unauthorize',$scope.authEntity)
+            $http.post('/auth/unauthorize',$scope.authEntity)
                 .success(function(data){
 
                 });

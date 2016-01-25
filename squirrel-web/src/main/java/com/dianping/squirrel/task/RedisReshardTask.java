@@ -1,6 +1,7 @@
 package com.dianping.squirrel.task;
 
 import com.dianping.cache.entity.ReshardRecord;
+import com.dianping.cache.scale.MigratingException;
 import com.dianping.cache.scale.cluster.redis.RedisCluster;
 import com.dianping.cache.scale.cluster.redis.RedisManager;
 import com.dianping.cache.scale.cluster.redis.RedisServer;
@@ -44,12 +45,18 @@ public class RedisReshardTask extends AbstractTask {
     }
 
     @Override
-    public void taskRun() {
-        reshard();
+    public void taskRun(){
+        try {
+            if(RedisManager.checkClusterStatus(reshardPlan)){
+                reshard();
+            }
+        } catch (Throwable throwable) {
+            ///throwable.printStackTrace();
+        }
     }
 
-    private void reshard() {
-        RedisCluster redisCluster = new RedisCluster(reshardPlan.getSrcNode());
+    private void reshard() throws Throwable{
+        RedisCluster redisCluster = new RedisCluster(reshardPlan.getCluster(),reshardPlan.getSrcNode());
         List<ReshardRecord> reshardRecordList = reshardPlan.getReshardRecordList();
         int stat = 0;
         for (ReshardRecord reshardRecord : reshardRecordList) {
@@ -69,8 +76,9 @@ public class RedisReshardTask extends AbstractTask {
                             reshardRecord.setSlotsDone(reshardRecord.getSlotsDone() + 1);
                             reshardService.updateReshardPlan(reshardPlan);
                         } else {
-                            logger.error("Migrate slot : " + slot + " error.");
-                            break;
+                            String message = "Migrate slot : " + slot + " error.";
+                            logger.error(message);
+                            throw new MigratingException(message);
                         }
                     } else {
                         break;
@@ -79,7 +87,7 @@ public class RedisReshardTask extends AbstractTask {
                     logger.error("Some Error Occured In Migrating Task",e);
                     reshardPlan.setStatus(400);
                     reshardService.updateReshardPlan(reshardPlan);
-                    break;
+                    throw e;
                 }
             }
             updateStat(++stat);

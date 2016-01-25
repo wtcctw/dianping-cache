@@ -1,8 +1,8 @@
-package com.dianping.cache.monitor.statsdata;
-
-import java.util.List;
+package com.dianping.squirrel.view.highcharts.statsdata;
 
 import com.dianping.cache.entity.RedisStats;
+
+import java.util.List;
 
 public class RedisStatsData {
 	private int length;

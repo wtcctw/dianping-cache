@@ -1,19 +1,13 @@
 package com.dianping.cache.scale.cluster.redis;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
+import com.dianping.cache.scale.cluster.Server;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.apache.commons.lang.StringUtils;
 import redis.clients.jedis.Jedis;
-import com.dianping.cache.scale.cluster.Server;
 
-@JsonIgnoreProperties({"slotList"})
+import java.util.*;
+
+@JsonIgnoreProperties({"slotList","redisCluster"})
 public class RedisServer extends Server {
 
     private String id;
@@ -35,6 +29,8 @@ public class RedisServer extends Server {
     private boolean importing;
 
     private int openSlot;
+
+    private RedisCluster redisCluster;
 
     public RedisServer(String address) {
         super(address);
@@ -194,6 +190,10 @@ public class RedisServer extends Server {
 
     public RedisInfo loadRedisInfo() {
         Jedis jedis = new Jedis(getIp(), getPort());
+        String password = getRedisCluster().getPassword();
+        if(password != null && !"".equals(password)){
+            jedis.auth(password);
+        }
         info = new RedisInfo();
         try {
             List<String> redisConfig = jedis.configGet("*");
@@ -316,5 +316,13 @@ public class RedisServer extends Server {
 
     public void setOpenSlot(int openSlot) {
         this.openSlot = openSlot;
+    }
+
+    public RedisCluster getRedisCluster() {
+        return redisCluster;
+    }
+
+    public void setRedisCluster(RedisCluster redisCluster) {
+        this.redisCluster = redisCluster;
     }
 }

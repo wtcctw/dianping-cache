@@ -259,7 +259,7 @@ module.controller('ClusterQpsController', function($scope, $http) {
 	$scope.endTime = new Date().getTime();
 
 	$scope.getProducerServerQps = function() {
-		$scope.key = window.localStorage.cacheKey;
+		$scope.key = window.localStorage.cluster;
 		renderGraph("/monitor/cluster/" + $scope.key, "container",
 				$scope.endTime, $http);
 	};

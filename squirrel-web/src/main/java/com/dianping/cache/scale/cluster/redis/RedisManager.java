@@ -2,9 +2,8 @@ package com.dianping.cache.scale.cluster.redis;
 
 import com.dianping.cache.entity.CacheConfiguration;
 import com.dianping.cache.entity.ReshardRecord;
-import com.dianping.cache.scale.cluster.Server;
 import com.dianping.cache.service.CacheConfigurationService;
-import com.dianping.cache.util.ParseServersUtil;
+import com.dianping.cache.util.ConfigUrlUtil;
 import com.dianping.cache.util.SpringLocator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,7 +29,7 @@ public class RedisManager {
 	public static final String SLOT_IMPORTING_IDENTIFIER = "--<--";
 	public static final String SLOT_MIGRATING_IDENTIFIER = "-->--";
 	public static final long CLUSTER_SLEEP_INTERVAL = 50;
-	public static final int CLUSTER_DEFAULT_TIMEOUT = 15000;
+	public static final int CLUSTER_DEFAULT_TIMEOUT = 20000;
 	public static final int CLUSTER_MIGRATE_NUM = 10;
 	public static final int DEFAULT_CHECKPORT_TIMEOUT = 60000;
 	public static final int CLUSTER_DEFAULT_DB = 0;
@@ -54,25 +53,31 @@ public class RedisManager {
 	
 	public static void addMaster(String cluster,String master){
 		RedisCluster rc = getRedisCluster(cluster);
-		RedisServer rs = new RedisServer(master);
+		RedisServer rs = rc.getServer(master);
+		if(rs == null){
+			return;
+		}
 		joinCluster(rc, rs);
 		refreshCache(cluster);
 	}
 
 	public static boolean addSlaveToMaster(String master, String slave) {
 		try {
-			RedisServer m = new RedisServer(master);
-			RedisServer s = new RedisServer(slave);
-			if (!checkPort(s)) {
+			RedisServer m = getServerInCluster(master);
+			RedisServer s = getServerInCluster(slave);
+			if (m == null || s == null || !checkPort(s)) {
 				return false;
 			}
 			String masterNodeId = getNodeId(m);
-			Jedis mJedis = new Jedis(m.getIp(), m.getPort());
+			Jedis mJedis = JedisAuthWapper.getJedis(m);
 			mJedis.clusterMeet(s.getIp(), s.getPort());
 			waitForClusterReady(master);
-			Jedis sJedis = new Jedis(s.getIp(), s.getPort());
+			Jedis sJedis = JedisAuthWapper.getJedis(s);
 			sJedis.clusterReplicate(masterNodeId);
-			sJedis.close();
+
+			JedisAuthWapper.returnResource(mJedis);
+			JedisAuthWapper.returnResource(sJedis);
+
 		} catch (Exception e) {
 			logger.error("Add slave to " + master + " error ! Please check : "
 					+ slave + "\n",e);
@@ -81,57 +86,6 @@ public class RedisManager {
 		return true;
 	}
 
-	public static void reshard(final ReshardPlan reshardPlan) {
-		if (!checkClusterStatus(reshardPlan)) {
-			return;
-		}
-
-		Runnable runnable = new Runnable() {
-			@Override
-			public void run() {
-				RedisCluster redisCluster = new RedisCluster(reshardPlan.getSrcNode());
-				List<ReshardRecord> reshardRecordList = reshardPlan.getReshardRecordList();
-				for (final ReshardRecord reshardRecord : reshardRecordList) {
-					while (true) {
-						try {
-
-							redisCluster.loadClusterInfo();
-							RedisServer src = redisCluster.getServer(reshardRecord.getSrcNode());
-							if(src == null)
-								continue;
-							if(src.getSlotSize() == 0)
-								break;
-							RedisServer des = redisCluster.getServer(reshardRecord.getDesNode());
-							if (reshardRecord.getSlotsDone() < reshardRecord.getSlotsToMigrateCount()) {
-								int slot = src.getSlotList().get(0);
-								System.out.println(slot);
-								// set curr migrate slot in reshardplan
-								boolean result = migrate(src, des, slot);
-								if (result) {
-									//update resharRecord(slotsDone++)  reshardPlan(slotInMigrate = -1)
-									reshardRecord.setSlotsDone(reshardRecord.getSlotsDone()+1);
-								} else {
-									// re migrate this slot
-								}
-							} else {
-								break;
-							}
-						} catch (Throwable e) {
-							logger.error("Some Error Occured In Migrating",e);
-							break;
-						}
-					}
-				}
-			}
-		};
-		Thread t = new Thread(runnable,"Migrate-thread");
-		t.start();
-		try {
-			t.join();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-	}
 
 	/**
 	 * migrate slot from src node to des node,if migrate failed,
@@ -146,10 +100,10 @@ public class RedisManager {
 	}
 
 	public static boolean migrate(RedisServer src,RedisServer des,int slot,boolean open){
-		Jedis srcNode = getResource(src.getIp(),src.getPort()).getResource();
+		Jedis srcNode = JedisAuthWapper.getJedis(src);
 		String srcNodeId = src.getId();
 		Pipeline pipeline = srcNode.pipelined();
-		Jedis destNode = getResource(des.getIp(),des.getPort()).getResource();
+		Jedis destNode = JedisAuthWapper.getJedis(des);
 		String destNodeId = des.getId();
 		int timeout = CLUSTER_DEFAULT_TIMEOUT;
 		/** migrate every slot from src node to dest node */
@@ -171,25 +125,25 @@ public class RedisManager {
                 }
 				pipeline.sync();
 				for(Map.Entry<String,Response<String>> item : responseMap.entrySet()){
-					try {
+					//try {
 						item.getValue().get();
-					}catch (Exception e){
-						if(e.toString().contains("BUSYKEY")){
-							logger.info("BUSYKEY key:{}",item.getKey());
-							srcNode.del(item.getKey());
-						}else if(e.toString().contains("IOERR")){
-							timeout *= 2;
-							if(timeout > 60000){
-								throw e;
-							}
-						}
-					}
+//					}catch (Exception e){
+//						if(e.toString().contains("BUSYKEY")){
+//							logger.error("BUSYKEY key:{}",item.getKey());
+//							//srcNode.del(item.getKey());
+//							throw e;
+//						}else if(e.toString().contains("IOERR")){
+//							timeout *= 2;
+//							if(timeout > 60000){
+//								throw e;
+//							}
+//						}
+//					}
 				}
 			} catch (Throwable e) {
 				logger.warn("Migrate process may be down.",e);
-				System.out.print("Migrate process may be down."+e);
-				getResource(src.getIp(),src.getPort()).returnResource(srcNode);
-				getResource(des.getIp(),des.getPort()).returnResource(destNode);
+				JedisAuthWapper.returnResource(srcNode);
+				JedisAuthWapper.returnResource(destNode);
 				return false;
 			}
 		}
@@ -197,13 +151,13 @@ public class RedisManager {
 		notifyAllNode(slot,destNodeId,des);
 		waitForMigrationDone(src);
 		waitForMigrationDone(des);
-		getResource(src.getIp(),src.getPort()).returnResource(srcNode);
-		getResource(des.getIp(),des.getPort()).returnResource(destNode);
+		JedisAuthWapper.returnResource(srcNode);
+		JedisAuthWapper.returnResource(destNode);
 		return true;
 	}
 
-	private static boolean checkClusterStatus(ReshardPlan reshardPlan){
-		RedisCluster redisCluster = new RedisCluster(reshardPlan.getSrcNode());
+	public static boolean checkClusterStatus(ReshardPlan reshardPlan){
+		RedisCluster redisCluster = new RedisCluster(reshardPlan.getCluster(),reshardPlan.getSrcNode());
 		if(redisCluster.isMigrating() || reshardPlan.getStatus() == 400){
 			return false;
 		}
@@ -222,13 +176,13 @@ public class RedisManager {
 	}
 
 	private static boolean checkPort(RedisServer redisServer,long timeout){
-		Jedis jedis = getResource(redisServer.getIp(),redisServer.getPort()).getResource();
+		Jedis jedis = JedisAuthWapper.getJedis(redisServer);
 		JedisConnectionException ex = null;
 		long wait = 0;
 		while (wait < timeout){
 			try {
 				if (jedis.ping().contains("PONG")){
-					getResource(redisServer.getIp(),redisServer.getPort()).returnResource(jedis);
+					JedisAuthWapper.returnResource(jedis);
 					return true;
 				}
 			}catch (JedisConnectionException e){
@@ -240,6 +194,8 @@ public class RedisManager {
 				}
 				wait += 1000;
 				ex = e;
+			}finally {
+				JedisAuthWapper.returnResource(jedis);
 			}
 		}
 		logger.error("TimeOut for wait " + redisServer.getAddress() + " response .",ex);
@@ -252,7 +208,7 @@ public class RedisManager {
 		if(nodeToDelete == null){
 			return false;
 		}
-		Jedis deleteNode = new Jedis(nodeToDelete.getIp(),nodeToDelete.getPort());
+		Jedis deleteNode = JedisAuthWapper.getJedis(nodeToDelete);
 		String deleteNodeId = nodeToDelete.getId();
 		List<RedisServer> allNodesOfCluster = rc.getAllAliveServer();
 		// check if the node to delete is a master
@@ -265,17 +221,17 @@ public class RedisManager {
 			for (RedisServer node : allNodesOfCluster) {
 				// a node cannot `forget` itself
 				if (!node.equals(nodeToDelete)) {
-					Jedis conn = new Jedis(node.getIp(), node.getPort());
+					Jedis conn = JedisAuthWapper.getJedis(node);
 					conn.clusterForget(deleteNodeId);
-					conn.close();
+					JedisAuthWapper.returnResource(conn);
 				}
 			}
-			deleteNode.close();
+			JedisAuthWapper.returnResource(deleteNode);
 			refreshCache(cluster);
 			return true;
 		}
 		//TODO   delete master node 
-		deleteNode.close();
+		JedisAuthWapper.returnResource(deleteNode);
 		refreshCache(cluster);
 		return false;// master
 	}
@@ -285,7 +241,7 @@ public class RedisManager {
 			return false;
 		}
 		RedisServer rsInCluster = cluster.getAllAliveServer().get(0);
-		Jedis clusterJedis = new Jedis(rsInCluster.getIp(), rsInCluster.getPort());
+		Jedis clusterJedis = JedisAuthWapper.getJedis(rsInCluster);
 		clusterJedis.clusterMeet(server.getIp(), server.getPort());
 		List<RedisServer> clusterNodes = cluster.getAllAliveServer();
 		boolean joinOk = false;
@@ -308,40 +264,40 @@ public class RedisManager {
 			}
 			sleepTime += CLUSTER_SLEEP_INTERVAL;
 		}
-		clusterJedis.close();
+		JedisAuthWapper.returnResource(clusterJedis);
 		return joinOk;
 	}
 
 	public static String getNodeId(RedisServer server) {
-		Jedis jedis = new Jedis(server.getIp(), server.getPort());
+		Jedis jedis = JedisAuthWapper.getJedis(server);
 		String[] clusterInfo = splitClusterInfo(jedis.clusterNodes());
 		for (String lineInfo : clusterInfo) {
 			if (lineInfo.contains("myself")) {
-				jedis.close();
+				JedisAuthWapper.returnResource(jedis);
 				return lineInfo.split(" ")[0];
 			}
 		}
-		jedis.close();
+		JedisAuthWapper.returnResource(jedis);
 		return null;
 	}
 
 	private static boolean isNodeKnown(RedisServer srcNodeInfo,RedisServer targetNodeInfo) {
-		Jedis srcNode = new Jedis(srcNodeInfo.getIp(), srcNodeInfo.getPort());
+		Jedis srcNode = JedisAuthWapper.getJedis(srcNodeInfo);
 		String targetNodeId = getNodeId(targetNodeInfo);
 		String[] clusterInfo = srcNode.clusterNodes()
 				.split(UNIX_LINE_SEPARATOR);
 		for (String infoLine : clusterInfo) {
 			if (infoLine.contains(targetNodeId)) {
-				srcNode.close();
+				JedisAuthWapper.returnResource(srcNode);
 				return true;
 			}
 		}
-		srcNode.close();
+		JedisAuthWapper.returnResource(srcNode);
 		return false;
 	}
 
 	public static List<RedisServer> getAllNodesOfCluster(RedisServer server) {
-		Jedis node = getResource(server.getIp(),server.getPort()).getResource();
+		Jedis node = JedisAuthWapper.getJedis(server);
 		List<RedisServer> clusterNodeList = new ArrayList<RedisServer>();
 		String[] clusterNodesOutput = node.clusterNodes().split(
 				UNIX_LINE_SEPARATOR);
@@ -351,7 +307,7 @@ public class RedisManager {
 					Integer.valueOf(hostAndPort[1]));
 			clusterNodeList.add(rs);
 		}
-		getResource(server.getIp(),server.getPort()).returnResource(node);
+		JedisAuthWapper.returnResource(node);
 		return clusterNodeList;
 	}
 
@@ -374,8 +330,9 @@ public class RedisManager {
 	
 	public static RedisCluster refreshCache(String cluster){
 		CacheConfigurationService cacheConfigurationService = SpringLocator.getBean("cacheConfigurationService");
-		List<String> serverList = ParseServersUtil.parseRedisServers(cacheConfigurationService.find(cluster).getServers());
-		RedisCluster rc = new RedisCluster(serverList);
+		CacheConfiguration config = cacheConfigurationService.find(cluster);
+		List<String> serverList = ConfigUrlUtil.serverList(config);
+		RedisCluster rc = new RedisCluster(config.getCacheKey(),serverList,ConfigUrlUtil.getProperty(config,"password"));
 		for (RedisNode node : rc.getNodes()) {
 			node.getMaster().loadRedisInfo();
 		}
@@ -416,9 +373,8 @@ public class RedisManager {
 	private static void waitForMigrationDone(final RedisServer server) {
 		checkNotNull(server, "nodesInfo is null.");
 
-		Jedis node = getResource(server.getIp(),server.getPort()).getResource();
+		Jedis node = JedisAuthWapper.getJedis(server);
 		String[] clusterNodesInfo;
-
 		boolean isOk = false;
 		while (!isOk) {
 			clusterNodesInfo = node.clusterNodes().split(UNIX_LINE_SEPARATOR);
@@ -438,16 +394,16 @@ public class RedisManager {
 				throw new JedisClusterException("waitForMigrationDone", e);
 			}
 		}
-		getResource(server.getIp(),server.getPort()).returnResource(node);
+		JedisAuthWapper.returnResource(node);
 	}
 
 
 	private static void notifyAllNode(int slot,String destNodeId,RedisServer redisServer){
 		List<RedisServer> servers = getAllNodesOfCluster(redisServer);
 		for(RedisServer server : servers){
-			Jedis jedis = getResource(server.getIp(),server.getPort()).getResource();
+			Jedis jedis = JedisAuthWapper.getJedis(server);
 			jedis.clusterSetSlotNode(slot,destNodeId);
-			getResource(server.getIp(),server.getPort()).returnResource(jedis);
+			JedisAuthWapper.returnResource(jedis);
 		}
 	}
 
@@ -469,28 +425,31 @@ public class RedisManager {
 			migrate(importing.get(0),migrating.get(0),slot,true);
 		}
 	}
-	private static void refreshCache(){
+
+	private static void refreshCache() {
 		scheduler.scheduleAtFixedRate(new Runnable() {
 			@Override
 			public void run() {
 				CacheConfigurationService cacheConfigurationService = SpringLocator.getBean("cacheConfigurationService");
 				List<CacheConfiguration> configurations = cacheConfigurationService.findAll();
-				Map<String,RedisCluster> tempClusterCache = new TreeMap<String, RedisCluster>();
+				Map<String, RedisCluster> tempClusterCache = new TreeMap<String, RedisCluster>();
 				for (CacheConfiguration configuration : configurations) {
 					if (configuration.getCacheKey().startsWith("redis") &&
 							"".equals(configuration.getSwimlane())) {
-						String url = configuration.getServers();
-						List<String> servers = ParseServersUtil.parseRedisServers(url);
-						RedisCluster cluster = new RedisCluster(configuration.getCacheKey(),servers);
+						List<String> servers = ConfigUrlUtil.serverList(configuration);
+						RedisCluster cluster = new RedisCluster(configuration.getCacheKey(), servers, ConfigUrlUtil.getProperty(configuration, "password"));
 						for (RedisNode node : cluster.getNodes()) {
 							node.getMaster().loadRedisInfo();
+							if(node.getSlave() != null){
+								node.getSlave().loadRedisInfo();
+							}
 						}
 						tempClusterCache.put(configuration.getCacheKey(), cluster);
 					}
 				}
 				clusterCache = tempClusterCache;
 			}
-		},3,30,TimeUnit.SECONDS);
+		}, 3, 30, TimeUnit.SECONDS);
 	}
 
 	private static boolean isMigating(RedisServer redisServer){
@@ -510,19 +469,6 @@ public class RedisManager {
 		return isMigating(redisServer);
 	}
 
-	private static JedisPool getResource(String ip, int port){
-		String address = ip + ":" + port;
-		JedisPool jedisPool = JEDIS_POOL_MAP.get(address);
-		if(jedisPool == null){
-			synchronized (JEDIS_POOL_MAP){
-				if(jedisPool == null){
-					jedisPool = new JedisPool(ip,port);
-					JEDIS_POOL_MAP.put(address,jedisPool);
-				}
-			}
-		}
-		return jedisPool;
-	}
 
 	public static Map<String,RedisCluster> getClusterCache() {
 		return clusterCache;
@@ -546,12 +492,33 @@ public class RedisManager {
 		return servers;
 	}
 
+	public static RedisServer getServerInCluster(String address){
+		return getServerInCluster(null,address);
+	}
+
+	public static RedisServer getServerInCluster(String cluster,String address){
+		RedisServer server = null;
+		if(cluster != null){
+			RedisCluster redisCluster = RedisManager.getRedisCluster(cluster);
+			server = redisCluster.getServer(address);
+		}else{
+			for(Map.Entry<String,RedisCluster> clusterEntry : RedisManager.getClusterCache().entrySet()){
+				if(clusterEntry.getValue().getServer(address) != null){
+					server = clusterEntry.getValue().getServer(address);
+				}
+			}
+		}
+		if(server ==null)
+			server = new RedisServer(address);
+		return server;
+	}
+
 	public static boolean failover(String cluster, String slaveAddress) {
 		try {
-			Server server = new Server(slaveAddress);
-			Jedis jedis = getResource(server.getIp(),server.getPort()).getResource();
+			RedisServer server = getServerInCluster(cluster,slaveAddress);
+			Jedis jedis = JedisAuthWapper.getJedis(server);
 			jedis.clusterFailover();
-			getResource(server.getIp(),server.getPort()).returnResource(jedis);
+			JedisAuthWapper.returnResource(jedis);
 		} catch (Throwable e) {
 			return false;
 		}

@@ -1,51 +1,51 @@
 package com.dianping.cache.service.impl;
 
-import com.dianping.cache.dao.MemcacheStatsDao;
-import com.dianping.cache.entity.MemcacheStats;
-import com.dianping.cache.service.MemcacheStatsService;
+import com.dianping.cache.dao.MemcachedStatsDao;
+import com.dianping.cache.entity.MemcachedStats;
+import com.dianping.cache.service.MemcachedStatsService;
 
 import java.util.List;
 
-public class MemcacheStatsServiceImpl implements MemcacheStatsService{
+public class MemcacheStatsServiceImpl implements MemcachedStatsService {
 
-	private MemcacheStatsDao memcacheStatsDao;
+	private MemcachedStatsDao memcachedStatsDao;
 	
 	
 	@Override
-	public List<MemcacheStats> findByServer(String server) {
+	public List<MemcachedStats> findByServer(String server) {
 		// TODO Auto-generated method stub
-		return memcacheStatsDao.findAll();
+		return memcachedStatsDao.findAll();
 	}
 
 	@Override
-	public void insert(MemcacheStats stat) {
+	public void insert(MemcachedStats stat) {
 		// TODO Auto-generated method stub
-		memcacheStatsDao.insert(stat);
+		memcachedStatsDao.insert(stat);
 	}
 	
 	@Override
-	public List<MemcacheStats> findByServerWithInterval(String address,
-			long start, long end) {
-		return memcacheStatsDao.findByServerWithInterval(address, start, end);
+	public List<MemcachedStats> findByServerWithInterval(String address,
+														 long start, long end) {
+		return memcachedStatsDao.findByServerWithInterval(address, start, end);
 	}
 	
 
-	public MemcacheStatsDao getMemcacheStatsDao() {
-		return memcacheStatsDao;
+	public MemcachedStatsDao getMemcachedStatsDao() {
+		return memcachedStatsDao;
 	}
 
-	public void setMemcacheStatsDao(MemcacheStatsDao memcacheStatsDao) {
-		this.memcacheStatsDao = memcacheStatsDao;
+	public void setMemcachedStatsDao(MemcachedStatsDao memcachedStatsDao) {
+		this.memcachedStatsDao = memcachedStatsDao;
 	}
 
 	@Override
 	public void delete(long timeBefore) {
-		this.memcacheStatsDao.delete(timeBefore);
+		this.memcachedStatsDao.delete(timeBefore);
 	}
 
 	@Override
-	public List<MemcacheStats> search(String sql) {
-		return memcacheStatsDao.search(sql);
+	public List<MemcachedStats> search(String sql) {
+		return memcachedStatsDao.search(sql);
 	}
 
 }

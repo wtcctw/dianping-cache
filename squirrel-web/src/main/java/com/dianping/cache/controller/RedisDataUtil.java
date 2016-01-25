@@ -1,6 +1,6 @@
 package com.dianping.cache.controller;
 
-import com.dianping.cache.monitor.statsdata.RedisClusterData;
+import com.dianping.squirrel.view.highcharts.statsdata.RedisClusterData;
 import com.dianping.cache.scale.cluster.redis.RedisCluster;
 import com.dianping.cache.scale.cluster.redis.RedisManager;
 import com.dianping.cache.scale.cluster.redis.RedisNode;

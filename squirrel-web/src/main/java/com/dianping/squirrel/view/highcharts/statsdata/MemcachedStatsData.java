@@ -1,8 +1,8 @@
-package com.dianping.cache.monitor.statsdata;
+package com.dianping.squirrel.view.highcharts.statsdata;
+
+import com.dianping.cache.entity.MemcachedStats;
 
 import java.util.List;
-
-import com.dianping.cache.entity.MemcacheStats;
 
 public class MemcachedStatsData {
 	
@@ -37,7 +37,7 @@ public class MemcachedStatsData {
 	public MemcachedStatsData(){
 	}
 	
-	public MemcachedStatsData(List<MemcacheStats> stats){
+	public MemcachedStatsData(List<MemcachedStats> stats){
 		
 		init(stats);
 		
@@ -62,7 +62,7 @@ public class MemcachedStatsData {
 		}
 	}
 	
-	private void init(List<MemcacheStats> stats){
+	private void init(List<MemcachedStats> stats){
 		if(stats == null || stats.size() <= 1)
 			throw new IllegalArgumentException("statsdata is null");
 		

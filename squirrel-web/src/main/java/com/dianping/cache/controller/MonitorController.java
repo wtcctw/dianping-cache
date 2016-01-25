@@ -1,25 +1,30 @@
 package com.dianping.cache.controller;
 
-import java.util.*;
-import java.util.concurrent.TimeUnit;
-
-import javax.annotation.Resource;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.ModelAndView;
-
 import com.dianping.cache.entity.CacheConfiguration;
-import com.dianping.cache.entity.MemcacheStats;
+import com.dianping.cache.entity.MemcachedStats;
 import com.dianping.cache.entity.Server;
 import com.dianping.cache.entity.ServerStats;
-import com.dianping.cache.monitor.highcharts.HighChartsWrapper;
 import com.dianping.cache.service.CacheConfigurationService;
-import com.dianping.cache.service.MemcacheStatsService;
+import com.dianping.cache.service.MemcachedStatsService;
 import com.dianping.cache.service.ServerService;
 import com.dianping.cache.service.ServerStatsService;
-import com.dianping.cache.monitor.highcharts.ChartsBuilder;
-import com.dianping.cache.monitor.statsdata.MemcachedStatsData;
-import com.dianping.cache.monitor.statsdata.ServerStatsData;
+import com.dianping.squirrel.view.highcharts.ChartsBuilder;
+import com.dianping.squirrel.view.highcharts.HighChartsWrapper;
+import com.dianping.squirrel.view.highcharts.statsdata.MemcachedStatsData;
+import com.dianping.squirrel.view.highcharts.statsdata.ServerStatsData;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.ModelAndView;
+
+import javax.annotation.Resource;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 @Controller
 public class MonitorController  extends AbstractSidebarController {
@@ -29,7 +34,7 @@ public class MonitorController  extends AbstractSidebarController {
 	private CacheConfigurationService cacheConfigurationService ;
 	
 	@Resource(name = "memcacheStatsService")
-	private MemcacheStatsService memcacheStatsService;
+	private MemcachedStatsService memcacheStatsService;
 	
 	@Resource(name = "serverService")
 	private ServerService serverService;
@@ -164,7 +169,7 @@ public class MonitorController  extends AbstractSidebarController {
 	@ResponseBody
 	public List<HighChartsWrapper> getClusterStats(@PathVariable("cluster") String cluster,@RequestParam("endTime") long endTime){
 		
-		Map<String,List<MemcacheStats>> stats0 = getClusterServerStats(cluster, endTime);
+		Map<String,List<MemcachedStats>> stats0 = getClusterServerStats(cluster, endTime);
 		
 		Map<String,MemcachedStatsData> data0 = convertStats(stats0);
 		
@@ -180,10 +185,10 @@ public class MonitorController  extends AbstractSidebarController {
 	
 
 	private Map<String, MemcachedStatsData> convertStats(
-			Map<String, List<MemcacheStats>> stats) {
+			Map<String, List<MemcachedStats>> stats) {
 		
 		Map<String,MemcachedStatsData> result = new HashMap<String,MemcachedStatsData>();
-		for(Map.Entry<String, List<MemcacheStats>> item : stats.entrySet()){
+		for(Map.Entry<String, List<MemcachedStats>> item : stats.entrySet()){
 			if(item.getValue() != null && item.getValue().size() > 1){
 				result.put(item.getKey(), new MemcachedStatsData(item.getValue()));
 			}
@@ -228,7 +233,7 @@ public class MonitorController  extends AbstractSidebarController {
 		return result;
 	}
 
-	private  Map<String,List<MemcacheStats>> getClusterServerStats(String cluster,long endTime) {
+	private  Map<String,List<MemcachedStats>> getClusterServerStats(String cluster, long endTime) {
 		//get all server in cluster
 		CacheConfiguration configuration = cacheConfigurationService.find(cluster);
 		List<String> servers = configuration.getServerList();
@@ -236,7 +241,7 @@ public class MonitorController  extends AbstractSidebarController {
 		long start = (endTime - TimeUnit.MILLISECONDS.convert(60, TimeUnit.MINUTES))/1000;
 		long end = endTime/1000;
 		
-		Map<String,List<MemcacheStats>> result = new HashMap<String,List<MemcacheStats>>();
+		Map<String,List<MemcachedStats>> result = new HashMap<String,List<MemcachedStats>>();
 		for(String server : servers){
 			result.put(server,getMemcacheStats(server,start,end));
 		}
@@ -244,7 +249,7 @@ public class MonitorController  extends AbstractSidebarController {
 	}
 
 	private  Map<String,Map<String,Object>> getCurrentServerStatsData(){
-		Map<String, List<MemcacheStats>> serverStats = getAllServerStats();
+		Map<String, List<MemcachedStats>> serverStats = getAllServerStats();
 		Map<String,MemcachedStatsData> serverStatsData = convertStats(serverStats);
 		Map<String,Map<String,Object>> currentStats = new HashMap<String,Map<String,Object>>();
 		for(Map.Entry<String,MemcachedStatsData> item : serverStatsData.entrySet()){
@@ -274,22 +279,22 @@ public class MonitorController  extends AbstractSidebarController {
 	}
 	
 	
-	private  Map<String,List<MemcacheStats>> getAllServerStats() {
+	private  Map<String,List<MemcachedStats>> getAllServerStats() {
 		//get all server in cluster
 		List<Server> sc = serverService.findAllMemcachedServers();
 		
 		long start = (System.currentTimeMillis()- TimeUnit.MILLISECONDS.convert(2, TimeUnit.MINUTES))/1000;
 		long end = (System.currentTimeMillis())/1000;
 		
-		Map<String,List<MemcacheStats>> result = new HashMap<String,List<MemcacheStats>>();
+		Map<String,List<MemcachedStats>> result = new HashMap<String,List<MemcachedStats>>();
 		for(Server server : sc){
 			result.put(server.getAddress(),getMemcacheStats(server.getAddress(),start,end));
 		}
 		return result;
 	}
 	
-	private List<MemcacheStats> getMemcacheStats(String address,long start,long end){
-		List<MemcacheStats> result = memcacheStatsService.findByServerWithInterval(address, start, end);
+	private List<MemcachedStats> getMemcacheStats(String address, long start, long end){
+		List<MemcachedStats> result = memcacheStatsService.findByServerWithInterval(address, start, end);
 		return result;
 	}
 	

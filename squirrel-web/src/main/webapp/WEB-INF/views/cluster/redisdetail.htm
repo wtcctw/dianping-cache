@@ -110,12 +110,14 @@
                         <thead>
                         <tr>
                             <th style="width: 5%">ID</th>
-                            <th style="width: 25%">Category</th>
+                            <th style="width: 20%">Category</th>
                             <th style="width: 10%">过期时间</th>
-                            <th style="width: 20%">命名模版</th>
+                            <th style="width: 10%">命名模版</th>
                             <th style="width: 10%">版本</th>
-                            <th style="width: 10%">是否热点</th>
-                            <th style="width: 20%;#if(${isadmin})display: table-cell;#else display: none;#end;">操作
+                            <th style="width: 5%">热点</th>
+                            <th style="width: 10%">数量</th>
+                            <th style="width: 10%">大小(MB)</th>
+                            <th style="width: 15%;#if(${isadmin})display: table-cell;#else display: none;#end;">操作
                                 <a href="#" class="grey pull-right">
                                     <i class="ace-icon fa fa-plus-square bigger-110"></i>
                                 </a>
@@ -125,17 +127,19 @@
                         <tbody>
                         <tr ng-repeat="category in categoryList">
                             <td>{{$index+1}}</td>
-                            <td>{{category.category}}</td>
-                            <td>{{category.duration}}</td>
-                            <td>{{category.indexTemplate}}</td>
-                            <td>{{category.version}}</td>
+                            <td>{{category.category.category}}</td>
+                            <td>{{category.category.duration}}</td>
+                            <td>{{category.category.indexTemplate}}</td>
+                            <td>{{category.category.version}}</td>
                             <td>
-                                <i class="ace-icon glyphicon glyphicon-ok grey" ng-show="{{category.hot}}"></i>
-                                <i class="ace-icon glyphicon glyphicon-remove grey" ng-show="!{{category.hot}}"></i>
+                                <i class="ace-icon glyphicon glyphicon-ok grey" ng-show="{{category.category.hot}}"></i>
+                                <i class="ace-icon glyphicon glyphicon-remove grey" ng-show="!{{category.category.hot}}"></i>
                             </td>
+                            <td>{{category.count}}</td>
+                            <td>{{category.size}}</td>
                             <td style="margin-right: 20px;#if(${isadmin})display: table-cell;#else display: none;#end;">
                                 <div class="hidden-sm hidden-xs action-buttons">
-                                    <a class="grey" href="#modifyCategory" ng-click="transportEntity(category)" data-toggle="modal">
+                                    <a class="grey" href="#modifyCategory" ng-click="transportEntity(category.category)" data-toggle="modal">
                                         <i class="ace-icon fa fa-cog bigger-130"></i>
                                     </a>
 
@@ -146,7 +150,7 @@
                                     <a class="grey" href="#">
                                         <i class="ace-icon glyphicon glyphicon-th-large bigger-130"></i>
                                     </a>
-                                    <a class="grey" href="#log" data-toggle="modal" ng-click="getLogs(category.category)">
+                                    <a class="grey" href="#log" data-toggle="modal" ng-click="getLogs(category.category.category)">
                                         <i class="ace-icon fa fa-file-text-o bigger-130"></i>
                                     </a>
 

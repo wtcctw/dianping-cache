@@ -1,24 +1,21 @@
 package com.dianping.squirrel.monitor.processor;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.ThreadPoolExecutor.CallerRunsPolicy;
-import java.util.concurrent.TimeUnit;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.dianping.squirrel.common.config.ConfigManager;
 import com.dianping.squirrel.common.config.ConfigManagerLoader;
 import com.dianping.squirrel.common.util.NamedThreadFactory;
 import com.dianping.squirrel.monitor.data.Data;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.*;
+import java.util.concurrent.ThreadPoolExecutor.CallerRunsPolicy;
+
+import static com.google.common.base.Preconditions.checkNotNull;
+
+@Component
 public class ProcessorManager {
 
     private static Logger logger = LoggerFactory.getLogger(ProcessorManager.class);
@@ -73,7 +70,7 @@ public class ProcessorManager {
     
     public void process(Data data) {
         checkNotNull(data, "data is null");
-        ProcessorChain processorChain = processorMap.get(data.getType());
+        ProcessorChain processorChain = processorMap.get(data.getType().toString());
         if(processorChain != null) {
             processorChain.process(data);
         } else {

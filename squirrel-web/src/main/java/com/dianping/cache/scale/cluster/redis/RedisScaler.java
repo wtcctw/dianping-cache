@@ -1,9 +1,5 @@
 package com.dianping.cache.scale.cluster.redis;
 
-import java.util.ArrayList;
-import java.util.List;
-
-
 import com.dianping.cache.entity.CacheConfiguration;
 import com.dianping.cache.entity.Server;
 import com.dianping.cache.scale.ScaleException;
@@ -13,11 +9,13 @@ import com.dianping.cache.scale.instance.Result;
 import com.dianping.cache.scale.instance.docker.DockerApply;
 import com.dianping.cache.service.CacheConfigurationService;
 import com.dianping.cache.service.ServerService;
-import com.dianping.cache.util.ParseServersUtil;
+import com.dianping.cache.util.ConfigUrlUtil;
 import com.dianping.cache.util.SpringLocator;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class RedisScaler {
 
@@ -36,7 +34,7 @@ public class RedisScaler {
 		logger.info("Cluster {} start addMaster operation",cluster);
 		CacheConfiguration config = cacheConfigurationService.find(cluster);
 		String servers = config.getServers();
-		List<String> serverlist = ParseServersUtil.parseRedisServers(servers);
+		List<String> serverlist = ConfigUrlUtil.serverList(servers);
 		Server server = serverService.findByAddress(serverlist.get(0));
 		AppId appId = AppId.valueOf(server.getAppId());
 		int operateid = autoApply.apply(appId, 1);
@@ -142,7 +140,7 @@ public class RedisScaler {
 		address = address.trim();
 		if(cluster.contains("redis")){
 			config.setAddTime(System.currentTimeMillis());
-			List<String> serverlist = ParseServersUtil.parseRedisServers(servers);
+			List<String> serverlist = ConfigUrlUtil.serverList(servers);
 			String urlHead = "redis-cluster://";
 			String urlTail = servers.substring(servers.indexOf("?"));
 			serverlist.add(address);
@@ -170,7 +168,7 @@ public class RedisScaler {
 		server = server.trim();
 		if(cluster.contains("redis")){
 			config.setAddTime(System.currentTimeMillis());
-			List<String> serverlist = ParseServersUtil.parseRedisServers(servers);
+			List<String> serverlist = ConfigUrlUtil.serverList(servers);
 			String urlHead = "redis-cluster://";
 			String urlTail = servers.substring(servers.indexOf("?"));
 			serverlist.remove(server);

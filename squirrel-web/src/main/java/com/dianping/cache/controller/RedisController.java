@@ -4,10 +4,10 @@ import com.dianping.cache.controller.vo.*;
 import com.dianping.cache.entity.CacheConfiguration;
 import com.dianping.cache.entity.CacheKeyConfiguration;
 import com.dianping.cache.entity.RedisStats;
-import com.dianping.cache.monitor.highcharts.ChartsBuilder;
-import com.dianping.cache.monitor.highcharts.HighChartsWrapper;
-import com.dianping.cache.monitor.statsdata.RedisClusterData;
-import com.dianping.cache.monitor.statsdata.RedisStatsData;
+import com.dianping.squirrel.view.highcharts.ChartsBuilder;
+import com.dianping.squirrel.view.highcharts.HighChartsWrapper;
+import com.dianping.squirrel.view.highcharts.statsdata.RedisClusterData;
+import com.dianping.squirrel.view.highcharts.statsdata.RedisStatsData;
 import com.dianping.cache.scale.ScaleException;
 import com.dianping.cache.scale.cluster.redis.RedisCluster;
 import com.dianping.cache.scale.cluster.redis.RedisManager;
@@ -140,16 +140,12 @@ public class RedisController extends AbstractSidebarController{
 
 	@RequestMapping(value = "/redis/detail")
 	@ResponseBody
-	public Map<String, Object> getRedisDetailData(@RequestParam String cluster){
-		List<CacheKeyConfiguration> categorys = cacheKeyConfigurationService.findByCacheType(cluster);
-		Map<String,Object> result = new HashMap<String, Object>();
+	public RedisDashBoardData.SimpleAnalysisData getRedisDetailData(@RequestParam String cluster){
 		RedisCluster redisCluster =  RedisManager.getRedisCluster(cluster);
 		RedisDashBoardData data = new RedisDashBoardData();
 		RedisDashBoardData.SimpleAnalysisData simpleAnalysisData = data.new SimpleAnalysisData(redisCluster);
 		simpleAnalysisData.analysis();
-		result.put("data",simpleAnalysisData);
-		result.put("categorys",categorys);
-		return result;
+		return simpleAnalysisData;
 	}
 
 	@RequestMapping(value = "/redis/data/applications")
@@ -181,17 +177,7 @@ public class RedisController extends AbstractSidebarController{
 	}
 
 
-	@RequestMapping(value = "/redis/auth/authorize")
-	@ResponseBody
-	public void authorize(@RequestBody AuthParams authParams) throws Exception {
-		authService.authorize(authParams.getApplication(),authParams.getResource());
-	}
 
-	@RequestMapping(value = "/redis/auth/unauthorize")
-	@ResponseBody
-	public void unauthorize(@RequestBody AuthParams authParams) throws Exception {
-		authService.unauthorize(authParams.getApplication(),authParams.getResource());
-	}
 
 	@RequestMapping(value = "/redis/reshard")
 	@ResponseBody

@@ -105,16 +105,26 @@ module.controller('RedisController', [
                     cluster : window.localStorage.cluster
                 }
             }).success(function(response){
-                $scope.redisData = response.data.redisCluster;
-                $scope.categoryList = response.categorys;
-                var usage = response.data.memoryUsage;
-                var qps = response.data.qps;
+                $scope.redisData = response.redisCluster;
+                var usage = response.memoryUsage;
+                var qps = response.qps;
                 makeGraph("container-memory",100,"内存使用率",usage);
                 makeGraph("container-qps",140000,"QPS",qps);
                 iniTable("node");
-                initCategory();
             }).error(function(){
             });
+
+            $http.get(window.contextPath + '/config/category/findbycluster/rdb',{
+                params: {
+                    cluster : window.localStorage.cluster
+                }
+            }).success(function(response){
+                $scope.categoryList = response;
+                initCategory();
+            }).error(function(){
+
+            });
+
         };
         $scope.initPage();
 
@@ -250,7 +260,7 @@ module.controller('RedisController', [
                         "aaSorting": [],
                         "aoColumns": [
                             {"bSortable": false},{"bSortable": false}, {"bSortable": false}, {"bSortable": false}, {"bSortable": false},
-                            {"bSortable": false}, {"bSortable": false}
+                            {"bSortable": false},null,null, {"bSortable": false}
                         ],
                     });
                 }, 0);

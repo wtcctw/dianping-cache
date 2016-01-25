@@ -1,11 +1,11 @@
 package com.dianping.cache.alarm.memcache;
 
 import com.dianping.cache.entity.CacheConfiguration;
-import com.dianping.cache.entity.MemcacheStats;
+import com.dianping.cache.entity.MemcachedStats;
 import com.dianping.cache.entity.Server;
-import com.dianping.cache.monitor.statsdata.MemcachedStatsData;
+import com.dianping.squirrel.view.highcharts.statsdata.MemcachedStatsData;
 import com.dianping.cache.service.CacheConfigurationService;
-import com.dianping.cache.service.MemcacheStatsService;
+import com.dianping.cache.service.MemcachedStatsService;
 import com.dianping.cache.service.ServerService;
 
 import java.util.ArrayList;
@@ -23,7 +23,7 @@ public class MemcacheData {
 
     private CacheConfigurationService cacheConfigurationService;
 
-    private MemcacheStatsService memcacheStatsService;
+    private MemcachedStatsService memcacheStatsService;
 
     public MemcacheData() {
 
@@ -113,7 +113,7 @@ public class MemcacheData {
     }
 
     public Map<String, Map<String, Object>> getCurrentServerStatsData() {
-        Map<String, List<MemcacheStats>> serverStats = getAllServerStats();
+        Map<String, List<MemcachedStats>> serverStats = getAllServerStats();
         Map<String, MemcachedStatsData> serverStatsData = convertStats(serverStats);
         Map<String, Map<String, Object>> currentStats = new HashMap<String, Map<String, Object>>();
         for (Map.Entry<String, MemcachedStatsData> item : serverStatsData.entrySet()) {
@@ -148,10 +148,10 @@ public class MemcacheData {
     }
 
     private Map<String, MemcachedStatsData> convertStats(
-            Map<String, List<MemcacheStats>> stats) {
+            Map<String, List<MemcachedStats>> stats) {
 
         Map<String, MemcachedStatsData> result = new HashMap<String, MemcachedStatsData>();
-        for (Map.Entry<String, List<MemcacheStats>> item : stats.entrySet()) {
+        for (Map.Entry<String, List<MemcachedStats>> item : stats.entrySet()) {
             if (item.getValue() != null && item.getValue().size() > 1) {
                 result.put(item.getKey(), new MemcachedStatsData(item.getValue()));
             }
@@ -162,22 +162,22 @@ public class MemcacheData {
         return result;
     }
 
-    private Map<String, List<MemcacheStats>> getAllServerStats() {
+    private Map<String, List<MemcachedStats>> getAllServerStats() {
         //get all server in cluster
         List<Server> sc = serverService.findAllMemcachedServers();
 
         long start = (System.currentTimeMillis() - TimeUnit.MILLISECONDS.convert(1, TimeUnit.MINUTES)) / 1000;
         long end = (System.currentTimeMillis()) / 1000;
 
-        Map<String, List<MemcacheStats>> result = new HashMap<String, List<MemcacheStats>>();
+        Map<String, List<MemcachedStats>> result = new HashMap<String, List<MemcachedStats>>();
         for (Server server : sc) {
             result.put(server.getAddress(), getMemcacheStats(server.getAddress(), start, end));
         }
         return result;
     }
 
-    private List<MemcacheStats> getMemcacheStats(String address, long start, long end) {
-        List<MemcacheStats> result = memcacheStatsService.findByServerWithInterval(address, start, end);
+    private List<MemcachedStats> getMemcacheStats(String address, long start, long end) {
+        List<MemcachedStats> result = memcacheStatsService.findByServerWithInterval(address, start, end);
         return result;
     }
 
@@ -197,11 +197,11 @@ public class MemcacheData {
         this.cacheConfigurationService = cacheConfigurationService;
     }
 
-    public MemcacheStatsService getMemcacheStatsService() {
+    public MemcachedStatsService getMemcacheStatsService() {
         return memcacheStatsService;
     }
 
-    public void setMemcacheStatsService(MemcacheStatsService memcacheStatsService) {
+    public void setMemcacheStatsService(MemcachedStatsService memcacheStatsService) {
         this.memcacheStatsService = memcacheStatsService;
     }
 }

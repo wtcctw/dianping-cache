@@ -1,9 +1,9 @@
-package com.dianping.cache.monitor.highcharts;
+package com.dianping.squirrel.view.highcharts;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public abstract class AbstractExtractData<T> implements ExtractData<T>{
+public abstract class AbstractExtractData<T> implements ExtractData<T> {
 	@Override
 	public Map<String,Number[]> getData(Map<String,T> data){
 		Map<String,Number[]> result = new HashMap<String,Number[]>();

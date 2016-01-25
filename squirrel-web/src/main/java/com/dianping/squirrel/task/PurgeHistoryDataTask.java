@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory;
 
 import com.dianping.cache.config.ConfigManager;
 import com.dianping.cache.config.ConfigManagerLoader;
-import com.dianping.cache.service.MemcacheStatsService;
+import com.dianping.cache.service.MemcachedStatsService;
 import com.dianping.cache.service.OperationLogService;
 import com.dianping.cache.service.ServerStatsService;
 import com.dianping.cache.util.SpringLocator;
@@ -36,7 +36,7 @@ public class PurgeHistoryDataTask {
 	
 	private ServerStatsService serverStatsService;
 	
-	private MemcacheStatsService memcacheStatsService;
+	private MemcachedStatsService memcacheStatsService;
 	
 	private OperationLogService operationLogService;
 

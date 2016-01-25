@@ -8,6 +8,7 @@
                 font-size: 14px;  color: #404040;
             }
             .bold{
+                color: #ff6a6a;!important;
                 font-weight: bolder;
             }
         </style>
@@ -45,9 +46,9 @@
                                     {{item.clusterName}}
                                 </a>
                             </td>
-                            <td ng-class="{'red':item.usageAlarm,'bold':item.usageAlarm}">{{item.memoryUsage}}%/{{item.maxMemory}}G</td>
-                            <td ng-class="{'red':item.qpsAlarm,'bold':item.qpsAlarm}">{{item.qps}}</td>
-                            <td ng-class="{'red':item.msAlarm,'bold':item.msAlarm}">{{item.masterNum}}/{{item.slaveNum}}</td>
+                            <td ng-class="{'bold':item.usageAlarm}">{{item.memoryUsage}}%/{{item.maxMemory}}G</td>
+                            <td ng-class="{'bold':item.qpsAlarm}">{{item.qps}}</td>
+                            <td ng-class="{'bold':item.msAlarm}">{{item.masterNum}}/{{item.slaveNum}}</td>
                             <td style="#if(${isadmin})display: table-cell;#else display: none;#end;">
                                 <div class="hidden-sm hidden-xs action-buttons">
                                     <a class="grey" href="${rc.contextPath}/redis/{{item.clusterName}}/edit" ng-click="transport(item.clusterName)">

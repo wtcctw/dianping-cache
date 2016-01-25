@@ -1,8 +1,10 @@
 package com.dianping.cache.entity;
 
+import com.dianping.squirrel.monitor.data.Stats;
+
 import java.io.Serializable;
 
-public class MemcacheStats implements Serializable{
+public class MemcachedStats implements Serializable,Stats{
 	
 	/**
 	 * 

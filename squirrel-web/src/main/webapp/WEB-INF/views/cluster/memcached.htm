@@ -8,7 +8,8 @@
                 font-size: 14px;  color: #404040;
             }
              .bold{
-                font-weight: bolder;
+                 color: #ff6a6a;!important;
+                 font-weight: bold;
             }
         </style>
         <div class="page-content">
@@ -41,14 +42,14 @@
                         <tr ng-repeat="item in data">
                             <td><img src="${rc.contextPath}/static/images/red.png" ng-show="item.clusterAlarm" >
                                 <img src="${rc.contextPath}/static/images/green.png" ng-show="!item.clusterAlarm" ></td>
-                            <td style="text-align: left;font: 14px Open Sans ;color: #3764a0" >
+                            <td style="text-align: left;font: 14px Open Sans ;color: #3764a0;!important;" >
                                 <a href="${rc.contextPath}/memcached/{{item.clusterName}}" ng-click="transport(item.clusterName,item.configuration.swimlane)">
                                     {{item.clusterName}}
                                 </a>
                             </td>
-                            <td ng-class="{'red':item.usageAlarm,'bold':item.usageAlarm}">{{item.memoryUsage}}%/{{item.maxMemory}}G</td>
-                            <td ng-class="{'red':item.qpsAlarm,'bold':item.qpsAlarm}">{{item.qps}}</td>
-                            <td ng-class="{'red':item.aliveAlarm,'bold':item.aliveAlarm}">{{item.servers.length}}/{{item.alive}}</td>
+                            <td ng-class="{'bold':item.usageAlarm}">{{item.memoryUsage}}%/{{item.maxMemory}}G</td>
+                            <td ng-class="{'bold':item.qpsAlarm}">{{item.qps}}</td>
+                            <td ng-class="{'bold':item.aliveAlarm}">{{item.servers.length}}/{{item.alive}}</td>
                             <td>{{item.hitrate}}%</td>
                             <td style="margin-right: 10px;#if(${isadmin})display: table-cell;#else display: none;#end;" >
                                 <div class="hidden-sm hidden-xs action-buttons">

@@ -1,8 +1,10 @@
 package com.dianping.cache.entity;
 
+import com.dianping.squirrel.monitor.data.Stats;
+
 import java.io.Serializable;
 
-public class RedisStats implements Serializable {
+public class RedisStats implements Serializable,Stats {
 
     /**
      *

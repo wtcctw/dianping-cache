@@ -69,7 +69,7 @@ public class ReshardPlanTest {
         }
 
         System.out.println("Start to Migrate");
-        RedisManager.reshard(reshardPlan);
+       // RedisManager.reshard(reshardPlan);
     }
 
     @Test
