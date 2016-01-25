@@ -26,6 +26,6 @@ public class SpringMailSender {
         mailSender.setUsername("shiyun.lv@dianping.com");
         mailSender.setHost("mail.51ping.com");
         mailSender.setDefaultEncoding("utf-8");
-//        mailSender.setProtocol("smtp");
+        mailSender.setProtocol("smtp");
     }
 }
