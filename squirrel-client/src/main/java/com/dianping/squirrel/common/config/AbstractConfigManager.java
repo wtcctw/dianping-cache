@@ -314,9 +314,16 @@ public abstract class AbstractConfigManager implements ConfigManager {
 		configChangeListeners.add(configChangeListener);
 		doRegisterConfigChangeListener(configChangeListener);
 	}
+	
+	public void unregisterConfigChangeListener(ConfigChangeListener configChangeListener) throws Exception {
+        configChangeListeners.remove(configChangeListener);
+        doUnregisterConfigChangeListener(configChangeListener);
+    }
 
 	public abstract void doRegisterConfigChangeListener(ConfigChangeListener configChangeListener) throws Exception;
 
+	public abstract void doUnregisterConfigChangeListener(ConfigChangeListener configChangeListener) throws Exception;
+	
 	public Map<String, Object> getLocalConfig() {
 		return localCache;
 	}

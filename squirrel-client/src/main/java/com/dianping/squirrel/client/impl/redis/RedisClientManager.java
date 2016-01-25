@@ -4,6 +4,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
@@ -18,9 +19,10 @@ import com.dianping.squirrel.client.util.ParamHelper;
 import com.dianping.squirrel.common.config.ConfigChangeListener;
 import com.dianping.squirrel.common.config.ConfigManager;
 import com.dianping.squirrel.common.config.ConfigManagerLoader;
+import com.dianping.squirrel.common.lifecycle.Lifecycle;
 import com.dianping.squirrel.common.util.NamedThreadFactory;
 
-public class RedisClientManager {
+public class RedisClientManager implements Lifecycle {
 
     private static Logger logger = LoggerFactory.getLogger(RedisClientManager.class);
     
@@ -43,15 +45,14 @@ public class RedisClientManager {
     private static final String KEY_ASYNC_MAXSIZE = "asyncMaxSize";
     private static final int DEFAULT_ASYNC_MAXSIZE = 20;
     private static final String KEY_ASYNC_QUEUESIZE = "asyncQueueSize";
-    private static final int DEFAULT_ASYNC_QUEUESIZE = 160000;
+    private static final int DEFAULT_ASYNC_QUEUESIZE = 1000;
     private static final String KEY_CLUSTER_UPDATE_INTERVAL = "clusterUpdateInterval";
     private static final int DEFAULT_CLUSTER_UPDATE_INTERVAL = 1800000;
     
     private static ConfigManager configManager = ConfigManagerLoader.getConfigManager();
     
-    private static RedisClientManager instance = new RedisClientManager();
+    private static ThreadFactory threadFactory = new NamedThreadFactory("squirrel-redis", true);
     
-    private volatile String password = null;
     private volatile int connTimeout = DEFAULT_CONN_TIMEOUT;
     private volatile int readTimeout = DEFAULT_READ_TIMEOUT;
     private volatile int maxRedirects = DEFAULT_MAX_REDIRECTS;
@@ -65,34 +66,36 @@ public class RedisClientManager {
     
     private volatile String paramString;
     
+    private String storeType;
+    
     private volatile RedisClientConfig clientConfig;
+    
+    private ConfigChangeListener configListener = new ConfigChangeListener() {
+
+        @Override
+        public void onChange(String key, String value) {
+            if(key != null && key.endsWith(KEY_REDIS_CONN_PARAMS)) {
+                logger.info("redis connection params changed: " + value);
+                paramString = value;
+                parseConnString();
+                renewClient();
+            }
+        }
+        
+    }; 
     
     private volatile JedisCluster client;
     
     private ThreadPoolExecutor executor;
     
-    private RedisClientManager() {
-        init();
-    }
-    
-    public static RedisClientManager getInstance() {
-        return instance;
-    }
-    
-    public void setClientConfig(RedisClientConfig clientConfig) {
+    public RedisClientManager(String storeType, RedisClientConfig clientConfig) {
+        this.storeType = storeType;
         this.clientConfig = clientConfig;
-        this.password = clientConfig.getPassword();
-        renewClient();
+        init();
     }
     
     public JedisCluster getClient() {
         return client;
-    }
-    
-    public void closeClient() {
-        if(client != null) {
-            client.close();
-        }
     }
     
     private synchronized void renewClient() {
@@ -124,20 +127,7 @@ public class RedisClientManager {
         try {
             paramString = configManager.getStringValue(KEY_REDIS_CONN_PARAMS);
             parseConnString();
-
-            configManager.registerConfigChangeListener(new ConfigChangeListener() {
-
-                @Override
-                public void onChange(String key, String value) {
-                    if(key != null && key.endsWith(KEY_REDIS_CONN_PARAMS)) {
-                        logger.info("redis connection params changed: " + value);
-                        paramString = value;
-                        parseConnString();
-                        renewClient();
-                    }
-                }
-                
-            });
+            configManager.registerConfigChangeListener(configListener);
         } catch (Exception e) {
             logger.error("failed to register config change listener", e);
         }
@@ -159,7 +149,7 @@ public class RedisClientManager {
         }
     }
 
-    public JedisCluster createClient(ThreadPoolExecutor executor) {
+    private JedisCluster createClient(ThreadPoolExecutor executor) {
         JedisCluster client = new JedisCluster(
                 getClusterNodes(clientConfig.getServerList()),
                 connTimeout, 
@@ -168,7 +158,7 @@ public class RedisClientManager {
                 getPoolConfig(clientConfig),
                 executor,
                 clusterUpdateInterval, 
-                password);
+                clientConfig.getPassword());
         return client;
     }
 
@@ -220,8 +210,26 @@ public class RedisClientManager {
     private ThreadPoolExecutor createExecutor() {
         return new ThreadPoolExecutor(asyncCoreSize, asyncMaxSize, 30L, TimeUnit.SECONDS, 
                 new ArrayBlockingQueue(asyncQueueSize), 
-                new NamedThreadFactory("squirrel-redis", true),
+                threadFactory,
                 new ThreadPoolExecutor.CallerRunsPolicy());
+    }
+
+    @Override
+    public void start() {
+        renewClient();
+    }
+
+    @Override
+    public void stop() {
+        if(configListener != null) {
+            try {
+                configManager.unregisterConfigChangeListener(configListener);
+            } catch (Exception e) {
+            }
+        }
+        if(client != null) {
+            client.close();
+        }
     }
     
 }

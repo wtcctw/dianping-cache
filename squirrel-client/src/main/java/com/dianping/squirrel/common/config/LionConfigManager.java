@@ -82,4 +82,9 @@ public class LionConfigManager extends AbstractConfigManager {
 	@Override
 	public void doRegisterConfigChangeListener(ConfigChangeListener configChangeListener) throws Exception {
 	}
+	
+	@Override
+	public void doUnregisterConfigChangeListener(ConfigChangeListener configChangeListener) throws Exception {
+	}
+	
 }

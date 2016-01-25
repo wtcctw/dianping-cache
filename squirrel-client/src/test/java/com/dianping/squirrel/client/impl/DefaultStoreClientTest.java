@@ -415,5 +415,22 @@ public class DefaultStoreClientTest extends TestCase {
         Object result = client.get(new StoreKey(CATEGORY, "key3"));
         assertEquals(result, new Bean(3, "value3"));
     }
+    
+    @Test
+    public void testMultiCategory() {
+        StoreClient client = StoreClientFactory.getStoreClient();
+        StoreKey key1 = new StoreKey("testRedis", "multi");
+        StoreKey key2 = new StoreKey("myredis", "multi");
+        client.set(key1, 0L);
+        client.set(key2, 0L);
+        Object result = client.increase(key1, 1);
+        assertEquals(result, 1L);
+        result = client.increase(key2, 100);
+        assertEquals(result, 100L);
+        result = client.increase(key1, 10);
+        assertEquals(result, 11L);
+        result = client.increase(key2, 10);
+        assertEquals(result, 110L);
+    }
 
 }
