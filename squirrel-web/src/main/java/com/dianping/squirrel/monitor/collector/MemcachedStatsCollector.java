@@ -33,6 +33,7 @@ public class MemcachedStatsCollector extends AbstractCollector {
     @Scheduled(cron = "0/30 * * * * *")
     public void scheduled(){
         if(isLeader() && collector_enable){
+            logger.info("memcachedStatsCollector  collect");
             List<Server> serverlist = serverService.findAllMemcachedServers();
             for(Server server : serverlist){
                 Data data = collectData(server);

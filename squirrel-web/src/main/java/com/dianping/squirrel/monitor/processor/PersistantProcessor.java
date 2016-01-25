@@ -1,5 +1,6 @@
 package com.dianping.squirrel.monitor.processor;
 
+import com.dianping.cache.entity.MemcachedStats;
 import com.dianping.cache.entity.RedisStats;
 import com.dianping.cache.entity.ServerStats;
 import com.dianping.cache.service.MemcachedStatsService;
@@ -29,7 +30,7 @@ public class PersistantProcessor extends AbstractProcessor {
     public void process(Data data) {
         switch (data.getType()){
             case MemcachedStats:
-                //memcachedStatsService.insert((MemcachedStats) data.getStats());
+                memcachedStatsService.insert((MemcachedStats) data.getStats());
                 break;
             case MemcachedHeartbeat:
                 break;

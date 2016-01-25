@@ -53,9 +53,11 @@ public class RedisStoreClientImpl extends AbstractStoreClient implements RedisSt
 
     private static final String OK = "OK";
 
+    private RedisClientConfig clientConfig;
+    
     private Transcoder<String> transcoder;
     
-    private RedisClientManager clientManager = RedisClientManager.getInstance();
+    private RedisClientManager clientManager;
     
     private String eventType = "Squirrel.redis.server";
     
@@ -69,24 +71,33 @@ public class RedisStoreClientImpl extends AbstractStoreClient implements RedisSt
     }
     
     @Override
-    public void configure(StoreClientConfig config) {
-        clientManager.setClientConfig((RedisClientConfig) config);
+    public void configure(StoreClientConfig clientConfig) {
+        this.clientConfig = (RedisClientConfig)clientConfig;
     }
 
     @Override
     public void configChanged(StoreClientConfig config) {
         logger.info("redis store client config changed: " + config);
-        clientManager.setClientConfig((RedisClientConfig) config);
+        this.clientConfig = (RedisClientConfig)config;
+        RedisClientManager oldClientManager = clientManager;
+        RedisClientManager newClientManager = new RedisClientManager(storeType, clientConfig);
+        newClientManager.start();
+        clientManager = newClientManager;
+        oldClientManager.stop();
     }
     
     @Override
     public void start() {
         transcoder = new RedisStringTranscoder(storeType);
+        clientManager = new RedisClientManager(storeType, clientConfig);
+        clientManager.start();
     }
 
     @Override
     public void stop() {
-        clientManager.closeClient();
+        if(clientManager != null) {
+            clientManager.stop();
+        }
     }
 
     @Override

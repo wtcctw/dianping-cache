@@ -46,6 +46,8 @@ public interface ConfigManager {
 
 	public void registerConfigChangeListener(ConfigChangeListener configChangeListener) throws Exception;
 
+	public void unregisterConfigChangeListener(ConfigChangeListener configChangeListener) throws Exception;
+	
 	public List<ConfigChangeListener> getConfigChangeListeners();
 
 }
