@@ -43,8 +43,12 @@ public class ClearCategoryTask extends AbstractTask {
 
     @Override
     long getTaskMaxStat() {
+      try {
         RdbService.TotalStat totalStat = rdbService.getCategoryMergeStat(category);
         return totalStat.count;
+      } catch (Exception e) {
+        return 2000;
+      }
     }
 
     @Override
@@ -55,10 +59,17 @@ public class ClearCategoryTask extends AbstractTask {
         JedisCluster jedisCluster = ((RedisStoreClient) storeClient).getJedisClient();
         Set<HostAndPort> nodes = jedisCluster.getCluserNodesHostAndPort();
         long stat = 0;
-        int step = 50;
+        int step = 2000;
         for (HostAndPort node : nodes) {
-            System.out.println(node.getHost());
+            System.out.println(node.getHost() + " " + node.getPort());
             Jedis jedis = new Jedis(node.getHost(), node.getPort());
+            try {
+                String info = jedis.info("Replication");
+                if(info.indexOf("role:master") < 0)
+                    continue;
+            } catch (Throwable t) {
+                continue;
+            }
             ScanParams scanParams = new ScanParams();
             scanParams.match(category + "*");
             scanParams.count(step);
@@ -68,23 +79,34 @@ public class ClearCategoryTask extends AbstractTask {
             } catch (Throwable e) {
                 continue;
             }
-            while (!Thread.currentThread().isInterrupted() && !result.getStringCursor().equals("0")) {
-                for(String key : result.getResult()) {
-                    jedis.del(key);
+            boolean a = Thread.currentThread().isInterrupted();
+            boolean b = result.getStringCursor().equals("0");
+            while (!Thread.currentThread().isInterrupted() && result.getResult().size() > 0) {
+                try {
+                    for (String key : result.getResult()) {
+                        jedis.del(key);
+                        stat += 1;
+                    }
+                    result = jedis.scan(result.getStringCursor(), scanParams);
+                } catch (Throwable t) {
+                    continue;
                 }
-                result = jedis.scan(result.getStringCursor(), scanParams);
             }
-            stat += step;
             this.updateStat((int)stat);
         }
     }
 
     public static void main(String[] args) {
-        StoreClient storeClient = StoreClientFactory.getStoreClientByCategory("redistemp");
-        for(int i = 0; i < 1000; i++) {
-            StoreKey storeKey = new StoreKey(Integer.toString(i));
-            storeClient.add(storeKey, "123");
+        StoreClient storeClient = StoreClientFactory.getStoreClient();
+        for(int i = 0; i < 2000; i++) {
+            storeClient.set(new StoreKey("redis-del", i), i);
         }
+        // 192.168.217.36 7004
+
+//        Jedis jedis = new Jedis("192.168.211.63", 7001);
+//        String s = jedis.info("Replication");
+//        boolean b = jedis.isConnected();
+//        int a = 1;
     }
 
 }
