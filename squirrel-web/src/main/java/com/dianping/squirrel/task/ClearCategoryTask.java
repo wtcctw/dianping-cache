@@ -81,7 +81,7 @@ public class ClearCategoryTask extends AbstractTask {
             }
             boolean a = Thread.currentThread().isInterrupted();
             boolean b = result.getStringCursor().equals("0");
-            while (!Thread.currentThread().isInterrupted() && result.getResult().size() > 0) {
+            while (!Thread.currentThread().isInterrupted() && !b) {
                 try {
                     for (String key : result.getResult()) {
                         jedis.del(key);
