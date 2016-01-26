@@ -4,13 +4,18 @@ import com.dianping.cache.service.RdbService;
 import com.dianping.squirrel.client.StoreClient;
 import com.dianping.squirrel.client.StoreClientFactory;
 import com.dianping.squirrel.client.StoreKey;
+import com.dianping.squirrel.client.core.StoreCallback;
 import com.dianping.squirrel.client.impl.redis.RedisStoreClient;
 
+import net.sf.ehcache.search.aggregator.Count;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import redis.clients.jedis.*;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicLong;
@@ -19,6 +24,7 @@ import java.util.concurrent.atomic.AtomicLong;
  * Created by thunder on 16/1/6.
  */
 public class ClearCategoryTask extends AbstractTask {
+    private static Logger logger = LoggerFactory.getLogger(ClearCategoryTask.class);
 
     private String TASKTYPE = "CLEAR_CATEGORY";
     private String category;
@@ -57,14 +63,14 @@ public class ClearCategoryTask extends AbstractTask {
 
     @Override
     public void taskRun() {
-
         if (storeClient == null || !(storeClient instanceof RedisStoreClient)) {
             return;
         }
+        StoreClient storeClient = StoreClientFactory.getStoreClientByCategory(category);
         ExecutorService executorService = Executors.newCachedThreadPool();
         JedisCluster jedisCluster = ((RedisStoreClient) storeClient).getJedisClient();
         Set<HostAndPort> nodes = jedisCluster.getCluserNodesHostAndPort();
-        final AtomicLong stat = new AtomicLong(0);
+        final AtomicLong stat = new AtomicLong(1);
         final int step = 2000;
         Set<HostAndPort> masters = new HashSet<HostAndPort>();
 
@@ -82,7 +88,6 @@ public class ClearCategoryTask extends AbstractTask {
 
         final CountDownLatch latch = new CountDownLatch(masters.size());
         ArrayList<Future> masterTask = new ArrayList<Future>();
-
         for (final HostAndPort node : masters) {
             Future f = executorService.submit(new Runnable() {
                 @Override
@@ -94,19 +99,19 @@ public class ClearCategoryTask extends AbstractTask {
                     ScanResult<String> result;
                     result = jedis.scan("0", scanParams);
                     boolean isInterrupted = Thread.currentThread().isInterrupted();
-                    boolean isEnd = result.getStringCursor().equals("0");
-                    while (!isInterrupted && !isEnd) {
+                    while (!isInterrupted && !result.getStringCursor().equals("0")) {
                         try {
+                            List<Response<Long>> responses = new ArrayList<Response<Long>>();
+                            Pipeline pipeline = jedis.pipelined();
                             for (String key : result.getResult()) {
-                                jedis.del(key);
-                                stat.addAndGet(1);
-                                if (stat.get() % 10000 == 0) {
-                                    synchronized (stat) {
-                                        if(stat.get() % 10000 == 0)
-                                            ClearCategoryTask.this.updateStat((int) stat.get());
-                                    }
-                                }
+                                Response<Long> rl = pipeline.del(key);
+                                responses.add(rl);
                             }
+                            pipeline.sync();
+                            for(Response<Long> r : responses) {
+                                stat.addAndGet(r.get());
+                            }
+                            logger.info("category " + category + " Stat " + stat + " cursor " + result.getStringCursor());
                             result = jedis.scan(result.getStringCursor(), scanParams);
                         } catch (Throwable t) {
                             continue;
@@ -130,17 +135,42 @@ public class ClearCategoryTask extends AbstractTask {
         executorService.shutdownNow();
     }
 
-    public static void main(String[] args) {
+    public static void addData() {
         StoreClient storeClient = StoreClientFactory.getStoreClient();
-        for (int i = 0; i < 2000; i++) {
-            storeClient.set(new StoreKey("redis-del", i), i);
-        }
-        // 192.168.217.36 7004
+        int total = 1000;
+        final int step = 1000;
+        final CountDownLatch latch = new CountDownLatch(total);
+        for (int i = 0; i < total; i ++) {
+            List<StoreKey> list = new ArrayList<StoreKey>();
+            List<Integer> res = new ArrayList<Integer>();
+            for(int j = 0; j < step; j ++) {
+                list.add(new StoreKey("redis-del", step * i + j));
+                res.add(j);
+            }
+            storeClient.asyncMultiSet(list, res, new StoreCallback<Boolean>() {
+                @Override
+                public void onSuccess(Boolean result) {
+                    latch.countDown();
+                    System.out.println("getback " + latch.getCount());
+                }
 
-//        Jedis jedis = new Jedis("192.168.211.63", 7001);
-//        String s = jedis.info("Replication");
-//        boolean b = jedis.isConnected();
-//        int a = 1;
+                @Override
+                public void onFailure(Throwable e) {
+                    latch.countDown();
+                    System.out.println("getback " + latch.getCount());
+                }
+            });
+        }
+        try {
+            latch.await();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void main(String[] args) throws InterruptedException {
+//        taskRun1("redis-del");
+//        addData();
     }
 
 }
