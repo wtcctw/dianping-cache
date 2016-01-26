@@ -99,7 +99,7 @@ public class ClearCategoryTask extends AbstractTask {
                     ScanResult<String> result;
                     result = jedis.scan("0", scanParams);
                     boolean isInterrupted = Thread.currentThread().isInterrupted();
-                    while (!isInterrupted && !result.getStringCursor().equals("0")) {
+                    while (!isInterrupted && (!result.getStringCursor().equals("0") || result.getResult().size() != 0)) {
                         try {
                             List<Response<Long>> responses = new ArrayList<Response<Long>>();
                             Pipeline pipeline = jedis.pipelined();
