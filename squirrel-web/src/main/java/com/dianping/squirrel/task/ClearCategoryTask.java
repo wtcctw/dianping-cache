@@ -87,6 +87,8 @@ public class ClearCategoryTask extends AbstractTask {
                         jedis.del(key);
                         stat += 1;
                     }
+                    if(stat % 1000 == 0)
+                        this.updateStat((int)stat);
                     result = jedis.scan(result.getStringCursor(), scanParams);
                 } catch (Throwable t) {
                     continue;
