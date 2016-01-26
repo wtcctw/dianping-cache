@@ -112,6 +112,7 @@ public class ClearCategoryTask extends AbstractTask {
                                 stat.addAndGet(r.get());
                             }
                             logger.info("category " + category + " Stat " + stat + " cursor " + result.getStringCursor());
+                            ClearCategoryTask.this.updateStat((int)stat.get());
                             result = jedis.scan(result.getStringCursor(), scanParams);
                         } catch (Throwable t) {
                             continue;
