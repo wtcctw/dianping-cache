@@ -111,7 +111,7 @@ public class RedisDashBoardData extends DashBoardData{
             for(RedisServer failed : redisCluster.getFailedServers()){
                 allAddress.add(failed.getAddress());
             }
-
+            Map<String,String> tempAddressList = new HashMap<String, String>();
             for(String address : allAddress){
                 Server server = serverService.findByAddress(address);
                 String agent = "other";
@@ -119,7 +119,9 @@ public class RedisDashBoardData extends DashBoardData{
                     agent = server.getHostIp();
                 }
                 Integer number = count.get(agent);
+                String addressList = tempAddressList.get(agent);
                 count.put(agent,number == null ? 1 : number+1);
+                tempAddressList.put(agent,addressList == null ? "<br>" + address : addressList + "<br>" + address);
             }
             int total = allAddress.size();
             PieSeries[] resultRate = new PieSeries[count.size()];
@@ -127,7 +129,7 @@ public class RedisDashBoardData extends DashBoardData{
             for(Map.Entry<String,Integer> entity : count.entrySet()){
                 String host = entity.getKey();
                 Float value = (float)(entity.getValue().intValue())/total * 100;
-                resultRate[index++] = new PieSeries(host,value);
+                resultRate[index++] = new PieSeries(host,value,tempAddressList.get(host));
             }
             rate = resultRate;
         }
@@ -232,6 +234,7 @@ public class RedisDashBoardData extends DashBoardData{
     public class PieSeries {
         String name;
         float y;
+        String address;
 
         public PieSeries() {
         }
@@ -239,6 +242,12 @@ public class RedisDashBoardData extends DashBoardData{
         public PieSeries(String name, float y) {
             this.name = name;
             this.y = y;
+        }
+
+        public PieSeries(String name, float y, String address) {
+            this.name = name;
+            this.y = y;
+            this.address = address;
         }
 
         public String getName() {
@@ -255,6 +264,14 @@ public class RedisDashBoardData extends DashBoardData{
 
         public void setY(float y) {
             this.y = y;
+        }
+
+        public String getAddress() {
+            return address;
+        }
+
+        public void setAddress(String address) {
+            this.address = address;
         }
     }
 }
