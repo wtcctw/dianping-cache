@@ -111,6 +111,7 @@ module.controller('RedisController', [
                 makeGraph("container-memory",100,"内存使用率",usage);
                 makeGraph("container-qps",140000,"QPS",qps);
                 iniTable("node");
+                piechart("container-rate",response.rate);
             }).error(function(){
             });
 
@@ -277,6 +278,40 @@ module.controller('RedisController', [
 
         $scope.setContent = function(content){
             $scope.logContent = content;
+        }
+
+
+        var piechart = function (divName,seriesdata) {
+            $(function () {
+                $('#'+divName).highcharts({
+                    chart: {
+                        plotBackgroundColor: null,
+                        plotBorderWidth: null,
+                        plotShadow: false
+                    },
+                    title: {
+                        text: ''
+                    },
+                    tooltip: {
+                        pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+                    },
+                    plotOptions: {
+                        pie: {
+                            allowPointSelect: true,
+                            cursor: 'pointer',
+                            dataLabels: {
+                                enabled: false
+                            },
+                            showInLegend: true
+                        }
+                    },
+                    series: [{
+                        type: 'pie',
+                        name: '实例占比',
+                        data: seriesdata
+                    }]
+                });
+            });
         }
 
 
