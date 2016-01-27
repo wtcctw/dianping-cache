@@ -30,7 +30,7 @@ public class RdbController extends AbstractSidebarController{
 
     @RequestMapping(value = "/rdb/stat")
     public ModelAndView viewServers() {
-        return new ModelAndView("rdb/stat");
+        return new ModelAndView("rdb/stat", createViewMap());
     }
 
     @RequestMapping(value = "/rdb/dayData")
@@ -66,12 +66,12 @@ public class RdbController extends AbstractSidebarController{
     }
     @Override
     protected String getSide() {
-        return null;
+        return "data";
     }
 
     @Override
     public String getSubSide() {
-        return null;
+        return "stat";
     }
 
 }
