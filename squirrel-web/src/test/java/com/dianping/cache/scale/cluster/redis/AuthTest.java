@@ -48,22 +48,11 @@ public class AuthTest {
     }
 
     @Test
-    public void R(){
-        Jedis jedis = new Jedis("127.0.0.1",7000);
-       // jedis.auth("123qwe0");
-        System.out.print(jedis.getHost() + ":" + jedis.getPort());
-    }
-
-    @Test
-    public void sss(){
+    public void temp(){
         StoreClient storeClient = StoreClientFactory.getStoreClient();
-        storeClient.set(new StoreKey("redis-ab",123),"ok");
-        storeClient.set(new StoreKey("redis-abc",123),"ok");
-        //storeClient.get(new StoreKey("redis-abc",123));
-        storeClient.set(new StoreKey("redis-ab",123),"failed");
-        storeClient.set(new StoreKey("redis-abc",123),"failed");
-
+        //storeClient.set(new StoreKey("EmidasLotteryIpStat","vivi","vivi"),1L);
+        storeClient.increase(new StoreKey("accessToken","vivi"),345);
+        storeClient.get(new StoreKey("accessToken","vivi"));
+        System.out.println(storeClient.get(new StoreKey("accessToken","vivi")));
     }
-
-
 }

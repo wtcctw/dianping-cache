@@ -4,7 +4,6 @@ import com.dianping.cache.dao.CategoryStatsDao;
 import com.dianping.cache.entity.CategoryStats;
 import com.dianping.cache.service.RdbService;
 import com.dianping.cache.util.CommonUtil;
-import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -12,7 +11,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,7 +30,7 @@ public class RdbController extends AbstractSidebarController{
 
     @RequestMapping(value = "/rdb/stat")
     public ModelAndView viewServers() {
-        return new ModelAndView("rdb/stat");
+        return new ModelAndView("rdb/stat", createViewMap());
     }
 
     @RequestMapping(value = "/rdb/dayData")
@@ -68,12 +66,12 @@ public class RdbController extends AbstractSidebarController{
     }
     @Override
     protected String getSide() {
-        return null;
+        return "data";
     }
 
     @Override
     public String getSubSide() {
-        return null;
+        return "stat";
     }
 
 }

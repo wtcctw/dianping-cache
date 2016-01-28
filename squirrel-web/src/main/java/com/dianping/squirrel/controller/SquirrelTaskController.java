@@ -51,11 +51,11 @@ public class SquirrelTaskController extends AbstractSidebarController {
 
     @Override
     protected String getSide() {
-        return null;
+        return "log";
     }
 
     @Override
     public String getSubSide() {
-        return "task";
+        return "tasks";
     }
 }

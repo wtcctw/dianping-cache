@@ -1,12 +1,14 @@
 package com.dianping.cache.controller.vo;
 
+import com.dianping.cache.entity.Server;
 import com.dianping.cache.scale.cluster.redis.RedisCluster;
 import com.dianping.cache.scale.cluster.redis.RedisInfo;
 import com.dianping.cache.scale.cluster.redis.RedisNode;
+import com.dianping.cache.scale.cluster.redis.RedisServer;
+import com.dianping.cache.service.ServerService;
+import com.dianping.cache.util.SpringLocator;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by dp on 16/1/1.
@@ -56,6 +58,7 @@ public class RedisDashBoardData extends DashBoardData{
         boolean clusterAlarm;
         String clusterName;
         RedisCluster redisCluster;
+        PieSeries[] rate;
         public SimpleAnalysisData(RedisCluster redisCluster){
             this.redisCluster = redisCluster;
             this.clusterName = redisCluster.getClusterName();
@@ -96,6 +99,39 @@ public class RedisDashBoardData extends DashBoardData{
                 clusterAlarm = true;
             }
             return clusterAlarm;
+        }
+
+        public void  agentRate(){
+            ServerService serverService = SpringLocator.getBean("serverService");
+            Set<String> allAddress = new HashSet<String>();
+            Map<String,Integer> count = new HashMap<String, Integer>();
+            for(RedisServer alive : redisCluster.getAllAliveServer()){
+                allAddress.add(alive.getAddress());
+            }
+            for(RedisServer failed : redisCluster.getFailedServers()){
+                allAddress.add(failed.getAddress());
+            }
+            Map<String,String> tempAddressList = new HashMap<String, String>();
+            for(String address : allAddress){
+                Server server = serverService.findByAddress(address);
+                String agent = "other";
+                if(server != null && server.getHostIp() != null){
+                    agent = server.getHostIp();
+                }
+                Integer number = count.get(agent);
+                String addressList = tempAddressList.get(agent);
+                count.put(agent,number == null ? 1 : number+1);
+                tempAddressList.put(agent,addressList == null ? "<br>" + address : addressList + "<br>" + address);
+            }
+            int total = allAddress.size();
+            PieSeries[] resultRate = new PieSeries[count.size()];
+            int index = 0;
+            for(Map.Entry<String,Integer> entity : count.entrySet()){
+                String host = entity.getKey();
+                Float value = (float)(entity.getValue().intValue())/total * 100;
+                resultRate[index++] = new PieSeries(host,value,tempAddressList.get(host));
+            }
+            rate = resultRate;
         }
 
         public int getQps() {
@@ -184,6 +220,58 @@ public class RedisDashBoardData extends DashBoardData{
 
         public void setRedisCluster(RedisCluster redisCluster) {
             this.redisCluster = redisCluster;
+        }
+
+        public PieSeries[] getRate() {
+            return rate;
+        }
+
+        public void setRate(PieSeries[] rate) {
+            this.rate = rate;
+        }
+    }
+
+    public class PieSeries {
+        String name;
+        float y;
+        String address;
+
+        public PieSeries() {
+        }
+
+        public PieSeries(String name, float y) {
+            this.name = name;
+            this.y = y;
+        }
+
+        public PieSeries(String name, float y, String address) {
+            this.name = name;
+            this.y = y;
+            this.address = address;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public float getY() {
+            return y;
+        }
+
+        public void setY(float y) {
+            this.y = y;
+        }
+
+        public String getAddress() {
+            return address;
+        }
+
+        public void setAddress(String address) {
+            this.address = address;
         }
     }
 }

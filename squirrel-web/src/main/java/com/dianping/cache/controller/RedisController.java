@@ -2,12 +2,7 @@ package com.dianping.cache.controller;
 
 import com.dianping.cache.controller.vo.*;
 import com.dianping.cache.entity.CacheConfiguration;
-import com.dianping.cache.entity.CacheKeyConfiguration;
 import com.dianping.cache.entity.RedisStats;
-import com.dianping.squirrel.view.highcharts.ChartsBuilder;
-import com.dianping.squirrel.view.highcharts.HighChartsWrapper;
-import com.dianping.squirrel.view.highcharts.statsdata.RedisClusterData;
-import com.dianping.squirrel.view.highcharts.statsdata.RedisStatsData;
 import com.dianping.cache.scale.ScaleException;
 import com.dianping.cache.scale.cluster.redis.RedisCluster;
 import com.dianping.cache.scale.cluster.redis.RedisManager;
@@ -20,12 +15,15 @@ import com.dianping.cache.service.ReshardService;
 import com.dianping.squirrel.service.AuthService;
 import com.dianping.squirrel.task.RedisReshardTask;
 import com.dianping.squirrel.task.TaskManager;
+import com.dianping.squirrel.view.highcharts.ChartsBuilder;
+import com.dianping.squirrel.view.highcharts.HighChartsWrapper;
+import com.dianping.squirrel.view.highcharts.statsdata.RedisClusterData;
+import com.dianping.squirrel.view.highcharts.statsdata.RedisStatsData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -52,20 +50,20 @@ public class RedisController extends AbstractSidebarController{
 
 	private String subside;
 
-	@RequestMapping(value = "/redis/dashboard")
-	public ModelAndView viewClusterDashBoard(){
-		return new ModelAndView("monitor/redisdashboard",createViewMap());
-	}
-
-	/**
-	 * @deprecated
-	 * @return
-     */
-	@RequestMapping(value = "/redis/dashboardinfo")
-	@ResponseBody
-	public List<RedisClusterData> getDashboard(){
-		return RedisDataUtil.getClusterData();
-	}
+//	@RequestMapping(value = "/redis/dashboard")
+//	public ModelAndView viewClusterDashBoard(){
+//		return new ModelAndView("monitor/redisdashboard",createViewMap());
+//	}
+//
+//	/**
+//	 * @deprecated
+//	 * @return
+//     */
+//	@RequestMapping(value = "/redis/dashboardinfo")
+//	@ResponseBody
+//	public List<RedisClusterData> getDashboard(){
+//		return RedisDataUtil.getClusterData();
+//	}
 
 	@RequestMapping(value = "/redis/data/dashboard")
 	@ResponseBody
@@ -145,6 +143,7 @@ public class RedisController extends AbstractSidebarController{
 		RedisDashBoardData data = new RedisDashBoardData();
 		RedisDashBoardData.SimpleAnalysisData simpleAnalysisData = data.new SimpleAnalysisData(redisCluster);
 		simpleAnalysisData.analysis();
+		simpleAnalysisData.agentRate();
 		return simpleAnalysisData;
 	}
 
