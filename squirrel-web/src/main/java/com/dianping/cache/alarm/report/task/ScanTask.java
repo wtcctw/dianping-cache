@@ -126,8 +126,8 @@ public class ScanTask {
 
             MimeMessageHelper helper = new MimeMessageHelper(msg, true);
             helper.setFrom(mailSender.getMailSender().getUsername());
-            String[] receiver =new String[]{"shiyun.lv@dianping.com","xiaoxiong.dai@dianping.com","dp.wang@dianping.com","enlight.chen@dianping.com","xiang.wu@dianping.com","faping.miao@dianping.com"};
-//            String[] receiver =new String[]{"shiyun.lv@dianping.com"};
+//            String[] receiver =new String[]{"shiyun.lv@dianping.com","xiaoxiong.dai@dianping.com","dp.wang@dianping.com","enlight.chen@dianping.com","xiang.wu@dianping.com","faping.miao@dianping.com"};
+            String[] receiver =new String[]{"shiyun.lv@dianping.com"};
             helper.setTo(receiver);
             helper.setSubject("缓存红黑榜");
 

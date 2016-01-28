@@ -81,7 +81,7 @@
         </tr>
         </thead>
         <tbody>
-            #foreach( $info in $delayDetails)
+            #foreach( $info in $failDetails)
             <tr>
                 #if($info.rowspan>0)
                     <td style="border:1px solid black;text-align: left" rowspan="$info.rowspan">$info.cacheName</td>
@@ -115,7 +115,7 @@
         </tr>
         </thead>
         <tbody>
-            #foreach( $info in $failDetails)
+            #foreach( $info in $delayDetails)
             <tr>
                 #if($info.rowspan>0)
                     <td style="border:1px solid black;;text-align: left" rowspan="$info.rowspan">$info.cacheName</td>
