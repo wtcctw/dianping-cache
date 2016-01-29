@@ -142,7 +142,6 @@ public class RedisController extends AbstractSidebarController{
 		RedisDashBoardData data = new RedisDashBoardData();
 		RedisDashBoardData.SimpleAnalysisData simpleAnalysisData = data.new SimpleAnalysisData(redisCluster);
 		simpleAnalysisData.analysis();
-		simpleAnalysisData.agentRate();
 		return simpleAnalysisData;
 	}
 
