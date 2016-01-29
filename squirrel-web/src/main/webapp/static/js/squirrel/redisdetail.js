@@ -81,8 +81,8 @@ function makeGraph(divName,max,title,currentValue) {
 module.controller('RedisController', [
     '$scope',
     '$http',
-    '$rootScope',
-    function($scope, $http,$rootScope) {
+    '$timeout',
+    function($scope, $http,$timeout) {
         $scope.redisData = {};
         $scope.reshardParams = {};
         $scope.redisScaleParams = {};
@@ -204,6 +204,7 @@ module.controller('RedisController', [
         };
 
         $scope.addSlave = function(cluster,address){
+            $('#mask').modal('show');
             $scope.redisScaleParams = {};
             $scope.redisScaleParams.cluster = cluster;
             $scope.redisScaleParams.masterAddress = address;
@@ -211,6 +212,9 @@ module.controller('RedisController', [
             ).success(function(response) {
             }).error(function(response) {
             });
+            $timeout(function() {
+                $('#mask').modal('hide');
+            }, 15000);
         };
 
         $scope.setFailover = function(failover){
@@ -218,17 +222,18 @@ module.controller('RedisController', [
         }
 
         $scope.execFailover = function(){
-            loadmask();
+            $('#mask').modal('show');
             $scope.redisScaleParams.cluster = $scope.redisData.clusterName;
             $scope.redisScaleParams.slaveAddress = $scope.failover;
             $http.post(window.contextPath + '/redis/failover',$scope.redisScaleParams)
                 .success(function(response){
                     if(response == true){
-                        hidemask();
                     }else{
-                        hidemask();
                     }
                 });
+            $timeout(function() {
+                $('#mask').modal('hide');
+            }, 5000);
         }
         var iniTable = function (table) {
             $(document).ready(function () {

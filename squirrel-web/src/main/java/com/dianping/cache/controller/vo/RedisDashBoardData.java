@@ -125,8 +125,17 @@ public class RedisDashBoardData extends DashBoardData{
             }
             int total = allAddress.size();
             PieSeries[] resultRate = new PieSeries[count.size()];
+
+            List<Map.Entry<String,Integer>> sortMapByValue = new ArrayList<Map.Entry<String, Integer>>(count.entrySet());
+            Collections.sort(sortMapByValue, new Comparator<Map.Entry<String, Integer>>() {
+                @Override
+                public int compare(Map.Entry<String, Integer> o1, Map.Entry<String, Integer> o2) {
+                    return o1.getValue() - o2.getValue();
+                }
+            });
+
             int index = 0;
-            for(Map.Entry<String,Integer> entity : count.entrySet()){
+            for(Map.Entry<String,Integer> entity : sortMapByValue){
                 String host = entity.getKey();
                 Float value = (float)(entity.getValue().intValue())/total * 100;
                 resultRate[index++] = new PieSeries(host,value,tempAddressList.get(host));
