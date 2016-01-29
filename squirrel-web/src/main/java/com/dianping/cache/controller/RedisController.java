@@ -73,9 +73,8 @@ public class RedisController extends AbstractSidebarController{
 	@RequestMapping(value = "/redis/data/history")
 	@ResponseBody
 	public List<HighChartsWrapper> getRedisHistory(String cluster,long endTime){
-		long start = (endTime - TimeUnit.MILLISECONDS.convert(120, TimeUnit.MINUTES))/1000;
+		long start = (endTime - TimeUnit.MILLISECONDS.convert(100, TimeUnit.DAYS))/1000;
 		long end = endTime/1000;
-		RedisCluster redisCluster = RedisManager.getRedisCluster(cluster);
 		List<RedisStats> data = redisService.findByServerWithInterval(cluster, start, end);
 		RedisStatsData statsData = new RedisStatsData(data);
 		return ChartsBuilder.buildRedisStatsCharts(statsData);
@@ -162,7 +161,7 @@ public class RedisController extends AbstractSidebarController{
 	@RequestMapping(value = "/redis/historydata")
 	@ResponseBody
 	public List<HighChartsWrapper> getRedisHistoryData(String address,long endTime){
-		long start = (endTime - TimeUnit.MILLISECONDS.convert(120, TimeUnit.MINUTES))/1000;
+		long start = (endTime - TimeUnit.MILLISECONDS.convert(1, TimeUnit.DAYS))/1000;
 		long end = endTime/1000;
 		List<RedisStats> data = redisService.findByServerWithInterval(address, start, end);
 		RedisStatsData statsData = new RedisStatsData(data);
