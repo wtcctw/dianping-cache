@@ -30,7 +30,7 @@ public class RedisManager {
 	public static final String SLOT_MIGRATING_IDENTIFIER = "-->--";
 	public static final long CLUSTER_SLEEP_INTERVAL = 50;
 	public static final int CLUSTER_DEFAULT_TIMEOUT = 20000;
-	public static final int CLUSTER_MIGRATE_NUM = 200;
+	public static final int CLUSTER_MIGRATE_NUM = 10;
 	public static final int DEFAULT_CHECKPORT_TIMEOUT = 60000;
 	public static final int CLUSTER_DEFAULT_DB = 0;
 	public static final String UNIX_LINE_SEPARATOR = "\n";
