@@ -5,8 +5,8 @@ import com.dianping.cache.alarm.alarmtemplate.MemcacheAlarmTemplateService;
 import com.dianping.cache.alarm.alarmtemplate.RedisAlarmTemplateService;
 import com.dianping.cache.alarm.controller.dto.AlarmConfigDto;
 import com.dianping.cache.alarm.controller.mapper.AlarmConfigMapper;
-import com.dianping.cache.alarm.dataanalyse.task.BaselineComputeTaskFactory;
-import com.dianping.cache.alarm.dataanalyse.thread.BaselineThread;
+import com.dianping.cache.alarm.dataanalyse.task.BaselineTaskFactory;
+import com.dianping.cache.alarm.dataanalyse.thread.BaselineComputeThread;
 import com.dianping.cache.alarm.dataanalyse.thread.BaselineThreadFactory;
 import com.dianping.cache.alarm.entity.AlarmConfig;
 import com.dianping.cache.alarm.entity.MemcacheTemplate;
@@ -45,7 +45,7 @@ public class AlarmConfigController extends AbstractSidebarController {
     private RedisAlarmTemplateService redisAlarmTemplateService;
 
     @Autowired
-    private BaselineComputeTaskFactory baselineComputeTaskFactory;
+    private BaselineTaskFactory baselineTaskFactory;
 
     @Autowired
     private BaselineThreadFactory baselineThreadFactory;
@@ -157,9 +157,9 @@ public class AlarmConfigController extends AbstractSidebarController {
     public void baselineCompute() {
         System.out.println("Hello world");
 
-        BaselineThread baselineThread = baselineThreadFactory.createBaselineThread();
+        BaselineComputeThread baselineComputeThread = baselineThreadFactory.createBaselineComputeThread();
 
-        ThreadManager.getInstance().execute(baselineThread);
+        ThreadManager.getInstance().execute(baselineComputeThread);
 
         return;
     }
