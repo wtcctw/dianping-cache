@@ -114,7 +114,8 @@ function renderGraph2(url, address, divName,endTime, http) {
 										childdiv
 												.highcharts({
 													chart : {
-														type : 'spline'
+														type : 'spline',
+														zoomType: 'x'
 													},
 													title : {
 														text : item.title,
@@ -297,20 +298,7 @@ module.controller('RedisServerController', [ '$scope', '$http', '$timeout',
 						$scope.endTime, $http);
 			};
 			
-			$scope.refresh = function() {
-				$scope.address = window.localStorage.address;
-				$http.get(window.contextPath + '/redis/serverinfodata', {
-					params : {
-						"address" : $scope.address
-					},
-				}).success(function(response) {
-					$scope.infodata = response;
-					$timeout(function() {
-						$scope.refresh();
-					}, 3000);
-				}).error(function(response) {
-				});
-			};
+
 			//$scope.refresh();
 
 			$scope.setTime = function(val) {

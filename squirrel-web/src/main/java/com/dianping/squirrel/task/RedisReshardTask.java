@@ -90,6 +90,9 @@ public class RedisReshardTask extends AbstractTask {
                     throw e;
                 }
             }
+            if(Thread.currentThread().isInterrupted()){
+                break;
+            }
             updateStat(++stat);
         }
     }

@@ -15,6 +15,8 @@ public class RedisStatsData {
 
 	private Integer[] connected_clients;
 
+	private Integer[] qps;
+
 	private Double[] input_kbps;
 
 	private Double[] output_kbps;
@@ -34,6 +36,7 @@ public class RedisStatsData {
 			used_memory = new Long[length];
 			total_connections = new Integer[length];
 			connected_clients = new Integer[length];
+			qps = new Integer[length];
 			input_kbps = new Double[length];
 			output_kbps = new Double[length];
 			used_cpu_sys = new Double[length];
@@ -45,6 +48,7 @@ public class RedisStatsData {
 				used_memory[index] = stat.getMemory_used();
 				total_connections[index] = stat.getTotal_connections();
 				connected_clients[index] = stat.getConnected_clients();
+				qps[index] = stat.getQps();
 				input_kbps[index] = stat.getInput_kbps();
 				output_kbps[index] = stat.getOutput_kbps();
 				used_cpu_sys[index] = stat.getUsed_cpu_sys();
@@ -142,5 +146,13 @@ public class RedisStatsData {
 
 	public void setUsed_cpu_user_children(Double[] used_cpu_user_children) {
 		this.used_cpu_user_children = used_cpu_user_children;
+	}
+
+	public Integer[] getQps() {
+		return qps;
+	}
+
+	public void setQps(Integer[] qps) {
+		this.qps = qps;
 	}
 }

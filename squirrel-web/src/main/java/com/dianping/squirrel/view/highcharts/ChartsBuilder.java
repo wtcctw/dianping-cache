@@ -124,10 +124,11 @@ public class ChartsBuilder {
 		List<HighChartsWrapper> result = new ArrayList<HighChartsWrapper>();
 		long startTime = data.getStartTime();
 		result.add(build1("Used_Memory",startTime,data.getUsed_memory()));
-		result.add(build1("total_connections_received",startTime,data.getTotal_connections()));
-		result.add(build1("connected_clients",startTime,data.getConnected_clients()));
+		result.add(build1("QPS",startTime,data.getQps()));
 		result.add(build1("input_kbps",startTime,data.getInput_kbps()));
 		result.add(build1("output_kbps",startTime,data.getOutput_kbps()));
+		result.add(build1("total_connections_received",startTime,data.getTotal_connections()));
+		result.add(build1("connected_clients",startTime,data.getConnected_clients()));
 		result.add(build1("used_cpu_sys",startTime,data.getUsed_cpu_sys()));
 		result.add(build1("used_cpu_user",startTime,data.getUsed_cpu_user()));
 		return result;
