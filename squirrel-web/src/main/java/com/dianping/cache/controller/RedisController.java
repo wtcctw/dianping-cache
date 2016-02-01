@@ -24,8 +24,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 
@@ -79,24 +79,19 @@ public class RedisController extends AbstractSidebarController{
 		RedisStatsData statsData = new RedisStatsData(data);
 		return ChartsBuilder.buildRedisStatsCharts(statsData);
 	}
+
+
+
+
 	/**
 	 * @deprecated
 	 * @return
 	 */
 	@RequestMapping(value = "/redis/serverinfo")
 	public ModelAndView viewRedisServerInfo(){
-		subside = "dashboard";
 		return new ModelAndView("monitor/redisserverinfo",createViewMap());
 	}
-	/**
-	 * @deprecated
-	 * @return
-	 */
-	@RequestMapping(value = "/redis/serverinfodata")
-	@ResponseBody
-	public Map<String, Object> getRedisServerInfo(String address){
-		return RedisDataUtil.getRedisServerData(address);
-	}
+
 	
 	@RequestMapping(value = "/redis")
 	public ModelAndView redis(){
@@ -135,15 +130,16 @@ public class RedisController extends AbstractSidebarController{
 		return configuration;
 	}
 
-	@RequestMapping(value = "/redis/detail")
+	@RequestMapping(value = "/redis/{cluster}/detail")
 	@ResponseBody
-	public RedisDashBoardData.SimpleAnalysisData getRedisDetailData(@RequestParam String cluster){
+	public RedisDashBoardData.SimpleAnalysisData getRedisDetailData(@PathVariable(value = "cluster") String cluster){
 		RedisCluster redisCluster =  RedisManager.getRedisCluster(cluster);
 		RedisDashBoardData data = new RedisDashBoardData();
 		RedisDashBoardData.SimpleAnalysisData simpleAnalysisData = data.new SimpleAnalysisData(redisCluster);
 		simpleAnalysisData.analysis();
 		return simpleAnalysisData;
 	}
+
 
 	@RequestMapping(value = "/redis/data/applications")
 	@ResponseBody
@@ -165,6 +161,17 @@ public class RedisController extends AbstractSidebarController{
 		List<RedisStats> data = redisService.findByServerWithInterval(address, start, end);
 		RedisStatsData statsData = new RedisStatsData(data);
 		return ChartsBuilder.buildRedisStatsCharts(statsData);
+	}
+
+	@RequestMapping(value = "/redis/period")
+	@ResponseBody
+	public List<HighChartsWrapper> period(String address,long endTime,int period){
+
+		List<RedisStats> periodStats =  redisService.findPeriodicStats(address,endTime/1000,period);
+		final HighChartsWrapper chartsWrapper = ChartsBuilder.buildPeriodCharts(periodStats,period,endTime);
+		return new ArrayList<HighChartsWrapper>(){{
+			add(chartsWrapper);
+		}};
 	}
 
 	@RequestMapping(value = "/redis/auth/setPassword")

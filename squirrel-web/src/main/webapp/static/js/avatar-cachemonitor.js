@@ -83,13 +83,14 @@ function renderGraph(url, divName, endTime, http) {
 			});
 }
 
-function renderGraph2(url, address, divName,endTime, http) {
+function renderGraph2(url, address, divName,endTime,period, http) {
 	http({
 		method : 'GET',
 		url : window.contextpath + url,
 		params : {
 			"address" : address,
-			"endTime" : endTime
+			"endTime" : endTime,
+			"period" : period
 		}
 	})
 			.success(
@@ -170,90 +171,7 @@ function renderGraph2(url, address, divName,endTime, http) {
 			});
 }
 
-function renderGraph3(url, cluster, divName,endTime, http) {
-	http({
-		method : 'GET',
-		url : window.contextpath + url,
-		params : {
-			"cluster" : cluster,
-			"endTime" : endTime
-		}
-	}).success(function(data) {
-						var children = document.getElementById(divName).childNodes;
-						if (children != null) {
-							var len = children.length;
-							for (i = 0; i < len; i++) {
-								document.getElementById(divName).removeChild(
-										children[children.length - 1]);
-							}
-						}
 
-						var parent = $('#' + divName);
-						var count = 0;
-						data.forEach(function(item) {
-									count++;
-									var childdiv = $('<div></div>');
-									childdiv.appendTo(parent);
-									$(function() {
-										childdiv.highcharts({
-											chart: {
-												zoomType: 'x'
-											},
-											title: {
-												text: item.title,
-											},
-											subtitle: {
-												text: document.ontouchstart === undefined ?
-														'Click and drag in the plot area to zoom in' :
-														'Pinch the chart to zoom in'
-											},
-											xAxis: {
-												type: 'datetime',
-												minRange: 14 * 24 * 3600000 // fourteen days
-											},
-											yAxis: {
-												title: {
-													text: item.yAxisTitle
-												}
-											},
-											legend: {
-												enabled: false
-											},
-											plotOptions: {
-												area: {
-													fillColor: {
-														linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1},
-														stops: [
-															[0, Highcharts.getOptions().colors[0]],
-															[1, Highcharts.Color(Highcharts.getOptions().colors[0]).setOpacity(0).get('rgba')]
-														]
-													},
-													marker: {
-														radius: 2
-													},
-													lineWidth: 1,
-													states: {
-														hover: {
-															lineWidth: 1
-														}
-													},
-													threshold: null
-												}
-											},
-											series: [{
-												type: 'area',
-												name: item.series.name,
-												pointInterval: item.plotOption.series.pointInterval,
-												pointStart: item.plotOption.series.pointStart + 8 * 3600 * 1000,
-												data: item.series.data,
-											}]
-										});
-									});
-								});
-					}).error(function(data) {
-		alert("响应错误" + data);
-	});
-}
 module.controller('ClusterQpsController', function($scope, $http) {
 
 	$scope.key = "";
@@ -295,10 +213,14 @@ module.controller('RedisServerController', [ '$scope', '$http', '$timeout',
 			$scope.getRedisHistoryData = function() {
 				$scope.address = window.localStorage.address;
 				renderGraph2("/redis/historydata",$scope.address, "container",
-						$scope.endTime, $http);
+						$scope.endTime,"", $http);
 			};
 			
-
+			$scope.getRedisPeriodData = function(){
+				$scope.address = window.localStorage.address;
+				renderGraph2("/redis/period",$scope.address, "periodcontainer",
+						$scope.endTime,1, $http);
+			}
 			//$scope.refresh();
 
 			$scope.setTime = function(val) {
@@ -306,14 +228,15 @@ module.controller('RedisServerController', [ '$scope', '$http', '$timeout',
 				if ($scope.endTime > new Date().getTime())
 					$scope.endTime = new Date().getTime();
 				renderGraph2("/redis/historydata",$scope.address, "container",
-						$scope.endTime, $http);
+						$scope.endTime,"", $http);
 			}
 
 			$scope.setNow = function() {
 				$scope.endTime = new Date().getTime();
 				renderGraph2("/redis/historydata",$scope.address, "container",
-						$scope.endTime, $http);
+						$scope.endTime,"", $http);
 			}
+			$scope.getRedisPeriodData();
 			$scope.getRedisHistoryData();
 
 		} ]);

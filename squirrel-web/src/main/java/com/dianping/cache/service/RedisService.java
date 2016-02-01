@@ -15,6 +15,5 @@ public interface RedisService {
 
 	List<RedisStats>search(String sql);
 
-
-	
+	List<RedisStats> findPeriodicStats(String address, long end, int period);
 }

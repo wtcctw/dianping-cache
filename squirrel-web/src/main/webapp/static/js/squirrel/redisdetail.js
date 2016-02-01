@@ -100,10 +100,8 @@ module.controller('RedisController', [
 
         $scope.initPage = function(){
 
-            $http.get(window.contextPath + '/redis/detail',{
-                params : {
-                    cluster : window.localStorage.cluster
-                }
+            $http.get(window.location.pathname+'/detail',{
+                params : {}
             }).success(function(response){
                 $scope.redisData = response.redisCluster;
                 var usage = response.memoryUsage;
