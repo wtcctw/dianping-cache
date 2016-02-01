@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
  * Created by lvshiyun on 16/1/3.
  */
 @Component
-public class BaselineComputeTaskFactoryImpl implements BaselineComputeTaskFactory, ApplicationContextAware {
+public class BaselineTaskFactoryImpl implements BaselineTaskFactory, ApplicationContextAware {
 
     private ApplicationContext applicationContext;
     @Override
@@ -20,5 +20,11 @@ public class BaselineComputeTaskFactoryImpl implements BaselineComputeTaskFactor
     public BaselineComputeTask createBaselineComputeTask(){
         BaselineComputeTask baselineComputeTask=(BaselineComputeTask)applicationContext.getBean("baselineComputeTask");
         return baselineComputeTask;
+    }
+
+    @Override
+    public BaselineCleanTask createBaselineCleanTask() {
+        BaselineCleanTask baselineCleanTask=(BaselineCleanTask)applicationContext.getBean("baselineCleanTask");
+        return baselineCleanTask;
     }
 }
