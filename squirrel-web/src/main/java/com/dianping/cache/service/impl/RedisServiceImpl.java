@@ -44,7 +44,7 @@ public class RedisServiceImpl implements RedisService {
 	}
 
 	@Override
-	public List<RedisStats> findPeriodicStats(String address, long end, int period) {
+	public List<RedisStats> findPeriodicStats(String address, long end, int period,int count) {
 		long interval =TimeUnit.SECONDS.convert(period, TimeUnit.DAYS);
 
 		Calendar calendar = Calendar.getInstance();
@@ -52,7 +52,7 @@ public class RedisServiceImpl implements RedisService {
 		calendar.set(Calendar.MINUTE, 59);
 		calendar.set(Calendar.SECOND,59);
 		calendar.set(Calendar.MILLISECOND, 0);
-		long begin = calendar.getTimeInMillis()/1000 - 7*interval;
+		long begin = calendar.getTimeInMillis()/1000 - count*interval;
 		List<RedisStats> result = new ArrayList<RedisStats>();
 		while(begin < end){
 			List<RedisStats> statses = redisStatsDao.findByServerWithInterval(address,begin-300,begin+300);

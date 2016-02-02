@@ -321,5 +321,4 @@ module.controller('RedisController', [
             });
         }
 
-
     } ]);

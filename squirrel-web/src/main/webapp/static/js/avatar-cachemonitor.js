@@ -83,7 +83,7 @@ function renderGraph(url, divName, endTime, http) {
 			});
 }
 
-function renderGraph2(url, address, divName,endTime,period, http) {
+function renderGraph2(url, address, divName,endTime,period,type, http) {
 	http({
 		method : 'GET',
 		url : window.contextpath + url,
@@ -115,7 +115,7 @@ function renderGraph2(url, address, divName,endTime,period, http) {
 										childdiv
 												.highcharts({
 													chart : {
-														type : 'spline',
+														type : type,
 														zoomType: 'x'
 													},
 													title : {
@@ -213,13 +213,13 @@ module.controller('RedisServerController', [ '$scope', '$http', '$timeout',
 			$scope.getRedisHistoryData = function() {
 				$scope.address = window.localStorage.address;
 				renderGraph2("/redis/historydata",$scope.address, "container",
-						$scope.endTime,"", $http);
+						$scope.endTime,"","spline", $http);
 			};
 			
 			$scope.getRedisPeriodData = function(){
 				$scope.address = window.localStorage.address;
 				renderGraph2("/redis/period",$scope.address, "periodcontainer",
-						$scope.endTime,1, $http);
+						$scope.endTime,1,"column", $http);
 			}
 			//$scope.refresh();
 
@@ -228,13 +228,13 @@ module.controller('RedisServerController', [ '$scope', '$http', '$timeout',
 				if ($scope.endTime > new Date().getTime())
 					$scope.endTime = new Date().getTime();
 				renderGraph2("/redis/historydata",$scope.address, "container",
-						$scope.endTime,"", $http);
+						$scope.endTime,"","spline", $http);
 			}
 
 			$scope.setNow = function() {
 				$scope.endTime = new Date().getTime();
 				renderGraph2("/redis/historydata",$scope.address, "container",
-						$scope.endTime,"", $http);
+						$scope.endTime,"","spline", $http);
 			}
 			$scope.getRedisPeriodData();
 			$scope.getRedisHistoryData();

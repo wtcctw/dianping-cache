@@ -167,8 +167,8 @@ public class RedisController extends AbstractSidebarController{
 	@ResponseBody
 	public List<HighChartsWrapper> period(String address,long endTime,int period){
 
-		List<RedisStats> periodStats =  redisService.findPeriodicStats(address,endTime/1000,period);
-		final HighChartsWrapper chartsWrapper = ChartsBuilder.buildPeriodCharts(periodStats,period,endTime);
+		List<RedisStats> periodStats =  redisService.findPeriodicStats(address,endTime/1000,1,30);
+		final HighChartsWrapper chartsWrapper = ChartsBuilder.buildPeriodCharts(periodStats,1,endTime,30);
 		return new ArrayList<HighChartsWrapper>(){{
 			add(chartsWrapper);
 		}};

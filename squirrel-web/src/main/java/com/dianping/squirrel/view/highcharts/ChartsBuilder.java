@@ -8,10 +8,7 @@ import com.dianping.squirrel.view.highcharts.statsdata.MemcachedStatsData;
 import com.dianping.squirrel.view.highcharts.statsdata.RedisStatsData;
 import com.dianping.squirrel.view.highcharts.statsdata.ServerStatsData;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 public class ChartsBuilder {
@@ -140,19 +137,19 @@ public class ChartsBuilder {
 		return result;
 	}
 
-	public static HighChartsWrapper buildPeriodCharts(List<RedisStats> statsList,int period,long endTime){
+	public static HighChartsWrapper buildPeriodCharts(List<RedisStats> statsList,int period,long endTime,int count){
 		HighChartsWrapper charts = new HighChartsWrapper();
-		charts.setTitle("Period Data For every " + period + " Days");
+		charts.setTitle("Period Data For  " + count + " Days");
 		Series[] series = new Series[1];
 		series[0] = new Series();
 		Number[] data = new Number[statsList.size()];
 		int index = 0;
 		Calendar calendar = Calendar.getInstance();
-		calendar.set(Calendar.HOUR_OF_DAY, 0);
-		calendar.set(Calendar.MINUTE, 0);
-		calendar.set(Calendar.SECOND,0);
+		calendar.set(Calendar.HOUR_OF_DAY, 23);
+		calendar.set(Calendar.MINUTE, 59);
+		calendar.set(Calendar.SECOND,59);
 		calendar.set(Calendar.MILLISECOND, 0);
-		long startTime = calendar.getTimeInMillis() - 7*TimeUnit.MILLISECONDS.convert(period,TimeUnit.DAYS);
+		long startTime = calendar.getTimeInMillis() - count*TimeUnit.MILLISECONDS.convert(period,TimeUnit.DAYS);
 		for(RedisStats stats : statsList){
 			if(stats != null){
 				data[index++] = stats.getMemory_used();
@@ -161,7 +158,15 @@ public class ChartsBuilder {
 			}
 		}
 
-		series[0].setData(data);
+		for (int i = index - 1; i > 0; i--){
+			if(data[i] != null && data[i-1] != null){
+				data[i] = data[i].intValue() - data[i-1].intValue();
+			}else {
+				data[i] =  null;
+			}
+		}
+
+		series[0].setData(Arrays.copyOfRange(data,1,data.length));
 		series[0].setName("Server");
 		PlotOption plotOption = new PlotOption();
 		PlotOptionSeries pos = new PlotOptionSeries();
