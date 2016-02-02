@@ -145,11 +145,11 @@ public class ChartsBuilder {
 		Number[] data = new Number[statsList.size()];
 		int index = 0;
 		Calendar calendar = Calendar.getInstance();
-		calendar.set(Calendar.HOUR_OF_DAY, 23);
-		calendar.set(Calendar.MINUTE, 59);
-		calendar.set(Calendar.SECOND,59);
+		calendar.set(Calendar.HOUR_OF_DAY, 0);
+		calendar.set(Calendar.MINUTE, 0);
+		calendar.set(Calendar.SECOND,0);
 		calendar.set(Calendar.MILLISECOND, 0);
-		long startTime = calendar.getTimeInMillis() - count*TimeUnit.MILLISECONDS.convert(period,TimeUnit.DAYS);
+		long startTime = calendar.getTimeInMillis() - (count-1)*TimeUnit.MILLISECONDS.convert(period,TimeUnit.DAYS);
 		for(RedisStats stats : statsList){
 			if(stats != null){
 				data[index++] = stats.getMemory_used();

@@ -4,10 +4,7 @@ import com.dianping.cache.controller.vo.*;
 import com.dianping.cache.entity.CacheConfiguration;
 import com.dianping.cache.entity.RedisStats;
 import com.dianping.cache.scale.ScaleException;
-import com.dianping.cache.scale.cluster.redis.RedisCluster;
-import com.dianping.cache.scale.cluster.redis.RedisManager;
-import com.dianping.cache.scale.cluster.redis.RedisScaler;
-import com.dianping.cache.scale.cluster.redis.ReshardPlan;
+import com.dianping.cache.scale.cluster.redis.*;
 import com.dianping.cache.service.CacheConfigurationService;
 import com.dianping.cache.service.CacheKeyConfigurationService;
 import com.dianping.cache.service.RedisService;
@@ -172,6 +169,29 @@ public class RedisController extends AbstractSidebarController{
 		return new ArrayList<HighChartsWrapper>(){{
 			add(chartsWrapper);
 		}};
+	}
+
+	@RequestMapping(value = "/redis/{cluster}/period")
+	@ResponseBody
+	public HighChartsWrapper clusterperiod(@PathVariable(value = "cluster")String cluster){
+		RedisCluster redisCluster = RedisManager.getRedisCluster(cluster);
+		List<RedisNode> nodes = redisCluster.getNodes();
+		long endTime = System.currentTimeMillis();
+		List<RedisStats> clusterRedisStats = new ArrayList<RedisStats>(31);
+		for(RedisNode node : nodes){
+			List<RedisStats> periodStats =  redisService.findPeriodicStats(node.getMaster().getAddress(),endTime/1000,1,30);
+			for(int index = 0; index < 31; index++){
+				if(clusterRedisStats.size() < index + 1){
+					clusterRedisStats.add(new RedisStats());
+				}
+				if(periodStats.get(index) != null){
+					long used = clusterRedisStats.get(index).getMemory_used();
+					clusterRedisStats.get(index).setMemory_used(used+periodStats.get(index).getMemory_used());
+				}
+			}
+		}
+		HighChartsWrapper chartsWrapper = ChartsBuilder.buildPeriodCharts(clusterRedisStats,1,endTime,30);
+		return chartsWrapper;
 	}
 
 	@RequestMapping(value = "/redis/auth/setPassword")
