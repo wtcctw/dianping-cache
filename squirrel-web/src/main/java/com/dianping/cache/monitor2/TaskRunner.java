@@ -16,7 +16,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * Created by thunder on 16/1/29.
  */
-public class TaskRunner implements Runnable {
+public class TaskRunner implements Runnable{
 
     private static final Logger logger = LoggerFactory.getLogger(TaskRunner.class);
 
@@ -42,6 +42,7 @@ public class TaskRunner implements Runnable {
         this.server = state.getServer();
         this.serverState = state;
         curatorClient = CuratorManager.getInstance().getCuratorClient();
+        pushServerStatus();
     }
 
 
@@ -64,7 +65,20 @@ public class TaskRunner implements Runnable {
             }
         } finally {
             lastCheckTime = System.currentTimeMillis();
-            serverState.setAlive(alive);
+            //TODO:这是测试代码
+            for(int i = 0; i < 10; i ++) {
+                serverState.setAlive(alive, new ServerListener() {
+                    @Override
+                    public void serverDead() {
+                        TaskRunner.this.pushServerStatus();
+                    }
+
+                    @Override
+                    public void serverAlive() {
+                        TaskRunner.this.pushServerStatus();
+                    }
+                });
+            }
             logger.info(serverState + ", time: " + (lastCheckTime-start));
         }
     }
@@ -106,9 +120,14 @@ public class TaskRunner implements Runnable {
         // first delete then create to ensure the ZK node is owned by this session
         try {
             curatorClient.delete().forPath(path);
-            curatorClient.delete().forPath(getMarkUpPath(memcached));
-        } catch(KeeperException.NoNodeException e) {
+        } catch(Exception e) {
         }
+
+        try {
+            curatorClient.delete().forPath(getMarkUpPath(memcached));
+        } catch(Exception e) {
+        }
+
         try {
             curatorClient.create().creatingParentsIfNeeded().withMode(CreateMode.EPHEMERAL).forPath(path);
             logger.info("server " + memcached + " marked down");
@@ -118,15 +137,20 @@ public class TaskRunner implements Runnable {
     }
 
     public void markUp(String memcached) throws Exception {
-
         String path = getMarkUpPath(memcached);
-
         // first delete then create to ensure the ZK node is owned by this session
         try {
-            curatorClient.delete().forPath(path);
             curatorClient.delete().forPath(getMarkDownPath(path));
-        } catch(KeeperException.NoNodeException e) {
+        } catch(Exception e) {
+            logger.info(getMarkDownPath(path) + " is not exist");
         }
+
+        try {
+            curatorClient.delete().forPath(path);
+        } catch(Exception e) {
+            logger.info(path + " is not exist");
+        }
+
         try {
             curatorClient.create().creatingParentsIfNeeded().withMode(CreateMode.EPHEMERAL).forPath(path);
             logger.info("server " + memcached + " marked up");

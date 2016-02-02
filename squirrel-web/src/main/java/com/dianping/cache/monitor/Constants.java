@@ -1,13 +1,24 @@
 package com.dianping.cache.monitor;
 
+import com.dianping.pigeon.registry.zookeeper.CuratorClient;
+
 public interface Constants {
     
     String KEY_ZOOKEEPER_ADDRESS = "avatar-cache.zookeeper.address";
 
-    String SERVICE_PATH = "/dp/cache/service";
-    String MEMBER_PATH = "/dp/cache/cache-server";
-    String MONITOR_PATH = "/dp/cache/monitor";
+    String MONITOR_PATH = "memecached";
 
+    String MANAGER_PATH = "/dp/cache/manager";
+    String SERVICE_PATH = "/dp/cache/service";
+
+
+    String MONITOR_JUDGE_LOCK = "/dp/cache/judge";
+    String INIT_STAT_LOCK = "/dp/cache/initMonitorState";
+
+
+    String MEMBER_PATH = "/dp/cache/cache-server";
+    String MONITOR_MARKUP_PATH = "/dp/cache/monitor_markup";
+    String MONITOR_MARKDOWN_PATH = "/dp/cache/monitor_markdown";
     String KEY_MONITOR_ENABLE = "avatar-cache.monitor.enable";
     boolean DEFAULT_MONITOR_ENABLE = true;
     
@@ -50,5 +61,4 @@ public interface Constants {
     int DEFAULT_NOTIFY_WEIXIN_TYPE = 54;// 运维平台
     String KEY_NOTIFY_WEIXIN_LIST = "avatar-cache.notify.weixin.list";
     String DEFAULT_NOTIFY_WEIXIN_LIST = "0023415,0000558,0014852,0005503,0003769,0021910";
-
 }

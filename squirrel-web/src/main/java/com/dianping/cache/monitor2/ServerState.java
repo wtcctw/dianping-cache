@@ -1,11 +1,12 @@
-package com.dianping.cache.monitor;
+package com.dianping.cache.monitor2;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import com.dianping.cache.monitor.Constants;
+import com.dianping.cache.monitor2.ServerListener;
 import com.dianping.squirrel.common.config.ConfigChangeListener;
 import com.dianping.squirrel.common.config.ConfigManager;
 import com.dianping.squirrel.common.config.ConfigManagerLoader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ServerState {
 
@@ -41,6 +42,11 @@ public class ServerState {
         this.server = server;
         deadThreshold = configManager.getIntValue(Constants.KEY_DEAD_THRESHOLD, Constants.DEFAULT_DEAD_THRESHOLD);
         liveThreshold = configManager.getIntValue(Constants.KEY_LIVE_THRESHOLD, Constants.DEFAULT_LIVE_THRESHOLD);
+
+        //TODO: 这个地方要去掉
+        deadThreshold = 3;
+        liveThreshold = 3;
+
         try {
             configManager.registerConfigChangeListener(new ConfigChangeListener() {
 
@@ -59,7 +65,7 @@ public class ServerState {
         }
     }
 
-    public void setAlive(boolean currentAlive) {
+    public void setAlive(boolean currentAlive, ServerListener listener) {
         boolean prevAlive = alive;
         alive = currentAlive;
         if(alive) {
@@ -77,7 +83,7 @@ public class ServerState {
                 prevState = state;
                 state = State.Alive;
                 if(prevState == State.Dead) {
-                    fireServerAlive();
+                    listener.serverAlive();
                 }
             }
         } else {
@@ -95,7 +101,7 @@ public class ServerState {
                 prevState = state;
                 state = State.Dead;
                 if(prevState != State.Dead) {
-                    fireServerDead();
+                    listener.serverDead();
                 }
             }
         }
@@ -117,29 +123,8 @@ public class ServerState {
         return liveCount;
     }
     
-    
     public State getState() {
         return state;
-    }
-    
-    private void fireServerDead() {
-        if(taskListener != null) {
-            try {
-                taskListener.serverDead(server);
-            } catch(Throwable t) {
-                logger.error("failed to notify server dead", t);
-            }
-        }
-    }
-
-    private void fireServerAlive() {
-        if(taskListener != null) {
-            try {
-                taskListener.serverAlive(server);
-            } catch(Throwable t) {
-                logger.error("failed to notify server alive", t);
-            }
-        }
     }
 
     public void setServerListener(ServerListener taskListener) {
