@@ -21,6 +21,8 @@ public class RedisTemplateDto {
 
     private boolean checkHistory;
 
+    private boolean memSwitch;
+
     private int memThreshold;
 
     private int memFluc;
@@ -28,6 +30,8 @@ public class RedisTemplateDto {
     private int memBase;
 
     private int memInterval;
+
+    private boolean qpsSwitch;
 
     private int qpsThreshold;
 
@@ -99,6 +103,14 @@ public class RedisTemplateDto {
         this.checkHistory = checkHistory;
     }
 
+    public boolean isMemSwitch() {
+        return memSwitch;
+    }
+
+    public void setMemSwitch(boolean memSwitch) {
+        this.memSwitch = memSwitch;
+    }
+
     public int getMemThreshold() {
         return memThreshold;
     }
@@ -129,6 +141,14 @@ public class RedisTemplateDto {
 
     public void setMemInterval(int memInterval) {
         this.memInterval = memInterval;
+    }
+
+    public boolean isQpsSwitch() {
+        return qpsSwitch;
+    }
+
+    public void setQpsSwitch(boolean qpsSwitch) {
+        this.qpsSwitch = qpsSwitch;
     }
 
     public int getQpsThreshold() {

@@ -23,10 +23,12 @@ public class RedisTemplateMapper {
                 .setWeixinMode(redisTemplateDto.isWeixinMode());
         redisTemplate.setIsDown(redisTemplateDto.isDown())
                 .setCheckHistory(redisTemplateDto.isCheckHistory())
+                .setMemSwitch(redisTemplateDto.isMemSwitch())
                 .setMemThreshold(redisTemplateDto.getMemThreshold())
                 .setMemBase(redisTemplateDto.getMemBase())
                 .setMemFluc(redisTemplateDto.getMemFluc())
                 .setMemInterval(redisTemplateDto.getMemInterval())
+                .setQpsSwitch(redisTemplateDto.isQpsSwitch())
                 .setQpsThreshold(redisTemplateDto.getQpsThreshold())
                 .setQpsBase(redisTemplateDto.getQpsBase())
                 .setQpsFluc(redisTemplateDto.getQpsFluc())

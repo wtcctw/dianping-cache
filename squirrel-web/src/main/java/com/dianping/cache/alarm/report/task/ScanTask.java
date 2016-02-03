@@ -70,8 +70,12 @@ public class ScanTask {
         for (Map.Entry<String, List<ScanDetail>> entry : diffScanDetails.entrySet()) {
 
             CmdbResult<CmdbProject> result = CmdbManager.getProject(entry.getKey());
+            String receiver;
+            if(null == result){
+                receiver = "shiyun.lv";
+            }
 
-            String receiver = result.cmdbResult.getRd_duty();
+            receiver= result.cmdbResult.getRd_duty();
 
             List<EmployeeDto> userDtoList = employeeService.queryEmployeeByKeyword(receiver);
             String receiverEmail = userDtoList.get(0).getEmail();

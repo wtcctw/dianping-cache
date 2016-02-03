@@ -10,10 +10,12 @@
         <result column="templateName" property="templateName"/>
         <result column="isDown" property="isDown"/>
         <result column="checkHistory" property="checkHistory"/>
+        <result column="memSwitch" property="memSwitch"/>
         <result column="memThreshold" property="memThreshold"/>
         <result column="memFluc" property="memFluc"/>
         <result column="memBase" property="memBase"/>
         <result column="memInterval" property="memInterval"/>
+        <result column="qpsSwitch" property="qpsSwitch"/>
         <result column="qpsThreshold" property="qpsThreshold"/>
         <result column="qpsFluc" property="qpsFluc"/>
         <result column="qpsBase" property="qpsBase"/>
@@ -26,13 +28,13 @@
     </resultMap>
 
     <insert id="insert" parameterType="RedisTemplate">
-        INSERT INTO redis_alarmTemplate(id,templateName,isDown,checkHistory,memThreshold,memFluc,memBase,memInterval,qpsThreshold,qpsFluc,qpsBase,qpsInterval,mailMode,smsMode,weixinMode,createTime, updateTime)
-        VALUES(#{id},#{templateName},#{isDown},#{checkHistory},#{memThreshold},#{memFluc},#{memBase},#{memInterval},#{qpsThreshold},#{qpsFluc},#{qpsBase},#{qpsInterval},#{mailMode},#{smsMode},#{weixinMode},#{createTime},#{updateTime})
+        INSERT INTO redis_alarmTemplate(id,templateName,isDown,checkHistory,memSwitch,memThreshold,memFluc,memBase,memInterval,qpsSwitch,qpsThreshold,qpsFluc,qpsBase,qpsInterval,mailMode,smsMode,weixinMode,createTime, updateTime)
+        VALUES(#{id},#{templateName},#{isDown},#{checkHistory},#{memSwitch},#{memThreshold},#{memFluc},#{memBase},#{memInterval},#{qpsSwitch},#{qpsThreshold},#{qpsFluc},#{qpsBase},#{qpsInterval},#{mailMode},#{smsMode},#{weixinMode},#{createTime},#{updateTime})
     </insert>
 
     <update id="update" parameterType="RedisTemplate">
         UPDATE redis_alarmTemplate
-        SET templateName=#{templateName},isDown=#{isDown},checkHistory=#{checkHistory},memThreshold=#{memThreshold},memFluc=#{memFluc},memBase=#{memBase},memInterval=#{memInterval},qpsThreshold=#{qpsThreshold},qpsFluc=#{qpsFluc},qpsBase=#{qpsBase},qpsInterval=#{qpsInterval},mailMode=#{mailMode},smsMode=#{smsMode},weixinMode=#{weixinMode},createTime=#{createTime},updateTime=#{updateTime}
+        SET templateName=#{templateName},isDown=#{isDown},checkHistory=#{checkHistory},memSwitch=#{memSwitch},memThreshold=#{memThreshold},memFluc=#{memFluc},memBase=#{memBase},memInterval=#{memInterval},qpsSwitch=#{qpsSwitch},qpsThreshold=#{qpsThreshold},qpsFluc=#{qpsFluc},qpsBase=#{qpsBase},qpsInterval=#{qpsInterval},mailMode=#{mailMode},smsMode=#{smsMode},weixinMode=#{weixinMode},createTime=#{createTime},updateTime=#{updateTime}
         WHERE id = #{id}
     </update>
 
@@ -43,21 +45,21 @@
 
 
     <select id="findById" resultMap="RedisTemplateResult" parameterType="int">
-        SELECT id,templateName,isDown,checkHistory,memThreshold,memFluc,memBase,memInterval,qpsThreshold,qpsFluc,qpsBase,qpsInterval,mailMode,smsMode,weixinMode,createTime, updateTime
+        SELECT id,templateName,isDown,checkHistory,memSwitch,memThreshold,memFluc,memBase,memInterval,qpsSwitch,qpsThreshold,qpsFluc,qpsBase,qpsInterval,mailMode,smsMode,weixinMode,createTime, updateTime
         FROM redis_alarmTemplate
         WHERE id = #{id}
         ORDER BY id ASC
     </select>
 
     <select id="findAlarmTemplateByTemplateName" resultMap="RedisTemplateResult" parameterType="String">
-        SELECT id,templateName,isDown,checkHistory,memThreshold,memFluc,memBase,memInterval,qpsThreshold,qpsFluc,qpsBase,qpsInterval,mailMode,smsMode,weixinMode,createTime, updateTime
+        SELECT id,templateName,isDown,checkHistory,memSwitch,memThreshold,memFluc,memBase,memInterval,qpsSwitch,qpsThreshold,qpsFluc,qpsBase,qpsInterval,mailMode,smsMode,weixinMode,createTime, updateTime
         FROM redis_alarmTemplate
         WHERE templateName = #{templateName}
         ORDER BY id ASC
     </select>
 
     <select id="findAll" resultMap="RedisTemplateResult">
-        SELECT id,templateName,isDown,checkHistory,memThreshold,memFluc,memBase,memInterval,qpsThreshold,qpsFluc,qpsBase,qpsInterval,mailMode,smsMode,weixinMode,createTime, updateTime
+        SELECT id,templateName,isDown,checkHistory,memSwitch,memThreshold,memFluc,memBase,memInterval,qpsSwitch,qpsThreshold,qpsFluc,qpsBase,qpsInterval,mailMode,smsMode,weixinMode,createTime, updateTime
         FROM redis_alarmTemplate
         ORDER BY id ASC
     </select>

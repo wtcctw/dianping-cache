@@ -119,44 +119,56 @@
                                         <td style="text-align: center;">{{e.down}}</td>
                                         <td style="text-align: center;">{{e.checkHistory}}</td>
                                         <td style="text-align: center;">
-                                         <span class="label arrowed-in" ng-class="'label-success'">
+                                         <span class="badge"
+                                               ng-class="{'label-success':e.memSwitch==true,'label-danger':e.memSwitch==false}">
                                              {{e.memThreshold}}
                                          </span>
-                                            <span class="label arrowed-in" ng-class="'label-success'">
+                                            <span class="badge"
+                                                  ng-class="{'label-success':e.memSwitch==true,'label-danger':e.memSwitch==false}">
                                              {{e.memBase}}
                                          </span>
-                                             <span class="label arrowed-in" ng-class="'label-success'">
+                                             <span class="badge"
+                                                   ng-class="{'label-success':e.memSwitch==true,'label-danger':e.memSwitch==false}">
                                              {{e.memFluc}}
                                          </span>
-                                               <span class="label arrowed-in" ng-class="'label-success'">
+                                               <span class="badge"
+                                                     ng-class="{'label-success':e.memSwitch==true,'label-danger':e.memSwitch==false}">
                                              {{e.memInterval}}
                                          </span>
                                         </td>
                                         <td style="text-align: center;">
-                                        <span class="label arrowed-in" ng-class="'label-success'">
+                                        <span class="badge"
+                                              ng-class="{'label-success':e.qpsSwitch==true,'label-danger':e.qpsSwitch==false}">
                                              {{e.qpsThreshold}}
                                          </span>
-                                            <span class="label arrowed-in" ng-class="'label-success'">
+                                            <span class="badge"
+                                                  ng-class="{'label-success':e.qpsSwitch==true,'label-danger':e.qpsSwitch==false}">
                                              {{e.qpsBase}}
                                          </span>
-                                             <span class="label arrowed-in" ng-class="'label-success'">
+                                             <span class="badge"
+                                                   ng-class="{'label-success':e.qpsSwitch==true,'label-danger':e.qpsSwitch==false}">
                                              {{e.qpsFluc}}
                                          </span>
-                                               <span class="label arrowed-in" ng-class="'label-success'">
+                                               <span class="badge"
+                                                     ng-class="{'label-success':e.qpsSwitch==true,'label-danger':e.qpsSwitch==false}">
                                              {{e.qpsInterval}}
                                          </span>
                                         </td>
                                         <td style="text-align: center;">
-                                         <span class="label arrowed-in" ng-class="'label-success'">
+                                         <span class="badge"
+                                               ng-class="{'label-success':e.connSwitch==true,'label-danger':e.connSwitch==false}">
                                              {{e.connThreshold}}
                                          </span>
-                                            <span class="label arrowed-in" ng-class="'label-success'">
+                                            <span class="badge"
+                                                  ng-class="{'label-success':e.connSwitch==true,'label-danger':e.connSwitch==false}">
                                              {{e.connBase}}
                                          </span>
-                                             <span class="label arrowed-in" ng-class="'label-success'">
+                                             <span class="badge"
+                                                   ng-class="{'label-success':e.connSwitch==true,'label-danger':e.connSwitch==false}">
                                              {{e.connFluc}}
                                          </span>
-                                               <span class="label arrowed-in" ng-class="'label-success'">
+                                               <span class="badge"
+                                                     ng-class="{'label-success':e.connSwitch==true,'label-danger':e.connSwitch==false}">
                                              {{e.connInterval}}
                                          </span>
                                         </td>
@@ -231,30 +243,38 @@
                                         <td style="text-align: center;">{{e.down}}</td>
                                         <td style="text-align: center;">{{e.checkHistory}}</td>
                                         <td style="text-align: center;">
-                                         <span class="label arrowed-in" ng-class="'label-success'">
+                                         <span class="badge"
+                                               ng-class="{'label-success':e.memSwitch==true,'label-danger':e.memSwitch==false}">
                                              {{e.memThreshold}}
                                          </span>
-                                            <span class="label arrowed-in" ng-class="'label-success'">
+                                            <span class="badge"
+                                                  ng-class="{'label-success':e.memSwitch==true,'label-danger':e.memSwitch==false}">
                                              {{e.memBase}}
                                          </span>
-                                             <span class="label arrowed-in" ng-class="'label-success'">
+                                             <span class="badge"
+                                                   ng-class="{'label-success':e.memSwitch==true,'label-danger':e.memSwitch==false}">
                                              {{e.memFluc}}
                                          </span>
-                                               <span class="label arrowed-in" ng-class="'label-success'">
+                                               <span class="badge"
+                                                     ng-class="{'label-success':e.memSwitch==true,'label-danger':e.memSwitch==false}">
                                              {{e.memInterval}}
                                          </span>
                                         </td>
                                         <td style="text-align: center;">
-                                        <span class="label arrowed-in" ng-class="'label-success'">
+                                        <span class="badge"
+                                              ng-class="{'label-success':e.qpsSwitch==true,'label-danger':e.qpsSwitch==false}">
                                              {{e.qpsThreshold}}
                                          </span>
-                                            <span class="label arrowed-in" ng-class="'label-success'">
+                                            <span class="badge"
+                                                  ng-class="{'label-success':e.qpsSwitch==true,'label-danger':e.qpsSwitch==false}">
                                              {{e.qpsBase}}
                                          </span>
-                                             <span class="label arrowed-in" ng-class="'label-success'">
+                                             <span class="badge"
+                                                   ng-class="{'label-success':e.qpsSwitch==true,'label-danger':e.qpsSwitch==false}">
                                              {{e.qpsFluc}}
                                          </span>
-                                               <span class="label arrowed-in" ng-class="'label-success'">
+                                               <span class="badge"
+                                                     ng-class="{'label-success':e.qpsSwitch==true,'label-danger':e.qpsSwitch==false}">
                                              {{e.qpsInterval}}
                                          </span>
                                         </td>
@@ -434,7 +454,14 @@
                                     </div>
                                 </div>
 
-                                <label class="col-xs-2 control-label control-label no-padding-right">内存</label>
+                                <div class="col-xs-12">
+                                    <label class="col-xs-2 control-label control-label no-padding-right">内存</label>
+                                    <label>
+                                        <input class="ace ace-switch ace-switch-3"
+                                               ng-model="memcacheTemplateConfigEntity.memSwitch" type="checkbox">
+                                        <span class="lbl middle"></span>
+                                    </label>
+                                </div>
                                 <div class="col-xs-12 form-group">
                                     <div class="col-xs-6">
                                         <label class="col-xs-6 control-label control-label no-padding-right">峰值：</label>
@@ -473,8 +500,15 @@
                                         </div>
                                     </div>
                                 </div>
+                                <div class="col-xs-12">
+                                    <label class="col-xs-2 control-label control-label no-padding-right">QPS</label>
+                                    <label>
+                                        <input class="ace ace-switch ace-switch-3"
+                                               ng-model="memcacheTemplateConfigEntity.qpsSwitch" type="checkbox">
+                                        <span class="lbl middle"></span>
+                                    </label>
+                                </div>
 
-                                <label class="col-xs-2 control-label control-label no-padding-right">QPS</label>
                                 <div class="col-xs-12 form-group">
                                     <div class="col-xs-6">
                                         <label class="col-xs-6 control-label control-label no-padding-right">峰值：</label>
@@ -513,8 +547,15 @@
                                         </div>
                                     </div>
                                 </div>
+                                <div class="col-xs-12">
+                                    <label class="col-xs-2 control-label control-label no-padding-right">连接数</label>
+                                    <label>
+                                        <input class="ace ace-switch ace-switch-3"
+                                               ng-model="memcacheTemplateConfigEntity.connSwitch" type="checkbox">
+                                        <span class="lbl middle"></span>
+                                    </label>
+                                </div>
 
-                                <label class="col-xs-2 control-label control-label no-padding-right">连接数</label>
                                 <div class="col-xs-12 form-group">
                                     <div class="col-xs-6">
                                         <label class="col-xs-6 control-label control-label no-padding-right">峰值：</label>
@@ -632,7 +673,15 @@
                                     </div>
                                 </div>
 
-                                <label class="col-xs-2 control-label control-label no-padding-right">内存</label>
+                                <div class="col-xs-12">
+                                    <label class="col-xs-2 control-label control-label no-padding-right">内存</label>
+                                    <label>
+                                        <input class="ace ace-switch ace-switch-3"
+                                               ng-model="redisTemplateConfigEntity.memSwitch" type="checkbox">
+                                        <span class="lbl middle"></span>
+                                    </label>
+                                </div>
+
                                 <div class="col-xs-12 form-group">
                                     <div class="col-xs-6">
                                         <label class="col-xs-6 control-label control-label no-padding-right">峰值：</label>
@@ -671,7 +720,15 @@
                                         </div>
                                     </div>
                                 </div>
-                                <label class="col-xs-2 control-label control-label no-padding-right">QPS峰值：</label>
+
+                                <div>
+                                    <label class="col-xs-2 control-label control-label no-padding-right">QPS</label>
+                                    <label>
+                                        <input class="ace ace-switch ace-switch-3"
+                                               ng-model="redisTemplateConfigEntity.qpsSwitch" type="checkbox">
+                                        <span class="lbl middle"></span>
+                                    </label>
+                                </div>
                                 <div class="col-xs-12 form-group">
                                     <div class="col-xs-6">
                                         <label class="col-xs-6 control-label control-label no-padding-right">峰值：</label>

@@ -11,6 +11,8 @@ public class MemcacheTemplate extends AlarmConfigTemplate {
 
     private boolean checkHistory;
 
+    private boolean memSwitch;
+
     private int memThreshold;
 
     private int memFluc;
@@ -19,6 +21,8 @@ public class MemcacheTemplate extends AlarmConfigTemplate {
 
     private int memInterval;
 
+    private boolean qpsSwitch;
+
     private int qpsThreshold;
 
     private int qpsFluc;
@@ -26,6 +30,8 @@ public class MemcacheTemplate extends AlarmConfigTemplate {
     private int qpsBase;
 
     private int qpsInterval;
+
+    private boolean connSwitch;
 
     private int connThreshold;
 
@@ -50,6 +56,15 @@ public class MemcacheTemplate extends AlarmConfigTemplate {
 
     public MemcacheTemplate setCheckHistory(boolean checkHistory) {
         this.checkHistory = checkHistory;
+        return this;
+    }
+
+    public boolean isMemSwitch() {
+        return memSwitch;
+    }
+
+    public MemcacheTemplate setMemSwitch(boolean memSwitch) {
+        this.memSwitch = memSwitch;
         return this;
     }
 
@@ -89,6 +104,15 @@ public class MemcacheTemplate extends AlarmConfigTemplate {
         return this;
     }
 
+    public boolean isQpsSwitch() {
+        return qpsSwitch;
+    }
+
+    public MemcacheTemplate setQpsSwitch(boolean qpsSwitch) {
+        this.qpsSwitch = qpsSwitch;
+        return this;
+    }
+
     public int getQpsThreshold() {
         return qpsThreshold;
     }
@@ -122,6 +146,15 @@ public class MemcacheTemplate extends AlarmConfigTemplate {
 
     public MemcacheTemplate setQpsInterval(int qpsInterval) {
         this.qpsInterval = qpsInterval;
+        return this;
+    }
+
+    public boolean isConnSwitch() {
+        return connSwitch;
+    }
+
+    public MemcacheTemplate setConnSwitch(boolean connSwitch) {
+        this.connSwitch = connSwitch;
         return this;
     }
 

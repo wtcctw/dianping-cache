@@ -21,6 +21,8 @@ public class MemcacheTemplateDto {
 
     private boolean checkHistory;
 
+    private boolean memSwitch;
+
     private int memThreshold;
 
     private int memFluc;
@@ -29,6 +31,8 @@ public class MemcacheTemplateDto {
 
     private int memInterval;
 
+    private boolean qpsSwitch;
+
     private int qpsThreshold;
 
     private int qpsFluc;
@@ -36,6 +40,8 @@ public class MemcacheTemplateDto {
     private int qpsBase;
 
     private int qpsInterval;
+
+    private boolean connSwitch;
 
     private int connThreshold;
 
@@ -107,6 +113,14 @@ public class MemcacheTemplateDto {
         this.checkHistory = checkHistory;
     }
 
+    public boolean isMemSwitch() {
+        return memSwitch;
+    }
+
+    public void setMemSwitch(boolean memSwitch) {
+        this.memSwitch = memSwitch;
+    }
+
     public int getMemThreshold() {
         return memThreshold;
     }
@@ -139,6 +153,14 @@ public class MemcacheTemplateDto {
         this.memInterval = memInterval;
     }
 
+    public boolean isQpsSwitch() {
+        return qpsSwitch;
+    }
+
+    public void setQpsSwitch(boolean qpsSwitch) {
+        this.qpsSwitch = qpsSwitch;
+    }
+
     public int getQpsThreshold() {
         return qpsThreshold;
     }
@@ -169,6 +191,14 @@ public class MemcacheTemplateDto {
 
     public void setQpsInterval(int qpsInterval) {
         this.qpsInterval = qpsInterval;
+    }
+
+    public boolean isConnSwitch() {
+        return connSwitch;
+    }
+
+    public void setConnSwitch(boolean connSwitch) {
+        this.connSwitch = connSwitch;
     }
 
     public int getConnThreshold() {

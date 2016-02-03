@@ -11,6 +11,8 @@ public class RedisTemplate extends AlarmConfigTemplate {
 
     private boolean checkHistory;
 
+    private boolean memSwitch;
+
     private int memThreshold;
 
     private int memFluc;
@@ -18,6 +20,8 @@ public class RedisTemplate extends AlarmConfigTemplate {
     private int memBase;
 
     private int memInterval;
+
+    private boolean qpsSwitch;
 
     private int qpsThreshold;
 
@@ -42,6 +46,15 @@ public class RedisTemplate extends AlarmConfigTemplate {
 
     public RedisTemplate setCheckHistory(boolean checkHistory) {
         this.checkHistory = checkHistory;
+        return this;
+    }
+
+    public boolean isMemSwitch() {
+        return memSwitch;
+    }
+
+    public RedisTemplate setMemSwitch(boolean memSwitch) {
+        this.memSwitch = memSwitch;
         return this;
     }
 
@@ -78,6 +91,15 @@ public class RedisTemplate extends AlarmConfigTemplate {
 
     public RedisTemplate setMemInterval(int memInterval) {
         this.memInterval = memInterval;
+        return this;
+    }
+
+    public boolean isQpsSwitch() {
+        return qpsSwitch;
+    }
+
+    public RedisTemplate setQpsSwitch(boolean qpsSwitch) {
+        this.qpsSwitch = qpsSwitch;
         return this;
     }
 
