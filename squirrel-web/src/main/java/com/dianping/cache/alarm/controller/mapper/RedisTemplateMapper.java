@@ -24,7 +24,13 @@ public class RedisTemplateMapper {
         redisTemplate.setIsDown(redisTemplateDto.isDown())
                 .setCheckHistory(redisTemplateDto.isCheckHistory())
                 .setMemThreshold(redisTemplateDto.getMemThreshold())
+                .setMemBase(redisTemplateDto.getMemBase())
+                .setMemFluc(redisTemplateDto.getMemFluc())
+                .setMemInterval(redisTemplateDto.getMemInterval())
                 .setQpsThreshold(redisTemplateDto.getQpsThreshold())
+                .setQpsBase(redisTemplateDto.getQpsBase())
+                .setQpsFluc(redisTemplateDto.getQpsFluc())
+                .setQpsInterval(redisTemplateDto.getQpsInterval())
                 .setCreateTime(redisTemplateDto.getCreateTime())
                 .setUpdateTime(new Date());
 

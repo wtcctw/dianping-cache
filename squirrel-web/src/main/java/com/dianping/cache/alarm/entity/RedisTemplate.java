@@ -13,7 +13,19 @@ public class RedisTemplate extends AlarmConfigTemplate {
 
     private int memThreshold;
 
+    private int memFluc;
+
+    private int memBase;
+
+    private int memInterval;
+
     private int qpsThreshold;
+
+    private int qpsFluc;
+
+    private int qpsBase;
+
+    private int qpsInterval;
 
     public boolean isDown() {
         return isDown;
@@ -42,12 +54,66 @@ public class RedisTemplate extends AlarmConfigTemplate {
         return this;
     }
 
+    public int getMemFluc() {
+        return memFluc;
+    }
+
+    public RedisTemplate setMemFluc(int memFluc) {
+        this.memFluc = memFluc;
+        return this;
+    }
+
+    public int getMemBase() {
+        return memBase;
+    }
+
+    public RedisTemplate setMemBase(int memBase) {
+        this.memBase = memBase;
+        return this;
+    }
+
+    public int getMemInterval() {
+        return memInterval;
+    }
+
+    public RedisTemplate setMemInterval(int memInterval) {
+        this.memInterval = memInterval;
+        return this;
+    }
+
     public int getQpsThreshold() {
         return qpsThreshold;
     }
 
     public RedisTemplate setQpsThreshold(int qpsThreshold) {
         this.qpsThreshold = qpsThreshold;
+        return this;
+    }
+
+    public int getQpsFluc() {
+        return qpsFluc;
+    }
+
+    public RedisTemplate setQpsFluc(int qpsFluc) {
+        this.qpsFluc = qpsFluc;
+        return this;
+    }
+
+    public int getQpsBase() {
+        return qpsBase;
+    }
+
+    public RedisTemplate setQpsBase(int qpsBase) {
+        this.qpsBase = qpsBase;
+        return this;
+    }
+
+    public int getQpsInterval() {
+        return qpsInterval;
+    }
+
+    public RedisTemplate setQpsInterval(int qpsInterval) {
+        this.qpsInterval = qpsInterval;
         return this;
     }
 }

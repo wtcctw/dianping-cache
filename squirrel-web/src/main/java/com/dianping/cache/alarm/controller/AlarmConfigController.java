@@ -52,7 +52,7 @@ public class AlarmConfigController extends AbstractSidebarController {
 
     @RequestMapping(value = "/config/alarm")
     public ModelAndView topicSetting(HttpServletRequest request, HttpServletResponse response) {
-        return new ModelAndView("alarm/alarmrule", createViewMap());
+        return new ModelAndView("alarm/alarmconfig", createViewMap());
     }
 
     @RequestMapping(value = "/config/alarm/list", method = RequestMethod.GET, produces = "application/json; charset=utf-8")
@@ -70,7 +70,7 @@ public class AlarmConfigController extends AbstractSidebarController {
     @ResponseBody
     public boolean createAlarmConfig(@RequestBody AlarmConfigDto alarmConfigDto) {
         boolean result = false;
-
+        
         if (alarmConfigDto.isUpdate()) {
             AlarmConfig alarmConfig = alarmConfigService.findById(alarmConfigDto.getId());
             alarmConfigDto.setCreateTime(alarmConfig.getCreateTime());

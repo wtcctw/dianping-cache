@@ -80,7 +80,7 @@ module
 
 module
     .controller(
-    'AlarmRuleController',
+    'AlarmConfigController',
     [
         '$rootScope',
         '$scope',

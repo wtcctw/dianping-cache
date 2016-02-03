@@ -45,8 +45,17 @@ public class MemcacheAlarmTemplateController extends AbstractSidebarController {
                     .setIsDown(true)
                     .setCheckHistory(false)
                     .setMemThreshold(95)
+                    .setMemBase(70)
+                    .setMemFluc(5)
+                    .setMemInterval(10)
                     .setQpsThreshold(80000)
+                    .setQpsBase(50000)
+                    .setQpsFluc(1000)
+                    .setQpsInterval(10)
                     .setConnThreshold(28000)
+                    .setConnBase(20000)
+                    .setConnFluc(1000)
+                    .setConnInterval(10)
                     .setCreateTime(new Date())
                     .setUpdateTime(new Date());
             memcachetemplateService.insert(memcacheTemplate);

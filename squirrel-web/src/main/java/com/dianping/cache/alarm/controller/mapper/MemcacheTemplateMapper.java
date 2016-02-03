@@ -25,8 +25,17 @@ public class MemcacheTemplateMapper {
         memcacheTemplate.setIsDown(memcacheTemplateDto.isDown())
                 .setCheckHistory(memcacheTemplateDto.isCheckHistory())
                 .setMemThreshold(memcacheTemplateDto.getMemThreshold())
+                .setMemBase(memcacheTemplateDto.getMemBase())
+                .setMemFluc(memcacheTemplateDto.getMemFluc())
+                .setMemInterval(memcacheTemplateDto.getMemInterval())
                 .setQpsThreshold(memcacheTemplateDto.getQpsThreshold())
+                .setQpsBase(memcacheTemplateDto.getQpsBase())
+                .setQpsFluc(memcacheTemplateDto.getQpsFluc())
+                .setQpsInterval(memcacheTemplateDto.getQpsInterval())
                 .setConnThreshold(memcacheTemplateDto.getConnThreshold())
+                .setConnBase(memcacheTemplateDto.getConnBase())
+                .setConnFluc(memcacheTemplateDto.getConnFluc())
+                .setConnInterval(memcacheTemplateDto.getConnInterval())
                 .setCreateTime(memcacheTemplateDto.getCreateTime())
                 .setUpdateTime(new Date());
 

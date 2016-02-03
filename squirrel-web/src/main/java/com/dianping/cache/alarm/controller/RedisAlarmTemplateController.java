@@ -46,7 +46,13 @@ public class RedisAlarmTemplateController extends AbstractSidebarController {
             redisTemplate.setIsDown(true)
                     .setCheckHistory(false)
                     .setMemThreshold(80)
+                    .setMemBase(70)
+                    .setMemFluc(5)
+                    .setMemInterval(10)
                     .setQpsThreshold(80000)
+                    .setQpsBase(50000)
+                    .setQpsFluc(1000)
+                    .setQpsInterval(10)
                     .setCreateTime(new Date())
                     .setUpdateTime(new Date());
             redistemplateService.insert(redisTemplate);

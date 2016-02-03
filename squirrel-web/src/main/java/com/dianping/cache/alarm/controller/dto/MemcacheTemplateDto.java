@@ -23,9 +23,27 @@ public class MemcacheTemplateDto {
 
     private int memThreshold;
 
+    private int memFluc;
+
+    private int memBase;
+
+    private int memInterval;
+
     private int qpsThreshold;
 
+    private int qpsFluc;
+
+    private int qpsBase;
+
+    private int qpsInterval;
+
     private int connThreshold;
+
+    private int connFluc;
+
+    private int connBase;
+
+    private int connInterval;
 
     private boolean isUpdate;
 
@@ -97,6 +115,30 @@ public class MemcacheTemplateDto {
         this.memThreshold = memThreshold;
     }
 
+    public int getMemFluc() {
+        return memFluc;
+    }
+
+    public void setMemFluc(int memFluc) {
+        this.memFluc = memFluc;
+    }
+
+    public int getMemBase() {
+        return memBase;
+    }
+
+    public void setMemBase(int memBase) {
+        this.memBase = memBase;
+    }
+
+    public int getMemInterval() {
+        return memInterval;
+    }
+
+    public void setMemInterval(int memInterval) {
+        this.memInterval = memInterval;
+    }
+
     public int getQpsThreshold() {
         return qpsThreshold;
     }
@@ -105,12 +147,60 @@ public class MemcacheTemplateDto {
         this.qpsThreshold = qpsThreshold;
     }
 
+    public int getQpsFluc() {
+        return qpsFluc;
+    }
+
+    public void setQpsFluc(int qpsFluc) {
+        this.qpsFluc = qpsFluc;
+    }
+
+    public int getQpsBase() {
+        return qpsBase;
+    }
+
+    public void setQpsBase(int qpsBase) {
+        this.qpsBase = qpsBase;
+    }
+
+    public int getQpsInterval() {
+        return qpsInterval;
+    }
+
+    public void setQpsInterval(int qpsInterval) {
+        this.qpsInterval = qpsInterval;
+    }
+
     public int getConnThreshold() {
         return connThreshold;
     }
 
     public void setConnThreshold(int connThreshold) {
         this.connThreshold = connThreshold;
+    }
+
+    public int getConnFluc() {
+        return connFluc;
+    }
+
+    public void setConnFluc(int connFluc) {
+        this.connFluc = connFluc;
+    }
+
+    public int getConnBase() {
+        return connBase;
+    }
+
+    public void setConnBase(int connBase) {
+        this.connBase = connBase;
+    }
+
+    public int getConnInterval() {
+        return connInterval;
+    }
+
+    public void setConnInterval(int connInterval) {
+        this.connInterval = connInterval;
     }
 
     public boolean isUpdate() {

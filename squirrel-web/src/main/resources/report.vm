@@ -62,75 +62,80 @@
 
 <body>
 
-<h3>缓存红黑榜</h3>
+<h3>缓存异常报表</h3>
 
 
 <div class="row" style="margin-center:1px">
-    <label>失败率 > 0.100% </label>
-    <table class="table table-bordered table-striped table-condensed  table-hover">
-        <thead>
-        <tr>
-            <th>Type</th>
-            <th>Name</th>
-            <th>Total</th>
-            <th>Failure</th>
-            <th>Failure(%)</th>
-            <th>Min(ms)</th>
-            <th>Max(ms)</th>
-            <th>Avg(ms)</th>
-        </tr>
-        </thead>
-        <tbody>
-            #foreach( $info in $failDetails)
+    #if($failDetails.size>0)
+        <label>失败率 > 0.100% </label>
+        <table class="table table-bordered table-striped table-condensed  table-hover">
+            <thead>
             <tr>
-                #if($info.rowspan>0)
-                    <td style="border:1px solid black;text-align: left" rowspan="$info.rowspan">$info.cacheName</td>
-                #end
-                <td style="border:1px solid black;text-align: left">$info.project</td>
-                <td style="border:1px solid black;text-align: center">$info.totalCount</td>
-                <td style="border:1px solid black;text-align: center">$info.failCount</td>
-                <td style="border:1px solid black;text-align: center;color: red">$info.failPercent</td>
-                <td style="border:1px solid black;text-align: center">$info.minVal</td>
-                <td style="border:1px solid black;text-align: center">$info.maxVal</td>
-                <td style="border:1px solid black;text-align: center">$info.avgVal</td>
+                <th>Type</th>
+                <th>Name</th>
+                <th>Total</th>
+                <th>Failure</th>
+                <th>Failure(%)</th>
+                <th>Min(ms)</th>
+                <th>Max(ms)</th>
+                <th>Avg(ms)</th>
             </tr>
-            #end
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                #foreach( $info in $failDetails)
+                <tr>
+                    #if($info.rowspan>0)
+                        <td style="border:1px solid black;text-align: left" rowspan="$info.rowspan">$info.cacheName</td>
+                    #end
+                    <td style="border:1px solid black;text-align: left">$info.project</td>
+                    <td style="border:1px solid black;text-align: center">$info.totalCount</td>
+                    <td style="border:1px solid black;text-align: center">$info.failCount</td>
+                    <td style="border:1px solid black;text-align: center;color: red">$info.failPercent</td>
+                    <td style="border:1px solid black;text-align: center">$info.minVal</td>
+                    <td style="border:1px solid black;text-align: center">$info.maxVal</td>
+                    <td style="border:1px solid black;text-align: center">$info.avgVal</td>
+                </tr>
+                #end
+            </tbody>
+        </table>
+    #end
 </div>
 
 <div class="row" style="margin-center:1px">
-    <label>平均时间 > 10ms </label>
-    <table class="table table-bordered table-striped table-condensed  table-hover">
-        <thead>
-        <tr>
-            <th>Type</th>
-            <th>Name</th>
-            <th>Total</th>
-            <th>Failure</th>
-            <th>Failure(%)</th>
-            <th>Min(ms)</th>
-            <th>Max(ms)</th>
-            <th>Avg(ms)</th>
-        </tr>
-        </thead>
-        <tbody>
-            #foreach( $info in $delayDetails)
+    #if($delayDetails.size()>0)
+        <label>平均时间 > 10ms </label>
+        <table class="table table-bordered table-striped table-condensed  table-hover">
+            <thead>
             <tr>
-                #if($info.rowspan>0)
-                    <td style="border:1px solid black;;text-align: left" rowspan="$info.rowspan">$info.cacheName</td>
-                #end
-                <td style="border:1px solid black;text-align: left">$info.project</td>
-                <td style="border:1px solid black;text-align: center">$info.totalCount</td>
-                <td style="border:1px solid black;text-align: center">$info.failCount</td>
-                <td style="border:1px solid black;text-align: center">$info.failPercent</td>
-                <td style="border:1px solid black;text-align: center">$info.minVal</td>
-                <td style="border:1px solid black;text-align: center">$info.maxVal</td>
-                <td style="border:1px solid black;text-align: center;color: red ">$info.avgVal</td>
+                <th>Type</th>
+                <th>Name</th>
+                <th>Total</th>
+                <th>Failure</th>
+                <th>Failure(%)</th>
+                <th>Min(ms)</th>
+                <th>Max(ms)</th>
+                <th>Avg(ms)</th>
             </tr>
-            #end
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                #foreach( $info in $delayDetails)
+                <tr>
+                    #if($info.rowspan>0)
+                        <td style="border:1px solid black;;text-align: left"
+                            rowspan="$info.rowspan">$info.cacheName</td>
+                    #end
+                    <td style="border:1px solid black;text-align: left">$info.project</td>
+                    <td style="border:1px solid black;text-align: center">$info.totalCount</td>
+                    <td style="border:1px solid black;text-align: center">$info.failCount</td>
+                    <td style="border:1px solid black;text-align: center">$info.failPercent</td>
+                    <td style="border:1px solid black;text-align: center">$info.minVal</td>
+                    <td style="border:1px solid black;text-align: center">$info.maxVal</td>
+                    <td style="border:1px solid black;text-align: center;color: red ">$info.avgVal</td>
+                </tr>
+                #end
+            </tbody>
+        </table>
+    #end
 </div>
 </div>
 
