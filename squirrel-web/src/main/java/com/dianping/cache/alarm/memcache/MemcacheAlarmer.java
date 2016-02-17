@@ -347,6 +347,7 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
 
                     if ((usage - memcacheBaseline.getMem()) < memcacheBaseline.getMem() * 0.1) {
                         alarmFlag = false;
+                        break;
                     }
                 }
 
@@ -577,6 +578,7 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
 
                     if ((conn -flucConnTmp) < flucConnTmp * 0.1) {
                         alarmFlag = false;
+                        break;
                     }
                 }
 
