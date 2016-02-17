@@ -6,7 +6,9 @@ import com.dianping.cache.controller.vo.IndexData;
 import com.dianping.cache.controller.vo.MemcachedDashBoardData;
 import com.dianping.cache.controller.vo.RedisDashBoardData;
 import com.dianping.cache.entity.CacheConfiguration;
+import com.dianping.cache.scale.instance.docker.paasbean.MachineStatusBean;
 import com.dianping.cache.service.CacheConfigurationService;
+import com.dianping.cache.service.PaasApiService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,6 +30,9 @@ public class IndexController extends AbstractMenuController{
 
 	@Autowired
 	private RedisController redisController;
+
+	@Autowired
+	private PaasApiService paasApiService;
 
 	@RequestMapping(value = "/")
 	public ModelAndView allApps() {
@@ -75,6 +80,20 @@ public class IndexController extends AbstractMenuController{
 		data.setRedisCapacity(redisCapacity);
 		data.setMemcachedCapacity(memcachedCapacity);
 		data.setCapacity(redisCapacity + memcachedCapacity);
+
+		List<MachineStatusBean> beans = paasApiService.getMachineStatus();
+		long totalMC = 0,freeMC = 0;
+		for(MachineStatusBean bean : beans){
+			totalMC += bean.getMemory();
+			freeMC += bean.getMemoryFree();
+			//System.out.println(bean.getIp() + "/" + bean.getMemoryFree());
+		}
+		data.setTotalMachines(beans.size());
+		data.setTotalMachineCapacity((int) (totalMC/1024/1024/1024/2));
+		data.setFreeMachineCapacity((int) (freeMC/1024/1024/1024/2));
+
 		return data;
 	}
+
+
 }

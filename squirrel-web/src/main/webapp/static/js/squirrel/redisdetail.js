@@ -92,6 +92,7 @@ module.controller('RedisController', [
         $scope.exportdes = [];
         $scope.reshardType;
         $scope.failover;
+        $scope.speed = 'true';
         $scope.configParas = [];
         $scope.categoryEntity = {
         }
@@ -136,6 +137,7 @@ module.controller('RedisController', [
             $scope.exportdes = [];
             $scope.reshardParams = {};
             $scope.reshardParams.cluster = $scope.redisData.clusterName;
+            $scope.reshardParams.speed = $scope.speed;
             if($scope.reshardType === "average"){
                 var avgTemp = $('.avg');
                 for(var i = 0;i<avgTemp.length;i++){

@@ -3,56 +3,56 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.2.xsd">
 
 	<!-- ActiveMQ 连接工厂 -->
-<!-- 	<bean id="connectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory"> -->
+<!-- 	<paasbean id="connectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory"> -->
 <!-- 		<property name="brokerURL" value="${avatar-cache.activemq.url}" /> -->
 <!-- 		<property name="userName" value="${avatar-cache.activemq.username}" /> -->
 <!-- 		<property name="password" value="${avatar-cache.activemq.password}" /> -->
 <!-- 		<property name="useAsyncSend" value="true" />-->
 <!-- 		<property name="producerWindowSize" value="1024000" />-->
 <!-- 		<property name="sendTimeout" value="1500"/> -->
-<!-- 	</bean> -->
+<!-- 	</paasbean> -->
 
 	<!-- Spring Caching 连接工厂 -->
-<!-- 	<bean id="cachingConnectionFactory" class="org.springframework.jms.connection.CachingConnectionFactory"> -->
+<!-- 	<paasbean id="cachingConnectionFactory" class="org.springframework.jms.connection.CachingConnectionFactory"> -->
 <!-- 		<property name="targetConnectionFactory" ref="connectionFactory" /> -->
 <!-- 		<property name="sessionCacheSize" value="10" /> -->
 <!-- 		<property name="reconnectOnException" value="true"/> -->
 <!-- 		<property name="clientId"> -->
-<!-- 			<bean class="com.dianping.avatar.jms.support.JmsClientIdGenerator"> -->
+<!-- 			<paasbean class="com.dianping.avatar.jms.support.JmsClientIdGenerator"> -->
 <!-- 				<constructor-arg index="0" value="${avatar-cache.activemq.clientId.prefix}"/> -->
-<!-- 			</bean> -->
+<!-- 			</paasbean> -->
 <!-- 		</property> -->
-<!-- 	</bean> -->
+<!-- 	</paasbean> -->
 	
-<!-- 	<bean id="messageConverter" class="com.dianping.avatar.jms.support.InnerDestinationAwareMessageConverter" > -->
+<!-- 	<paasbean id="messageConverter" class="com.dianping.avatar.jms.support.InnerDestinationAwareMessageConverter" > -->
 <!-- 		<constructor-arg index="0" value="com.dianping.remote.share.annotation.JmsMessageBody"></constructor-arg> -->
-<!-- 	</bean> -->
+<!-- 	</paasbean> -->
 
 	<!-- Spring JMS Template -->
-<!-- 	<bean id="jmsTemplate" class="org.springframework.jms.core.JmsTemplate"> -->
+<!-- 	<paasbean id="jmsTemplate" class="org.springframework.jms.core.JmsTemplate"> -->
 <!-- 		<property name="connectionFactory" ref="cachingConnectionFactory" /> -->
 <!-- 		<property name="messageConverter" ref="messageConverter" /> -->
 <!-- 		<property name="pubSubDomain" value="true"/> -->
 <!-- 		<property name="timeToLive" value="600000"/> -->
-<!-- 	</bean> -->
+<!-- 	</paasbean> -->
 
 	<!-- Queue定义 -->
-<!-- 	<bean id="notifyQueue" class="org.apache.activemq.command.ActiveMQQueue"> -->
+<!-- 	<paasbean id="notifyQueue" class="org.apache.activemq.command.ActiveMQQueue"> -->
 <!-- 		<constructor-arg value="${avatar-cache.activemq.cache.queue.name}" /> -->
-<!-- 	</bean> -->
+<!-- 	</paasbean> -->
 
 	<!-- Topic定义 -->
-<!-- 	<bean id="notifyTopic" class="org.apache.activemq.command.ActiveMQTopic"> -->
+<!-- 	<paasbean id="notifyTopic" class="org.apache.activemq.command.ActiveMQTopic"> -->
 <!-- 		<constructor-arg value="${avatar-cache.activemq.cache.topic.name}" /> -->
-<!-- 	</bean> -->
+<!-- 	</paasbean> -->
 
 	<!-- 使用Spring JmsTemplate的消息生产者 -->
-<!-- 	<bean id="amqNotifyMessageProducer" class="com.dianping.cache.remote.jms.CacheMessageProducerAMQ" init-method="init"> -->
+<!-- 	<paasbean id="amqNotifyMessageProducer" class="com.dianping.cache.remote.jms.CacheMessageProducerAMQ" init-method="init"> -->
 <!-- 		<property name="jmsTemplate" ref="jmsTemplate" /> -->
 <!-- 		<property name="notifyQueue" ref="notifyQueue" /> -->
 <!-- 		<property name="notifyTopic" ref="notifyTopic" /> -->
 <!-- 		<property name="mailService" ref="mailService"/> -->
-<!-- 	</bean> -->
+<!-- 	</paasbean> -->
 	
 	<bean id="converter" class="com.dianping.cache.remote.jms.convert.JDKObject2BytesConverter">
 	</bean>
@@ -77,7 +77,7 @@
 			<list>
 				<ref bean="swallowNotifyMessageProducer2"/>
 				<ref bean="swallowNotifyMessageProducer"/>
-<!-- 				<ref bean="amqNotifyMessageProducer"/> -->
+<!-- 				<ref paasbean="amqNotifyMessageProducer"/> -->
 				<ref bean="cacheMessageNotifier"/>
 			</list>
 		</property>

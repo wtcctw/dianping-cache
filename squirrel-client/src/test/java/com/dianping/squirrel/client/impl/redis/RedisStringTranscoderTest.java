@@ -1,13 +1,12 @@
 package com.dianping.squirrel.client.impl.redis;
 
-import static org.junit.Assert.*;
+import com.dianping.squirrel.client.impl.Bean;
+import com.dianping.squirrel.common.serialize.HessianSerializer;
+import org.junit.Test;
 
 import java.io.UnsupportedEncodingException;
 
-import org.junit.Test;
-
-import com.dianping.squirrel.client.impl.Bean;
-import com.dianping.squirrel.common.serialize.HessianSerializer;
+import static org.junit.Assert.assertEquals;
 
 public class RedisStringTranscoderTest {
 
@@ -15,7 +14,7 @@ public class RedisStringTranscoderTest {
     public void testAll() throws Exception {
         RedisStringTranscoder transcoder = new RedisStringTranscoder();
         HessianSerializer hs = new HessianSerializer();
-        Bean bean = new Bean(12345678, "bean");
+        Bean bean = new Bean(12345678, "paasbean");
         // long
         String output = transcoder.encode(12345678L);
         System.out.println("long: " + output);

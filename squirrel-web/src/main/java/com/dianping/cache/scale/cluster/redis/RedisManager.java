@@ -2,6 +2,7 @@ package com.dianping.cache.scale.cluster.redis;
 
 import com.dianping.cache.entity.CacheConfiguration;
 import com.dianping.cache.entity.ReshardRecord;
+import com.dianping.cache.scale.MigratingException;
 import com.dianping.cache.service.CacheConfigurationService;
 import com.dianping.cache.util.ConfigUrlUtil;
 import com.dianping.cache.util.SpringLocator;
@@ -30,7 +31,8 @@ public class RedisManager {
 	public static final String SLOT_MIGRATING_IDENTIFIER = "-->--";
 	public static final long CLUSTER_SLEEP_INTERVAL = 50;
 	public static final int CLUSTER_DEFAULT_TIMEOUT = 20000;
-	public static final int CLUSTER_MIGRATE_NUM = 10;
+	public static final int CLUSTER_MIGRATE_NUM_FAST = 10;
+	public static final int CLUSTER_MIGRATE_NUM_SLOW = 1;
 	public static final int DEFAULT_CHECKPORT_TIMEOUT = 60000;
 	public static final int CLUSTER_DEFAULT_DB = 0;
 	public static final String UNIX_LINE_SEPARATOR = "\n";
@@ -96,16 +98,22 @@ public class RedisManager {
      * @return
      */
 	public static boolean migrate(RedisServer src,RedisServer des,int slot){
-		return  migrate(src,des,slot,false);
+		return  migrate(src,des,slot,false,false);
 	}
 
-	public static boolean migrate(RedisServer src,RedisServer des,int slot,boolean open){
+	public static boolean migrate(RedisServer src,RedisServer des,int slot,boolean open,boolean speed){
 		Jedis srcNode = JedisAuthWapper.getJedis(src);
 		String srcNodeId = src.getId();
 		Pipeline pipeline = srcNode.pipelined();
 		Jedis destNode = JedisAuthWapper.getJedis(des);
 		String destNodeId = des.getId();
 		int timeout = CLUSTER_DEFAULT_TIMEOUT;
+		int migrate_num;
+		if(speed){
+			migrate_num = CLUSTER_MIGRATE_NUM_FAST;
+		}else{
+			migrate_num = CLUSTER_MIGRATE_NUM_SLOW;
+		}
 		/** migrate every slot from src node to dest node */
 		if(!open){
 			destNode.clusterSetSlotImporting(slot, srcNodeId);
@@ -113,10 +121,21 @@ public class RedisManager {
 		}
 		while (true) {
 			try {
-				List<String> keysInSlot = srcNode.clusterGetKeysInSlot(slot,CLUSTER_MIGRATE_NUM);
+				List<String> keysInSlot = srcNode.clusterGetKeysInSlot(slot,migrate_num);
 				if (keysInSlot == null || keysInSlot.isEmpty()) {
                     break;
                 }
+
+				if(!speed){
+					for (String key : keysInSlot) {
+						if(!"OK".equals(srcNode.migrate(des.getIp(), des.getPort(), key, CLUSTER_DEFAULT_DB, timeout))){
+							logger.error("slot migtating error,reponse is not OK,key :" + key);
+							throw new MigratingException("slot migtating error,reponse is not OK,key :" + key);
+						}
+					}
+					continue;
+				}
+
 				Map<String,Response<String>> responseMap = new HashMap<String, Response<String>>(keysInSlot.size());
 				for (String key : keysInSlot) {
                     Response<String> str = pipeline.migrate(des.getIp(),des.getPort(), key,
@@ -403,9 +422,15 @@ public class RedisManager {
 	private static void notifyAllNode(int slot,String destNodeId,RedisServer redisServer){
 		List<RedisServer> servers = getAllNodesOfCluster(redisServer);
 		for(RedisServer server : servers){
-			Jedis jedis = JedisAuthWapper.getJedis(server);
-			jedis.clusterSetSlotNode(slot,destNodeId);
-			JedisAuthWapper.returnResource(jedis);
+			Jedis jedis = null;
+			try {
+				jedis = JedisAuthWapper.getJedis(server);
+				jedis.clusterSetSlotNode(slot,destNodeId);
+			} catch (Exception e) {
+				logger.error("notify node slot stable error",e);
+			} finally {
+				JedisAuthWapper.returnResource(jedis);
+			}
 		}
 	}
 
@@ -424,7 +449,7 @@ public class RedisManager {
 		}
 
 		if(importing.size() == 1 && migrating.size() == 1){
-			migrate(importing.get(0),migrating.get(0),slot,true);
+			//migrate(importing.get(0),migrating.get(0),slot,true);
 		}
 	}
 

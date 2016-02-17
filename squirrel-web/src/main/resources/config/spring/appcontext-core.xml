@@ -33,9 +33,9 @@
 
     <bean class="com.dianping.cache.alarm.lifecycle.LifecycleComponentManager" />
 
-    <!--<bean id="dataStorage" class="com.dianping.cache.monitor.storage.MemcacheStatsDataStorage"></bean>-->
-    <!--<bean id="store" class="com.dianping.cache.monitor.storage.ServerStatsDataStorage"></bean>-->
-    <!--<bean id="redisDataStorage" class="com.dianping.cache.monitor.storage.RedisStatsDataStorage"></bean>-->
+    <!--<paasbean id="dataStorage" class="com.dianping.cache.monitor.storage.MemcacheStatsDataStorage"></paasbean>-->
+    <!--<paasbean id="store" class="com.dianping.cache.monitor.storage.ServerStatsDataStorage"></paasbean>-->
+    <!--<paasbean id="redisDataStorage" class="com.dianping.cache.monitor.storage.RedisStatsDataStorage"></paasbean>-->
     <bean id="retrieveCategoryMappingTask" class="com.dianping.squirrel.task.RetrieveCategoryMappingTask"></bean>
     <bean id="purgeHistoryDataTask" class="com.dianping.squirrel.task.PurgeHistoryDataTask"></bean>
 

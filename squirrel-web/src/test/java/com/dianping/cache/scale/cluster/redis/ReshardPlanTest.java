@@ -38,7 +38,7 @@ public class ReshardPlanTest {
 
     @Test
     public void testMakePlan() throws Exception {
-        ReshardPlan reshardPlan = new ReshardPlan("redis-wh", srcNodes, desNodes, false);
+        ReshardPlan reshardPlan = new ReshardPlan("redis-wh", srcNodes, desNodes, false,false);
         List<ReshardRecord> reshardRecordList = reshardPlan.getReshardRecordList();
         for (ReshardRecord reshardRecord : reshardRecordList) {
             System.out.println("From :" + reshardRecord.getSrcNode() + "-- > To :" + reshardRecord.getDesNode() + " slots : " + reshardRecord.getSlotsToMigrate());
@@ -46,7 +46,7 @@ public class ReshardPlanTest {
 
 
         System.out.println("Second----");
-        reshardPlan = new ReshardPlan("redis-wh", srcNodes, desNodes, true);
+        reshardPlan = new ReshardPlan("redis-wh", srcNodes, desNodes,false,false);
         reshardRecordList = reshardPlan.getReshardRecordList();
         for (ReshardRecord reshardRecord : reshardRecordList) {
             System.out.println("From :" + reshardRecord.getSrcNode() + "-- > To :" + reshardRecord.getDesNode() + " slots : " + reshardRecord.getSlotsToMigrate());
@@ -54,7 +54,7 @@ public class ReshardPlanTest {
 
         System.out.println("Third----");
         desNodes.add("127.0.0.1:7005");
-        reshardPlan = new ReshardPlan("redis-wh", srcNodes, desNodes, false);
+        reshardPlan = new ReshardPlan("redis-wh", srcNodes, desNodes,false,false);
         reshardRecordList = reshardPlan.getReshardRecordList();
         for (ReshardRecord reshardRecord : reshardRecordList) {
             System.out.println("From :" + reshardRecord.getSrcNode() + "-- > To :" + reshardRecord.getDesNode() + " slots : " + reshardRecord.getSlotsToMigrate());
@@ -63,7 +63,7 @@ public class ReshardPlanTest {
 
     @Test
     public void testReshard(){
-        ReshardPlan reshardPlan = new ReshardPlan("redis-test", srcNodes, desNodes, false);List<ReshardRecord> reshardRecordList = reshardPlan.getReshardRecordList();
+        ReshardPlan reshardPlan = new ReshardPlan("redis-test", srcNodes, desNodes, false,false);List<ReshardRecord> reshardRecordList = reshardPlan.getReshardRecordList();
         for (ReshardRecord reshardRecord : reshardRecordList) {
             System.out.println("From :" + reshardRecord.getSrcNode() + "-- > To :" + reshardRecord.getDesNode() + " slots : " + reshardRecord.getSlotsToMigrate());
         }

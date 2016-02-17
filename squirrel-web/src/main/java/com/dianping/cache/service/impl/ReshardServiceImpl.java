@@ -1,7 +1,6 @@
 package com.dianping.cache.service.impl;
 
-import com.dianping.cache.scale.ScaleException;
-import com.dianping.cache.scale.cluster.redis.RedisCluster;
+import com.dianping.cache.controller.vo.RedisReshardParams;
 import com.dianping.cache.scale.cluster.redis.RedisManager;
 import com.dianping.cache.scale.cluster.redis.RedisServer;
 import com.dianping.cache.scale.cluster.redis.ReshardPlan;
@@ -15,10 +14,13 @@ import java.util.List;
  */
 public class ReshardServiceImpl implements ReshardService{
     @Override
-    public ReshardPlan createReshardPlan(String cluster,List<String> srcNodes,List<String> desNodes,boolean isAverage) {
+    public ReshardPlan createReshardPlan(RedisReshardParams redisReshardParams) {
+        List<String> desNodes = redisReshardParams.getDesNodes();
+        List<String> srcNodes = redisReshardParams.getSrcNodes();
+        String cluster = redisReshardParams.getCluster();
         ReshardPlan reshardPlan;
         List<RedisServer> srcNodeServer = RedisManager.getServerInClusterCache(cluster,srcNodes);
-        if(isAverage){
+        if(redisReshardParams.isAverage()){
             int totalSlots = 0,avgSlots;
             for(RedisServer server : srcNodeServer){
                 totalSlots += server.getSlotSize();
@@ -35,10 +37,10 @@ public class ReshardServiceImpl implements ReshardService{
                     less.add(server.getAddress());
                 }
             }
-            reshardPlan = new ReshardPlan(cluster,more,less,true);
+            reshardPlan = new ReshardPlan(cluster,more,less,true,redisReshardParams.isSpeed());
         }else{
             desNodes.removeAll(srcNodes);
-            reshardPlan = new ReshardPlan(cluster,srcNodes,desNodes,false);
+            reshardPlan = new ReshardPlan(cluster,srcNodes,desNodes,false,redisReshardParams.isSpeed());
         }
 
         return reshardPlan;

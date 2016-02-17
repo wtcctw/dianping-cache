@@ -143,7 +143,7 @@ var ClojureHighlightRules = function() {
             'alter alter-meta! alter-var-root amap ancestors and apply areduce ' +
             'array-map aset aset-boolean aset-byte aset-char aset-double aset-float ' +
             'aset-int aset-long aset-short assert assoc assoc! assoc-in associative? ' +
-            'atom await await-for await1 bases bean bigdec bigint binding bit-and ' +
+            'atom await await-for await1 bases paasbean bigdec bigint binding bit-and ' +
             'bit-and-not bit-clear bit-flip bit-not bit-or bit-set bit-shift-left ' +
             'bit-shift-right bit-test bit-xor boolean boolean-array booleans ' +
             'bound-fn bound-fn* butlast byte byte-array bytes cast char char-array ' +
