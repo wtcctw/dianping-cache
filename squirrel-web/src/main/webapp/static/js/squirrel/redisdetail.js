@@ -100,10 +100,8 @@ module.controller('RedisController', [
 
         $scope.initPage = function(){
 
-            $http.get(window.contextPath + '/redis/detail',{
-                params : {
-                    cluster : window.localStorage.cluster
-                }
+            $http.get(window.location.pathname+'/detail',{
+                params : {}
             }).success(function(response){
                 $scope.redisData = response.redisCluster;
                 var usage = response.memoryUsage;
@@ -285,6 +283,15 @@ module.controller('RedisController', [
             $scope.logContent = content;
         }
 
+        $scope.initCharts = function() {
+            $http.get(window.location.pathname+'/period',{
+                params : {}
+            }).success(function(response){
+                cloumnchart("container-incr",response);
+            }).error(function(){
+            });
+        }
+        $scope.initCharts();
 
         var piechart = function (divName,seriesdata) {
             $(function () {
@@ -322,6 +329,59 @@ module.controller('RedisController', [
                 });
             });
         }
-
+        var cloumnchart = function (divName,item) {
+            $(function () {
+                $('#'+divName).highcharts({
+                    chart : {
+                        type : "column",
+                    },
+                    title : {
+                        text : item.title,
+                        x : 0
+                        //center
+                    },
+                    subtitle : {
+                        text : item.subTitle,
+                        x : 0
+                    },
+                    xAxis : {
+                        type : 'datetime'
+                    },
+                    yAxis : {
+                        title : {
+                            text : item.yAxisTitle
+                        },
+                        min : 0,
+                        plotLines : [ {
+                            value : 0,
+                            width : 10,
+                            color : '#808080'
+                        } ]
+                    },
+                    tooltip : {
+                        valueSuffix : ''
+                    },
+                    legend : {
+                        layout : 'vertical',
+                        align : 'right',
+                        verticalAlign : 'middle',
+                        borderWidth : 0
+                    },
+                    plotOptions : {
+                        series : {
+                            pointStart : item.plotOption.series.pointStart + 8 * 3600 * 1000,
+                            pointInterval : item.plotOption.series.pointInterval
+                            // one day
+                        },
+                        spline : {
+                            marker : {
+                                enabled : false
+                            }
+                        }
+                    },
+                    series : item.series
+                });
+            });
+        }
 
     } ]);

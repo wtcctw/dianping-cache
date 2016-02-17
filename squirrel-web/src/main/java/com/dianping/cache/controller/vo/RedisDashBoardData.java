@@ -143,7 +143,7 @@ public class RedisDashBoardData extends DashBoardData{
             for(Map.Entry<String,Integer> entity : sortMapByValue){
                 String host = entity.getKey();
                 Float value = (float)(entity.getValue().intValue())/total * 100;
-                if(value > 25.0F){
+                if(value > 24.0F){
                     this.disperse++;
                     disperseAlarm = true;
                 }
