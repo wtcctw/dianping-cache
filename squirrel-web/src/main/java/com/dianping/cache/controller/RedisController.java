@@ -207,8 +207,7 @@ public class RedisController extends AbstractSidebarController{
 	@ResponseBody
 	public void reshard(@RequestBody RedisReshardParams redisReshardParams) {
 
-		ReshardPlan reshardPlan = reshardService.createReshardPlan(redisReshardParams.getCluster(), redisReshardParams.getSrcNodes(),
-				redisReshardParams.getDesNodes(), redisReshardParams.isAverage());
+		ReshardPlan reshardPlan = reshardService.createReshardPlan(redisReshardParams);
 		RedisReshardTask task = new RedisReshardTask(reshardPlan);
 
 		TaskManager.submit(task);

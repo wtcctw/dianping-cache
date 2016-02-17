@@ -30,9 +30,9 @@
 	</bean>
 
 	<!--
-    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">自动发现 映射器
+    <paasbean class="org.mybatis.spring.mapper.MapperScannerConfigurer">自动发现 映射器
         <property name="basePackage" value="com.dp.mybatis.dao"/>
-    </bean> -->
+    </paasbean> -->
 
     <bean id="userDao" class="org.mybatis.spring.mapper.MapperFactoryBean">
  		<property name="mapperInterface" value="com.dianping.cache.dao.UserDao" />

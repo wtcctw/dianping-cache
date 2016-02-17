@@ -188,15 +188,22 @@
                         <div class="input-group col-xs-12"  ng-switch="reshardType">
                             <div class="col-xs-12 form-group">
                                 <label class="col-xs-3 control-label control-label no-padding-right">1.选择迁移模式</label>
-                                <div class="col-xs-9">
+                                <div class="col-xs-6">
                                     <select class="col-xs-12" ng-model="reshardType"
                                             name="type"required>
                                         <option value="average">配平</option>
                                         <option value="export">导出</option>
                                     </select>
                                     <span ng-switch-when="average">(注:配平模式下将平衡所选实例的slot)</span>
-                                    <span ng-switch-when="export">(注:导出模式下会把选中源实例中所有的slot导出)</span>
+                                    <span ng-switch-when="export">(注:将选中源实例中所有的slot导出)</span>
                                 </div>
+                                <!--<div class="col-xs-3">-->
+                                    <!--<select class="col-xs-12" ng-model="speed"-->
+                                            <!--name="type"required>-->
+                                        <!--<option value="false">1key迁移</option>-->
+                                        <!--<option value="true">10Key迁移</option>-->
+                                    <!--</select>-->
+                                <!--</div>-->
                             </div>
                             <div class="space-4"></div>
                             <div class="col-xs-12 form-group" ng-switch-when="average">

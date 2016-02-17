@@ -19,6 +19,12 @@ public class IndexData {
     private int redisDataInc;
     private int mecachedDataInc;
 
+    private int totalMachines;
+    private int totalMachineCapacity;
+    private int freeMachineCapacity;
+    private String totalMachineCapacityString;
+    private String freeMachineCapacityString;
+
     public int getTotalNum() {
         return totalNum;
     }
@@ -60,6 +66,33 @@ public class IndexData {
     public void setMemcachedCapacity(int memcachedCapacity) {
         this.memcachedCapacity = memcachedCapacity;
         memcachedCapacityString = convertT(memcachedCapacity);
+    }
+
+
+    public int getTotalMachines() {
+        return totalMachines;
+    }
+
+    public void setTotalMachines(int totalMachines) {
+        this.totalMachines = totalMachines;
+    }
+
+    public int getTotalMachineCapacity() {
+        return totalMachineCapacity;
+    }
+
+    public void setTotalMachineCapacity(int totalMachineCapacity) {
+        this.totalMachineCapacity = totalMachineCapacity;
+        totalMachineCapacityString = convertT(totalMachineCapacity);
+    }
+
+    public int getFreeMachineCapacity() {
+        return freeMachineCapacity;
+    }
+
+    public void setFreeMachineCapacity(int freeMachineCapacity) {
+        this.freeMachineCapacity = freeMachineCapacity;
+        freeMachineCapacityString = convertT(freeMachineCapacity);
     }
 
     public int getDataInc() {
@@ -108,6 +141,22 @@ public class IndexData {
 
     public void setMemcachedCapacityString(String memcachedCapacityString) {
         this.memcachedCapacityString = memcachedCapacityString;
+    }
+
+    public String getTotalMachineCapacityString() {
+        return totalMachineCapacityString;
+    }
+
+    public void setTotalMachineCapacityString(String totalMachineCapacityString) {
+        this.totalMachineCapacityString = totalMachineCapacityString;
+    }
+
+    public String getFreeMachineCapacityString() {
+        return freeMachineCapacityString;
+    }
+
+    public void setFreeMachineCapacityString(String freeMachineCapacityString) {
+        this.freeMachineCapacityString = freeMachineCapacityString;
     }
 
     private String convertT(int capacity){
