@@ -24,21 +24,22 @@
 		<result column="evictions" property="evictions"/>
 		<result column="limit_maxbytes" property="limit_maxbytes"/>
 		<result column="bytes" property="bytes"/>
+		<result column="mem" property="mem"/>
 		<result column="taskId" property="taskId"/>
 		<result column="updateTime" property="updateTime"/>
 	</resultMap>
 
 	<insert id="insert" parameterType="MemcacheBaseline">
 		INSERT INTO memcache_baseline(baseline_name,serverId,uptime, curr_time, total_conn, curr_conn, curr_items, cmd_set, get_hits, get_misses,
-		 					bytes_read, bytes_written, delete_hits, delete_misses, evictions,limit_maxbytes, bytes, taskId, updateTime)
+		 					bytes_read, bytes_written, delete_hits, delete_misses, evictions,limit_maxbytes, bytes, mem, taskId, updateTime)
 		VALUES( #{baseline_name},#{serverId},#{uptime}, #{curr_time}, #{total_conn}, #{curr_conn}, #{curr_items}, #{cmd_set}, #{get_hits}, #{get_misses},
-					#{bytes_read}, #{bytes_written}, #{delete_hits}, #{delete_misses}, #{evictions},#{limit_maxbytes},#{bytes},#{taskId},#{updateTime})
+					#{bytes_read}, #{bytes_written}, #{delete_hits}, #{delete_misses}, #{evictions},#{limit_maxbytes},#{bytes},#{mem},#{taskId},#{updateTime})
 	</insert>
 	
 	
 	<select id="findByName" resultMap="MemcacheBaselineResult" parameterType="String">
    		SELECT id,baseline_name, serverId, uptime,curr_time, total_conn, curr_conn, curr_items, cmd_set, get_hits, get_misses,
-				 bytes_read, bytes_written, delete_hits, delete_misses, evictions,limit_maxbytes, bytes, taskId, updateTime
+				 bytes_read, bytes_written, delete_hits, delete_misses, evictions,limit_maxbytes, bytes, mem, taskId, updateTime
    		FROM memcache_baseline
    		WHERE baseline_name = #{baseline_name}
    		ORDER BY id DESC
@@ -46,14 +47,14 @@
 	
 	<select id="findAll" resultMap="MemcacheBaselineResult">
 		SELECT id,baseline_name, serverId, curr_time, total_conn, curr_conn, curr_items, cmd_set, get_hits, get_misses,
-				 bytes_read, bytes_written, delete_hits, delete_misses, evictions,limit_maxbytes, bytes, taskId, updateTime
+				 bytes_read, bytes_written, delete_hits, delete_misses, evictions,limit_maxbytes, bytes, mem, taskId, updateTime
    		FROM memcache_baseline
    		ORDER BY id DESC
 	</select>
 
 	<select id="findByTaskId" resultMap="MemcacheBaselineResult" parameterType="int">
 		SELECT id,baseline_name, serverId, curr_time, total_conn, curr_conn, curr_items, cmd_set, get_hits, get_misses,
-		bytes_read, bytes_written, delete_hits, delete_misses, evictions,limit_maxbytes, bytes, taskId, updateTime
+		bytes_read, bytes_written, delete_hits, delete_misses, evictions,limit_maxbytes, bytes, mem, taskId, updateTime
 		FROM memcache_baseline
 		WHERE taskId = #{taskId}
 		ORDER BY id DESC
@@ -61,7 +62,7 @@
 
 	<select id="findLast" resultMap="MemcacheBaselineResult" >
 		SELECT id, baseline_name, serverId,uptime, curr_time, total_conn, curr_conn, curr_items, cmd_set, get_hits, get_misses,
-				 bytes_read, bytes_written, delete_hits, delete_misses, evictions,limit_maxbytes, bytes, taskId, updateTime
+				 bytes_read, bytes_written, delete_hits, delete_misses, evictions,limit_maxbytes, bytes, mem, taskId, updateTime
    		FROM memcache_baseline
    		WHERE serverId = select id from servers where address = #{server}
    		ORDER BY id DESC
@@ -71,7 +72,7 @@
 	<select id="findByServerWithInterval" resultMap="MemcacheBaselineResult" parameterType="map">
 		<![CDATA[
 		SELECT id, baseline_name, serverId,uptime, curr_time, total_conn, curr_conn, curr_items, cmd_set, get_hits, get_misses,
-				 bytes_read, bytes_written, delete_hits, delete_misses, evictions,limit_maxbytes, bytes, taskId, updateTime
+				 bytes_read, bytes_written, delete_hits, delete_misses, evictions,limit_maxbytes, bytes, mem, taskId, updateTime
    		FROM memcache_baseline
    		WHERE curr_time >= #{start} AND curr_time <= #{end} AND serverId = (select id from servers  where address = #{address}) 
    		ORDER BY curr_time ASC 
