@@ -6,10 +6,7 @@ import com.dianping.cache.alarm.entity.AlarmRecord;
 import com.dianping.cache.controller.AbstractSidebarController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
@@ -35,7 +32,7 @@ public class AlarmRecordController extends AbstractSidebarController {
 
     @RequestMapping(value = "/event/list", method = RequestMethod.GET)
     @ResponseBody
-    public Object alarmRecordList(int offset, int limit) {
+    public Object alarmRecordList(@RequestParam("offset")int offset, @RequestParam("limit")int limit) {
         List<AlarmRecord> alarmRecords = alarmRecordService.findByPage(offset, limit);
         Map<String, Object> result = new HashMap<String, Object>();
         result.put("size", alarmRecords.size());

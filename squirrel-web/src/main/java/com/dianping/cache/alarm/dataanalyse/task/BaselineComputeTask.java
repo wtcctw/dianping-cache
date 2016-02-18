@@ -57,10 +57,13 @@ public class BaselineComputeTask {
     @Autowired
     ServerService serverService;
 
+    Map<String, Float> memMap;
+
 
     public void run() {
 
         try {
+            logger.info("Start to compute baseline......");
             Date now = new Date();
             com.dianping.cache.alarm.entity.BaselineComputeTask baselinecomputeTask = new com.dianping.cache.alarm.entity.BaselineComputeTask();
             baselinecomputeTask.setCreateTime(now);
@@ -69,10 +72,15 @@ public class BaselineComputeTask {
 
             int taskId = baselineComputeTaskService.getRecentTaskId().get(0).getId();
 
+            memMap = new HashMap<String, Float>();
+
+            getMemMap(memMap);
 
             memcacheBaselineCompute(taskId);
+            logger.info("memcache baseline compute complete.");
 
             redisBaselineCompute(taskId);
+            logger.info("redis baseline compute complete.");
 
         } catch (ParseException e) {
             e.printStackTrace();
@@ -80,13 +88,13 @@ public class BaselineComputeTask {
 
     }
 
-
     private void memcacheBaselineCompute(int taskId) throws ParseException {
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd",Locale.ENGLISH);
         List<String> startTime = getStartTime();
         String endTime = df.format(new Date());
 
-        Map<String, MemcachedStats> memcacheStatses = getMemcacheState(startTime, endTime);
+//        Map<String, MemcachedStats> memcacheStatses = getMemcacheState(startTime, endTime);
+        Map<String, MemcachedStats> memcacheStatses = null;
 
         memcacheBaslineStoreToDb(taskId, memcacheStatses);
     }
@@ -95,8 +103,6 @@ public class BaselineComputeTask {
 
         Map<String, MemcacheBaseline> memcacheBaselineMap = new HashMap<String, MemcacheBaseline>();
 
-
-        Map<String, Float>memMap = getMemMap();
 
         for (Map.Entry<String, MemcachedStats> entry : memcacheStatses.entrySet()) {
             MemcacheBaseline memcacheBaseline = MemcacheBaselineMapper.convertToMemcacheBaseline(entry.getValue());
@@ -109,21 +115,20 @@ public class BaselineComputeTask {
         }
     }
 
-    private Map<String, Float> getMemMap() throws ParseException {
+    private Map<String, Float> getMemMap(Map<String, Float>memMap) throws ParseException {
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
         List<String> startTime = getStartTime();
         String endTime = df.format(new Date());
 
-        Map<String, Float>memMap = getMemState(startTime, endTime);
+       memMap = getMemState(startTime, endTime,memMap);
 
         return memMap;
     }
 
-    private Map<String, Float> getMemState(List<String> startTimeList, String endDate) throws ParseException {
+    private Map<String, Float> getMemState(List<String> startTimeList, String endDate,Map<String, Float> memMap) throws ParseException {
 
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss",Locale.ENGLISH);
 
-        Map<String, Float> memMap = new HashMap<String, Float>();
 
         for (int i = 0; i < startTimeList.size(); i++) {
             String startTime = startTimeList.get(i);
@@ -144,12 +149,13 @@ public class BaselineComputeTask {
             long tmp = startLong;
             long endLong = df.parse(endTime).getTime() / 1000;
 
-            List<Server> serverList = serverService.findAllMemcachedServers();
+            List<Server> serverListMemcache = serverService.findAllMemcachedServers();
+            List<Server> serverListRedis = serverService.findAllRedisServers();
 
             while (tmp + 60 < endLong) {//每分钟只采样一次
                 long end = tmp + 120;
 
-                for (Server server : serverList) {
+                for (Server server : serverListMemcache) {
 
                     List<ServerStats> serverStatsList = serverStatsService.findByServerWithInterval(server.getAddress(), tmp, end);
 
@@ -173,9 +179,34 @@ public class BaselineComputeTask {
                     }
 
                 }
+
+                for (Server server : serverListRedis) {
+
+                    List<ServerStats> serverStatsList = serverStatsService.findByServerWithInterval(server.getAddress(), tmp, end);
+
+                    if (0 != serverStatsList.size()) {
+                        SimpleDateFormat sdf = new SimpleDateFormat("EEEE:HH:mm",Locale.ENGLISH);
+                        Date nameDate = new Date(tmp * 1000);
+                        String name = "Redis_" + sdf.format(nameDate) + "_" + server.getAddress();
+
+
+                        Float mem = (float)serverStatsList.get(0).getMem_used()/serverStatsList.get(0).getMem_total();
+
+
+                        if (null == memMap.get(name)) {
+                            memMap.put(name, mem);
+                        } else {
+                            Float memTmp = dealMem(mem, memMap.get(name));
+
+                            memMap.remove(name);
+                            memMap.put(name, memTmp);
+                        }
+                    }
+
+                }
                 tmp += 60;
             }
-            for (Server server : serverList) {
+            for (Server server : serverListMemcache) {
 
                 List<ServerStats> serverStatsList = serverStatsService.findByServerWithInterval(server.getAddress(), tmp, endLong);
 
@@ -199,6 +230,32 @@ public class BaselineComputeTask {
                 }
 
             }
+
+            for (Server server : serverListRedis) {
+
+                List<ServerStats> serverStatsList = serverStatsService.findByServerWithInterval(server.getAddress(), tmp, endLong);
+
+                if (0 != serverStatsList.size()) {
+                    SimpleDateFormat sdf = new SimpleDateFormat("EEEE:HH:mm",Locale.ENGLISH);
+                    Date nameDate = new Date(tmp * 1000);
+                    String name = "Redis_" + sdf.format(nameDate) + "_" + server.getAddress();
+
+
+                    Float mem = (float)serverStatsList.get(0).getMem_used()/serverStatsList.get(0).getMem_total();
+
+
+                    if (null == memMap.get(name)) {
+                        memMap.put(name, mem);
+                    } else {
+                        Float memTmp = dealMem(mem, memMap.get(name));
+
+                        memMap.remove(name);
+                        memMap.put(name, memTmp);
+                    }
+                }
+
+            }
+
         }
 
         return memMap;
@@ -223,8 +280,6 @@ public class BaselineComputeTask {
 
     private void redisBaslineStoreToDb(int taskId, Map<String, RedisStats> redisStatsMap) throws ParseException {
         Map<String, RedisBaseline> redisBaselineMap = new HashMap<String, RedisBaseline>();
-
-        Map<String, Float>memMap = getMemMap();
 
         for (Map.Entry<String, RedisStats> entry : redisStatsMap.entrySet()) {
             RedisBaseline redisBaseline = RedisBaselineMapper.convertToRedisBaseline(entry.getValue());
@@ -434,9 +489,6 @@ public class BaselineComputeTask {
             long startLong = df.parse(startTime).getTime() / 1000;
             long tmp = startLong;
             long endLong = df.parse(endTime).getTime() / 1000;
-//            startLong = endLong - 100;
-//            tmp = startLong;
-
 
             while (tmp + 60 < endLong) {//每分钟只采样一次
                 long end = tmp + 120;
