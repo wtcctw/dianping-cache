@@ -98,7 +98,15 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
 
         memcachedStatsMap = new HashMap<String, MemcacheBaseline>();
 
+
+        long start,end;
+        logger.info("Memcache getHistoryMap StartTime:"+ (new Date()).toString());
+        start = System.currentTimeMillis();
         getHistoryMap(memcachedStatsMap);
+        logger.info("Memcache getHistoryMap EndTime:" + (new Date()).toString());
+        end = System.currentTimeMillis();
+        logger.info("Memcache getHistoryMap cost "+ (end-start) + "ms");
+
 
         MemcacheEvent memcacheEvent = eventFactory.createMemcacheEvent();
 

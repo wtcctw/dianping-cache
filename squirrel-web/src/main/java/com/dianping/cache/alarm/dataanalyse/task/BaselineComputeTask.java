@@ -75,6 +75,7 @@ public class BaselineComputeTask {
             memMap = new HashMap<String, Float>();
 
             getMemMap(memMap);
+            logger.info("getMemMap complete.");
 
             memcacheBaselineCompute(taskId);
             logger.info("memcache baseline compute complete.");
@@ -151,8 +152,15 @@ public class BaselineComputeTask {
 
             List<Server> serverListMemcache = serverService.findAllMemcachedServers();
             List<Server> serverListRedis = serverService.findAllRedisServers();
-
+            int per = 0;
             while (tmp + 60 < endLong) {//每分钟只采样一次
+
+                float percent = (float)(tmp-startLong)/(endLong-startLong)*100;
+
+                if(percent>(per+1)) {
+                    logger.info("getMemState complete " + percent + "%");
+                    per = (int)percent;
+                }
                 long end = tmp + 120;
 
                 for (Server server : serverListMemcache) {
@@ -320,7 +328,15 @@ public class BaselineComputeTask {
 
             List<Server> serverList = serverService.findAllMemcachedServers();
 
+            int per =0;
             while (tmp + 60 < endLong) {//每分钟只采样一次
+
+                float percent = (float)(tmp-startLong)/(endLong-startLong)*100;
+
+                if(percent>(per+1)) {
+                    logger.info("getMemcacheState complete " + percent + "%");
+                    per = (int)percent;
+                }
                 long end = tmp + 120;
 
                 for (Server server : serverList) {
@@ -490,7 +506,16 @@ public class BaselineComputeTask {
             long tmp = startLong;
             long endLong = df.parse(endTime).getTime() / 1000;
 
+            int per = 0;
             while (tmp + 60 < endLong) {//每分钟只采样一次
+
+                float percent = (float)(tmp-startLong)/(endLong-startLong)*100;
+
+                if(percent>(per+1)) {
+                    logger.info("getRedisState complete " + percent + "%");
+                    per = (int)percent;
+                }
+
                 long end = tmp + 120;
 
                 for (Server server : serverList) {

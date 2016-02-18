@@ -83,7 +83,13 @@ public class RedisAlarmer extends AbstractRedisAlarmer {
 
         redisBaselineMap = new HashMap<String, RedisBaseline>();
 
+        long start,end;
+        logger.info("Redis getHistoryMap StartTime:"+ (new Date()).toString());
+        start = System.currentTimeMillis();
         getHistoryMap(redisBaselineMap);
+        logger.info("Redis getHistoryMap EndTime:" + (new Date()).toString());
+        end = System.currentTimeMillis();
+        logger.info("Redis getHistoryMap cost " + (end - start) + "ms");
 
 
         List<RedisClusterData> redisClusterDatas = RedisDataUtil.getClusterData();
