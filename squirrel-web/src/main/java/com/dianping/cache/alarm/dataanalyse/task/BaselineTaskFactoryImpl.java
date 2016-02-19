@@ -27,4 +27,10 @@ public class BaselineTaskFactoryImpl implements BaselineTaskFactory, Application
         BaselineCleanTask baselineCleanTask=(BaselineCleanTask)applicationContext.getBean("baselineCleanTask");
         return baselineCleanTask;
     }
+
+    @Override
+    public BaselineMapGetTask createBaselineMapGetTask() {
+        BaselineMapGetTask baselineMapGetTask=(BaselineMapGetTask)applicationContext.getBean("baselineMapGetTask");
+        return baselineMapGetTask;
+    }
 }

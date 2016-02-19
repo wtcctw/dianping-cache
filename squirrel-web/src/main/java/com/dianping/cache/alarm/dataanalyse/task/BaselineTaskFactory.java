@@ -7,4 +7,6 @@ public interface BaselineTaskFactory {
     BaselineComputeTask createBaselineComputeTask();
 
     BaselineCleanTask createBaselineCleanTask();
+
+    BaselineMapGetTask createBaselineMapGetTask();
 }

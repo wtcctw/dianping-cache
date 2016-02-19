@@ -4,6 +4,7 @@ import com.dianping.cache.alarm.AlarmType;
 import com.dianping.cache.alarm.alarmconfig.AlarmConfigService;
 import com.dianping.cache.alarm.alarmtemplate.MemcacheAlarmTemplateService;
 import com.dianping.cache.alarm.dao.AlarmRecordDao;
+import com.dianping.cache.alarm.dataanalyse.baselineCache.BaselineCacheService;
 import com.dianping.cache.alarm.dataanalyse.service.MemcacheBaselineService;
 import com.dianping.cache.alarm.entity.*;
 import com.dianping.cache.alarm.event.EventFactory;
@@ -53,9 +54,6 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
 
 
 
-    Map<String, MemcacheBaseline> memcachedStatsMap;
-
-
     @Autowired
     private ServerService serverService;
 
@@ -80,14 +78,14 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
     @Autowired
     MemcacheAlarmTemplateService memcacheAlarmTemplateService;
 
-
     @Autowired
     MemcacheBaselineService memcacheBaselineService;
 
     @Autowired
     MemcacheStatsFlucService memcacheStatsFlucService;
 
-    List<String> serverList;
+    @Autowired
+    BaselineCacheService baselineCacheService;
 
     @Override
     public void doAlarm() throws InterruptedException, IOException, TimeoutException {
@@ -95,18 +93,6 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
     }
 
     private void doCheck() throws InterruptedException, IOException, TimeoutException {
-
-        memcachedStatsMap = new HashMap<String, MemcacheBaseline>();
-
-
-        long start,end;
-        logger.info("Memcache getHistoryMap StartTime:"+ (new Date()).toString());
-        start = System.currentTimeMillis();
-        getHistoryMap(memcachedStatsMap);
-        logger.info("Memcache getHistoryMap EndTime:" + (new Date()).toString());
-        end = System.currentTimeMillis();
-        logger.info("Memcache getHistoryMap cost "+ (end-start) + "ms");
-
 
         MemcacheEvent memcacheEvent = eventFactory.createMemcacheEvent();
 
@@ -163,67 +149,6 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
             eventReporter.report(memcacheEvent);
 
         }
-    }
-
-    private void getHistoryMap(Map<String, MemcacheBaseline> memcachedStatsMap) {
-
-        MemcacheData memcacheData = new MemcacheData();
-
-        memcacheData.setCacheConfigurationService(cacheConfigurationService);
-        memcacheData.setMemcacheStatsService(memcacheStatsService);
-        memcacheData.setServerService(serverService);
-
-
-        Map<String, Map<String, Object>> currentServerStats = memcacheData.getCurrentServerStatsData();
-
-        List<CacheConfiguration> configList = cacheConfigurationService.findAll();
-
-        List<AlarmType> types = new ArrayList<AlarmType>();
-
-        String sql = " SELECT id,baseline_name, serverId, curr_time, total_conn, curr_conn, curr_items, cmd_set, get_hits, get_misses," +
-                " bytes_read, bytes_written, delete_hits, delete_misses, evictions,limit_maxbytes, bytes, taskId, updateTime " +
-                "   FROM memcache_baseline" + " ORDER BY taskId DESC limit 1";
-
-
-        List<MemcacheBaseline> memcacheBaselineList = memcacheBaselineService.search(sql);
-
-        int taskId = memcacheBaselineList.get(0).getTaskId();
-
-        for (CacheConfiguration item : configList) {
-            //遍历所有的集群  对于集群名称为memcached的进行检查并放入告警队列
-            if (item.getCacheKey().contains("memcached")
-                    && !"memcached-leo".equals(item.getCacheKey())) {
-
-                this.serverList = item.getServerList();
-                List<String> serverList = this.serverList;
-                for (String server : serverList) {
-
-                    SimpleDateFormat sdf = new SimpleDateFormat("EEEE:HH:mm", Locale.ENGLISH);
-                    Date nameDate = new Date();
-
-                    for (int i = -5; i < 5; i++) {
-                        GregorianCalendar gc = new GregorianCalendar();
-                        gc.setTime(nameDate);
-
-                        gc.add(12, i);
-
-                        String name = "Memcache_" + sdf.format(gc.getTime()) + "_" + server;
-
-                        sql = " SELECT id,baseline_name, serverId, curr_time, total_conn, curr_conn, curr_items, cmd_set, get_hits, get_misses," +
-                                " bytes_read, bytes_written, delete_hits, delete_misses, evictions,limit_maxbytes, bytes, taskId, updateTime " +
-                                "   FROM memcache_baseline" + " WHERE baseline_name = '" + name + "' AND taskId = " + taskId + "  ORDER BY id ASC";
-
-                        List<MemcacheBaseline> baselineList = memcacheBaselineService.search(sql);
-
-                        if (0 != baselineList.size()) {
-                            memcachedStatsMap.put(name, baselineList.get(0));
-                        }
-                    }
-                }
-            }
-
-        }
-
     }
 
     boolean isDownAlarm(CacheConfiguration item, Map<String, Map<String, Object>> currentServerStats, MemcacheEvent memcacheEvent) throws InterruptedException, IOException, TimeoutException {
@@ -351,7 +276,10 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
                     gc.add(12, i);
                     String name = "Memcache_" + sdf.format(gc.getTime()) + "_" + server;
 
-                    MemcacheBaseline memcacheBaseline = memcachedStatsMap.get(name);
+                    MemcacheBaseline memcacheBaseline = baselineCacheService.getMemcacheBaselineByName(name);
+                    if(null == memcacheBaseline){
+                        continue;
+                    }
 
                     if ((usage - memcacheBaseline.getMem()) < memcacheBaseline.getMem() * 0.1) {
                         alarmFlag = false;
@@ -463,7 +391,7 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
                     gc.add(12, i);
                     String name = "Memcache_" + sdf.format(gc.getTime()) + "_" + server;
 
-                    MemcacheBaseline memcacheBaseline = memcachedStatsMap.get(name);
+                    MemcacheBaseline memcacheBaseline = baselineCacheService.getMemcacheBaselineByName(name);
                     if(null ==memcacheBaseline){
                         continue;
                     }
@@ -580,7 +508,10 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
                     gc.add(12, i);
                     String name = "Memcache_" + sdf.format(gc.getTime()) + "_" + server;
 
-                    MemcacheBaseline memcacheBaseline = memcachedStatsMap.get(name);
+                    MemcacheBaseline memcacheBaseline = baselineCacheService.getMemcacheBaselineByName(name);
+                    if(null == memcacheBaseline){
+                        continue;
+                    }
 
                     long flucConnTmp = memcacheBaseline.getCurr_conn();
 
@@ -805,4 +736,5 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
     public void setCacheConfigurationService(CacheConfigurationService cacheConfigurationService) {
         this.cacheConfigurationService = cacheConfigurationService;
     }
+
 }

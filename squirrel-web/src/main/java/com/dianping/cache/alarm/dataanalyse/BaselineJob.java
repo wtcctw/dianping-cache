@@ -3,6 +3,7 @@ package com.dianping.cache.alarm.dataanalyse;
 
 import com.dianping.cache.alarm.dataanalyse.thread.BaselineCleanThread;
 import com.dianping.cache.alarm.dataanalyse.thread.BaselineComputeThread;
+import com.dianping.cache.alarm.dataanalyse.thread.BaselineMapGetThread;
 import com.dianping.cache.alarm.dataanalyse.thread.BaselineThreadFactory;
 import com.dianping.cache.alarm.threadmanager.ThreadManager;
 import com.dianping.cache.util.NetUtil;
@@ -13,6 +14,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -55,6 +57,20 @@ public class BaselineJob {
             ThreadManager.getInstance().execute(baselineCleanThread);
         }
     }
+
+
+
+    @Scheduled(cron = "0 10 * * * ?")//每小时10分触发一次
+    public void baselineMapGetTask() {
+        if (isMaster()) {
+            logger.info("baselineMapGet job,Time:"+(new Date()).toString(), getClass().getSimpleName());
+
+            BaselineMapGetThread baselineMapGetThread = baselineThreadFactory.createBaselineMapGetThread();
+
+            ThreadManager.getInstance().execute(baselineMapGetThread);
+        }
+    }
+
 
 
     public boolean isMaster() {
