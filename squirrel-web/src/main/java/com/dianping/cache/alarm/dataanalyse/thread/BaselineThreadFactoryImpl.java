@@ -33,4 +33,10 @@ public class BaselineThreadFactoryImpl implements BaselineThreadFactory, Applica
         BaselineCleanThread baselineCleanThread = (BaselineCleanThread)applicationContext.getBean("baselineCleanThread");
         return baselineCleanThread;
     }
+
+    @Override
+    public BaselineMapGetThread createBaselineMapGetThread() {
+        BaselineMapGetThread baselineMapGetThread = (BaselineMapGetThread)applicationContext.getBean("baselineMapGetThread");
+        return baselineMapGetThread;
+    }
 }

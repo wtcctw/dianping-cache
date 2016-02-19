@@ -1,6 +1,7 @@
 package com.dianping.cache.alarm.controller;
 
 import com.dianping.cache.alarm.dataanalyse.thread.BaselineComputeThread;
+import com.dianping.cache.alarm.dataanalyse.thread.BaselineMapGetThread;
 import com.dianping.cache.alarm.dataanalyse.thread.BaselineThreadFactory;
 import com.dianping.cache.alarm.entity.ScanDetail;
 import com.dianping.cache.alarm.report.scanService.ScanDetailService;
@@ -213,6 +214,18 @@ public class ScanJobController extends AbstractSidebarController {
             BaselineComputeThread baselineComputeThread = baselineThreadFactory.createBaselineComputeThread();
 
             ThreadManager.getInstance().execute(baselineComputeThread);
+        }
+    }
+
+    @RequestMapping(value = "/report/baselineMapGetJob")
+    @ResponseBody
+    public void baselineMapGet() {
+
+        if(isMaster()) {
+            logger.info(getClass()+"baselineMapGet Start...");
+            BaselineMapGetThread baselineMapGetThread = baselineThreadFactory.createBaselineMapGetThread();
+
+            ThreadManager.getInstance().execute(baselineMapGetThread);
         }
     }
 

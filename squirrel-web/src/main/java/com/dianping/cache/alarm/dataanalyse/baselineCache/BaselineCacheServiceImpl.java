@@ -8,9 +8,8 @@ import com.dianping.cache.alarm.entity.RedisBaseline;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
  * Created by lvshiyun on 15/12/26.
@@ -27,56 +26,61 @@ public class BaselineCacheServiceImpl implements BaselineCacheService {
     @Autowired
     BaselineComputeTaskService baselineComputeTaskService;
 
-    private Map<String, MemcacheBaseline> memcacheBaselineMap;
-
-    private Map<String, RedisBaseline> redisBaselineMap;
-
-
-
+    private BaselineCache baselineCache;
 
     public BaselineCacheServiceImpl() {
-        memcacheBaselineMap = new HashMap<String, MemcacheBaseline>();
-        redisBaselineMap = new HashMap<String, RedisBaseline>();
+        baselineCache = BaselineCache.getInstance();
     }
-
 
     @Override
     public MemcacheBaseline getMemcacheBaselineByName(String name) {
-        return this.memcacheBaselineMap.get(name);
+        return baselineCache.getFromMemcacheBaselineMap(name);
     }
 
     @Override
     public RedisBaseline getRedisBaselineByName(String name) {
-        return this.redisBaselineMap.get(name);
+        return baselineCache.getFromRedisBaselineMap(name);
     }
 
     @Override
-    public synchronized void reload() {
-        Map<String, MemcacheBaseline> memcacheBaselineMap = getMemcacheBaselineFromDb();
+    public void putBaselineMapToCache(Map<String, MemcacheBaseline> memcacheBaselineMap,Map<String, RedisBaseline> redisBaselineMap) {
 
-        putMemcacheBaselineMapToCache(memcacheBaselineMap);
+        Map<String,MemcacheBaseline>stringMemcacheBaselineMap = new HashMap<String, MemcacheBaseline>(memcacheBaselineMap);
 
-        Map<String, RedisBaseline> redisBaselineMap = getRedisBaselineFromDb();
+        Map<String, RedisBaseline> stringRedisBaselineMap = new HashMap<String, RedisBaseline>(redisBaselineMap);
 
-        putRedisBaselineMapToCache(redisBaselineMap);
+
+        BaselineCache baselineCache = new BaselineCache();
+
+        baselineCache.setMemcacheBaselineMap(stringMemcacheBaselineMap);
+
+        baselineCache.setRedisBaselineMap(redisBaselineMap);
+
+
+        BaselineCache.setInstance(baselineCache);
+
     }
 
     @Override
-    public void putRedisBaselineMapToCache(Map<String, RedisBaseline> redisBaselineMap) {
-
-        Map<String, RedisBaseline> baselineMap = new HashMap<String, RedisBaseline>(redisBaselineMap);
-
-        this.redisBaselineMap = baselineMap;
-    }
-
-    @Override
-    public Map<String, RedisBaseline> getRedisBaselineFromDb() {
+    public Map<String, RedisBaseline> getRedisBaselineFromDb(Date date) {
 
         Map<String, RedisBaseline> redisBaselineMap = new HashMap<String, RedisBaseline>();
 
         int taskId = baselineComputeTaskService.getRecentTaskId().get(0).getId();
 
-        List<RedisBaseline> redisBaselines = redisBaselineService.findByTaskId(taskId);
+        SimpleDateFormat sdf = new SimpleDateFormat("EEEE:HH", Locale.ENGLISH);
+
+        String nameNow = "Redis_" + sdf.format(date);
+        GregorianCalendar gc = new GregorianCalendar();
+        gc.setTime(date);
+        gc.add(12,60);
+        String nameHourLater = "Redis_" + sdf.format(gc.getTime());
+        gc.add(12, -120);//1小时之前
+        String nameHourAgo = "Redis_" +sdf.format(gc.getTime());
+
+        String sql = "SELECT * FROM redis_baseline WHERE baseline_name LIKE '"+ nameHourLater +"%' OR baseline_name LIKE '" + nameNow + "%' OR baseline_name LIKE '"+nameHourAgo + "%' AND taskId =" + taskId;
+
+        List<RedisBaseline> redisBaselines = redisBaselineService.search(sql);
 
         for (RedisBaseline redisBaseline : redisBaselines) {
             redisBaselineMap.put(redisBaseline.getBaseline_name(), redisBaseline);
@@ -86,21 +90,28 @@ public class BaselineCacheServiceImpl implements BaselineCacheService {
     }
 
     @Override
-    public void putMemcacheBaselineMapToCache(Map<String, MemcacheBaseline> memcacheBaselineMap) {
-
-        Map<String, MemcacheBaseline> baselineMap = new HashMap<String, MemcacheBaseline>(memcacheBaselineMap);
-
-        this.memcacheBaselineMap = baselineMap;
-
-    }
-
-    @Override
-    public Map<String, MemcacheBaseline> getMemcacheBaselineFromDb() {
+    public Map<String, MemcacheBaseline> getMemcacheBaselineFromDb(Date date) {
         Map<String, MemcacheBaseline> memcacheBaselineMap = new HashMap<String, MemcacheBaseline>();
 
         int taskId = baselineComputeTaskService.getRecentTaskId().get(0).getId();
 
-        List<MemcacheBaseline> memcacheBaselines = memcacheBaselineService.findByTaskId(taskId);
+
+        SimpleDateFormat sdf = new SimpleDateFormat("EEEE:HH", Locale.ENGLISH);
+
+        String nameNow = "Memcache_" + sdf.format(date);
+        GregorianCalendar gc = new GregorianCalendar();
+        gc.setTime(date);
+        gc.add(12, 60);
+        String nameHourLater = "Memcache_" + sdf.format(gc.getTime());
+        gc.add(12, -120);//1小时之前
+        String nameHourAgo = "Memcache_" +sdf.format(gc.getTime());
+
+
+        String sql = "SELECT * FROM memcache_baseline WHERE baseline_name LIKE '"+nameHourLater+"%' OR baseline_name LIKE '" + nameNow + "%' OR baseline_name LIKE '"+nameHourAgo +"%' AND taskId =" + taskId;
+
+
+
+        List<MemcacheBaseline> memcacheBaselines = memcacheBaselineService.search(sql);
 
         for (MemcacheBaseline memcacheBaseline : memcacheBaselines) {
             memcacheBaselineMap.put(memcacheBaseline.getBaseline_name(), memcacheBaseline);
@@ -108,6 +119,5 @@ public class BaselineCacheServiceImpl implements BaselineCacheService {
 
         return memcacheBaselineMap;
     }
-
 
 }

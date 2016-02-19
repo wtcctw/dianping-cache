@@ -8,4 +8,6 @@ public interface BaselineThreadFactory {
     BaselineComputeThread createBaselineComputeThread();
 
     BaselineCleanThread createBaselineCleanThread();
+
+    BaselineMapGetThread createBaselineMapGetThread();
 }

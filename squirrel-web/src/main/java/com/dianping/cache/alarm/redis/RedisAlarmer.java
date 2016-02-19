@@ -4,6 +4,7 @@ import com.dianping.cache.alarm.AlarmType;
 import com.dianping.cache.alarm.alarmconfig.AlarmConfigService;
 import com.dianping.cache.alarm.alarmtemplate.RedisAlarmTemplateService;
 import com.dianping.cache.alarm.dao.AlarmRecordDao;
+import com.dianping.cache.alarm.dataanalyse.baselineCache.BaselineCacheService;
 import com.dianping.cache.alarm.dataanalyse.service.RedisBaselineService;
 import com.dianping.cache.alarm.entity.*;
 import com.dianping.cache.alarm.event.EventFactory;
@@ -70,7 +71,9 @@ public class RedisAlarmer extends AbstractRedisAlarmer {
     @Autowired
     private ServerService serverService;
 
-    Map<String, RedisBaseline> redisBaselineMap;
+    @Autowired
+    BaselineCacheService baselineCacheService;
+
 
     @Override
     public void doAlarm() throws InterruptedException, IOException, TimeoutException {
@@ -80,17 +83,6 @@ public class RedisAlarmer extends AbstractRedisAlarmer {
     private void doCheck() throws InterruptedException, IOException, TimeoutException {
 
         RedisEvent redisEvent = eventFactory.createRedisEvent();
-
-        redisBaselineMap = new HashMap<String, RedisBaseline>();
-
-        long start,end;
-        logger.info("Redis getHistoryMap StartTime:"+ (new Date()).toString());
-        start = System.currentTimeMillis();
-        getHistoryMap(redisBaselineMap);
-        logger.info("Redis getHistoryMap EndTime:" + (new Date()).toString());
-        end = System.currentTimeMillis();
-        logger.info("Redis getHistoryMap cost " + (end - start) + "ms");
-
 
         List<RedisClusterData> redisClusterDatas = RedisDataUtil.getClusterData();
 
@@ -196,7 +188,10 @@ public class RedisAlarmer extends AbstractRedisAlarmer {
                             gc.add(12, i);
                             String name = "Redis_" + sdf.format(gc.getTime()) + "_" + node.getMaster().getAddress();
 
-                            RedisBaseline redisBaseline = redisBaselineMap.get(name);
+                            RedisBaseline redisBaseline = baselineCacheService.getRedisBaselineByName(name);
+                            if(null == redisBaseline){
+                                continue;
+                            }
 
                             if ((node.getMaster().getInfo().getUsed() - redisBaseline.getMem()) < redisBaseline.getMem() * 0.1) {
                                 alarmFlag = false;
@@ -257,7 +252,10 @@ public class RedisAlarmer extends AbstractRedisAlarmer {
                                 gc.add(12, i);
                                 String name = "Redis_" + sdf.format(gc.getTime()) + "_" + node.getMaster().getAddress();
 
-                                RedisBaseline redisBaseline = redisBaselineMap.get(name);
+                                RedisBaseline redisBaseline = baselineCacheService.getRedisBaselineByName(name);
+                                if(null == redisBaseline){
+                                    continue;
+                                }
 
                                 if ((node.getMaster().getInfo().getQps() - redisBaseline.getQps()) < redisBaseline.getQps() * 0.1) {
                                     alarmFlag = false;
