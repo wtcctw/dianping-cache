@@ -94,8 +94,10 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
 
     private void doCheck() throws InterruptedException, IOException, TimeoutException {
 
+        //创建Memcache告警事件
         MemcacheEvent memcacheEvent = eventFactory.createMemcacheEvent();
 
+        //获取Memcache当前数据
         MemcacheData memcacheData = new MemcacheData();
 
         memcacheData.setCacheConfigurationService(cacheConfigurationService);
@@ -105,9 +107,10 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
 
         Map<String, Map<String, Object>> currentServerStats = memcacheData.getCurrentServerStatsData();
 
+        //获取所有的设备列表
         List<CacheConfiguration> configList = cacheConfigurationService.findAll();
 
-
+        //设置变量标识是否告警，只要有一种情况告警，就发送告警
         boolean isReport = false;
 
         List<AlarmType> types = new ArrayList<AlarmType>();
@@ -117,29 +120,22 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
                     && !"memcached-leo".equals(item.getCacheKey())) {
 
                 boolean downAlarm = isDownAlarm(item, currentServerStats, memcacheEvent);
-                if (downAlarm) {
-                    isReport = true;
-                }
 
                 boolean memAlarm = isMemAlarm(item, currentServerStats, memcacheEvent);
-                if (memAlarm) {
-                    isReport = true;
-                }
+
+                boolean memFlucAlarm = isMemFlucAlarm(item, currentServerStats, memcacheEvent);
 
                 boolean qpsAlarm = isQpsAlarm(item, currentServerStats, memcacheEvent);
-                if (qpsAlarm) {
-                    isReport = true;
-                }
+
+                boolean qpsFlucAlarm = isQpsFlucAlarm(item,currentServerStats,memcacheEvent);
 
                 boolean connAlarm = isConnAlarm(item, currentServerStats, memcacheEvent);
-                if (connAlarm) {
+
+                boolean connFlucAlarm = isConnFlucAlarm(item, currentServerStats, memcacheEvent);
+
+                if (downAlarm || memAlarm || memFlucAlarm || qpsAlarm || qpsFlucAlarm ||connAlarm || connFlucAlarm) {
                     isReport = true;
                 }
-
-//                boolean history = isHistoryAlarm(item, currentServerStats, memcacheEvent);
-//                if (history) {
-//                    isReport = true;
-//                }
             }
         }
 
@@ -189,7 +185,65 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
     boolean isMemAlarm(CacheConfiguration item, Map<String, Map<String, Object>> currentServerStats, MemcacheEvent memcacheEvent) throws InterruptedException {
 
         boolean flag = false;
-        boolean flag1 = false;
+
+        AlarmConfig alarmConfig = alarmConfigService.findByClusterTypeAndName(ALARMTYPE, item.getCacheKey());
+
+        if ((null == alarmConfig) && (null != item.getCacheKey())) {
+            alarmConfig = new AlarmConfig("Memcache", item.getCacheKey());
+            alarmConfigService.insert(alarmConfig);
+        }
+        MemcacheTemplate memcacheTemplate = memcacheAlarmTemplateService.findAlarmTemplateByTemplateName(alarmConfig.getAlarmTemplate());
+
+        if (null == memcacheTemplate) {
+            logger.info(item.getCacheKey() + "not config template");
+            memcacheTemplate = memcacheAlarmTemplateService.findAlarmTemplateByTemplateName("Default");
+        }
+
+        List<String> serverList = item.getServerList();
+
+        long mem = 0;
+        long memused = 0;
+        float usage = 0;
+
+        String ip = "";
+
+        for (String server : serverList) {
+            ip = server;
+            if (0 != currentServerStats.size()) {
+                if (null != currentServerStats.get(server)) {
+                    Long tmp = (Long) currentServerStats.get(server).get("max_memory");
+                    if (null != tmp) {
+                        mem = tmp;
+                    }
+
+                    tmp = (Long) currentServerStats.get(server).get("used_memory");
+                    if (null != tmp) {
+                        memused = tmp;
+                    }
+                } else {
+                    continue;
+                }
+            }
+
+
+            if (0 != mem) {
+                usage = (float) memused / mem;
+            }
+
+            if (usage * 100 > memcacheTemplate.getMemThreshold()) {
+
+                String detail = item.getCacheKey() + ":" + MEMUSAGE_TOO_HIGH + ",IP为" + ip + ";使用率为" + usage;
+
+                flag = putToChannel(alarmConfig, MEMUSAGE_TOO_HIGH, memcacheEvent, item, ip, detail, usage * 100);
+            }
+        }
+
+        return flag;
+    }
+
+    boolean isMemFlucAlarm(CacheConfiguration item, Map<String, Map<String, Object>> currentServerStats, MemcacheEvent memcacheEvent) throws InterruptedException {
+
+        boolean flag = false;
 
         AlarmConfig alarmConfig = alarmConfigService.findByClusterTypeAndName(ALARMTYPE, item.getCacheKey());
 
@@ -240,12 +294,6 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
                 usage = (float) memused / mem;
             }
 
-            if (usage * 100 > memcacheTemplate.getMemThreshold()) {
-
-                String detail = item.getCacheKey() + ":" + MEMUSAGE_TOO_HIGH + ",IP为" + ip + ";使用率为" + usage;
-
-                flag = putToChannel(alarmConfig, MEMUSAGE_TOO_HIGH, memcacheEvent, item, ip, detail, usage * 100);
-            }
 
             //短时间内波动分析
             //1.开关 2.是否高于flucBase 3.上升率 4.历史数据分析
@@ -292,19 +340,70 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
 
                     String val = MEMUSAGE_INCREASE_TOO_FAST + ",使用率在" + memInterval + "分钟内从" + flucUsage + "增长到" + usage;
 
-                    flag1 = putToChannel(alarmConfig, MEMUSAGE_INCREASE_TOO_FAST, memcacheEvent, item, ip, detail, val);
+                    flag = putToChannel(alarmConfig, MEMUSAGE_INCREASE_TOO_FAST, memcacheEvent, item, ip, detail, val);
                 }
             }
 
         }
 
-        return flag||flag1;
+        return flag;
     }
 
     boolean isQpsAlarm(CacheConfiguration item, Map<String, Map<String, Object>> currentServerStats, MemcacheEvent memcacheEvent) throws InterruptedException {
 
         boolean flag = false;
-        boolean flag1 = false;
+
+        AlarmConfig alarmConfig = alarmConfigService.findByClusterTypeAndName(ALARMTYPE, item.getCacheKey());
+
+        if ((null == alarmConfig) && (null != item.getCacheKey())) {
+            alarmConfig = new AlarmConfig("Memcache", item.getCacheKey());
+            alarmConfigService.insert(alarmConfig);
+        }
+
+        MemcacheTemplate memcacheTemplate = memcacheAlarmTemplateService.findAlarmTemplateByTemplateName(alarmConfig.getAlarmTemplate());
+
+        if (null == memcacheTemplate) {
+            logger.info(item.getCacheKey() + "not config template");
+            memcacheTemplate = memcacheAlarmTemplateService.findAlarmTemplateByTemplateName("Default");
+        }
+
+        List<String> serverList = item.getServerList();
+
+        long qps = 0;
+
+        String ip = "";
+
+        for (String server : serverList) {
+            ip = server;
+            if (0 != currentServerStats.size()) {
+                if (null != currentServerStats.get(server)) {
+                    Long tmp = (Long) currentServerStats.get(server).get("QPS");
+                    if (null != tmp) {
+                        qps = tmp;
+                    }
+                } else {
+                    continue;
+                }
+            }
+
+
+            if (qps > memcacheTemplate.getQpsThreshold()) {
+                String detail = item.getCacheKey() + ":" + QPS_TOO_HIGH + ",IP为" + ip + ";QPS为" + qps;
+
+                flag = putToChannel(alarmConfig, QPS_TOO_HIGH, memcacheEvent, item, ip, detail, qps);
+
+            }
+
+        }
+
+        return flag;
+
+    }
+
+
+    boolean isQpsFlucAlarm(CacheConfiguration item, Map<String, Map<String, Object>> currentServerStats, MemcacheEvent memcacheEvent) throws InterruptedException {
+
+        boolean flag = false;
 
         AlarmConfig alarmConfig = alarmConfigService.findByClusterTypeAndName(ALARMTYPE, item.getCacheKey());
 
@@ -344,14 +443,6 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
                 } else {
                     continue;
                 }
-            }
-
-
-            if (qps > memcacheTemplate.getQpsThreshold()) {
-                String detail = item.getCacheKey() + ":" + QPS_TOO_HIGH + ",IP为" + ip + ";QPS为" + qps;
-
-                flag = putToChannel(alarmConfig, QPS_TOO_HIGH, memcacheEvent, item, ip, detail, qps);
-
             }
 
             //短时间内波动分析
@@ -409,12 +500,12 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
 
                     String val = QPS_INCREASE_TOO_FAST + ",QPS在" + qpsInterval + "分钟内从" + flucQps + "增长到" + qps;
 
-                    flag1 = putToChannel(alarmConfig, QPS_INCREASE_TOO_FAST, memcacheEvent, item, ip, detail, val);
+                    flag = putToChannel(alarmConfig, QPS_INCREASE_TOO_FAST, memcacheEvent, item, ip, detail, val);
                 }
             }
         }
 
-        return flag||flag1;
+        return flag;
 
     }
 
@@ -422,7 +513,58 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
                                 item, Map<String, Map<String, Object>> currentServerStats, MemcacheEvent memcacheEvent) throws
             InterruptedException {
         boolean flag = false;
-        boolean flag1 = false;
+
+        AlarmConfig alarmConfig = alarmConfigService.findByClusterTypeAndName(ALARMTYPE, item.getCacheKey());
+
+        if ((null == alarmConfig) && (null != item.getCacheKey())) {
+            alarmConfig = new AlarmConfig("Memcache", item.getCacheKey());
+            alarmConfigService.insert(alarmConfig);
+        }
+
+        MemcacheTemplate memcacheTemplate = memcacheAlarmTemplateService.findAlarmTemplateByTemplateName(alarmConfig.getAlarmTemplate());
+
+        if (null == memcacheTemplate) {
+            logger.info(item.getCacheKey() + "not config template");
+            memcacheTemplate = memcacheAlarmTemplateService.findAlarmTemplateByTemplateName("Default");
+        }
+
+        List<String> serverList = item.getServerList();
+
+        int conn = 0;
+
+        String ip = "";
+
+        for (String server : serverList) {
+
+            ip = server;
+
+            if (0 != currentServerStats.size()) {
+                if (null != currentServerStats.get(server)) {
+                    Integer tmp = (Integer) currentServerStats.get(server).get("curr_conn");
+                    if (null != tmp) {
+                        conn = tmp;
+                    }
+                } else {
+                    continue;
+                }
+            }
+
+
+            if (conn > memcacheTemplate.getConnThreshold()) {
+
+                String detail = item.getCacheKey() + ":" + CONN_TOO_HIGH + ",IP为" + ip + ";连接数为" + conn;
+
+                flag = putToChannel(alarmConfig, QPS_TOO_HIGH, memcacheEvent, item, ip, detail, conn);
+
+            }
+        }
+
+        return flag;
+    }
+
+    boolean isConnFlucAlarm(CacheConfiguration item, Map<String, Map<String, Object>> currentServerStats, MemcacheEvent memcacheEvent) throws
+            InterruptedException {
+        boolean flag = false;
 
         AlarmConfig alarmConfig = alarmConfigService.findByClusterTypeAndName(ALARMTYPE, item.getCacheKey());
 
@@ -464,14 +606,6 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
                 }
             }
 
-
-            if (conn > memcacheTemplate.getConnThreshold()) {
-
-                String detail = item.getCacheKey() + ":" + CONN_TOO_HIGH + ",IP为" + ip + ";连接数为" + conn;
-
-                flag = putToChannel(alarmConfig, QPS_TOO_HIGH, memcacheEvent, item, ip, detail, conn);
-
-            }
 
 
             //短时间内波动分析
@@ -526,13 +660,13 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
 
                     String val = CONN_INCREASE_TOO_FAST + ";连接数在" + connInterval + "分钟内从" + flucConn + "增长到" + conn;
 
-                    flag1 = putToChannel(alarmConfig, CONN_INCREASE_TOO_FAST, memcacheEvent, item, ip, detail, val);
+                    flag = putToChannel(alarmConfig, CONN_INCREASE_TOO_FAST, memcacheEvent, item, ip, detail, val);
                 }
             }
 
         }
 
-        return flag||flag1;
+        return flag;
     }
 
     boolean isHistoryAlarm(CacheConfiguration item, Map<String, Map<String, Object>> currentServerStats, MemcacheEvent memcacheEvent) throws InterruptedException, IOException, TimeoutException {
@@ -726,15 +860,6 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
         }
 
         return result;
-    }
-
-
-    public CacheConfigurationService getCacheConfigurationService() {
-        return cacheConfigurationService;
-    }
-
-    public void setCacheConfigurationService(CacheConfigurationService cacheConfigurationService) {
-        this.cacheConfigurationService = cacheConfigurationService;
     }
 
 }

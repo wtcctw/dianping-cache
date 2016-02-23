@@ -38,7 +38,9 @@ public class RedisStatsFlucService {
         }catch (ParseException e){
             e.printStackTrace();
         }
-
+        if(null == usage){
+            usage = (float)0;
+        }
         return usage;
     }
 
