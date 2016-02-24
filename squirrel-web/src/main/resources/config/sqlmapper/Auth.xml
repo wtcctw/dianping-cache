@@ -9,7 +9,7 @@
         <result column="id" property="id"/>
         <result column="resource" property="resource"/>
         <result column="password" property="password"/>
-        <result column="applications" property="applications"/>
+        <result column="application" property="application"/>
         <result column="strict" property="strict"/>
     </resultMap>
     
@@ -22,7 +22,7 @@
 
     <update id="update" parameterType="Auth">
         UPDATE auth
-        SET password = #{password},applications = #{applications},strict = #{strict}
+        SET password = #{password},application = #{application},strict = #{strict}
         WHERE id = #{id} AND resource = #{resource}
     </update>
 
@@ -32,8 +32,8 @@
     </delete>
 
     <insert id="insert" parameterType="Auth">
-        INSERT INTO auth(resource,password,applications,strict)
-        VALUES (#{resource},#{password},#{applications},#{strict});
+        INSERT INTO auth(resource,password,application,strict)
+        VALUES (#{resource},#{password},#{application},#{strict});
     </insert>
 
 </mapper>

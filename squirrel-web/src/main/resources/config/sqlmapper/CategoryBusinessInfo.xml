@@ -8,7 +8,7 @@
 	<resultMap id="Info" type="CategoryBusinessInfo">
 		<result column="id" property="id"/>
 		<result column="category" property="category"/>
-		<result column="applications" property="applications"/>
+		<result column="application" property="application"/>
 		<result column="owner" property="owner"/>
 		<result column="description" property="description"/>
 	</resultMap>
@@ -19,8 +19,8 @@
 		WHERE category = #{category}
 	</select>
 	<insert id="insert" parameterType="CategoryBusinessInfo">
-		INSERT INTO category_info(category, applications, owner, description)
-		VALUES(#{category},#{applications},#{owner}.#{description})
+		INSERT INTO category_info(category, application, owner, description)
+		VALUES(#{category},#{application},#{owner}.#{description})
 	</insert>
 	
 	<delete id="delete" parameterType="String">

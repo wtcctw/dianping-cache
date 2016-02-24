@@ -7,7 +7,7 @@ package com.dianping.cache.entity;
 public class CategoryBusinessInfo {
     private int id;
     private String category;
-    private String applications;
+    private String application;
     private String owner;
     private String description;
 
@@ -27,12 +27,12 @@ public class CategoryBusinessInfo {
         this.category = category;
     }
 
-    public String getApplications() {
-        return applications;
+    public String getApplication() {
+        return application;
     }
 
-    public void setApplications(String applications) {
-        this.applications = applications;
+    public void setApplication(String application) {
+        this.application = application;
     }
 
     public String getOwner() {
