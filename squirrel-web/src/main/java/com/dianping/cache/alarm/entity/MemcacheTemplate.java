@@ -11,11 +11,35 @@ public class MemcacheTemplate extends AlarmConfigTemplate {
 
     private boolean checkHistory;
 
+    private boolean memSwitch;
+
     private int memThreshold;
+
+    private int memFluc;
+
+    private int memBase;
+
+    private int memInterval;
+
+    private boolean qpsSwitch;
 
     private int qpsThreshold;
 
+    private int qpsFluc;
+
+    private int qpsBase;
+
+    private int qpsInterval;
+
+    private boolean connSwitch;
+
     private int connThreshold;
+
+    private int connFluc;
+
+    private int connBase;
+
+    private int connInterval;
 
     public boolean isDown() {
         return isDown;
@@ -35,12 +59,57 @@ public class MemcacheTemplate extends AlarmConfigTemplate {
         return this;
     }
 
+    public boolean isMemSwitch() {
+        return memSwitch;
+    }
+
+    public MemcacheTemplate setMemSwitch(boolean memSwitch) {
+        this.memSwitch = memSwitch;
+        return this;
+    }
+
     public int getMemThreshold() {
         return memThreshold;
     }
 
     public MemcacheTemplate setMemThreshold(int memThreshold) {
         this.memThreshold = memThreshold;
+        return this;
+    }
+
+    public int getMemFluc() {
+        return memFluc;
+    }
+
+    public MemcacheTemplate setMemFluc(int memFluc) {
+        this.memFluc = memFluc;
+        return this;
+    }
+
+    public int getMemBase() {
+        return memBase;
+    }
+
+    public MemcacheTemplate setMemBase(int memBase) {
+        this.memBase = memBase;
+        return this;
+    }
+
+    public int getMemInterval() {
+        return memInterval;
+    }
+
+    public MemcacheTemplate setMemInterval(int memInterval) {
+        this.memInterval = memInterval;
+        return this;
+    }
+
+    public boolean isQpsSwitch() {
+        return qpsSwitch;
+    }
+
+    public MemcacheTemplate setQpsSwitch(boolean qpsSwitch) {
+        this.qpsSwitch = qpsSwitch;
         return this;
     }
 
@@ -53,6 +122,42 @@ public class MemcacheTemplate extends AlarmConfigTemplate {
         return this;
     }
 
+    public int getQpsFluc() {
+        return qpsFluc;
+    }
+
+    public MemcacheTemplate setQpsFluc(int qpsFluc) {
+        this.qpsFluc = qpsFluc;
+        return this;
+    }
+
+    public int getQpsBase() {
+        return qpsBase;
+    }
+
+    public MemcacheTemplate setQpsBase(int qpsBase) {
+        this.qpsBase = qpsBase;
+        return this;
+    }
+
+    public int getQpsInterval() {
+        return qpsInterval;
+    }
+
+    public MemcacheTemplate setQpsInterval(int qpsInterval) {
+        this.qpsInterval = qpsInterval;
+        return this;
+    }
+
+    public boolean isConnSwitch() {
+        return connSwitch;
+    }
+
+    public MemcacheTemplate setConnSwitch(boolean connSwitch) {
+        this.connSwitch = connSwitch;
+        return this;
+    }
+
     public int getConnThreshold() {
         return connThreshold;
     }
@@ -62,4 +167,30 @@ public class MemcacheTemplate extends AlarmConfigTemplate {
         return this;
     }
 
+    public int getConnFluc() {
+        return connFluc;
+    }
+
+    public MemcacheTemplate setConnFluc(int connFluc) {
+        this.connFluc = connFluc;
+        return this;
+    }
+
+    public int getConnBase() {
+        return connBase;
+    }
+
+    public MemcacheTemplate setConnBase(int connBase) {
+        this.connBase = connBase;
+        return this;
+    }
+
+    public int getConnInterval() {
+        return connInterval;
+    }
+
+    public MemcacheTemplate setConnInterval(int connInterval) {
+        this.connInterval = connInterval;
+        return this;
+    }
 }

@@ -1,9 +1,17 @@
 package com.dianping.cache.alarm.report.task;
 
+import com.dianping.ba.hris.md.api.dto.EmployeeDto;
+import com.dianping.ba.hris.md.api.service.EmployeeService;
 import com.dianping.cache.alarm.email.SpringMailSender;
 import com.dianping.cache.alarm.entity.ScanDetail;
+import com.dianping.cache.alarm.receiver.ReceiverService;
 import com.dianping.cache.alarm.report.scanService.ScanDetailService;
 import com.dianping.cache.alarm.utils.DateUtil;
+import com.dianping.cache.entity.CategoryToApp;
+import com.dianping.cache.service.CategoryToAppService;
+import com.dianping.ops.cmdb.CmdbManager;
+import com.dianping.ops.cmdb.CmdbProject;
+import com.dianping.ops.cmdb.CmdbResult;
 import com.dianping.ops.http.HttpConfig;
 import com.dianping.ops.http.HttpGetter;
 import com.dianping.ops.http.HttpResult;
@@ -42,65 +50,217 @@ public class ScanTask {
     @Autowired
     ScanDetailService scanDetailService;
 
+    @Autowired
+    CategoryToAppService categoryToAppService;
+
+    @Autowired
+    private EmployeeService employeeService;
+
 
     public void run() throws InterruptedException, DocumentException, URISyntaxException, MessagingException {
         logger.info("ScanTask run");
 
         List<ScanDetail> scanDetails = AlarmScanDetails();
 
-        Map<String,List<ScanDetail>>failDetails = new HashMap<String, List<ScanDetail>>();
-        Map<String,List<ScanDetail>>delayDetails = new HashMap<String, List<ScanDetail>>();
+        saveToDb(scanDetails);
 
-        for(ScanDetail scanDetail:scanDetails){
-            if(scanDetail.getAvgVal()>10){
-                if(null != delayDetails.get(scanDetail.getCacheName())){
-                    delayDetails.get(scanDetail.getCacheName()).add(scanDetail);
-                }else {
-                    List<ScanDetail> list = new ArrayList<ScanDetail>();
-                    list.add(scanDetail);
-                    delayDetails.put(scanDetail.getCacheName(),list);
-                }
+        Map<String, List<ScanDetail>> diffScanDetails = splitScanDetails(scanDetails);
 
-            }else if(scanDetail.getFailPercent()>0.1){
-                if(null != failDetails.get(scanDetail.getCacheName())){
-                    failDetails.get(scanDetail.getCacheName()).add(scanDetail);
-                }else {
-                    List<ScanDetail> list = new ArrayList<ScanDetail>();
-                    list.add(scanDetail);
-                    failDetails.put(scanDetail.getCacheName(), list);
-                }
+        logger.info("ScanTask SendEmail");
+        for (Map.Entry<String, List<ScanDetail>> entry : diffScanDetails.entrySet()) {
+
+            CmdbResult<CmdbProject> result = CmdbManager.getProject(entry.getKey());
+            String receiver;
+            if(null == result){
+                receiver = "shiyun.lv";
+            }
+
+            receiver= result.cmdbResult.getRd_duty();
+
+            List<EmployeeDto> userDtoList = employeeService.queryEmployeeByKeyword(receiver);
+            String receiverEmail = userDtoList.get(0).getEmail();
+
+            Map<String, List<ScanDetail>> detailMap = dealScanDetal(entry.getValue());
+
+            if ((detailMap.get("delayDetailLists").size() > 0) && (detailMap.get("failDetailLists").size() > 0)) {
+
+                sendMail(detailMap.get("delayDetailLists"), detailMap.get("failDetailLists"), receiverEmail);
+            }
+        }
+    }
+
+    private void saveToDb(List<ScanDetail> scanDetails) {
+        Map<String, ScanDetail> dealedDetails = new HashMap<String, ScanDetail>();
+
+
+        for (ScanDetail scanDetail : scanDetails) {
+            String name = scanDetail.getCacheName() + scanDetail.getProject();
+
+            if (null != dealedDetails.get(name)) {
+                int total = dealedDetails.get(name).getTotalCount() + scanDetail.getTotalCount();
+                int failure = dealedDetails.get(name).getFailCount() + scanDetail.getFailCount();
+                double failurePercent = failure / total;
+                double min = Math.min(dealedDetails.get(name).getMinVal(), scanDetail.getMinVal());
+                double max = Math.max(dealedDetails.get(name).getMaxVal(), scanDetail.getMaxVal());
+                double avg = (dealedDetails.get(name).getAvgVal() * dealedDetails.get(name).getTotalCount() +
+                        scanDetail.getAvgVal() * scanDetail.getTotalCount()) / (dealedDetails.get(name).getTotalCount()
+                        + scanDetail.getTotalCount());
+
+                dealedDetails.get(name).setTotalCount(total)
+                        .setFailCount(failure)
+                        .setFailPercent(failurePercent)
+                        .setMinVal(min)
+                        .setMaxVal(max)
+                        .setAvgVal(avg);
+
+            } else {
+                dealedDetails.put(name, scanDetail);
             }
         }
 
-        List<ScanDetail>failDetailList = new ArrayList<ScanDetail>();
-        List<ScanDetail>delayDetailList = new ArrayList<ScanDetail>();
-
-        for(Map.Entry<String, List<ScanDetail>> entry:failDetails.entrySet()){
-            List<ScanDetail> list =failDetails.get(entry.getKey());
-            list.get(0).setRowspan(list.size());
-            failDetailList.addAll(list);
+        for(Map.Entry<String,ScanDetail> entry:dealedDetails.entrySet()){
+            scanDetailService.insert(entry.getValue());
         }
-
-        for(Map.Entry<String, List<ScanDetail>> entry:delayDetails.entrySet()){
-            List<ScanDetail> list =delayDetails.get(entry.getKey());
-            list.get(0).setRowspan(list.size());
-            delayDetailList.addAll(list);
-        }
-
-
-        logger.info("ScanTask SendEmail");
-
-        sendMail(delayDetailList,failDetailList);
     }
 
+        private Map<String, List<ScanDetail>> splitScanDetails (List < ScanDetail > scanDetails) {
+            Map<String, List<ScanDetail>> diffScanDetailMap = new HashMap<String, List<ScanDetail>>();
 
-    /**
-     *  * 使用Velocity模板发送邮件
-     *  *
-     *  * @throws MessagingException
-     *  
-     */
-    private void sendMail(List<ScanDetail> delayDetails,List<ScanDetail>failDetails) throws MessagingException {
+            for (ScanDetail scanDetail : scanDetails) {
+                String category = scanDetail.getProject().split(":")[0];
+
+                String appName;
+                List<CategoryToApp> categoryToAppList = categoryToAppService.findByCategory(category);
+                if (0 != categoryToAppList.size()) {
+                    appName = categoryToAppService.findByCategory(category).get(0).getApplication();
+                } else {
+                    appName = "not found";
+                }
+                if (null != diffScanDetailMap.get(appName)) {
+                    diffScanDetailMap.get(appName).add(scanDetail);
+                } else {
+                    List<ScanDetail> list = new ArrayList<ScanDetail>();
+                    list.add(scanDetail);
+                    diffScanDetailMap.put(appName, list);
+                }
+            }
+
+            return diffScanDetailMap;
+        }
+
+        Map<String, List<ScanDetail>> dealScanDetal (List < ScanDetail > scanDetails) {
+            Map<String, ScanDetail> failDetails = new HashMap<String, ScanDetail>();
+            Map<String, ScanDetail> delayDetails = new HashMap<String, ScanDetail>();
+
+            for (ScanDetail scanDetail : scanDetails) {
+                String name = scanDetail.getCacheName() + scanDetail.getProject();
+                if (scanDetail.getAvgVal() > 10) {
+                    if (null != delayDetails.get(name)) {
+                        int total = delayDetails.get(name).getTotalCount() + scanDetail.getTotalCount();
+                        int failure = delayDetails.get(name).getFailCount() + scanDetail.getFailCount();
+                        double failurePercent = failure / total;
+                        double min = Math.min(delayDetails.get(name).getMinVal(), scanDetail.getMinVal());
+                        double max = Math.max(delayDetails.get(name).getMaxVal(), scanDetail.getMaxVal());
+                        double avg = (delayDetails.get(name).getAvgVal() * delayDetails.get(name).getTotalCount() +
+                                scanDetail.getAvgVal() * scanDetail.getTotalCount()) / (delayDetails.get(name).getTotalCount()
+                                + scanDetail.getTotalCount());
+
+                        delayDetails.get(name).setTotalCount(total)
+                                .setFailCount(failure)
+                                .setFailPercent(failurePercent)
+                                .setMinVal(min)
+                                .setMaxVal(max)
+                                .setAvgVal(avg);
+
+                    } else {
+                        delayDetails.put(name, scanDetail);
+                    }
+
+                } else if (scanDetail.getFailPercent() > 0.1) {
+
+                    if (null != failDetails.get(name)) {
+                        int total = failDetails.get(name).getTotalCount() + scanDetail.getTotalCount();
+                        int failure = failDetails.get(name).getFailCount() + scanDetail.getFailCount();
+                        double failurePercent = failure / total;
+                        double min = Math.min(failDetails.get(name).getMinVal(), scanDetail.getMinVal());
+                        double max = Math.max(failDetails.get(name).getMaxVal(), scanDetail.getMaxVal());
+                        double avg = (failDetails.get(name).getAvgVal() * failDetails.get(name).getTotalCount() +
+                                scanDetail.getAvgVal() * scanDetail.getTotalCount()) / (failDetails.get(name).getTotalCount()
+                                + scanDetail.getTotalCount());
+
+                        failDetails.get(name).setTotalCount(total)
+                                .setFailCount(failure)
+                                .setFailPercent(failurePercent)
+                                .setMinVal(min)
+                                .setMaxVal(max)
+                                .setAvgVal(avg);
+
+                    } else {
+                        failDetails.put(name, scanDetail);
+                    }
+                }
+            }
+
+            List<ScanDetail> failDetailList = new ArrayList<ScanDetail>();
+            List<ScanDetail> delayDetailList = new ArrayList<ScanDetail>();
+
+            for (Map.Entry<String, ScanDetail> entry : failDetails.entrySet()) {
+                ScanDetail detail = failDetails.get(entry.getKey());
+
+                failDetailList.add(detail);
+            }
+
+            for (Map.Entry<String, ScanDetail> entry : delayDetails.entrySet()) {
+                ScanDetail detail = delayDetails.get(entry.getKey());
+                delayDetailList.add(detail);
+            }
+
+
+            List<ScanDetail> failDetailLists = dealRowSpan(failDetailList);
+            List<ScanDetail> delayDetailLists = dealRowSpan(delayDetailList);
+
+            Map<String, List<ScanDetail>> detailMap = new HashMap<String, List<ScanDetail>>();
+            detailMap.put("failDetailLists", failDetailLists);
+            detailMap.put("delayDetailLists", delayDetailLists);
+
+            return detailMap;
+        }
+
+        private List<ScanDetail> dealRowSpan (List < ScanDetail > detailList) {
+
+            Map<String, List<ScanDetail>> detailMap = new HashMap<String, List<ScanDetail>>();
+
+            List<ScanDetail> scanDetailList = new ArrayList<ScanDetail>();
+
+            for (ScanDetail scanDetail : detailList) {
+                if (null != detailMap.get(scanDetail.getCacheName())) {
+                    detailMap.get(scanDetail.getCacheName()).add(scanDetail);
+                } else {
+                    List<ScanDetail> list = new ArrayList<ScanDetail>();
+                    list.add(scanDetail);
+                    detailMap.put(scanDetail.getCacheName(), list);
+                }
+            }
+
+            for (Map.Entry<String, List<ScanDetail>> entry : detailMap.entrySet()) {
+                List<ScanDetail> list = detailMap.get(entry.getKey());
+                list.get(0).setRowspan(list.size());
+                scanDetailList.addAll(list);
+            }
+
+            return scanDetailList;
+
+        }
+
+
+        /**
+         *  * 使用Velocity模板发送邮件
+         *  *
+         *  * @throws MessagingException
+         *  
+         */
+
+    private void sendMail(List<ScanDetail> delayDetails, List<ScanDetail> failDetails, String receiver) throws MessagingException {
 
         SpringMailSender mailSender = new SpringMailSender();
 
@@ -121,15 +281,15 @@ public class ScanTask {
             model.put("delayDetails", delayDetails);
             model.put("failDetails", failDetails);
             // Spring提供的VelocityEngineUtils将模板进行数据填充，并转换成普通的String对象
-            String emailText = VelocityEngineUtils.mergeTemplateIntoString(velocityEngine, "report.vm","utf-8", model);
+            String emailText = VelocityEngineUtils.mergeTemplateIntoString(velocityEngine, "report.vm", "utf-8", model);
             MimeMessage msg = new MimeMessage(session);
 
             MimeMessageHelper helper = new MimeMessageHelper(msg, true);
             helper.setFrom(mailSender.getMailSender().getUsername());
-            String[] receiver =new String[]{"shiyun.lv@dianping.com","xiaoxiong.dai@dianping.com","dp.wang@dianping.com","enlight.chen@dianping.com","xiang.wu@dianping.com","faping.miao@dianping.com"};
-//            String[] receiver =new String[]{"shiyun.lv@dianping.com"};
-            helper.setTo(receiver);
-            helper.setSubject("缓存红黑榜");
+//            String[] receiverList =new String[]{"shiyun.lv@dianping.com","xiaoxiong.dai@dianping.com","dp.wang@dianping.com","enlight.chen@dianping.com","xiang.wu@dianping.com","faping.miao@dianping.com"};
+            String[] receiverList = new String[]{"shiyun.lv@dianping.com", receiver};
+            helper.setTo(receiverList);
+            helper.setSubject("缓存异常报表");
 
             msg.setContent(emailText, "text/html; charset=UTF-8");
 
@@ -218,7 +378,7 @@ public class ScanTask {
 
                             scanDetailList.add(scanDetail);
 
-                            scanDetailService.insert(scanDetail);
+//                            scanDetailService.insert(scanDetail);
 
                         }
                     }

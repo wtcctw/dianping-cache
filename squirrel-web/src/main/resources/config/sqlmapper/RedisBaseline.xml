@@ -9,6 +9,7 @@
 		<result column="id" property="id"/>
 		<result column="baseline_name" property="baseline_name"/>
 		<result column="serverId" property="serverId"/>
+		<result column="mem" property="mem"/>
 		<result column="memory_used" property="memory_used"/>
 		<result column="curr_time" property="curr_time"/>
 		<result column="total_connections" property="total_connections"/>
@@ -25,9 +26,9 @@
 	</resultMap>
 
 	<insert id="insert" parameterType="RedisBaseline">
-		INSERT INTO redis_baseline(serverId,baseline_name,curr_time, memory_used,total_connections,connected_clients,
+		INSERT INTO redis_baseline(serverId,mem,baseline_name,curr_time, memory_used,total_connections,connected_clients,
 				qps,input_kbps,output_kbps,used_cpu_sys,used_cpu_user,used_cpu_sys_children,used_cpu_user_children, taskId, updateTime)
-		VALUES(#{serverId},#{baseline_name},#{curr_time}, #{memory_used},#{total_connections},#{connected_clients},
+		VALUES(#{serverId},#{mem},#{baseline_name},#{curr_time}, #{memory_used},#{total_connections},#{connected_clients},
 			  #{qps},#{input_kbps},#{output_kbps},#{used_cpu_sys},#{used_cpu_user},#{used_cpu_sys_children},#{used_cpu_user_children},#{taskId},#{updateTime})
 	</insert>
 	

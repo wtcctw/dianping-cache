@@ -1,8 +1,8 @@
-<div class="main-content" id="AlarmRuleController" ng-controller="AlarmRuleController">
+<div class="main-content" id="AlarmConfigController" ng-controller="AlarmConfigController">
     <div class="main-content-inner">
         <div>
             <script type="text/javascript"
-                    src="${rc.contextPath}/static/js/alarm/alarmrule.js"></script>
+                    src="${rc.contextPath}/static/js/alarm/alarmconfig.js"></script>
 
         </div>
 
@@ -42,7 +42,7 @@
                                         <!--<th>告警集群类型</th>-->
                                         <th>告警集群类型及名称</th>
                                         <th>模板名称</th>
-                                        <th >收件人</th>
+                                        <th>收件人</th>
                                         <th>是否发送业务线</th>
                                         <th>操作
                                             <a class="breadcrumbs-btn" href="#configModal" ng-click="clearModal()"
@@ -55,9 +55,11 @@
                                     <tbody>
                                     <tr ng-repeat="e in alarmRuleSearchPaginator.currentPageItems">
                                         <!--<td style="text-align: center;"><input type="checkbox" name="check-list" value="{{e.id}}"></td>-->
-                                        <td width="30%" style="text-align:left;">{{e.clusterType}}:{{e.clusterName}}</td>
+                                        <td width="30%" style="text-align:left;">{{e.clusterType}}:{{e.clusterName}}
+                                        </td>
                                         <td width="15%" style="text-align:center;">{{e.alarmTemplate}}</td>
-                                        <td width="30%" style="text-align:center;word-break:break-all">{{e.receiver}}</td>
+                                        <td width="30%" style="text-align:center;word-break:break-all">{{e.receiver}}
+                                        </td>
                                         <td width="10%" style="text-align:center;">
                                 <span class="sticker">
                                     <span class="label arrowed-in"
@@ -98,9 +100,9 @@
                                         <th>模板名称</th>
                                         <th>宕机</th>
                                         <th>历史数据</th>
-                                        <th>内存上阈值</th>
-                                        <th>QPS上阈值</th>
-                                        <th>连接数上阈值</th>
+                                        <th>内存(峰值,波动基数，波动粒度，间隔时间)</th>
+                                        <th>QPS(峰值,波动基数，波动粒度，间隔时间)</th>
+                                        <th>连接数(峰值,波动基数，波动粒度，间隔时间)</th>
                                         <th>告警方式</th>
                                         <th>操作
                                             <a class="breadcrumbs-btn" href="#memcacheTemplateModal"
@@ -116,9 +118,60 @@
                                         <td style="text-align: center;">{{e.templateName}}</td>
                                         <td style="text-align: center;">{{e.down}}</td>
                                         <td style="text-align: center;">{{e.checkHistory}}</td>
-                                        <td style="text-align: center;">{{e.memThreshold}}</td>
-                                        <td style="text-align: center;">{{e.qpsThreshold}}</td>
-                                        <td style="text-align: center;">{{e.connThreshold}}</td>
+                                        <td style="text-align: center;">
+                                         <span class="badge"
+                                               ng-class="{'label-success':e.memSwitch==true,'label-danger':e.memSwitch==false}">
+                                             {{e.memThreshold}}
+                                         </span>
+                                            <span class="badge"
+                                                  ng-class="{'label-success':e.memSwitch==true,'label-danger':e.memSwitch==false}">
+                                             {{e.memBase}}
+                                         </span>
+                                             <span class="badge"
+                                                   ng-class="{'label-success':e.memSwitch==true,'label-danger':e.memSwitch==false}">
+                                             {{e.memFluc}}
+                                         </span>
+                                               <span class="badge"
+                                                     ng-class="{'label-success':e.memSwitch==true,'label-danger':e.memSwitch==false}">
+                                             {{e.memInterval}}
+                                         </span>
+                                        </td>
+                                        <td style="text-align: center;">
+                                        <span class="badge"
+                                              ng-class="{'label-success':e.qpsSwitch==true,'label-danger':e.qpsSwitch==false}">
+                                             {{e.qpsThreshold}}
+                                         </span>
+                                            <span class="badge"
+                                                  ng-class="{'label-success':e.qpsSwitch==true,'label-danger':e.qpsSwitch==false}">
+                                             {{e.qpsBase}}
+                                         </span>
+                                             <span class="badge"
+                                                   ng-class="{'label-success':e.qpsSwitch==true,'label-danger':e.qpsSwitch==false}">
+                                             {{e.qpsFluc}}
+                                         </span>
+                                               <span class="badge"
+                                                     ng-class="{'label-success':e.qpsSwitch==true,'label-danger':e.qpsSwitch==false}">
+                                             {{e.qpsInterval}}
+                                         </span>
+                                        </td>
+                                        <td style="text-align: center;">
+                                         <span class="badge"
+                                               ng-class="{'label-success':e.connSwitch==true,'label-danger':e.connSwitch==false}">
+                                             {{e.connThreshold}}
+                                         </span>
+                                            <span class="badge"
+                                                  ng-class="{'label-success':e.connSwitch==true,'label-danger':e.connSwitch==false}">
+                                             {{e.connBase}}
+                                         </span>
+                                             <span class="badge"
+                                                   ng-class="{'label-success':e.connSwitch==true,'label-danger':e.connSwitch==false}">
+                                             {{e.connFluc}}
+                                         </span>
+                                               <span class="badge"
+                                                     ng-class="{'label-success':e.connSwitch==true,'label-danger':e.connSwitch==false}">
+                                             {{e.connInterval}}
+                                         </span>
+                                        </td>
                                         <td style="text-align: center;">
                                 <span class="sticker">
                                     <span class="label arrowed-in"
@@ -172,8 +225,8 @@
                                         <th>告警模板名称</th>
                                         <th>宕机</th>
                                         <th>历史数据</th>
-                                        <th>内存上阈值</th>
-                                        <th>QPS上阈值</th>
+                                        <th>内存(峰值,波动基数，波动粒度，间隔时间)</th>
+                                        <th>QPS(峰值,波动基数，波动粒度，间隔时间)</th>
                                         <th>告警方式</th>
                                         <th>操作
                                             <a class="breadcrumbs-btn" href="#redisTemplateModal"
@@ -189,8 +242,42 @@
                                         <td style="text-align: center;">{{e.templateName}}</td>
                                         <td style="text-align: center;">{{e.down}}</td>
                                         <td style="text-align: center;">{{e.checkHistory}}</td>
-                                        <td style="text-align: center;">{{e.memThreshold}}</td>
-                                        <td style="text-align: center;">{{e.qpsThreshold}}</td>
+                                        <td style="text-align: center;">
+                                         <span class="badge"
+                                               ng-class="{'label-success':e.memSwitch==true,'label-danger':e.memSwitch==false}">
+                                             {{e.memThreshold}}
+                                         </span>
+                                            <span class="badge"
+                                                  ng-class="{'label-success':e.memSwitch==true,'label-danger':e.memSwitch==false}">
+                                             {{e.memBase}}
+                                         </span>
+                                             <span class="badge"
+                                                   ng-class="{'label-success':e.memSwitch==true,'label-danger':e.memSwitch==false}">
+                                             {{e.memFluc}}
+                                         </span>
+                                               <span class="badge"
+                                                     ng-class="{'label-success':e.memSwitch==true,'label-danger':e.memSwitch==false}">
+                                             {{e.memInterval}}
+                                         </span>
+                                        </td>
+                                        <td style="text-align: center;">
+                                        <span class="badge"
+                                              ng-class="{'label-success':e.qpsSwitch==true,'label-danger':e.qpsSwitch==false}">
+                                             {{e.qpsThreshold}}
+                                         </span>
+                                            <span class="badge"
+                                                  ng-class="{'label-success':e.qpsSwitch==true,'label-danger':e.qpsSwitch==false}">
+                                             {{e.qpsBase}}
+                                         </span>
+                                             <span class="badge"
+                                                   ng-class="{'label-success':e.qpsSwitch==true,'label-danger':e.qpsSwitch==false}">
+                                             {{e.qpsFluc}}
+                                         </span>
+                                               <span class="badge"
+                                                     ng-class="{'label-success':e.qpsSwitch==true,'label-danger':e.qpsSwitch==false}">
+                                             {{e.qpsInterval}}
+                                         </span>
+                                        </td>
                                         <td style="text-align: center;">
                                 <span class="sticker">
                                     <span class="label arrowed-in"
@@ -367,34 +454,144 @@
                                     </div>
                                 </div>
 
-
+                                <div class="col-xs-12">
+                                    <label class="col-xs-2 control-label control-label no-padding-right">内存</label>
+                                    <label>
+                                        <input class="ace ace-switch ace-switch-3"
+                                               ng-model="memcacheTemplateConfigEntity.memSwitch" type="checkbox">
+                                        <span class="lbl middle"></span>
+                                    </label>
+                                </div>
                                 <div class="col-xs-12 form-group">
-                                    <label class="col-xs-3 control-label control-label no-padding-right">内存上阈值：</label>
+                                    <div class="col-xs-6">
+                                        <label class="col-xs-6 control-label control-label no-padding-right">峰值：</label>
 
-                                    <div class="col-xs-9">
-                                        <input type="text" class="form-control"
-                                               ng-model="memcacheTemplateConfigEntity.memThreshold"
-                                               name="memcachememThreshold">
+                                        <div class="col-xs-6">
+                                            <input type="text" class="form-control"
+                                                   ng-model="memcacheTemplateConfigEntity.memThreshold"
+                                                   name="memcachememThreshold">
+                                        </div>
                                     </div>
+                                    <div class="col-xs-6">
+                                        <label class="col-xs-6 control-label control-label no-padding-right">波动基数：</label>
+
+                                        <div class="col-xs-6">
+                                            <input type="text" class="form-control"
+                                                   ng-model="memcacheTemplateConfigEntity.memBase"
+                                                   name="memcachememBase">
+                                        </div>
+                                    </div>
+                                    <div class="col-xs-6">
+                                        <label class="col-xs-6 control-label control-label no-padding-right">波动粒度：</label>
+
+                                        <div class="col-xs-6">
+                                            <input type="text" class="form-control"
+                                                   ng-model="memcacheTemplateConfigEntity.memFluc"
+                                                   name="memcachememFluc">
+                                        </div>
+                                    </div>
+                                    <div class="col-xs-6">
+                                        <label class="col-xs-6 control-label control-label no-padding-right">间隔时间：</label>
+
+                                        <div class="col-xs-6">
+                                            <input type="text" class="form-control"
+                                                   ng-model="memcacheTemplateConfigEntity.memInterval"
+                                                   name="memcachememInterval">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-xs-12">
+                                    <label class="col-xs-2 control-label control-label no-padding-right">QPS</label>
+                                    <label>
+                                        <input class="ace ace-switch ace-switch-3"
+                                               ng-model="memcacheTemplateConfigEntity.qpsSwitch" type="checkbox">
+                                        <span class="lbl middle"></span>
+                                    </label>
                                 </div>
 
                                 <div class="col-xs-12 form-group">
-                                    <label class="col-xs-3 control-label control-label no-padding-right">QPS上阈值：</label>
+                                    <div class="col-xs-6">
+                                        <label class="col-xs-6 control-label control-label no-padding-right">峰值：</label>
 
-                                    <div class="col-xs-9">
-                                        <input type="text" class="form-control"
-                                               ng-model="memcacheTemplateConfigEntity.qpsThreshold"
-                                               name="memcacheqpsThreshold">
+                                        <div class="col-xs-6">
+                                            <input type="text" class="form-control"
+                                                   ng-model="memcacheTemplateConfigEntity.qpsThreshold"
+                                                   name="memcacheqpsThreshold">
+                                        </div>
                                     </div>
+                                    <div class="col-xs-6">
+                                        <label class="col-xs-6 control-label control-label no-padding-right">波动基数：</label>
+
+                                        <div class="col-xs-6">
+                                            <input type="text" class="form-control"
+                                                   ng-model="memcacheTemplateConfigEntity.qpsBase"
+                                                   name="memcacheqpsBase">
+                                        </div>
+                                    </div>
+                                    <div class="col-xs-6">
+                                        <label class="col-xs-6 control-label control-label no-padding-right">波动粒度：</label>
+
+                                        <div class="col-xs-6">
+                                            <input type="text" class="form-control"
+                                                   ng-model="memcacheTemplateConfigEntity.qpsFluc"
+                                                   name="memcacheqpsFluc">
+                                        </div>
+                                    </div>
+                                    <div class="col-xs-6">
+                                        <label class="col-xs-6 control-label control-label no-padding-right">间隔时间：</label>
+
+                                        <div class="col-xs-6">
+                                            <input type="text" class="form-control"
+                                                   ng-model="memcacheTemplateConfigEntity.qpsInterval"
+                                                   name="memcacheqpsInterval">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-xs-12">
+                                    <label class="col-xs-2 control-label control-label no-padding-right">连接数</label>
+                                    <label>
+                                        <input class="ace ace-switch ace-switch-3"
+                                               ng-model="memcacheTemplateConfigEntity.connSwitch" type="checkbox">
+                                        <span class="lbl middle"></span>
+                                    </label>
                                 </div>
 
                                 <div class="col-xs-12 form-group">
-                                    <label class="col-xs-3 control-label control-label no-padding-right">连接数上阈值：</label>
+                                    <div class="col-xs-6">
+                                        <label class="col-xs-6 control-label control-label no-padding-right">峰值：</label>
 
-                                    <div class="col-xs-9">
-                                        <input type="text" class="form-control"
-                                               ng-model="memcacheTemplateConfigEntity.connThreshold"
-                                               name="memcacheconnThreshold">
+                                        <div class="col-xs-6">
+                                            <input type="text" class="form-control"
+                                                   ng-model="memcacheTemplateConfigEntity.connThreshold"
+                                                   name="memcacheconnThreshold">
+                                        </div>
+                                    </div>
+                                    <div class="col-xs-6">
+                                        <label class="col-xs-6 control-label control-label no-padding-right">波动基数：</label>
+
+                                        <div class="col-xs-6">
+                                            <input type="text" class="form-control"
+                                                   ng-model="memcacheTemplateConfigEntity.connBase"
+                                                   name="memcacheconnBase">
+                                        </div>
+                                    </div>
+                                    <div class="col-xs-6">
+                                        <label class="col-xs-6 control-label control-label no-padding-right">波动粒度：</label>
+
+                                        <div class="col-xs-6">
+                                            <input type="text" class="form-control"
+                                                   ng-model="memcacheTemplateConfigEntity.connFluc"
+                                                   name="memcacheconnFluc">
+                                        </div>
+                                    </div>
+                                    <div class="col-xs-6">
+                                        <label class="col-xs-6 control-label control-label no-padding-right">间隔时间：</label>
+
+                                        <div class="col-xs-6">
+                                            <input type="text" class="form-control"
+                                                   ng-model="memcacheTemplateConfigEntity.connInterval"
+                                                   name="memcacheconnInterval">
+                                        </div>
                                     </div>
                                 </div>
 
@@ -476,22 +673,98 @@
                                     </div>
                                 </div>
 
-                                <div class="col-xs-12 form-group">
-                                    <label class="col-xs-3 control-label control-label no-padding-right">内存上阈值：</label>
+                                <div class="col-xs-12">
+                                    <label class="col-xs-2 control-label control-label no-padding-right">内存</label>
+                                    <label>
+                                        <input class="ace ace-switch ace-switch-3"
+                                               ng-model="redisTemplateConfigEntity.memSwitch" type="checkbox">
+                                        <span class="lbl middle"></span>
+                                    </label>
+                                </div>
 
-                                    <div class="col-xs-9">
-                                        <input type="text" class="form-control"
-                                               ng-model="redisTemplateConfigEntity.memThreshold"
-                                               name="redismemThreshold">
+                                <div class="col-xs-12 form-group">
+                                    <div class="col-xs-6">
+                                        <label class="col-xs-6 control-label control-label no-padding-right">峰值：</label>
+
+                                        <div class="col-xs-6">
+                                            <input type="text" class="form-control"
+                                                   ng-model="redisTemplateConfigEntity.memThreshold"
+                                                   name="redismemThreshold">
+                                        </div>
+                                    </div>
+                                    <div class="col-xs-6">
+                                        <label class="col-xs-6 control-label control-label no-padding-right">波动基数：</label>
+
+                                        <div class="col-xs-6">
+                                            <input type="text" class="form-control"
+                                                   ng-model="redisTemplateConfigEntity.memBase"
+                                                   name="redismemBase">
+                                        </div>
+                                    </div>
+                                    <div class="col-xs-6">
+                                        <label class="col-xs-6 control-label control-label no-padding-right">波动粒度：</label>
+
+                                        <div class="col-xs-6">
+                                            <input type="text" class="form-control"
+                                                   ng-model="redisTemplateConfigEntity.memFluc"
+                                                   name="redismemFluc">
+                                        </div>
+                                    </div>
+                                    <div class="col-xs-6">
+                                        <label class="col-xs-6 control-label control-label no-padding-right">时间间隔：</label>
+
+                                        <div class="col-xs-6">
+                                            <input type="text" class="form-control"
+                                                   ng-model="redisTemplateConfigEntity.memInterval"
+                                                   name="redismemInterval">
+                                        </div>
                                     </div>
                                 </div>
-                                <div class="col-xs-12 form-group">
-                                    <label class="col-xs-3 control-label control-label no-padding-right">QPS上阈值：</label>
 
-                                    <div class="col-xs-9">
-                                        <input type="text" class="form-control"
-                                               ng-model="redisTemplateConfigEntity.qpsThreshold"
-                                               name="redisqpsThreshold">
+                                <div>
+                                    <label class="col-xs-2 control-label control-label no-padding-right">QPS</label>
+                                    <label>
+                                        <input class="ace ace-switch ace-switch-3"
+                                               ng-model="redisTemplateConfigEntity.qpsSwitch" type="checkbox">
+                                        <span class="lbl middle"></span>
+                                    </label>
+                                </div>
+                                <div class="col-xs-12 form-group">
+                                    <div class="col-xs-6">
+                                        <label class="col-xs-6 control-label control-label no-padding-right">峰值：</label>
+
+                                        <div class="col-xs-6">
+                                            <input type="text" class="form-control"
+                                                   ng-model="redisTemplateConfigEntity.qpsThreshold"
+                                                   name="redisqpsThreshold">
+                                        </div>
+                                    </div>
+                                    <div class="col-xs-6">
+                                        <label class="col-xs-6 control-label control-label no-padding-right">波动基数：</label>
+
+                                        <div class="col-xs-6">
+                                            <input type="text" class="form-control"
+                                                   ng-model="redisTemplateConfigEntity.qpsBase"
+                                                   name="redisqpsBase">
+                                        </div>
+                                    </div>
+                                    <div class="col-xs-6">
+                                        <label class="col-xs-6 control-label control-label no-padding-right">波动粒度：</label>
+
+                                        <div class="col-xs-6">
+                                            <input type="text" class="form-control"
+                                                   ng-model="redisTemplateConfigEntity.qpsFluc"
+                                                   name="redisqpsFluc">
+                                        </div>
+                                    </div>
+                                    <div class="col-xs-6">
+                                        <label class="col-xs-6 control-label control-label no-padding-right">间隔时间：</label>
+
+                                        <div class="col-xs-6">
+                                            <input type="text" class="form-control"
+                                                   ng-model="redisTemplateConfigEntity.qpsInterval"
+                                                   name="redisqpsInterval">
+                                        </div>
                                     </div>
                                 </div>
 
@@ -538,7 +811,7 @@
         </div>
 
 
-</div>
+    </div>
 
 </div>
 

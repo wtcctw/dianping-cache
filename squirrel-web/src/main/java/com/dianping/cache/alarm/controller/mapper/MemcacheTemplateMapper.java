@@ -24,9 +24,21 @@ public class MemcacheTemplateMapper {
                 .setWeixinMode(memcacheTemplateDto.isWeixinMode());
         memcacheTemplate.setIsDown(memcacheTemplateDto.isDown())
                 .setCheckHistory(memcacheTemplateDto.isCheckHistory())
+                .setMemSwitch(memcacheTemplateDto.isMemSwitch())
                 .setMemThreshold(memcacheTemplateDto.getMemThreshold())
+                .setMemBase(memcacheTemplateDto.getMemBase())
+                .setMemFluc(memcacheTemplateDto.getMemFluc())
+                .setMemInterval(memcacheTemplateDto.getMemInterval())
+                .setQpsSwitch(memcacheTemplateDto.isQpsSwitch())
                 .setQpsThreshold(memcacheTemplateDto.getQpsThreshold())
+                .setQpsBase(memcacheTemplateDto.getQpsBase())
+                .setQpsFluc(memcacheTemplateDto.getQpsFluc())
+                .setQpsInterval(memcacheTemplateDto.getQpsInterval())
+                .setConnSwitch(memcacheTemplateDto.isConnSwitch())
                 .setConnThreshold(memcacheTemplateDto.getConnThreshold())
+                .setConnBase(memcacheTemplateDto.getConnBase())
+                .setConnFluc(memcacheTemplateDto.getConnFluc())
+                .setConnInterval(memcacheTemplateDto.getConnInterval())
                 .setCreateTime(memcacheTemplateDto.getCreateTime())
                 .setUpdateTime(new Date());
 

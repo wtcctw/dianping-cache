@@ -80,7 +80,7 @@ module
 
 module
     .controller(
-    'AlarmRuleController',
+    'AlarmConfigController',
     [
         '$rootScope',
         '$scope',
@@ -275,11 +275,8 @@ module
                 }
             );
 
-
-
             //memcacheTemplate
             $scope.memcacheClusters;
-
 
             var memcachefetchFunction = function (offset, limit, callback) {
                 $scope.memcachesearchEntity = {
@@ -303,7 +300,6 @@ module
 
             $scope.memcacherefreshpage = function (memcacheForm) {
                 $('#memcacheTemplateModal').modal('hide');
-                console.log($scope.memcacheTemplateConfigEntity);
                 $http
                     .post(
                     window.contextPath + '/setting/memcachetemplate/create',
@@ -332,9 +328,21 @@ module
                 $scope.memcacheTemplateConfigEntity.weixinMode = $scope.memcacheTemplateSearchPaginator.currentPageItems[index].weixinMode;
                 $scope.memcacheTemplateConfigEntity.isDown = $scope.memcacheTemplateSearchPaginator.currentPageItems[index].isDown;
                 $scope.memcacheTemplateConfigEntity.checkHistory = $scope.memcacheTemplateSearchPaginator.currentPageItems[index].checkHistory;
+                $scope.memcacheTemplateConfigEntity.memSwitch = $scope.memcacheTemplateSearchPaginator.currentPageItems[index].memSwitch;
                 $scope.memcacheTemplateConfigEntity.memThreshold = $scope.memcacheTemplateSearchPaginator.currentPageItems[index].memThreshold;
+                $scope.memcacheTemplateConfigEntity.memBase = $scope.memcacheTemplateSearchPaginator.currentPageItems[index].memBase;
+                $scope.memcacheTemplateConfigEntity.memFluc = $scope.memcacheTemplateSearchPaginator.currentPageItems[index].memFluc;
+                $scope.memcacheTemplateConfigEntity.memInterval = $scope.memcacheTemplateSearchPaginator.currentPageItems[index].memInterval;
+                $scope.memcacheTemplateConfigEntity.qpsSwitch = $scope.memcacheTemplateSearchPaginator.currentPageItems[index].qpsSwitch;
                 $scope.memcacheTemplateConfigEntity.qpsThreshold = $scope.memcacheTemplateSearchPaginator.currentPageItems[index].qpsThreshold;
+                $scope.memcacheTemplateConfigEntity.qpsBase = $scope.memcacheTemplateSearchPaginator.currentPageItems[index].qpsBase;
+                $scope.memcacheTemplateConfigEntity.qpsFluc = $scope.memcacheTemplateSearchPaginator.currentPageItems[index].qpsFluc;
+                $scope.memcacheTemplateConfigEntity.qpsInterval = $scope.memcacheTemplateSearchPaginator.currentPageItems[index].qpsInterval;
+                $scope.memcacheTemplateConfigEntity.connSwitch = $scope.memcacheTemplateSearchPaginator.currentPageItems[index].connSwitch;
                 $scope.memcacheTemplateConfigEntity.connThreshold = $scope.memcacheTemplateSearchPaginator.currentPageItems[index].connThreshold;
+                $scope.memcacheTemplateConfigEntity.connBase = $scope.memcacheTemplateSearchPaginator.currentPageItems[index].connBase;
+                $scope.memcacheTemplateConfigEntity.connFluc = $scope.memcacheTemplateSearchPaginator.currentPageItems[index].connFluc;
+                $scope.memcacheTemplateConfigEntity.connInterval = $scope.memcacheTemplateSearchPaginator.currentPageItems[index].connInterval;
                 $scope.memcacheTemplateConfigEntity.isUpdate = true;
             }
 
@@ -446,8 +454,16 @@ module
                 $scope.redisTemplateConfigEntity.weixinMode = $scope.redisTemplateSearchPaginator.currentPageItems[index].weixinMode;
                 $scope.redisTemplateConfigEntity.isDown = $scope.redisTemplateSearchPaginator.currentPageItems[index].isDown;
                 $scope.redisTemplateConfigEntity.checkHistory = $scope.redisTemplateSearchPaginator.currentPageItems[index].checkHistory;
+                $scope.redisTemplateConfigEntity.memSwitch = $scope.redisTemplateSearchPaginator.currentPageItems[index].memSwitch;
                 $scope.redisTemplateConfigEntity.memThreshold = $scope.redisTemplateSearchPaginator.currentPageItems[index].memThreshold;
+                $scope.redisTemplateConfigEntity.memBase = $scope.redisTemplateSearchPaginator.currentPageItems[index].memBase;
+                $scope.redisTemplateConfigEntity.memFluc = $scope.redisTemplateSearchPaginator.currentPageItems[index].memFluc;
+                $scope.redisTemplateConfigEntity.memInterval = $scope.redisTemplateSearchPaginator.currentPageItems[index].memInterval;
+                $scope.redisTemplateConfigEntity.qpsSwitch = $scope.redisTemplateSearchPaginator.currentPageItems[index].qpsSwitch;
                 $scope.redisTemplateConfigEntity.qpsThreshold = $scope.redisTemplateSearchPaginator.currentPageItems[index].qpsThreshold;
+                $scope.redisTemplateConfigEntity.qpsBase = $scope.redisTemplateSearchPaginator.currentPageItems[index].qpsBase;
+                $scope.redisTemplateConfigEntity.qpsFluc = $scope.redisTemplateSearchPaginator.currentPageItems[index].qpsFluc;
+                $scope.redisTemplateConfigEntity.qpsInterval = $scope.redisTemplateSearchPaginator.currentPageItems[index].qpsInterval;
                 $scope.redisTemplateConfigEntity.isUpdate = true;
             }
 

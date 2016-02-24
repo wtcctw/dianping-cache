@@ -46,6 +46,8 @@ public class MemcacheBaseline implements Serializable{
 	
 	private long bytes;
 
+	private float mem;
+
 	private int taskId;
 
 	private Date updateTime;
@@ -208,6 +210,15 @@ public class MemcacheBaseline implements Serializable{
 
 	public MemcacheBaseline setCurr_time(long curr_time) {
 		this.curr_time = curr_time;
+		return this;
+	}
+
+	public float getMem() {
+		return mem;
+	}
+
+	public MemcacheBaseline setMem(float mem) {
+		this.mem = mem;
 		return this;
 	}
 

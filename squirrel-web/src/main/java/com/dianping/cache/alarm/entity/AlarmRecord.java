@@ -24,7 +24,7 @@ public class AlarmRecord implements Serializable {
 
     private String ip;
 
-    private float val;
+    private String val;
 
     private Date createTime;
 
@@ -81,11 +81,11 @@ public class AlarmRecord implements Serializable {
         return this;
     }
 
-    public float getValue() {
+    public String getValue() {
         return val;
     }
 
-    public AlarmRecord setValue(float val) {
+    public AlarmRecord setValue(String val) {
         this.val = val;
         return this;
     }

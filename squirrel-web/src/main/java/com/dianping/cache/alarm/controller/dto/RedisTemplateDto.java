@@ -21,9 +21,25 @@ public class RedisTemplateDto {
 
     private boolean checkHistory;
 
+    private boolean memSwitch;
+
     private int memThreshold;
 
+    private int memFluc;
+
+    private int memBase;
+
+    private int memInterval;
+
+    private boolean qpsSwitch;
+
     private int qpsThreshold;
+
+    private int qpsFluc;
+
+    private int qpsBase;
+
+    private int qpsInterval;
 
     private boolean isUpdate;
 
@@ -87,6 +103,14 @@ public class RedisTemplateDto {
         this.checkHistory = checkHistory;
     }
 
+    public boolean isMemSwitch() {
+        return memSwitch;
+    }
+
+    public void setMemSwitch(boolean memSwitch) {
+        this.memSwitch = memSwitch;
+    }
+
     public int getMemThreshold() {
         return memThreshold;
     }
@@ -95,12 +119,68 @@ public class RedisTemplateDto {
         this.memThreshold = memThreshold;
     }
 
+    public int getMemFluc() {
+        return memFluc;
+    }
+
+    public void setMemFluc(int memFluc) {
+        this.memFluc = memFluc;
+    }
+
+    public int getMemBase() {
+        return memBase;
+    }
+
+    public void setMemBase(int memBase) {
+        this.memBase = memBase;
+    }
+
+    public int getMemInterval() {
+        return memInterval;
+    }
+
+    public void setMemInterval(int memInterval) {
+        this.memInterval = memInterval;
+    }
+
+    public boolean isQpsSwitch() {
+        return qpsSwitch;
+    }
+
+    public void setQpsSwitch(boolean qpsSwitch) {
+        this.qpsSwitch = qpsSwitch;
+    }
+
     public int getQpsThreshold() {
         return qpsThreshold;
     }
 
     public void setQpsThreshold(int qpsThreshold) {
         this.qpsThreshold = qpsThreshold;
+    }
+
+    public int getQpsFluc() {
+        return qpsFluc;
+    }
+
+    public void setQpsFluc(int qpsFluc) {
+        this.qpsFluc = qpsFluc;
+    }
+
+    public int getQpsBase() {
+        return qpsBase;
+    }
+
+    public void setQpsBase(int qpsBase) {
+        this.qpsBase = qpsBase;
+    }
+
+    public int getQpsInterval() {
+        return qpsInterval;
+    }
+
+    public void setQpsInterval(int qpsInterval) {
+        this.qpsInterval = qpsInterval;
     }
 
     public boolean isUpdate() {

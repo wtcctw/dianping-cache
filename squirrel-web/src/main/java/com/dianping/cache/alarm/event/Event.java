@@ -76,7 +76,7 @@ public abstract class Event {
     public abstract void alarm() throws InterruptedException, URISyntaxException, DocumentException;
 
     public void sendMessage(AlarmDetail alarmDetail) throws InterruptedException, URISyntaxException, DocumentException {
-        logger.info("[sendMessage] AlarmType {}", alarmType);
+        logger.info("[sendMessage] AlarmType {}", alarmDetail.getClusterType(),alarmDetail.getAlarmDetail());
 
         try {
 
