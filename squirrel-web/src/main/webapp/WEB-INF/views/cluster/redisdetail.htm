@@ -146,7 +146,7 @@
                                         <i class="ace-icon fa fa-cog bigger-130"></i>
                                     </a>
 
-                                    <a class="grey" href="#">
+                                    <a class="grey" href="#information" ng-click="categoryInfo(category.category.category)" data-toggle="modal">
                                         <i class="ace-icon fa fa-search bigger-130"></i>
                                     </a>
 
@@ -481,6 +481,53 @@
             </div>
         </div>
     </div>
+
+
+    <div class="modal fade" id="information" tabindex="-1"
+         role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content" style="border: none">
+                <div class="modal-body">
+                    <form class="form-horizontal" role="form" method="post">
+                        <div class="form-group">
+                            <button class="close btn-xs" data-dismiss="modal"
+                                    aria-hidden="true">&times;</button>
+                            <h4>业务信息</h4>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-4">category</label>
+                            <div class="col-sm-8">
+                                <input class="col-sm-12" type="text" name="category"
+                                       ng-model="categoryInfoEntity.category">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-4">申请人</label>
+                            <div class="col-sm-8">
+                                <input class="col-sm-12" type="text" name="owner"
+                                       ng-model="categoryInfoEntity.owner">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-4">应用名</label>
+                            <div class="col-sm-8">
+                                <input class="col-sm-12" type="text" name="application"
+                                       ng-model="categoryInfoEntity.application">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-4 ">业务含义</label>
+                            <div class="col-sm-8">
+                                <textarea class="col-sm-12"name="description"
+                                       ng-model="categoryInfoEntity.description">
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
 
     <div class="modal fade" id="log" tabindex="-1" role="dialog"
          aria-labelledby="myModalLabel" aria-hidden="true" >

@@ -62,11 +62,11 @@
 
 <body>
 
-<h3>缓存异常报表</h3>
+<h3>缓存延迟失败率异常日报表</h3>
 
 
 <div class="row" style="margin-center:1px">
-    #if($failDetails.size>0)
+    #if($failDetails.size()>0)
         <label>失败率 > 0.100% </label>
         <table class="table table-bordered table-striped table-condensed  table-hover">
             <thead>

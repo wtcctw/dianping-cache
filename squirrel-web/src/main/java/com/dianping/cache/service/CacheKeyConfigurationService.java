@@ -15,14 +15,14 @@
  */
 package com.dianping.cache.service;
 
-import java.util.List;
-
-import org.springframework.transaction.annotation.Transactional;
-
 import com.dianping.avatar.exception.DuplicatedIdentityException;
 import com.dianping.cache.entity.CacheKeyConfiguration;
+import com.dianping.cache.entity.CategoryBusinessInfo;
 import com.dianping.cache.service.condition.CacheKeyConfigSearchCondition;
 import com.dianping.core.type.PageModel;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 /**
  * CacheKeyConfigurationService
@@ -60,5 +60,7 @@ public interface CacheKeyConfigurationService {
 	List<CacheKeyConfiguration> findByCacheType(String cacheType);
 	
 	void delete(String category);
+
+	CategoryBusinessInfo findCategoryBusinessInfo(String category);
 	
 }

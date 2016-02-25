@@ -15,17 +15,11 @@
  */
 package com.dianping.cache.service.impl;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.dianping.avatar.exception.DuplicatedIdentityException;
 import com.dianping.cache.dao.CacheKeyConfigurationDao;
+import com.dianping.cache.dao.CategoryBusinessInfoDao;
 import com.dianping.cache.entity.CacheKeyConfiguration;
+import com.dianping.cache.entity.CategoryBusinessInfo;
 import com.dianping.cache.remote.jms.CacheMessageProducer;
 import com.dianping.cache.remote.translator.CacheKeyConfiguration2DTOTranslator;
 import com.dianping.cache.remote.translator.Translator;
@@ -34,6 +28,13 @@ import com.dianping.cache.service.OperationLogService;
 import com.dianping.cache.service.condition.CacheKeyConfigSearchCondition;
 import com.dianping.core.type.PageModel;
 import com.dianping.squirrel.common.domain.CacheKeyConfigurationDTO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * CacheKeyConfiguration service implementation
@@ -49,6 +50,8 @@ public class CacheKeyConfigurationServiceImpl implements CacheKeyConfigurationSe
 	private CacheKeyConfigurationDao configurationDao;
 	
 	private CacheMessageProducer cacheMessageProducer;
+
+	private CategoryBusinessInfoDao categoryBusinessInfoDao;
 	
 	private Translator<CacheKeyConfiguration, CacheKeyConfigurationDTO> translator = new CacheKeyConfiguration2DTOTranslator();
 
@@ -141,6 +144,11 @@ public class CacheKeyConfigurationServiceImpl implements CacheKeyConfigurationSe
 		}
 	}
 
+	@Override
+	public CategoryBusinessInfo findCategoryBusinessInfo(String category) {
+		return categoryBusinessInfoDao.find(category);
+	}
+
 	private void logCacheKeyConfigDelete(CacheKeyConfiguration config, boolean succeed) {
 		if (config != null) {
 			operationLogService.create(succeed, "KeyConfigDelete", transferConfigDetail(config, null), true);
@@ -189,4 +197,7 @@ public class CacheKeyConfigurationServiceImpl implements CacheKeyConfigurationSe
 		this.operationLogService = operationLogService;
 	}
 
+	public void setCategoryBusinessInfoDao(CategoryBusinessInfoDao categoryBusinessInfoDao) {
+		this.categoryBusinessInfoDao = categoryBusinessInfoDao;
+	}
 }

@@ -16,6 +16,7 @@
         <property name="configurationDao" ref="cacheKeyConfigurationDao" />
         <property name="cacheMessageProducer" ref="notifyMessageProducer" />
         <property name="operationLogService" ref="operationLogService" />
+        <property name="categoryBusinessInfoDao" ref="categoryBusinessInfoDao" />
     </bean>
 
     <bean id="operationLogService" class="com.dianping.cache.service.impl.OperationLogServiceImpl">

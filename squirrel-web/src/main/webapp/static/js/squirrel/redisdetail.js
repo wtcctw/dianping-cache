@@ -95,7 +95,9 @@ module.controller('RedisController', [
         $scope.speed = 'true';
         $scope.configParas = [];
         $scope.categoryEntity = {
-        }
+        };
+        $scope.categoryInfoEntity = {
+        };
 
 
 
@@ -272,6 +274,15 @@ module.controller('RedisController', [
                 }, 0);
             });
         };
+
+        $scope.categoryInfo = function(category){
+            $http.get(window.contextPath + '/categoryinfo', {params: {
+                category:category,
+                }}
+            ).success(function (data) {
+                $scope.categoryInfoEntity = data;
+            });
+        }
 
         $scope.getLogs = function(cluster){
             $http.get(window.contextPath + '/auditlog/search/'+cluster, {params: {

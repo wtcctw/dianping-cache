@@ -4,6 +4,7 @@ import com.dianping.cache.controller.vo.CategoryWrapperData;
 import com.dianping.cache.controller.vo.ConfigurationParams;
 import com.dianping.cache.entity.CacheConfiguration;
 import com.dianping.cache.entity.CacheKeyConfiguration;
+import com.dianping.cache.entity.CategoryBusinessInfo;
 import com.dianping.cache.service.CacheConfigurationService;
 import com.dianping.cache.service.CacheKeyConfigurationService;
 import com.dianping.cache.service.RdbService;
@@ -87,6 +88,12 @@ public class ConfigController extends AbstractSidebarController {
         return result;
     }
 
+    @RequestMapping(value = "/categoryinfo")
+    @ResponseBody
+    public CategoryBusinessInfo getCategoryBusinessInfo(String category) {
+        CategoryBusinessInfo info = cacheKeyConfigurationService.findCategoryBusinessInfo(category);
+        return info;
+    }
 
     @RequestMapping(value = "/config/cluster/update")
     @ResponseBody

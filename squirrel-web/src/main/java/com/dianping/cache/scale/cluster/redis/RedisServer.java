@@ -191,11 +191,11 @@ public class RedisServer extends Server {
     public RedisInfo loadRedisInfo() {
         Jedis jedis = new Jedis(getIp(), getPort());
         String password = getRedisCluster().getPassword();
-        if(password != null && !"".equals(password)){
-            jedis.auth(password);
-        }
         info = new RedisInfo();
         try {
+            if(password != null && !"".equals(password)){
+                jedis.auth(password);
+            }
             List<String> redisConfig = jedis.configGet("*");
             String redisInfo = jedis.info();
             Map<String, String> redisConfigMap = parseServerConfig(redisConfig);
@@ -232,6 +232,7 @@ public class RedisServer extends Server {
             }
 
         } catch (Exception e) {
+
         } finally {
             jedis.close();
         }
