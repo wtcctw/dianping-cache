@@ -133,6 +133,11 @@
         <property name="sqlSessionFactory" ref="sqlSessionFactory"/>
     </bean>
 
+	<bean id="categoryBusinessInfoDao" class="org.mybatis.spring.mapper.MapperFactoryBean">
+		<property name="mapperInterface" value="com.dianping.cache.dao.CategoryBusinessInfoDao"/>
+		<property name="sqlSessionFactory" ref="sqlSessionFactory"/>
+	</bean>
+
 	<bean id="authDao" class="org.mybatis.spring.mapper.MapperFactoryBean">
 		<property name="mapperInterface" value="com.dianping.squirrel.dao.AuthDao"/>
 		<property name="sqlSessionFactory" ref="sqlSessionFactory"/>

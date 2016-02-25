@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.dianping.cache.dao.CategoryBusinessInfoDao">
+	
+	<resultMap id="Info" type="CategoryBusinessInfo">
+		<result column="id" property="id"/>
+		<result column="category" property="category"/>
+		<result column="application" property="application"/>
+		<result column="owner" property="owner"/>
+		<result column="description" property="description"/>
+	</resultMap>
+
+	<select id="find" parameterType="String" resultMap="Info">
+		SELECT * 
+		FROM category_info
+		WHERE category = #{category}
+	</select>
+	<insert id="insert" parameterType="CategoryBusinessInfo">
+		INSERT INTO category_info(category, application, owner, description)
+		VALUES(#{category},#{application},#{owner}.#{description})
+	</insert>
+	
+	<delete id="delete" parameterType="String">
+		DELETE FROM category_info
+		WHERE category = #{category}
+	</delete>	
+
+</mapper>
