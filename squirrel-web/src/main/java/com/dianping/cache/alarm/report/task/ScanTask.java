@@ -295,7 +295,6 @@ public class ScanTask {
         try {
             VelocityEngine velocityEngine = v.createVelocityEngine();
 
-
             // 声明Map对象，并填入用来填充模板文件的键值对
             Map<String, Object> model = new HashMap<String, Object>();
             model.put("delayDetails", delayDetails);
@@ -316,7 +315,7 @@ public class ScanTask {
             }
 
             helper.setTo(receiverList);
-            helper.setSubject("缓存延迟失败率异常日报表");
+            helper.setSubject("KV红黑榜日报表");
 
             msg.setContent(emailText, "text/html; charset=UTF-8");
 
