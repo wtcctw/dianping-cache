@@ -71,8 +71,10 @@
         <table class="table table-bordered table-striped table-condensed  table-hover">
             <thead>
             <tr>
-                <th>Type</th>
-                <th>Name</th>
+                <th>CacheName</th>
+                <th>Project</th>
+                <th>Rdduty</th>
+                <th>Category&Operation</th>
                 <th>Total</th>
                 <th>Failure</th>
                 <th>Failure(%)</th>
@@ -87,6 +89,8 @@
                     #if($info.rowspan>0)
                         <td style="border:1px solid black;text-align: left" rowspan="$info.rowspan">$info.cacheName</td>
                     #end
+                    <td style="border:1px solid black;text-align: left">$info.projectName</td>
+                    <td style="border:1px solid black;text-align: left">$info.rdDuty</td>
                     <td style="border:1px solid black;text-align: left">$info.project</td>
                     <td style="border:1px solid black;text-align: center">$info.totalCount</td>
                     <td style="border:1px solid black;text-align: center">$info.failCount</td>
@@ -107,8 +111,10 @@
         <table class="table table-bordered table-striped table-condensed  table-hover">
             <thead>
             <tr>
-                <th>Type</th>
-                <th>Name</th>
+                <th>CacheName</th>
+                <th>Project</th>
+                <th>Rdduty</th>
+                <th>Category&Operation</th>
                 <th>Total</th>
                 <th>Failure</th>
                 <th>Failure(%)</th>
@@ -124,6 +130,8 @@
                         <td style="border:1px solid black;;text-align: left"
                             rowspan="$info.rowspan">$info.cacheName</td>
                     #end
+                    <td style="border:1px solid black;text-align: left">$info.projectName</td>
+                    <td style="border:1px solid black;text-align: left">$info.rdDuty</td>
                     <td style="border:1px solid black;text-align: left">$info.project</td>
                     <td style="border:1px solid black;text-align: center">$info.totalCount</td>
                     <td style="border:1px solid black;text-align: center">$info.failCount</td>

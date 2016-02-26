@@ -34,8 +34,10 @@
                 <table
                        class="table table-bordered table-striped table-condensed  table-hover">
                     <tr>
-                        <th style="border:1px solid black;">Type</th>
-                        <th style="border:1px solid black;">Name</th>
+                        <th style="border:1px solid black;">CacheName</th>
+                        <th style="border:1px solid black;">Project</th>
+                        <th style="border:1px solid black;">Rdduty</th>
+                        <th style="border:1px solid black;">Category&Operation</th>
                         <th style="border:1px solid black;">Total</th>
                         <th style="border:1px solid black;">Failure</th>
                         <th style="border:1px solid black;">Failure(%)</th>
@@ -46,6 +48,8 @@
                     <tr ng-repeat="m in searchPaginator.currentPagefailDetails">
 
                         <td style="border:1px solid black;text-align: left" ng-if="m.rowspan!=0" rowspan="{{m.rowspan}}">{{m.cacheName}}</td>
+                        <td style="border:1px solid black;text-align: left">{{m.projectName}}</td>
+                        <td style="border:1px solid black;text-align: left">{{m.rdDuty}}</td>
                         <td style="border:1px solid black;text-align: left">{{m.project}}</td>
                         <td style="border:1px solid black;text-align: left" >{{m.totalCount}}</td>
                         <td style="border:1px solid black;text-align: left">{{m.failCount}}</td>
@@ -62,8 +66,10 @@
                 <table
                        class="table table-bordered table-striped table-condensed  table-hover">
                     <tr>
-                        <th style="border:1px solid black;">Type</th>
-                        <th style="border:1px solid black;">Name</th>
+                        <th style="border:1px solid black;">CacheName</th>
+                        <th style="border:1px solid black;">Project</th>
+                        <th style="border:1px solid black;">Rdduty</th>
+                        <th style="border:1px solid black;">Category&Operation</th>
                         <th style="border:1px solid black;">Total</th>
                         <th style="border:1px solid black;">Failure</th>
                         <th style="border:1px solid black;">Failure(%)</th>
@@ -73,6 +79,8 @@
                     </tr>
                     <tr ng-repeat="m in searchPaginator.currentPagedelayDetails">
                         <td style="border:1px solid black;text-align: left" ng-if="m.rowspan!=0" rowspan="{{m.rowspan}}">{{m.cacheName}}</td>
+                        <td style="border:1px solid black;text-align: left">{{m.projectName}}</td>
+                        <td style="border:1px solid black;text-align: left">{{m.rdDuty}}</td>
                         <td style="border:1px solid black;text-align: left">{{m.project}}</td>
                         <td style="border:1px solid black;text-align: left">{{m.totalCount}}</td>
                         <td style="border:1px solid black;text-align: left">{{m.failCount}}</td>

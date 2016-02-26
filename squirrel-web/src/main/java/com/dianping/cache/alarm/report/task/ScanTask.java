@@ -59,13 +59,16 @@ public class ScanTask {
     public void run() throws InterruptedException, DocumentException, URISyntaxException, MessagingException {
         logger.info("ScanTask run");
 
-        List<ScanDetail> scanDetails = AlarmScanDetails();
+        List<ScanDetail> scanDetailList = AlarmScanDetails();
+
+        List<ScanDetail>scanDetails = addProjectRdduty(scanDetailList);
 
         saveToDb(scanDetails);
 
         Map<String, List<ScanDetail>> detail = dealScanDetal(scanDetails);
 
-        String rdReceiver = "rdTeam";
+        List<String> rdReceiver = new ArrayList<String>();
+        rdReceiver.add("rdTeam");
 
         sendMail(detail.get("delayDetailLists"), detail.get("failDetailLists"), rdReceiver);
 
@@ -76,9 +79,9 @@ public class ScanTask {
         logger.info("ScanTask SendEmail");
         for (Map.Entry<String, List<ScanDetail>> entry : diffScanDetails.entrySet()) {
 
-            String receiverEmail;
+            List<String> receiverEmail = new ArrayList<String>();
             if("not found".equals(entry.getKey())){
-                receiverEmail ="rdTeam";
+                receiverEmail.add("rdTeam");
             }else {
 
                 CmdbResult<CmdbProject> result = CmdbManager.getProject(entry.getKey());
@@ -88,13 +91,8 @@ public class ScanTask {
                 } else {
                     receiver = result.cmdbResult.getRd_duty();
                 }
-                List<EmployeeDto> userDtoList = employeeService.queryEmployeeByKeyword(receiver);
 
-                if (0 == userDtoList.size()) {
-                    receiverEmail = "shiyun.lv@dianping.com";
-                } else {
-                    receiverEmail = userDtoList.get(0).getEmail();
-                }
+                receiverEmail = getReceiverEmails(receiver);
             }
             Map<String, List<ScanDetail>> detailMap = dealScanDetal(entry.getValue());
 
@@ -103,6 +101,63 @@ public class ScanTask {
                 sendMail(detailMap.get("delayDetailLists"), detailMap.get("failDetailLists"), receiverEmail);
             }
         }
+    }
+
+    private List<String> getReceiverEmails(String receiver) {
+
+        List<String> receiverEmail = new ArrayList<String>();
+        String[] receivers;
+        if(receiver.contains(",")){
+            receivers = receiver.split(",");
+
+            for(int i=0;i<receivers.length;i++){
+                List<EmployeeDto> userDtoList = employeeService.queryEmployeeByKeyword(receivers[i]);
+
+                if (0 == userDtoList.size()) {
+                    receiverEmail.add("shiyun.lv@dianping.com");
+                } else {
+                    receiverEmail.add(userDtoList.get(0).getEmail());
+                }
+            }
+
+        }else {
+            List<EmployeeDto> userDtoList = employeeService.queryEmployeeByKeyword(receiver);
+
+            if (0 == userDtoList.size()) {
+                receiverEmail.add("shiyun.lv@dianping.com");
+            } else {
+                receiverEmail.add(userDtoList.get(0).getEmail());
+            }
+        }
+
+        return receiverEmail;
+    }
+
+    private List<ScanDetail> addProjectRdduty(List<ScanDetail> scanDetails) {
+
+        for (ScanDetail scanDetail : scanDetails) {
+            String category = scanDetail.getProject().split(":")[0];
+
+            String appName;
+            List<CategoryToApp> categoryToAppList = categoryToAppService.findByCategory(category);
+            if (0 != categoryToAppList.size()) {
+                appName = categoryToAppService.findByCategory(category).get(0).getApplication();
+            } else {
+                appName = "not found";
+            }
+            scanDetail.setProjectName(appName);
+            CmdbResult<CmdbProject> result = CmdbManager.getProject(appName);
+
+            if((null != result)&&(null != result.cmdbResult)){
+                scanDetail.setRdDuty(result.cmdbResult.getRd_duty());
+            }else {
+                scanDetail.setRdDuty("Don't know!");
+            }
+
+        }
+
+
+        return scanDetails;
     }
 
     private void saveToDb(List<ScanDetail> scanDetails) {
@@ -280,7 +335,7 @@ public class ScanTask {
      *  
      */
 
-    private void sendMail(List<ScanDetail> delayDetails, List<ScanDetail> failDetails, String receiver) throws MessagingException {
+    private void sendMail(List<ScanDetail> delayDetails, List<ScanDetail> failDetails, List<String> receiver) throws MessagingException {
 
         SpringMailSender mailSender = new SpringMailSender();
 
@@ -306,11 +361,14 @@ public class ScanTask {
             MimeMessageHelper helper = new MimeMessageHelper(msg, true);
             helper.setFrom(mailSender.getMailSender().getUsername());
             String[] receiverList;
-            if ("rdTeam".equals(receiver)) {
+            if ("rdTeam".equals(receiver.get(0))) {
                 receiverList = new String[]{"shiyun.lv@dianping.com", "xiaoxiong.dai@dianping.com", "dp.wang@dianping.com", "enlight.chen@dianping.com", "xiang.wu@dianping.com", "faping.miao@dianping.com"};
 //                receiverList = new String[]{"shiyun.lv@dianping.com"};
             } else {
-                receiverList = new String[]{"shiyun.lv@dianping.com", receiver};
+                receiver.add("shiyun.lv@dianping.com");
+                final int size = receiver.size();
+                receiverList = (String[])receiver.toArray(new String[size]);
+
 //                receiverList = new String[]{"shiyun.lv@dianping.com"};
             }
 
