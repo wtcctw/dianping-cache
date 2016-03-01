@@ -1,5 +1,6 @@
 package com.dianping.squirrel.view.highcharts;
 
+import com.dianping.cache.entity.RedisStats;
 import com.dianping.squirrel.view.highcharts.HighChartsWrapper.PlotOption;
 import com.dianping.squirrel.view.highcharts.HighChartsWrapper.PlotOptionSeries;
 import com.dianping.squirrel.view.highcharts.HighChartsWrapper.Series;
@@ -7,9 +8,8 @@ import com.dianping.squirrel.view.highcharts.statsdata.MemcachedStatsData;
 import com.dianping.squirrel.view.highcharts.statsdata.RedisStatsData;
 import com.dianping.squirrel.view.highcharts.statsdata.ServerStatsData;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 public class ChartsBuilder {
 	
@@ -122,15 +122,63 @@ public class ChartsBuilder {
 	
 	public static List<HighChartsWrapper> buildRedisStatsCharts(RedisStatsData data){
 		List<HighChartsWrapper> result = new ArrayList<HighChartsWrapper>();
-		long startTime = data.getStartTime();
-		result.add(build1("Used_Memory",startTime,data.getUsed_memory()));
-		result.add(build1("total_connections_received",startTime,data.getTotal_connections()));
-		result.add(build1("connected_clients",startTime,data.getConnected_clients()));
-		result.add(build1("input_kbps",startTime,data.getInput_kbps()));
-		result.add(build1("output_kbps",startTime,data.getOutput_kbps()));
-		result.add(build1("used_cpu_sys",startTime,data.getUsed_cpu_sys()));
-		result.add(build1("used_cpu_user",startTime,data.getUsed_cpu_user()));
+		if(data != null){
+			long startTime = data.getStartTime();
+			//result.add(build1("Used_Memory_Dayly",startTime,data.getUsed_memory()));
+			result.add(build1("Used_Memory",startTime,data.getUsed_memory()));
+			result.add(build1("QPS",startTime,data.getQps()));
+			result.add(build1("input_kbps",startTime,data.getInput_kbps()));
+			result.add(build1("output_kbps",startTime,data.getOutput_kbps()));
+			result.add(build1("total_connections_received",startTime,data.getTotal_connections()));
+			result.add(build1("connected_clients",startTime,data.getConnected_clients()));
+			result.add(build1("used_cpu_sys",startTime,data.getUsed_cpu_sys()));
+			result.add(build1("used_cpu_user",startTime,data.getUsed_cpu_user()));
+		}
 		return result;
+	}
+
+	public static HighChartsWrapper buildPeriodCharts(List<RedisStats> statsList,int period,long endTime,int count){
+		HighChartsWrapper charts = new HighChartsWrapper();
+		charts.setTitle("Period Data For  " + count + " Days");
+		Series[] series = new Series[1];
+		series[0] = new Series();
+		Number[] data = new Number[statsList.size()];
+		int index = 0;
+		Calendar calendar = Calendar.getInstance();
+		calendar.set(Calendar.HOUR_OF_DAY, 0);
+		calendar.set(Calendar.MINUTE, 0);
+		calendar.set(Calendar.SECOND,0);
+		calendar.set(Calendar.MILLISECOND, 0);
+		long startTime = calendar.getTimeInMillis() - (count-1)*TimeUnit.MILLISECONDS.convert(period,TimeUnit.DAYS);
+		for(RedisStats stats : statsList){
+			if(stats != null){
+				data[index++] = stats.getMemory_used();
+			}else{
+				data[index++] = null;
+			}
+		}
+
+		for (int i = index - 1; i > 0; i--){
+			if(data[i] != null && data[i-1] != null){
+				data[i] = data[i].intValue() - data[i-1].intValue();
+			}else {
+				data[i] =  null;
+			}
+		}
+
+		series[0].setData(Arrays.copyOfRange(data,1,data.length));
+		series[0].setName("Server");
+		PlotOption plotOption = new PlotOption();
+		PlotOptionSeries pos = new PlotOptionSeries();
+
+		pos.setPointStart(startTime);
+		pos.setPointInterval(TimeUnit.MILLISECONDS.convert(period,TimeUnit.DAYS));
+		plotOption.setSeries(pos);
+
+		charts.setyAxisTitle("");
+		charts.setPlotOption(plotOption);
+		charts.setSeries(series);
+		return charts;
 	}
 	
 	private static HighChartsWrapper build0(String title, long startTime, Map<String, Number[]> data) {

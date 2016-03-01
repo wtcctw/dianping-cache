@@ -21,10 +21,22 @@ public class BaselineThreadFactoryImpl implements BaselineThreadFactory, Applica
     }
 
     @Override
-    public BaselineThread createBaselineThread() {
+    public BaselineComputeThread createBaselineComputeThread() {
 
-        BaselineThread baselineThread = (BaselineThread)applicationContext.getBean("baselineThread");
-        return baselineThread;
+        BaselineComputeThread baselineComputeThread = (BaselineComputeThread)applicationContext.getBean("baselineComputeThread");
+        return baselineComputeThread;
 
+    }
+
+    @Override
+    public BaselineCleanThread createBaselineCleanThread() {
+        BaselineCleanThread baselineCleanThread = (BaselineCleanThread)applicationContext.getBean("baselineCleanThread");
+        return baselineCleanThread;
+    }
+
+    @Override
+    public BaselineMapGetThread createBaselineMapGetThread() {
+        BaselineMapGetThread baselineMapGetThread = (BaselineMapGetThread)applicationContext.getBean("baselineMapGetThread");
+        return baselineMapGetThread;
     }
 }

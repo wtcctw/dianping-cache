@@ -154,7 +154,7 @@ module.controller('RedisDashBoardController', [ '$scope', '$http','$document','$
                         "iDisplayLength": 10,
                         "aoColumns": [
                             {"bSortable": false},null, null, null, {"bSortable": false},
-                            {"bSortable": false}, {"bSortable": false}
+                            {"bSortable": false}, {"bSortable": false},{"bSortable": false}
                         ],
                     });
                     var obj = document.getElementById("redisTable_length");

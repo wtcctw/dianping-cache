@@ -81,8 +81,8 @@ function makeGraph(divName,max,title,currentValue) {
 module.controller('RedisController', [
     '$scope',
     '$http',
-    '$rootScope',
-    function($scope, $http,$rootScope) {
+    '$timeout',
+    function($scope, $http,$timeout) {
         $scope.redisData = {};
         $scope.reshardParams = {};
         $scope.redisScaleParams = {};
@@ -92,18 +92,19 @@ module.controller('RedisController', [
         $scope.exportdes = [];
         $scope.reshardType;
         $scope.failover;
+        $scope.speed = 'true';
         $scope.configParas = [];
         $scope.categoryEntity = {
-        }
+        };
+        $scope.categoryInfoEntity = {
+        };
 
 
 
         $scope.initPage = function(){
 
-            $http.get(window.contextPath + '/redis/detail',{
-                params : {
-                    cluster : window.localStorage.cluster
-                }
+            $http.get(window.location.pathname+'/detail',{
+                params : {}
             }).success(function(response){
                 $scope.redisData = response.redisCluster;
                 var usage = response.memoryUsage;
@@ -138,6 +139,7 @@ module.controller('RedisController', [
             $scope.exportdes = [];
             $scope.reshardParams = {};
             $scope.reshardParams.cluster = $scope.redisData.clusterName;
+            $scope.reshardParams.speed = $scope.speed;
             if($scope.reshardType === "average"){
                 var avgTemp = $('.avg');
                 for(var i = 0;i<avgTemp.length;i++){
@@ -204,6 +206,7 @@ module.controller('RedisController', [
         };
 
         $scope.addSlave = function(cluster,address){
+            $('#mask').modal('show');
             $scope.redisScaleParams = {};
             $scope.redisScaleParams.cluster = cluster;
             $scope.redisScaleParams.masterAddress = address;
@@ -211,6 +214,9 @@ module.controller('RedisController', [
             ).success(function(response) {
             }).error(function(response) {
             });
+            $timeout(function() {
+                $('#mask').modal('hide');
+            }, 15000);
         };
 
         $scope.setFailover = function(failover){
@@ -218,17 +224,18 @@ module.controller('RedisController', [
         }
 
         $scope.execFailover = function(){
-            loadmask();
+            $('#mask').modal('show');
             $scope.redisScaleParams.cluster = $scope.redisData.clusterName;
             $scope.redisScaleParams.slaveAddress = $scope.failover;
             $http.post(window.contextPath + '/redis/failover',$scope.redisScaleParams)
                 .success(function(response){
                     if(response == true){
-                        hidemask();
                     }else{
-                        hidemask();
                     }
                 });
+            $timeout(function() {
+                $('#mask').modal('hide');
+            }, 5000);
         }
         var iniTable = function (table) {
             $(document).ready(function () {
@@ -268,6 +275,15 @@ module.controller('RedisController', [
             });
         };
 
+        $scope.categoryInfo = function(category){
+            $http.get(window.contextPath + '/categoryinfo', {params: {
+                category:category,
+                }}
+            ).success(function (data) {
+                $scope.categoryInfoEntity = data;
+            });
+        }
+
         $scope.getLogs = function(cluster){
             $http.get(window.contextPath + '/auditlog/search/'+cluster, {params: {
                 }}
@@ -280,6 +296,15 @@ module.controller('RedisController', [
             $scope.logContent = content;
         }
 
+        $scope.initCharts = function() {
+            $http.get(window.location.pathname+'/period',{
+                params : {}
+            }).success(function(response){
+                cloumnchart("container-incr",response);
+            }).error(function(){
+            });
+        }
+        $scope.initCharts();
 
         var piechart = function (divName,seriesdata) {
             $(function () {
@@ -317,6 +342,59 @@ module.controller('RedisController', [
                 });
             });
         }
-
+        var cloumnchart = function (divName,item) {
+            $(function () {
+                $('#'+divName).highcharts({
+                    chart : {
+                        type : "column",
+                    },
+                    title : {
+                        text : item.title,
+                        x : 0
+                        //center
+                    },
+                    subtitle : {
+                        text : item.subTitle,
+                        x : 0
+                    },
+                    xAxis : {
+                        type : 'datetime'
+                    },
+                    yAxis : {
+                        title : {
+                            text : item.yAxisTitle
+                        },
+                        min : 0,
+                        plotLines : [ {
+                            value : 0,
+                            width : 10,
+                            color : '#808080'
+                        } ]
+                    },
+                    tooltip : {
+                        valueSuffix : ''
+                    },
+                    legend : {
+                        layout : 'vertical',
+                        align : 'right',
+                        verticalAlign : 'middle',
+                        borderWidth : 0
+                    },
+                    plotOptions : {
+                        series : {
+                            pointStart : item.plotOption.series.pointStart + 8 * 3600 * 1000,
+                            pointInterval : item.plotOption.series.pointInterval
+                            // one day
+                        },
+                        spline : {
+                            marker : {
+                                enabled : false
+                            }
+                        }
+                    },
+                    series : item.series
+                });
+            });
+        }
 
     } ]);

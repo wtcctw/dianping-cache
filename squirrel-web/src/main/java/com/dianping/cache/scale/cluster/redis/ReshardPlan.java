@@ -2,10 +2,12 @@ package com.dianping.cache.scale.cluster.redis;
 
 import com.dianping.cache.entity.ReshardRecord;
 import com.dianping.cache.scale.ScaleException;
-import com.dianping.cache.service.ReshardRecordService;
 import org.springframework.stereotype.Component;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by dp on 15/12/25.
@@ -31,16 +33,19 @@ public class ReshardPlan {
 
     private boolean isAverage;
 
+    private boolean speed;
+
     private List<ReshardRecord> reshardRecordList;
 
     public ReshardPlan(){
     }
 
-    public ReshardPlan(String cluster,List<String> srcNode,List<String> desNode,boolean isAverage){
+    public ReshardPlan(String cluster,List<String> srcNode,List<String> desNode,boolean isAverage,boolean speed){
         this.cluster = cluster;
         this.srcNode = srcNode;
         this.desNode = desNode;
         this.isAverage = isAverage;
+        this.speed = speed;
         reshardRecordList = makePlan();
     }
 
@@ -151,5 +156,13 @@ public class ReshardPlan {
 
     public List<String> getDesNode() {
         return desNode;
+    }
+
+    public boolean isSpeed() {
+        return speed;
+    }
+
+    public void setSpeed(boolean speed) {
+        this.speed = speed;
     }
 }

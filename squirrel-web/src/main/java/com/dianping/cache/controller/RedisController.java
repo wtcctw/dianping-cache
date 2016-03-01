@@ -4,10 +4,7 @@ import com.dianping.cache.controller.vo.*;
 import com.dianping.cache.entity.CacheConfiguration;
 import com.dianping.cache.entity.RedisStats;
 import com.dianping.cache.scale.ScaleException;
-import com.dianping.cache.scale.cluster.redis.RedisCluster;
-import com.dianping.cache.scale.cluster.redis.RedisManager;
-import com.dianping.cache.scale.cluster.redis.RedisScaler;
-import com.dianping.cache.scale.cluster.redis.ReshardPlan;
+import com.dianping.cache.scale.cluster.redis.*;
 import com.dianping.cache.service.CacheConfigurationService;
 import com.dianping.cache.service.CacheKeyConfigurationService;
 import com.dianping.cache.service.RedisService;
@@ -24,8 +21,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 
@@ -73,31 +70,25 @@ public class RedisController extends AbstractSidebarController{
 	@RequestMapping(value = "/redis/data/history")
 	@ResponseBody
 	public List<HighChartsWrapper> getRedisHistory(String cluster,long endTime){
-		long start = (endTime - TimeUnit.MILLISECONDS.convert(120, TimeUnit.MINUTES))/1000;
+		long start = (endTime - TimeUnit.MILLISECONDS.convert(100, TimeUnit.DAYS))/1000;
 		long end = endTime/1000;
-		RedisCluster redisCluster = RedisManager.getRedisCluster(cluster);
 		List<RedisStats> data = redisService.findByServerWithInterval(cluster, start, end);
 		RedisStatsData statsData = new RedisStatsData(data);
 		return ChartsBuilder.buildRedisStatsCharts(statsData);
 	}
+
+
+
+
 	/**
 	 * @deprecated
 	 * @return
 	 */
 	@RequestMapping(value = "/redis/serverinfo")
 	public ModelAndView viewRedisServerInfo(){
-		subside = "dashboard";
 		return new ModelAndView("monitor/redisserverinfo",createViewMap());
 	}
-	/**
-	 * @deprecated
-	 * @return
-	 */
-	@RequestMapping(value = "/redis/serverinfodata")
-	@ResponseBody
-	public Map<String, Object> getRedisServerInfo(String address){
-		return RedisDataUtil.getRedisServerData(address);
-	}
+
 	
 	@RequestMapping(value = "/redis")
 	public ModelAndView redis(){
@@ -136,16 +127,16 @@ public class RedisController extends AbstractSidebarController{
 		return configuration;
 	}
 
-	@RequestMapping(value = "/redis/detail")
+	@RequestMapping(value = "/redis/{cluster}/detail")
 	@ResponseBody
-	public RedisDashBoardData.SimpleAnalysisData getRedisDetailData(@RequestParam String cluster){
+	public RedisDashBoardData.SimpleAnalysisData getRedisDetailData(@PathVariable(value = "cluster") String cluster){
 		RedisCluster redisCluster =  RedisManager.getRedisCluster(cluster);
 		RedisDashBoardData data = new RedisDashBoardData();
 		RedisDashBoardData.SimpleAnalysisData simpleAnalysisData = data.new SimpleAnalysisData(redisCluster);
 		simpleAnalysisData.analysis();
-		simpleAnalysisData.agentRate();
 		return simpleAnalysisData;
 	}
+
 
 	@RequestMapping(value = "/redis/data/applications")
 	@ResponseBody
@@ -162,11 +153,45 @@ public class RedisController extends AbstractSidebarController{
 	@RequestMapping(value = "/redis/historydata")
 	@ResponseBody
 	public List<HighChartsWrapper> getRedisHistoryData(String address,long endTime){
-		long start = (endTime - TimeUnit.MILLISECONDS.convert(120, TimeUnit.MINUTES))/1000;
+		long start = (endTime - TimeUnit.MILLISECONDS.convert(1, TimeUnit.DAYS))/1000;
 		long end = endTime/1000;
 		List<RedisStats> data = redisService.findByServerWithInterval(address, start, end);
 		RedisStatsData statsData = new RedisStatsData(data);
 		return ChartsBuilder.buildRedisStatsCharts(statsData);
+	}
+
+	@RequestMapping(value = "/redis/period")
+	@ResponseBody
+	public List<HighChartsWrapper> period(String address,long endTime,int period){
+
+		List<RedisStats> periodStats =  redisService.findPeriodicStats(address,endTime/1000,1,30);
+		final HighChartsWrapper chartsWrapper = ChartsBuilder.buildPeriodCharts(periodStats,1,endTime,30);
+		return new ArrayList<HighChartsWrapper>(){{
+			add(chartsWrapper);
+		}};
+	}
+
+	@RequestMapping(value = "/redis/{cluster}/period")
+	@ResponseBody
+	public HighChartsWrapper clusterperiod(@PathVariable(value = "cluster")String cluster){
+		RedisCluster redisCluster = RedisManager.getRedisCluster(cluster);
+		List<RedisNode> nodes = redisCluster.getNodes();
+		long endTime = System.currentTimeMillis();
+		List<RedisStats> clusterRedisStats = new ArrayList<RedisStats>(31);
+		for(RedisNode node : nodes){
+			List<RedisStats> periodStats =  redisService.findPeriodicStats(node.getMaster().getAddress(),endTime/1000,1,30);
+			for(int index = 0; index < 31; index++){
+				if(clusterRedisStats.size() < index + 1){
+					clusterRedisStats.add(new RedisStats());
+				}
+				if(periodStats.get(index) != null){
+					long used = clusterRedisStats.get(index).getMemory_used();
+					clusterRedisStats.get(index).setMemory_used(used+periodStats.get(index).getMemory_used());
+				}
+			}
+		}
+		HighChartsWrapper chartsWrapper = ChartsBuilder.buildPeriodCharts(clusterRedisStats,1,endTime,30);
+		return chartsWrapper;
 	}
 
 	@RequestMapping(value = "/redis/auth/setPassword")
@@ -182,8 +207,7 @@ public class RedisController extends AbstractSidebarController{
 	@ResponseBody
 	public void reshard(@RequestBody RedisReshardParams redisReshardParams) {
 
-		ReshardPlan reshardPlan = reshardService.createReshardPlan(redisReshardParams.getCluster(), redisReshardParams.getSrcNodes(),
-				redisReshardParams.getDesNodes(), redisReshardParams.isAverage());
+		ReshardPlan reshardPlan = reshardService.createReshardPlan(redisReshardParams);
 		RedisReshardTask task = new RedisReshardTask(reshardPlan);
 
 		TaskManager.submit(task);

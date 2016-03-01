@@ -59,6 +59,7 @@ public class RedisReshardTask extends AbstractTask {
         RedisCluster redisCluster = new RedisCluster(reshardPlan.getCluster(),reshardPlan.getSrcNode());
         List<ReshardRecord> reshardRecordList = reshardPlan.getReshardRecordList();
         int stat = 0;
+        boolean speed = reshardPlan.isSpeed();
         for (ReshardRecord reshardRecord : reshardRecordList) {
             while (!Thread.currentThread().isInterrupted() ) {
                 try {
@@ -71,7 +72,7 @@ public class RedisReshardTask extends AbstractTask {
                     RedisServer des = redisCluster.getServer(reshardRecord.getDesNode());
                     if (reshardRecord.getSlotsDone() < reshardRecord.getSlotsToMigrateCount()) {
                         int slot = src.getSlotList().get(0);
-                        boolean result = RedisManager.migrate(src, des, slot);
+                        boolean result = RedisManager.migrate(src, des, slot, false,speed);
                         if (result) {
                             reshardRecord.setSlotsDone(reshardRecord.getSlotsDone() + 1);
                             reshardService.updateReshardPlan(reshardPlan);
@@ -89,6 +90,9 @@ public class RedisReshardTask extends AbstractTask {
                     reshardService.updateReshardPlan(reshardPlan);
                     throw e;
                 }
+            }
+            if(Thread.currentThread().isInterrupted()){
+                break;
             }
             updateStat(++stat);
         }

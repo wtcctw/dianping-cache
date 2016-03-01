@@ -11,6 +11,10 @@ public class ScanDetail {
 
     private String project;
 
+    private String projectName;
+
+    private String rdDuty;
+
     private int totalCount;
 
     private int failCount;
@@ -101,6 +105,24 @@ public class ScanDetail {
 
     public ScanDetail setProject(String project) {
         this.project = project;
+        return this;
+    }
+
+    public String getProjectName() {
+        return projectName;
+    }
+
+    public ScanDetail setProjectName(String projectName) {
+        this.projectName = projectName;
+        return this;
+    }
+
+    public String getRdDuty() {
+        return rdDuty;
+    }
+
+    public ScanDetail setRdDuty(String rdDuty) {
+        this.rdDuty = rdDuty;
         return this;
     }
 

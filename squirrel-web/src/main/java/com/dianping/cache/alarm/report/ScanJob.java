@@ -23,7 +23,7 @@ import java.util.List;
 public class ScanJob {
     protected static Logger logger = LoggerFactory.getLogger(ScanJob.class);
 
-    private static final ArrayList<String> IPLIST = new ArrayList<String>(){{
+    private static final ArrayList<String> IPLIST = new ArrayList<String>() {{
         add("10.1.14.104");//线上
         add("10.2.7.129");//ppe
         add("192.168.227.113");//beta
@@ -35,24 +35,21 @@ public class ScanJob {
 
 
     @Scheduled(cron = "0 0 3 * * ?")//每天的3点触发定时任务
-//    @Scheduled(cron = "0 */1 * * * ?")
     public void baselineWeeklyJob() throws InterruptedException, DocumentException, URISyntaxException {
+        if (isMaster()) {
+            logger.info("scanTaskDailyJob", getClass().getSimpleName());
 
-        logger.info("scanTaskDailyJob", getClass().getSimpleName());
-
-        if(isMaster()) {
             ScanThread scanThread = scanThreadFactory.createScanThread();
             ThreadManager.getInstance().execute(scanThread);
         }
     }
 
-
-    public boolean isMaster(){
+    public boolean isMaster() {
         boolean isMaster = false;
         try {
-            List<String> ip= NetUtil.getAllLocalIp();
+            List<String> ip = NetUtil.getAllLocalIp();
             ip.retainAll(IPLIST);
-            if(ip.size() > 0)
+            if (ip.size() > 0)
                 isMaster = true;
 
         } catch (Exception e) {

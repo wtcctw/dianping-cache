@@ -16,6 +16,8 @@ public class RedisBaseline implements Serializable {
 
     private int serverId;//对应的机器ip
 
+    private float mem;
+
     private long memory_used;
 
     private long curr_time;
@@ -69,6 +71,15 @@ public class RedisBaseline implements Serializable {
 
     public RedisBaseline setServerId(int serverId) {
         this.serverId = serverId;
+        return this;
+    }
+
+    public float getMem() {
+        return mem;
+    }
+
+    public RedisBaseline setMem(float mem) {
+        this.mem = mem;
         return this;
     }
 

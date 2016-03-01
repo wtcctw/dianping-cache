@@ -52,9 +52,11 @@ public class RedisDashBoardData extends DashBoardData{
         float memoryUsage;
         int masterNum;
         int slaveNum;
+        int disperse;
         boolean qpsAlarm;
         boolean usageAlarm;
         boolean msAlarm;
+        boolean disperseAlarm;
         boolean clusterAlarm;
         String clusterName;
         RedisCluster redisCluster;
@@ -92,25 +94,28 @@ public class RedisDashBoardData extends DashBoardData{
             if(memoryUsage > 70.0f || maxMemory == 0){
                 usageAlarm = true;
             }
-            if(masterNum != slaveNum  || masterNum == 0){
+            if(masterNum != slaveNum  || masterNum == 0 || redisCluster.getFailedServers().size() > 0){
                 msAlarm = true;
             }
-            if(qpsAlarm || usageAlarm || msAlarm){
+            agentRate();
+            if(qpsAlarm || usageAlarm || msAlarm || disperseAlarm){
                 clusterAlarm = true;
             }
+
             return clusterAlarm;
         }
 
-        public void  agentRate(){
+        private void   agentRate(){
+            disperse = 0;
             ServerService serverService = SpringLocator.getBean("serverService");
             Set<String> allAddress = new HashSet<String>();
             Map<String,Integer> count = new HashMap<String, Integer>();
             for(RedisServer alive : redisCluster.getAllAliveServer()){
                 allAddress.add(alive.getAddress());
             }
-            for(RedisServer failed : redisCluster.getFailedServers()){
-                allAddress.add(failed.getAddress());
-            }
+//            for(RedisServer failed : redisCluster.getFailedServers()){
+//                allAddress.add(failed.getAddress());
+//            }
             Map<String,String> tempAddressList = new HashMap<String, String>();
             for(String address : allAddress){
                 Server server = serverService.findByAddress(address);
@@ -125,10 +130,23 @@ public class RedisDashBoardData extends DashBoardData{
             }
             int total = allAddress.size();
             PieSeries[] resultRate = new PieSeries[count.size()];
+
+            List<Map.Entry<String,Integer>> sortMapByValue = new ArrayList<Map.Entry<String, Integer>>(count.entrySet());
+            Collections.sort(sortMapByValue, new Comparator<Map.Entry<String, Integer>>() {
+                @Override
+                public int compare(Map.Entry<String, Integer> o1, Map.Entry<String, Integer> o2) {
+                    return o2.getValue() - o1.getValue();
+                }
+            });
+
             int index = 0;
-            for(Map.Entry<String,Integer> entity : count.entrySet()){
+            for(Map.Entry<String,Integer> entity : sortMapByValue){
                 String host = entity.getKey();
                 Float value = (float)(entity.getValue().intValue())/total * 100;
+                if(value > 24.0F){
+                    this.disperse++;
+                    disperseAlarm = true;
+                }
                 resultRate[index++] = new PieSeries(host,value,tempAddressList.get(host));
             }
             rate = resultRate;
@@ -229,6 +247,22 @@ public class RedisDashBoardData extends DashBoardData{
         public void setRate(PieSeries[] rate) {
             this.rate = rate;
         }
+
+        public int getDisperse() {
+            return disperse;
+        }
+
+        public void setDisperse(int disperse) {
+            this.disperse = disperse;
+        }
+
+        public boolean getDisperseAlarm() {
+            return disperseAlarm;
+        }
+
+        public void setDisperseAlarm(boolean disperseAlarm) {
+            this.disperseAlarm = disperseAlarm;
+        }
     }
 
     public class PieSeries {
@@ -273,6 +307,8 @@ public class RedisDashBoardData extends DashBoardData{
         public void setAddress(String address) {
             this.address = address;
         }
+
+
     }
 }
 

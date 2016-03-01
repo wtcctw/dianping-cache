@@ -8,6 +8,7 @@ import java.util.List;
 public class RedisReshardParams {
     private String cluster;
     private boolean isAverage;
+    private boolean speed;
     private List<String> srcNodes;
     private List<String> desNodes;
 
@@ -41,5 +42,13 @@ public class RedisReshardParams {
 
     public void setDesNodes(List<String> desNodes) {
         this.desNodes = desNodes;
+    }
+
+    public boolean isSpeed() {
+        return speed;
+    }
+
+    public void setSpeed(boolean speed) {
+        this.speed = speed;
     }
 }

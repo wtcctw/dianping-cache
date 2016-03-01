@@ -1,5 +1,8 @@
 package com.dianping.cache.alarm.controller;
 
+import com.dianping.cache.alarm.dataanalyse.thread.BaselineComputeThread;
+import com.dianping.cache.alarm.dataanalyse.thread.BaselineMapGetThread;
+import com.dianping.cache.alarm.dataanalyse.thread.BaselineThreadFactory;
 import com.dianping.cache.alarm.entity.ScanDetail;
 import com.dianping.cache.alarm.report.scanService.ScanDetailService;
 import com.dianping.cache.alarm.report.thread.ScanThread;
@@ -7,6 +10,7 @@ import com.dianping.cache.alarm.report.thread.ScanThreadFactory;
 import com.dianping.cache.alarm.threadmanager.ThreadManager;
 import com.dianping.cache.alarm.utils.DateUtil;
 import com.dianping.cache.controller.AbstractSidebarController;
+import com.dianping.cache.util.NetUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,12 +30,22 @@ public class ScanJobController extends AbstractSidebarController {
     private static final long MS_PER_HOUR = 1000 * 60 * 60;
     private static final long MS_PER_DAY = MS_PER_HOUR * 24;
 
+    private static final ArrayList<String> IPLIST = new ArrayList<String>() {{
+        add("10.1.14.104");//线上
+        add("10.2.7.129");//ppe
+        add("192.168.227.113");//beta
+        add("172.24.121.42");//my host
+    }};
+
 
     @Autowired
     ScanDetailService scanDetailService;
 
     @Autowired
     ScanThreadFactory scanThreadFactory;
+
+    @Autowired
+    BaselineThreadFactory baselineThreadFactory;
 
 
     @RequestMapping(value = "/report")
@@ -182,12 +196,53 @@ public class ScanJobController extends AbstractSidebarController {
     @ResponseBody
     public void scanJob() {
 
-        ScanThread scanThread = scanThreadFactory.createScanThread();
+        if(isMaster()) {
+            logger.info(getClass()+"ScanJob Start...");
 
-        ThreadManager.getInstance().execute(scanThread);
+            ScanThread scanThread = scanThreadFactory.createScanThread();
 
+            ThreadManager.getInstance().execute(scanThread);
+        }
     }
 
+    @RequestMapping(value = "/report/baselineComputeJob")
+    @ResponseBody
+    public void baselineCompute() {
+
+        if(isMaster()) {
+            logger.info(getClass()+"baselineCompute Start...");
+            BaselineComputeThread baselineComputeThread = baselineThreadFactory.createBaselineComputeThread();
+
+            ThreadManager.getInstance().execute(baselineComputeThread);
+        }
+    }
+
+    @RequestMapping(value = "/report/baselineMapGetJob")
+    @ResponseBody
+    public void baselineMapGet() {
+
+        if(isMaster()) {
+            logger.info(getClass()+"baselineMapGet Start...");
+            BaselineMapGetThread baselineMapGetThread = baselineThreadFactory.createBaselineMapGetThread();
+
+            ThreadManager.getInstance().execute(baselineMapGetThread);
+        }
+    }
+
+    public boolean isMaster() {
+        boolean isMaster = false;
+        try {
+            List<String> ip = NetUtil.getAllLocalIp();
+            ip.retainAll(IPLIST);
+            if (ip.size() > 0)
+                isMaster = true;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return isMaster;
+    }
 
     @Override
     protected String getSide() {

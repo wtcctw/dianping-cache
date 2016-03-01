@@ -16,6 +16,7 @@
         <property name="configurationDao" ref="cacheKeyConfigurationDao" />
         <property name="cacheMessageProducer" ref="notifyMessageProducer" />
         <property name="operationLogService" ref="operationLogService" />
+        <property name="categoryBusinessInfoDao" ref="categoryBusinessInfoDao" />
     </bean>
 
     <bean id="operationLogService" class="com.dianping.cache.service.impl.OperationLogServiceImpl">
@@ -98,7 +99,6 @@
         <property name="callMethod" value="sync" />
         <property name="timeout" value="5000" />
     </bean>
-
 
     <bean id="serviceMonitorService" class="com.dianping.cache.service.impl.ServiceMonitorServiceImpl" />
     <bean id="ClearCategoryTask" class="com.dianping.squirrel.task.ClearCategoryTask" scope="prototype"/>

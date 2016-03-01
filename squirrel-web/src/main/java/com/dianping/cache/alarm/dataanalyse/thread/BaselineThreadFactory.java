@@ -5,5 +5,9 @@ package com.dianping.cache.alarm.dataanalyse.thread;
  */
 public interface BaselineThreadFactory {
 
-    BaselineThread createBaselineThread();
+    BaselineComputeThread createBaselineComputeThread();
+
+    BaselineCleanThread createBaselineCleanThread();
+
+    BaselineMapGetThread createBaselineMapGetThread();
 }
