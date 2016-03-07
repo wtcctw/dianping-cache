@@ -5,6 +5,8 @@ import com.dianping.cache.alarm.alarmconfig.AlarmConfigService;
 import com.dianping.cache.alarm.alarmtemplate.MemcacheAlarmTemplateService;
 import com.dianping.cache.alarm.dao.AlarmRecordDao;
 import com.dianping.cache.alarm.dataanalyse.baselineCache.BaselineCacheService;
+import com.dianping.cache.alarm.dataanalyse.minValCache.MinVal;
+import com.dianping.cache.alarm.dataanalyse.minValCache.MinValCacheService;
 import com.dianping.cache.alarm.dataanalyse.service.MemcacheBaselineService;
 import com.dianping.cache.alarm.entity.*;
 import com.dianping.cache.alarm.event.EventFactory;
@@ -33,11 +35,15 @@ import java.util.concurrent.TimeoutException;
 public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
     //从数据库拉出当前最近的一次数据，然后检查相应的配置文件，是否符合报警条件，符合则生成报警事件放入event队列
 
+    private static final int MEMUSAGE = 0;
+    private static final int QPS = 1;
+    private static final int CONN = 2;
+
     private static final String CLUSTER_DOWN = "集群实例无法连接";
     private static final String MEMUSAGE_TOO_HIGH = "内存使用率过高";
     private static final String MEMUSAGE_INCREASE_TOO_FAST = "内存使用率增长过快";
     private static final String QPS_TOO_HIGH = "QPS过高";
-    private static final String QPS_INCREASE_TOO_FAST = "QPS增长过快" ;
+    private static final String QPS_INCREASE_TOO_FAST = "QPS增长过快";
     private static final String CONN_TOO_HIGH = "连接数过高";
     private static final String CONN_INCREASE_TOO_FAST = "连接数增长过快";
 
@@ -51,7 +57,6 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
     private static final String HITRATE_FLUC_TOO_MUCH = "hitrate波动过大";
 
     private static final String ALARMTYPE = "Memcache";
-
 
 
     @Autowired
@@ -86,6 +91,9 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
 
     @Autowired
     BaselineCacheService baselineCacheService;
+
+    @Autowired
+    MinValCacheService minValCacheService;
 
     @Override
     public void doAlarm() throws InterruptedException, IOException, TimeoutException {
@@ -127,13 +135,13 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
 
                 boolean qpsAlarm = isQpsAlarm(item, currentServerStats, memcacheEvent);
 
-                boolean qpsFlucAlarm = isQpsFlucAlarm(item,currentServerStats,memcacheEvent);
+                boolean qpsFlucAlarm = isQpsFlucAlarm(item, currentServerStats, memcacheEvent);
 
                 boolean connAlarm = isConnAlarm(item, currentServerStats, memcacheEvent);
 
                 boolean connFlucAlarm = isConnFlucAlarm(item, currentServerStats, memcacheEvent);
 
-                if (downAlarm || memAlarm || memFlucAlarm || qpsAlarm || qpsFlucAlarm ||connAlarm || connFlucAlarm) {
+                if (downAlarm || memAlarm || memFlucAlarm || qpsAlarm || qpsFlucAlarm || connAlarm || connFlucAlarm) {
                     isReport = true;
                 }
             }
@@ -302,30 +310,32 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
                 continue;
             }
 
-            if (usage*100 < memBase) {
+            if (usage * 100 < memBase) {
                 continue;
             }
 
-            float flucUsage = memcacheStatsFlucService.getMemcacheMemUsageByTime(memInterval, server);
-            if(0==flucUsage){
+            float minMemUsage = Float.parseFloat(getMinVal(MEMUSAGE, server, memInterval, usage).toString());
+
+//          float flucUsage = memcacheStatsFlucService.getMemcacheMemUsageByTime(memInterval, server);
+            if (0 == minMemUsage) {
                 continue;
             }
 
             boolean alarmFlag = true;
 
-            if ((usage - flucUsage)*100 > memFluc) {
+            if ((usage - minMemUsage) * 100 > memFluc) {
 
                 SimpleDateFormat sdf = new SimpleDateFormat("EEEE:HH:mm", Locale.ENGLISH);
                 Date nameDate = new Date();
 
-                for (int i = -5; i < 5; i++) {
+                for (int i = -1; i < 1; i++) {
                     GregorianCalendar gc = new GregorianCalendar();
                     gc.setTime(nameDate);
                     gc.add(12, i);
                     String name = "Memcache_" + sdf.format(gc.getTime()) + "_" + server;
 
                     MemcacheBaseline memcacheBaseline = baselineCacheService.getMemcacheBaselineByName(name);
-                    if(null == memcacheBaseline){
+                    if (null == memcacheBaseline) {
                         continue;
                     }
 
@@ -335,10 +345,10 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
                     }
                 }
 
-                if(alarmFlag) {
-                    String detail = item.getCacheKey() + ":" + MEMUSAGE_INCREASE_TOO_FAST + ",IP为" + ip + ";使用率在" + memInterval + "分钟内从" + flucUsage + "增长到" + usage;
+                if (alarmFlag) {
+                    String detail = item.getCacheKey() + ":" + MEMUSAGE_INCREASE_TOO_FAST + ",IP为" + ip + ";使用率在" + memInterval + "分钟内从" + minMemUsage + "增长到" + usage;
 
-                    String val = MEMUSAGE_INCREASE_TOO_FAST + ",使用率在" + memInterval + "分钟内从" + flucUsage + "增长到" + usage;
+                    String val = MEMUSAGE_INCREASE_TOO_FAST + ",使用率在" + memInterval + "分钟内从" + minMemUsage + "增长到" + usage;
 
                     flag = putToChannel(alarmConfig, MEMUSAGE_INCREASE_TOO_FAST, memcacheEvent, item, ip, detail, val);
                 }
@@ -425,7 +435,6 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
         int qpsInterval = memcacheTemplate.getQpsInterval();
 
 
-
         List<String> serverList = item.getServerList();
 
         long qps = 0;
@@ -461,44 +470,48 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
             //获取指定时间间隔之前的数值
             MemcachedStats memcachedStats = memcacheStatsFlucService.getMemcacheStatsByTime(qpsInterval, serverService.findByAddress(server).getId());
 
-            if(null == memcachedStats){
+            if (null == memcachedStats) {
                 continue;
             }
 
-            long flucQps = (memcachedStats.getGet_hits()+memcachedStats.getGet_misses()+memcachedStats.getCmd_set())/30;
+
+            // long flucQps = (memcachedStats.getGet_hits() + memcachedStats.getGet_misses() + memcachedStats.getCmd_set()) / 30;
+
+            long minQps = Long.parseLong(getMinVal(QPS, server, qpsInterval, qps).toString());
+
 
             boolean alarmFlag = true;
 
             //上升过快
-            if (qps -flucQps > qpsFluc) {
+            if (qps - minQps > qpsFluc) {
 
                 SimpleDateFormat sdf = new SimpleDateFormat("EEEE:HH:mm", Locale.ENGLISH);
                 Date nameDate = new Date();
 
                 //比较前后5分钟的历史数据
-                for (int i = -5; i < 5; i++) {
+                for (int i = -1; i < 1; i++) {
                     GregorianCalendar gc = new GregorianCalendar();
                     gc.setTime(nameDate);
                     gc.add(12, i);
                     String name = "Memcache_" + sdf.format(gc.getTime()) + "_" + server;
 
                     MemcacheBaseline memcacheBaseline = baselineCacheService.getMemcacheBaselineByName(name);
-                    if(null ==memcacheBaseline){
+                    if (null == memcacheBaseline) {
                         continue;
                     }
 
-                    long flucQpsTmp = (memcacheBaseline.getGet_hits()+memcacheBaseline.getGet_misses()+memcacheBaseline.getCmd_set())/30;
+                    long flucQpsTmp = (memcacheBaseline.getGet_hits() + memcacheBaseline.getGet_misses() + memcacheBaseline.getCmd_set()) / 30;
 
-                    if ((qps -flucQpsTmp) < flucQpsTmp * 0.1) {
+                    if ((qps - flucQpsTmp) < flucQpsTmp * 0.1) {
                         alarmFlag = false;
                         break;
                     }
                 }
 
-                if(alarmFlag) {
-                    String detail = item.getCacheKey() + ":" + QPS_INCREASE_TOO_FAST + ",IP为" + ip + ";QPS在" + qpsInterval + "分钟内从" + flucQps + "增长到" + qps;
+                if (alarmFlag) {
+                    String detail = item.getCacheKey() + ":" + QPS_INCREASE_TOO_FAST + ",IP为" + ip + ";QPS在" + qpsInterval + "分钟内从" + minQps + "增长到" + qps;
 
-                    String val = QPS_INCREASE_TOO_FAST + ",QPS在" + qpsInterval + "分钟内从" + flucQps + "增长到" + qps;
+                    String val = QPS_INCREASE_TOO_FAST + ",QPS在" + qpsInterval + "分钟内从" + minQps + "增长到" + qps;
 
                     flag = putToChannel(alarmConfig, QPS_INCREASE_TOO_FAST, memcacheEvent, item, ip, detail, val);
                 }
@@ -607,7 +620,6 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
             }
 
 
-
             //短时间内波动分析
             //1.开关 2.是否高于flucBase 3.上升率 4.历史数据分析
 
@@ -622,43 +634,46 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
             }
 
             //获取指定时间间隔之前的数值
-            MemcachedStats memcachedStats = memcacheStatsFlucService.getMemcacheStatsByTime(connInterval, serverService.findByAddress(server).getId());
+//            MemcachedStats memcachedStats = memcacheStatsFlucService.getMemcacheStatsByTime(connInterval, serverService.findByAddress(server).getId());
 
-            long flucConn = memcachedStats.getCurr_conn();
+//          long flucConn = memcachedStats.getCurr_conn();
+
+            long minConn = Long.parseLong(getMinVal(CONN, server, connInterval, conn).toString());
+
 
             boolean alarmFlag = true;
 
 
             //上升过快
-            if (conn - flucConn > connFluc) {
+            if (conn - minConn > connFluc) {
 
                 SimpleDateFormat sdf = new SimpleDateFormat("EEEE:HH:mm", Locale.ENGLISH);
                 Date nameDate = new Date();
 
                 //比较前后5分钟的历史数据
-                for (int i = -5; i < 5; i++) {
+                for (int i = -1; i < 1; i++) {
                     GregorianCalendar gc = new GregorianCalendar();
                     gc.setTime(nameDate);
                     gc.add(12, i);
                     String name = "Memcache_" + sdf.format(gc.getTime()) + "_" + server;
 
                     MemcacheBaseline memcacheBaseline = baselineCacheService.getMemcacheBaselineByName(name);
-                    if(null == memcacheBaseline){
+                    if (null == memcacheBaseline) {
                         continue;
                     }
 
                     long flucConnTmp = memcacheBaseline.getCurr_conn();
 
-                    if ((conn -flucConnTmp) < flucConnTmp * 0.1) {
+                    if ((conn - flucConnTmp) < flucConnTmp * 0.1) {
                         alarmFlag = false;
                         break;
                     }
                 }
 
-                if(alarmFlag) {
-                    String detail = item.getCacheKey() + ":" + CONN_INCREASE_TOO_FAST + ",IP为" + ip + ";连接数在" + connInterval + "分钟内从" + flucConn + "增长到" + conn;
+                if (alarmFlag) {
+                    String detail = item.getCacheKey() + ":" + CONN_INCREASE_TOO_FAST + ",IP为" + ip + ";连接数在" + connInterval + "分钟内从" + minConn + "增长到" + conn;
 
-                    String val = CONN_INCREASE_TOO_FAST + ";连接数在" + connInterval + "分钟内从" + flucConn + "增长到" + conn;
+                    String val = CONN_INCREASE_TOO_FAST + ";连接数在" + connInterval + "分钟内从" + minConn + "增长到" + conn;
 
                     flag = putToChannel(alarmConfig, CONN_INCREASE_TOO_FAST, memcacheEvent, item, ip, detail, val);
                 }
@@ -668,6 +683,80 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
 
         return flag;
     }
+
+    private Object getMinVal(int type, String server, int interval, Object curVal) {
+        String minName = "Memcache_" + type + "_" + server;
+        MinVal minVal = minValCacheService.getMinValByName(minName);
+        if (null == minVal) {
+            switch (type) {
+                case MEMUSAGE:
+                    float flucUsage = memcacheStatsFlucService.getMemcacheMemUsageByTime(interval, server);
+                    minValCacheService.updateMinVal(minName, new MinVal(ALARMTYPE, type, new Date(), flucUsage));
+                    break;
+                case QPS:
+                    MemcachedStats memcachedStatsQps = memcacheStatsFlucService.getMemcacheStatsByTime(interval, serverService.findByAddress(server).getId());
+                    long flucQps = (memcachedStatsQps.getGet_hits() + memcachedStatsQps.getGet_misses() + memcachedStatsQps.getCmd_set()) / 30;
+                    minValCacheService.updateMinVal(minName, new MinVal(ALARMTYPE, type, new Date(), flucQps));
+                    break;
+                case CONN:
+                    MemcachedStats memcachedStatsConn = memcacheStatsFlucService.getMemcacheStatsByTime(interval, serverService.findByAddress(server).getId());
+                    long flucConn = memcachedStatsConn.getCurr_conn();
+                    minValCacheService.updateMinVal(minName, new MinVal(ALARMTYPE, type, new Date(), flucConn));
+                    break;
+            }
+        } else {
+            MinVal curMinVal = new MinVal(ALARMTYPE, type, new Date(), curVal);
+            boolean update = minValCacheService.checkForUpdate(minName, curMinVal);
+            if (update) {
+                minValCacheService.updateMinVal(minName, curMinVal);
+            }
+            boolean isExpire = minValCacheService.isExpire(minName, interval);
+            if (isExpire) {
+                Object tmpMinVal = null;
+                for (int i = 0; i < interval; i++) {
+                    switch (type) {
+                        case MEMUSAGE:
+                            float flucUsage = memcacheStatsFlucService.getMemcacheMemUsageByTime(interval, server);
+                            if (null == tmpMinVal) {
+                                tmpMinVal = flucUsage;
+                            } else {
+                                if (Float.parseFloat(tmpMinVal.toString()) > flucUsage) {
+                                    tmpMinVal = flucUsage;
+                                }
+                            }
+                            break;
+                        case QPS:
+                            MemcachedStats memcachedStatsQps = memcacheStatsFlucService.getMemcacheStatsByTime(interval, serverService.findByAddress(server).getId());
+                            long flucQps = (memcachedStatsQps.getGet_hits() + memcachedStatsQps.getGet_misses() + memcachedStatsQps.getCmd_set()) / 30;
+                            if (null == tmpMinVal) {
+                                tmpMinVal = flucQps;
+                            } else {
+                                if (Long.parseLong(tmpMinVal.toString()) > flucQps) {
+                                    tmpMinVal = flucQps;
+                                }
+                            }
+                            break;
+                        case CONN:
+                            MemcachedStats memcachedStatsConn = memcacheStatsFlucService.getMemcacheStatsByTime(interval, serverService.findByAddress(server).getId());
+                            long flucConn = memcachedStatsConn.getCurr_conn();
+                            if (null == tmpMinVal) {
+                                tmpMinVal = flucConn;
+                            } else {
+                                if (Long.parseLong(tmpMinVal.toString()) > flucConn) {
+                                    tmpMinVal = flucConn;
+                                }
+                            }
+                            break;
+                    }
+                }
+
+                MinVal newMinVal = new MinVal(ALARMTYPE,type,new Date(),tmpMinVal);
+                minValCacheService.updateMinVal(minName, newMinVal);
+            }
+        }
+        return minValCacheService.getMinValByName(minName).getVal();
+    }
+
 
     boolean isHistoryAlarm(CacheConfiguration item, Map<String, Map<String, Object>> currentServerStats, MemcacheEvent memcacheEvent) throws InterruptedException, IOException, TimeoutException {
 
@@ -823,13 +912,13 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
 
 
             AlarmRecord alarmRecord = new AlarmRecord();
-            if(null!=o) {
+            if (null != o) {
                 alarmRecord.setAlarmTitle(type)
                         .setClusterName(item.getCacheKey())
                         .setIp(ip)
                         .setValue(String.valueOf(o))
                         .setCreateTime(new Date());
-            }else {
+            } else {
                 alarmRecord.setAlarmTitle(type)
                         .setClusterName(item.getCacheKey())
                         .setIp(ip)
@@ -839,7 +928,7 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
             alarmRecordDao.insert(alarmRecord);
 
             memcacheEvent.put(alarmDetail);
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             return false;
         }
