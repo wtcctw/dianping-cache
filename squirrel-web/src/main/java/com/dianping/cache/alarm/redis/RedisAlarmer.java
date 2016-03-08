@@ -5,6 +5,8 @@ import com.dianping.cache.alarm.alarmconfig.AlarmConfigService;
 import com.dianping.cache.alarm.alarmtemplate.RedisAlarmTemplateService;
 import com.dianping.cache.alarm.dao.AlarmRecordDao;
 import com.dianping.cache.alarm.dataanalyse.baselineCache.BaselineCacheService;
+import com.dianping.cache.alarm.dataanalyse.minValCache.MinVal;
+import com.dianping.cache.alarm.dataanalyse.minValCache.MinValCacheService;
 import com.dianping.cache.alarm.dataanalyse.service.RedisBaselineService;
 import com.dianping.cache.alarm.entity.*;
 import com.dianping.cache.alarm.event.EventFactory;
@@ -22,7 +24,10 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.TimeoutException;
 
 /**
@@ -30,6 +35,9 @@ import java.util.concurrent.TimeoutException;
  */
 @Service
 public class RedisAlarmer extends AbstractRedisAlarmer {
+
+    private static final int MEMUSAGE = 0;
+    private static final int QPS = 1;
 
     private static final String CLUSTER_DOWN = "集群实例无法连接";
     private static final String MEMUSAGE_TOO_HIGH = "内存使用率过高";
@@ -74,6 +82,9 @@ public class RedisAlarmer extends AbstractRedisAlarmer {
 
     @Autowired
     BaselineCacheService baselineCacheService;
+
+    @Autowired
+    MinValCacheService minValCacheService;
 
 
     @Override
@@ -241,17 +252,18 @@ public class RedisAlarmer extends AbstractRedisAlarmer {
         RedisStats redisStat = redisStatsFlucService.getRedisStatsByTime(qpsInterval,id);
         if (null != redisStat) {
 
-            long flucQps = redisStat.getQps();
-            if (qpsSwitch && (0 != flucQps) && (node.getMaster().getInfo().getQps() < qpsBase)) {
+//            long minQps = redisStat.getQps();
+            long minQps = Long.parseLong(getMinVal(QPS, node, qpsInterval,node.getMaster().getInfo().getQps()).toString());
+            if (qpsSwitch && (0 != minQps) && (node.getMaster().getInfo().getQps() < qpsBase)) {
 
                 boolean alarmFlag = true;
 
-                if ((node.getMaster().getInfo().getQps() - flucQps) > qpsFluc) {
+                if ((node.getMaster().getInfo().getQps() - minQps) > qpsFluc) {
 
                     SimpleDateFormat sdf = new SimpleDateFormat("EEEE:HH:mm", Locale.ENGLISH);
                     Date nameDate = new Date();
 
-                    for (int i = -5; i < 5; i++) {
+                    for (int i = -1; i < 1; i++) {
                         GregorianCalendar gc = new GregorianCalendar();
                         gc.setTime(nameDate);
                         gc.add(12, i);
@@ -269,10 +281,10 @@ public class RedisAlarmer extends AbstractRedisAlarmer {
                     }
 
                     if (alarmFlag) {
-                        String detail = item.getClusterName() + ":" + node.getMaster().getAddress() + "," + QPS_INCREASE_TOO_MUCH + ";QPS在" + qpsInterval + "分钟内从" + flucQps + "增长到" + node.getMaster().getInfo().getQps();
+                        String detail = item.getClusterName() + ":" + node.getMaster().getAddress() + "," + QPS_INCREASE_TOO_MUCH + ";QPS在" + qpsInterval + "分钟内从" + minQps + "增长到" + node.getMaster().getInfo().getQps();
 
                         flag = true;
-                        String val = QPS_INCREASE_TOO_MUCH + ",QPS在" + qpsInterval + "分钟内从" + flucQps + "增长到" + node.getMaster().getInfo().getQps();
+                        String val = QPS_INCREASE_TOO_MUCH + ",QPS在" + qpsInterval + "分钟内从" + minQps + "增长到" + node.getMaster().getInfo().getQps();
 
                         putToChannel(alarmConfig, QPS_INCREASE_TOO_MUCH, item, redisTemplate, node, detail, redisEvent, val);
 
@@ -314,17 +326,19 @@ public class RedisAlarmer extends AbstractRedisAlarmer {
         //短时间内波动分析
         //1.开关 2.是否高于flucBase 3.上升率 4.历史数据分析
 
-        float flucUsage = redisStatsFlucService.getRedisMemUsageByTime(memInterval, node.getMaster().getAddress());
-        if (memSwitch && (0 != flucUsage) && (node.getMaster().getInfo().getUsed() * 100 < memBase)) {
+//        float minMemUsage = redisStatsFlucService.getRedisMemUsageByTime(memInterval, node.getMaster().getAddress());
+        float minMemUsage = Float.parseFloat(getMinVal(MEMUSAGE, node, memInterval,node.getMaster().getInfo().getUsed()).toString());
+
+        if (memSwitch && (0 != minMemUsage) && (node.getMaster().getInfo().getUsed() * 100 < memBase)) {
 
             boolean alarmFlag = true;
 
-            if ((node.getMaster().getInfo().getUsed() - flucUsage) * 100 > memFluc) {
+            if ((node.getMaster().getInfo().getUsed() - minMemUsage) * 100 > memFluc) {
 
                 SimpleDateFormat sdf = new SimpleDateFormat("EEEE:HH:mm", Locale.ENGLISH);
                 Date nameDate = new Date();
 
-                for (int i = -5; i < 5; i++) {
+                for (int i = -1; i < 1; i++) {
                     GregorianCalendar gc = new GregorianCalendar();
                     gc.setTime(nameDate);
                     gc.add(12, i);
@@ -343,9 +357,9 @@ public class RedisAlarmer extends AbstractRedisAlarmer {
 
                 if (alarmFlag) {
                     flag = true;
-                    String detail = item.getClusterName() + ":" + node.getMaster().getAddress() + "," + MEMUSAGE_INCREASE_TOO_MUCH + ";使用率在" + memInterval + "分钟内从" + flucUsage + "增长到" + node.getMaster().getInfo().getUsed();
+                    String detail = item.getClusterName() + ":" + node.getMaster().getAddress() + "," + MEMUSAGE_INCREASE_TOO_MUCH + ";使用率在" + memInterval + "分钟内从" + minMemUsage + "增长到" + node.getMaster().getInfo().getUsed();
 
-                    String val = MEMUSAGE_INCREASE_TOO_MUCH + ",使用率在" + memInterval + "分钟内从" + flucUsage + "增长到" + node.getMaster().getInfo().getUsed();
+                    String val = MEMUSAGE_INCREASE_TOO_MUCH + ",使用率在" + memInterval + "分钟内从" + minMemUsage + "增长到" + node.getMaster().getInfo().getUsed();
 
                     putToChannel(alarmConfig, MEMUSAGE_INCREASE_TOO_MUCH, item, redisTemplate, node, detail, redisEvent, val);
 
@@ -367,6 +381,74 @@ public class RedisAlarmer extends AbstractRedisAlarmer {
         }
 
         return flag;
+    }
+
+
+    private Object getMinVal(int type, RedisNode node, int interval,Object curVal) {
+        String minName = "Redis_" + type + "_" + node.getMaster().getAddress();
+        MinVal minVal = minValCacheService.getMinValByName(minName);
+        if (null == minVal) {
+            switch (type) {
+                case MEMUSAGE:
+                    float flucUsage = redisStatsFlucService.getRedisMemUsageByTime(interval, node.getMaster().getAddress());
+                    minValCacheService.updateMinVal(minName, new MinVal(ALARMTYPE, type, new Date(), flucUsage));
+                    break;
+                case QPS:
+                    Server server = serverService.findByAddress(node.getMaster().getAddress());
+                    if(null == server){
+                        break;
+                    }
+                    int id =  server.getId();
+                    RedisStats redisStat = redisStatsFlucService.getRedisStatsByTime(interval, id);
+                    long flucQps = redisStat.getQps();
+                    minValCacheService.updateMinVal(minName, new MinVal(ALARMTYPE, type, new Date(), flucQps));
+                    break;
+            }
+        } else {
+            MinVal curMinVal = new MinVal(ALARMTYPE, type, new Date(), curVal);
+            boolean update = minValCacheService.checkForUpdate(minName, curMinVal);
+            if (update) {
+                minValCacheService.updateMinVal(minName, curMinVal);
+            }
+            boolean isExpire = minValCacheService.isExpire(minName, interval);
+            if (isExpire) {
+                Object tmpMinVal = null;
+                for (int i = 0; i < interval; i++) {
+                    switch (type) {
+                        case MEMUSAGE:
+                            float flucUsage = redisStatsFlucService.getRedisMemUsageByTime(i, node.getMaster().getAddress());
+                            if (null == tmpMinVal) {
+                                tmpMinVal = flucUsage;
+                            } else {
+                                if (Float.parseFloat(tmpMinVal.toString()) > flucUsage) {
+                                    tmpMinVal = flucUsage;
+                                }
+                            }
+                            break;
+                        case QPS:
+                            Server server = serverService.findByAddress(node.getMaster().getAddress());
+                            if(null == server){
+                                break;
+                            }
+                            int id =  server.getId();
+                            RedisStats redisStat = redisStatsFlucService.getRedisStatsByTime(i, id);
+                            long flucQps = redisStat.getQps();
+                            if (null == tmpMinVal) {
+                                tmpMinVal = flucQps;
+                            } else {
+                                if (Long.parseLong(tmpMinVal.toString()) > flucQps) {
+                                    tmpMinVal = flucQps;
+                                }
+                            }
+                            break;
+                    }
+                }
+
+                MinVal newMinVal = new MinVal(ALARMTYPE,type,new Date(),tmpMinVal);
+                minValCacheService.updateMinVal(minName, newMinVal);
+            }
+        }
+        return minValCacheService.getMinValByName(minName).getVal();
     }
 
     private boolean masterSlaveConsistency(RedisClusterData item, RedisEvent redisEvent) {
