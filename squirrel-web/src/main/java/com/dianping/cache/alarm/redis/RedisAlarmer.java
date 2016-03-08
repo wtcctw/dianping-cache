@@ -457,6 +457,9 @@ public class RedisAlarmer extends AbstractRedisAlarmer {
                     }
                 }
 
+                if(null == tmpMinVal){
+                    tmpMinVal = 0;
+                }
                 MinVal newMinVal = new MinVal(ALARMTYPE,type,new Date(),tmpMinVal);
                 minValCacheService.updateMinVal(minName, newMinVal);
             }
