@@ -14,6 +14,7 @@ import com.dianping.cache.alarm.event.EventReporter;
 import com.dianping.cache.alarm.event.EventType;
 import com.dianping.cache.entity.CacheConfiguration;
 import com.dianping.cache.entity.MemcachedStats;
+import com.dianping.cache.entity.Server;
 import com.dianping.cache.monitor.MemcachedClientFactory;
 import com.dianping.cache.service.CacheConfigurationService;
 import com.dianping.cache.service.MemcachedStatsService;
@@ -478,8 +479,14 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
                 continue;
             }
 
+            Server server1 = serverService.findByAddress(server);
+            if(null == server1){
+                continue;
+            }
+            int id = server1.getId();
+
             //获取指定时间间隔之前的数值
-            MemcachedStats memcachedStats = memcacheStatsFlucService.getMemcacheStatsByTime(qpsInterval, serverService.findByAddress(server).getId());
+            MemcachedStats memcachedStats = memcacheStatsFlucService.getMemcacheStatsByTime(qpsInterval, id);
 
             if (null == memcachedStats) {
                 continue;
@@ -717,7 +724,13 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
                     minValCacheService.updateMinVal(minName, new MinVal(ALARMTYPE, type, new Date(), flucUsage));
                     break;
                 case QPS:
-                    MemcachedStats memcachedStatsQps = memcacheStatsFlucService.getMemcacheStatsByTime(interval, serverService.findByAddress(server).getId());
+                    Server serverQps = serverService.findByAddress(server);
+                    if(null == serverQps){
+                        break;
+                    }
+                    int id = serverQps.getId();
+
+                    MemcachedStats memcachedStatsQps = memcacheStatsFlucService.getMemcacheStatsByTime(interval, id);
                     if(null == memcachedStatsQps){
                         break;
                     }
@@ -725,7 +738,12 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
                     minValCacheService.updateMinVal(minName, new MinVal(ALARMTYPE, type, new Date(), flucQps));
                     break;
                 case CONN:
-                    MemcachedStats memcachedStatsConn = memcacheStatsFlucService.getMemcacheStatsByTime(interval, serverService.findByAddress(server).getId());
+                    Server serverConn = serverService.findByAddress(server);
+                    if(null == serverConn){
+                        break;
+                    }
+                    int idConn = serverConn.getId();
+                    MemcachedStats memcachedStatsConn = memcacheStatsFlucService.getMemcacheStatsByTime(interval, idConn);
                     if(null == memcachedStatsConn){
                         break;
                     }
