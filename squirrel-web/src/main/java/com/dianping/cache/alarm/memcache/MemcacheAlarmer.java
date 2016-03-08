@@ -250,6 +250,7 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
     }
 
     boolean isMemFlucAlarm(CacheConfiguration item, Map<String, Map<String, Object>> currentServerStats, MemcacheEvent memcacheEvent) throws InterruptedException {
+        logger.info("isMemFlucAlarm: start……"+item.getCacheKey());
 
         boolean flag = false;
 
@@ -302,19 +303,21 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
                 usage = (float) memused / mem;
             }
 
-
+            logger.info("isMemFlucAlarm:cur usage="+usage+" "+item.getCacheKey());
             //短时间内波动分析
             //1.开关 2.是否高于flucBase 3.上升率 4.历史数据分析
 
             if (!memSwitch) {
+                logger.info("isMemFlucAlarm:switch off……"+item.getCacheKey());
                 continue;
             }
-
+            logger.info("isMemFlucAlarm:switch on……"+item.getCacheKey());
             if (usage * 100 < memBase) {
                 continue;
             }
 
             float minMemUsage = Float.parseFloat(getMinVal(MEMUSAGE, server, memInterval, usage).toString());
+            logger.info("isMemFlucAlarm:minMemUsage="+minMemUsage+" "+item.getCacheKey());
 
 //          float flucUsage = memcacheStatsFlucService.getMemcacheMemUsageByTime(memInterval, server);
             if (0 == minMemUsage) {
@@ -324,6 +327,7 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
             boolean alarmFlag = true;
 
             if ((usage - minMemUsage) * 100 > memFluc) {
+                logger.info("isMemFlucAlarm:memUsage fluc too much ……"+item.getCacheKey());
 
                 SimpleDateFormat sdf = new SimpleDateFormat("EEEE:HH:mm", Locale.ENGLISH);
                 Date nameDate = new Date();
@@ -339,13 +343,15 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
                         continue;
                     }
 
-                    if ((usage - memcacheBaseline.getMem()) < memcacheBaseline.getMem() * 0.1) {
+                    if ((usage - memcacheBaseline.getMem()) < 0) {
+                        logger.info("isMemFlucAlarm:usage lower than history baseline……"+item.getCacheKey());
                         alarmFlag = false;
                         break;
                     }
                 }
 
                 if (alarmFlag) {
+                    logger.info("isMemFlucAlarm:alarm……"+item.getCacheKey());
                     String detail = item.getCacheKey() + ":" + MEMUSAGE_INCREASE_TOO_FAST + ",IP为" + ip + ";使用率在" + memInterval + "分钟内从" + minMemUsage + "增长到" + usage;
 
                     String val = MEMUSAGE_INCREASE_TOO_FAST + ",使用率在" + memInterval + "分钟内从" + minMemUsage + "增长到" + usage;
@@ -413,6 +419,7 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
 
     boolean isQpsFlucAlarm(CacheConfiguration item, Map<String, Map<String, Object>> currentServerStats, MemcacheEvent memcacheEvent) throws InterruptedException {
 
+        logger.info("isQpsFlucAlarm: start……"+item.getCacheKey());
         boolean flag = false;
 
         AlarmConfig alarmConfig = alarmConfigService.findByClusterTypeAndName(ALARMTYPE, item.getCacheKey());
@@ -457,10 +464,14 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
             //短时间内波动分析
             //1.开关 2.是否高于flucBase 3.上升率 4.历史数据分析
 
+            logger.info("isMemFlucAlarm:cur qps="+qps+" "+item.getCacheKey());
+
             //1.开关
             if (!qpsSwitch) {
+                logger.info("isQpsFlucAlarm: switch off……"+item.getCacheKey());
                 continue;
             }
+            logger.info("isQpsFlucAlarm: switch on……"+item.getCacheKey());
 
             //2.忽略小数值
             if (qps < qpsBase) {
@@ -478,17 +489,18 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
             // long flucQps = (memcachedStats.getGet_hits() + memcachedStats.getGet_misses() + memcachedStats.getCmd_set()) / 30;
 
             long minQps = Long.parseLong(getMinVal(QPS, server, qpsInterval, qps).toString());
-
+            logger.info("isQpsFlucAlarm:minQps="+minQps+" "+item.getCacheKey());
 
             boolean alarmFlag = true;
 
             //上升过快
             if (qps - minQps > qpsFluc) {
+                logger.info("isQpsFlucAlarm: qps fluc too much……"+item.getCacheKey());
 
                 SimpleDateFormat sdf = new SimpleDateFormat("EEEE:HH:mm", Locale.ENGLISH);
                 Date nameDate = new Date();
 
-                //比较前后5分钟的历史数据
+                //比较前后1分钟的历史数据
                 for (int i = -1; i < 1; i++) {
                     GregorianCalendar gc = new GregorianCalendar();
                     gc.setTime(nameDate);
@@ -502,13 +514,15 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
 
                     long flucQpsTmp = (memcacheBaseline.getGet_hits() + memcacheBaseline.getGet_misses() + memcacheBaseline.getCmd_set()) / 30;
 
-                    if ((qps - flucQpsTmp) < flucQpsTmp * 0.1) {
+                    if ((qps - flucQpsTmp) < 0) {
+                        logger.info("isQpsFlucAlarm: qps lower than history baseline……"+item.getCacheKey());
                         alarmFlag = false;
                         break;
                     }
                 }
 
                 if (alarmFlag) {
+                    logger.info("isQpsFlucAlarm: alarm……"+item.getCacheKey());
                     String detail = item.getCacheKey() + ":" + QPS_INCREASE_TOO_FAST + ",IP为" + ip + ";QPS在" + qpsInterval + "分钟内从" + minQps + "增长到" + qps;
 
                     String val = QPS_INCREASE_TOO_FAST + ",QPS在" + qpsInterval + "分钟内从" + minQps + "增长到" + qps;
@@ -577,6 +591,7 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
 
     boolean isConnFlucAlarm(CacheConfiguration item, Map<String, Map<String, Object>> currentServerStats, MemcacheEvent memcacheEvent) throws
             InterruptedException {
+        logger.info("isConnFlucAlarm: start……"+item.getCacheKey());
         boolean flag = false;
 
         AlarmConfig alarmConfig = alarmConfigService.findByClusterTypeAndName(ALARMTYPE, item.getCacheKey());
@@ -623,10 +638,14 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
             //短时间内波动分析
             //1.开关 2.是否高于flucBase 3.上升率 4.历史数据分析
 
+            logger.info("isMemFlucAlarm:cur conn="+conn+" "+item.getCacheKey());
+
             //1.开关
             if (!connSwitch) {
+                logger.info("isConnFlucAlarm: switch off……"+item.getCacheKey());
                 continue;
             }
+            logger.info("isConnFlucAlarm: switch on……"+item.getCacheKey());
 
             //2.忽略小数值
             if (conn < connBase) {
@@ -640,12 +659,14 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
 
             long minConn = Long.parseLong(getMinVal(CONN, server, connInterval, conn).toString());
 
+            logger.info("isConnFlucAlarm:minConn="+minConn+" "+item.getCacheKey());
 
             boolean alarmFlag = true;
 
 
             //上升过快
             if (conn - minConn > connFluc) {
+                logger.info("isConnFlucAlarm: conn fluc too much……"+item.getCacheKey());
 
                 SimpleDateFormat sdf = new SimpleDateFormat("EEEE:HH:mm", Locale.ENGLISH);
                 Date nameDate = new Date();
@@ -664,13 +685,15 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
 
                     long flucConnTmp = memcacheBaseline.getCurr_conn();
 
-                    if ((conn - flucConnTmp) < flucConnTmp * 0.1) {
+                    if ((conn - flucConnTmp) < 0) {
+                        logger.info("isConnFlucAlarm: conn is lower than history baseline……"+item.getCacheKey());
                         alarmFlag = false;
                         break;
                     }
                 }
 
                 if (alarmFlag) {
+                    logger.info("isConnFlucAlarm: alarm……"+item.getCacheKey());
                     String detail = item.getCacheKey() + ":" + CONN_INCREASE_TOO_FAST + ",IP为" + ip + ";连接数在" + connInterval + "分钟内从" + minConn + "增长到" + conn;
 
                     String val = CONN_INCREASE_TOO_FAST + ";连接数在" + connInterval + "分钟内从" + minConn + "增长到" + conn;
@@ -695,11 +718,17 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
                     break;
                 case QPS:
                     MemcachedStats memcachedStatsQps = memcacheStatsFlucService.getMemcacheStatsByTime(interval, serverService.findByAddress(server).getId());
+                    if(null == memcachedStatsQps){
+                        break;
+                    }
                     long flucQps = (memcachedStatsQps.getGet_hits() + memcachedStatsQps.getGet_misses() + memcachedStatsQps.getCmd_set()) / 30;
                     minValCacheService.updateMinVal(minName, new MinVal(ALARMTYPE, type, new Date(), flucQps));
                     break;
                 case CONN:
                     MemcachedStats memcachedStatsConn = memcacheStatsFlucService.getMemcacheStatsByTime(interval, serverService.findByAddress(server).getId());
+                    if(null == memcachedStatsConn){
+                        break;
+                    }
                     long flucConn = memcachedStatsConn.getCurr_conn();
                     minValCacheService.updateMinVal(minName, new MinVal(ALARMTYPE, type, new Date(), flucConn));
                     break;
@@ -716,7 +745,7 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
                 for (int i = 0; i < interval; i++) {
                     switch (type) {
                         case MEMUSAGE:
-                            float flucUsage = memcacheStatsFlucService.getMemcacheMemUsageByTime(interval, server);
+                            float flucUsage = memcacheStatsFlucService.getMemcacheMemUsageByTime(i, server);
                             if (null == tmpMinVal) {
                                 tmpMinVal = flucUsage;
                             } else {
@@ -726,7 +755,10 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
                             }
                             break;
                         case QPS:
-                            MemcachedStats memcachedStatsQps = memcacheStatsFlucService.getMemcacheStatsByTime(interval, serverService.findByAddress(server).getId());
+                            MemcachedStats memcachedStatsQps = memcacheStatsFlucService.getMemcacheStatsByTime(i, serverService.findByAddress(server).getId());
+                            if(null == memcachedStatsQps){
+                                break;
+                            }
                             long flucQps = (memcachedStatsQps.getGet_hits() + memcachedStatsQps.getGet_misses() + memcachedStatsQps.getCmd_set()) / 30;
                             if (null == tmpMinVal) {
                                 tmpMinVal = flucQps;
@@ -737,7 +769,10 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
                             }
                             break;
                         case CONN:
-                            MemcachedStats memcachedStatsConn = memcacheStatsFlucService.getMemcacheStatsByTime(interval, serverService.findByAddress(server).getId());
+                            MemcachedStats memcachedStatsConn = memcacheStatsFlucService.getMemcacheStatsByTime(i, serverService.findByAddress(server).getId());
+                            if(null == memcachedStatsConn){
+                                break;
+                            }
                             long flucConn = memcachedStatsConn.getCurr_conn();
                             if (null == tmpMinVal) {
                                 tmpMinVal = flucConn;
@@ -754,7 +789,12 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
                 minValCacheService.updateMinVal(minName, newMinVal);
             }
         }
-        return minValCacheService.getMinValByName(minName).getVal();
+        MinVal result = minValCacheService.getMinValByName(minName);
+        if(null == result){
+            return 0;
+        }else {
+            return minValCacheService.getMinValByName(minName).getVal();
+        }
     }
 
 

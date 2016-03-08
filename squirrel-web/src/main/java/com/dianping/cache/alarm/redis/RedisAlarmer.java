@@ -230,6 +230,7 @@ public class RedisAlarmer extends AbstractRedisAlarmer {
     }
 
     private boolean isQpsFlucAlarm(RedisClusterData item, RedisNode node, AlarmConfig alarmConfig, RedisTemplate redisTemplate, RedisEvent redisEvent) {
+        logger.info("isQpsFlucAlarm: start……"+item.getClusterName());
         boolean flag = false;
 
         //QPS
@@ -255,8 +256,12 @@ public class RedisAlarmer extends AbstractRedisAlarmer {
 
 //            long minQps = redisStat.getQps();
             long minQps = Long.parseLong(getMinVal(QPS, node, qpsInterval,node.getMaster().getInfo().getQps()).toString());
-            if (qpsSwitch && (0 != minQps) && (node.getMaster().getInfo().getQps() < qpsBase)) {
 
+            logger.info("isQpsFlucAlarm: cur qps="+node.getMaster().getInfo().getQps()+" "+item.getClusterName());
+            logger.info("isQpsFlucAlarm: minQps ="+minQps+" "+item.getClusterName());
+
+            if (qpsSwitch && (0 != minQps) && (node.getMaster().getInfo().getQps() < qpsBase)) {
+                logger.info("isQpsFlucAlarm: qps fluc too much ……"+item.getClusterName());
                 boolean alarmFlag = true;
 
                 if ((node.getMaster().getInfo().getQps() - minQps) > qpsFluc) {
@@ -275,7 +280,8 @@ public class RedisAlarmer extends AbstractRedisAlarmer {
                             continue;
                         }
 
-                        if ((node.getMaster().getInfo().getQps() - redisBaseline.getQps()) < redisBaseline.getQps() * 0.1) {
+                        if ((node.getMaster().getInfo().getQps() - redisBaseline.getQps()) < 0) {
+                            logger.info("isQpsFlucAlarm: qps is lower than history baseline……"+item.getClusterName());
                             alarmFlag = false;
                             break;
                         }
@@ -316,6 +322,8 @@ public class RedisAlarmer extends AbstractRedisAlarmer {
     }
 
     private boolean isMemFlucAlarm(RedisClusterData item, RedisNode node, AlarmConfig alarmConfig, RedisTemplate redisTemplate, RedisEvent redisEvent) {
+        logger.info("isMemFlucAlarm: start……"+item.getClusterName());
+
 
         boolean flag = false;
 
@@ -329,8 +337,10 @@ public class RedisAlarmer extends AbstractRedisAlarmer {
 
 //        float minMemUsage = redisStatsFlucService.getRedisMemUsageByTime(memInterval, node.getMaster().getAddress());
         float minMemUsage = Float.parseFloat(getMinVal(MEMUSAGE, node, memInterval,node.getMaster().getInfo().getUsed()).toString());
-
+        logger.info("isMemFlucAlarm: curMemUsage="+node.getMaster().getInfo().getUsed()*100+" "+item.getClusterName());
+        logger.info("isMemFlucAlarm: minMemUsage="+minMemUsage+" "+item.getClusterName());
         if (memSwitch && (0 != minMemUsage) && (node.getMaster().getInfo().getUsed() * 100 < memBase)) {
+            logger.info("isMemFlucAlarm: memusage fluc too much……"+item.getClusterName());
 
             boolean alarmFlag = true;
 
@@ -350,13 +360,15 @@ public class RedisAlarmer extends AbstractRedisAlarmer {
                         continue;
                     }
 
-                    if ((node.getMaster().getInfo().getUsed() - redisBaseline.getMem()) < redisBaseline.getMem() * 0.1) {
+                    if ((node.getMaster().getInfo().getUsed() - redisBaseline.getMem()) < 0) {
+                        logger.info("isMemFlucAlarm: memusage is lower than history baseline……"+item.getClusterName());
                         alarmFlag = false;
                         break;
                     }
                 }
 
                 if (alarmFlag) {
+                    logger.info("isMemFlucAlarm:alarm……"+item.getClusterName());
                     flag = true;
                     String detail = item.getClusterName() + ":" + node.getMaster().getAddress() + "," + MEMUSAGE_INCREASE_TOO_MUCH + ";使用率在" + memInterval + "分钟内从" + minMemUsage + "增长到" + node.getMaster().getInfo().getUsed();
 
