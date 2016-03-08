@@ -426,7 +426,7 @@ public class RedisAlarmer extends AbstractRedisAlarmer {
             boolean isExpire = minValCacheService.isExpire(minName, interval);
             if (isExpire) {
                 Object tmpMinVal = null;
-                for (int i = 0; i < interval; i++) {
+                for (int i = 1; i < interval; i++) {
                     switch (type) {
                         case MEMUSAGE:
                             float flucUsage = redisStatsFlucService.getRedisMemUsageByTime(i, node.getMaster().getAddress());

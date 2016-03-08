@@ -715,6 +715,7 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
     }
 
     private Object getMinVal(int type, String server, int interval, Object curVal) {
+        logger.info("start of getMinVal()");
         String minName = "Memcache_" + type + "_" + server;
         MinVal minVal = minValCacheService.getMinValByName(minName);
         if (null == minVal) {
@@ -760,7 +761,7 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
             boolean isExpire = minValCacheService.isExpire(minName, interval);
             if (isExpire) {
                 Object tmpMinVal = null;
-                for (int i = 0; i < interval; i++) {
+                for (int i = 1; i < interval; i++) {
                     switch (type) {
                         case MEMUSAGE:
                             float flucUsage = memcacheStatsFlucService.getMemcacheMemUsageByTime(i, server);
@@ -808,6 +809,7 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
             }
         }
         MinVal result = minValCacheService.getMinValByName(minName);
+        logger.info("end of getMinVal()");
         if(null == result){
             Object obj = new String("0");
             return obj;
