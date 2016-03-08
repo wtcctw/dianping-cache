@@ -479,11 +479,11 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
                 continue;
             }
 
-            Server server1 = serverService.findByAddress(server);
-            if(null == server1){
+            Server serverQps = serverService.findByAddress(server);
+            if(null == serverQps){
                 continue;
             }
-            int id = server1.getId();
+            int id = serverQps.getId();
 
             //获取指定时间间隔之前的数值
             MemcachedStats memcachedStats = memcacheStatsFlucService.getMemcacheStatsByTime(qpsInterval, id);
@@ -809,12 +809,12 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
         }
         MinVal result = minValCacheService.getMinValByName(minName);
         if(null == result){
-            return 0;
+            Object obj = new String("0");
+            return obj;
         }else {
             return minValCacheService.getMinValByName(minName).getVal();
         }
     }
-
 
     boolean isHistoryAlarm(CacheConfiguration item, Map<String, Map<String, Object>> currentServerStats, MemcacheEvent memcacheEvent) throws InterruptedException, IOException, TimeoutException {
 

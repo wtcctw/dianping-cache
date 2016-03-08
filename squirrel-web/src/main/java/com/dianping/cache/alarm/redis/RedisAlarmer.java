@@ -461,7 +461,13 @@ public class RedisAlarmer extends AbstractRedisAlarmer {
                 minValCacheService.updateMinVal(minName, newMinVal);
             }
         }
-        return minValCacheService.getMinValByName(minName).getVal();
+        MinVal result = minValCacheService.getMinValByName(minName);
+        if(null == result){
+            Object obj = new String("0");
+            return obj;
+        }else {
+            return minValCacheService.getMinValByName(minName).getVal();
+        }
     }
 
     private boolean masterSlaveConsistency(RedisClusterData item, RedisEvent redisEvent) {
