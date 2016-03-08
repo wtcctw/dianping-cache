@@ -978,7 +978,7 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
 
             memcacheEvent.put(alarmDetail);
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("MemcacheAlarmer putToChannel" + e);
             return false;
         }
 

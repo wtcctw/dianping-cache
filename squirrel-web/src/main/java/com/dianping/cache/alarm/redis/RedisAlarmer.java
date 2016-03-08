@@ -288,6 +288,7 @@ public class RedisAlarmer extends AbstractRedisAlarmer {
                     }
 
                     if (alarmFlag) {
+                        logger.info("isQpsFlucAlarm:alarm……"+item.getClusterName());
                         String detail = item.getClusterName() + ":" + node.getMaster().getAddress() + "," + QPS_INCREASE_TOO_MUCH + ";QPS在" + qpsInterval + "分钟内从" + minQps + "增长到" + node.getMaster().getInfo().getQps();
 
                         flag = true;
@@ -570,25 +571,30 @@ public class RedisAlarmer extends AbstractRedisAlarmer {
 
     private void putToChannel(AlarmConfig alarmConfig, String type, RedisClusterData item, RedisTemplate redisTemplate, RedisNode node, String detail, RedisEvent redisEvent, Object o) {
 
-        AlarmDetail alarmDetail = new AlarmDetail(alarmConfig);
+        try {
+            AlarmDetail alarmDetail = new AlarmDetail(alarmConfig);
 
-        alarmDetail.setAlarmTitle(item.getClusterName() + type)
-                .setAlarmDetail(detail)
-                .setMailMode(redisTemplate.isMailMode())
-                .setSmsMode(redisTemplate.isSmsMode())
-                .setWeixinMode(redisTemplate.isWeixinMode())
-                .setCreateTime(new Date());
+            alarmDetail.setAlarmTitle(item.getClusterName() + type)
+                    .setAlarmDetail(detail)
+                    .setMailMode(redisTemplate.isMailMode())
+                    .setSmsMode(redisTemplate.isSmsMode())
+                    .setWeixinMode(redisTemplate.isWeixinMode())
+                    .setCreateTime(new Date());
 
-        AlarmRecord alarmRecord = new AlarmRecord();
-        alarmRecord.setAlarmTitle(type)
-                .setClusterName(item.getClusterName())
-                .setIp(node.getMaster().getAddress())
-                .setValue(String.valueOf(o))
-                .setCreateTime(new Date());
+            AlarmRecord alarmRecord = new AlarmRecord();
+            alarmRecord.setAlarmTitle(type)
+                    .setClusterName(item.getClusterName())
+                    .setIp(node.getMaster().getAddress())
+                    .setValue(String.valueOf(o))
+                    .setCreateTime(new Date());
 
-        alarmRecordDao.insert(alarmRecord);
+            alarmRecordDao.insert(alarmRecord);
 
-        redisEvent.put(alarmDetail);
+            redisEvent.put(alarmDetail);
+        }catch (Exception e){
+            logger.error("RedisAlarmer putToChannel"+e);
+        }
+
 
     }
 
