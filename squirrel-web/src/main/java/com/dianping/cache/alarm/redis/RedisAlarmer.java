@@ -44,7 +44,8 @@ public class RedisAlarmer extends AbstractRedisAlarmer {
     private static final String MEMUSAGE_INCREASE_TOO_MUCH = "内存增长过快";
     private static final String QPS_TOO_HIGH = "QPS过高";
     private static final String QPS_INCREASE_TOO_MUCH = "QPS增长过快";
-    private static final String MASTER_SLAVE_DIFF = "Master和Slave数量不一致";
+    private static final String MASTER_MORE_THAN_SLAVE ="Master数量比Slave多";
+    private static final String MASTER_LESS_THAN_SLAVE ="Master数量比Slave少";
 
     private static final String TOTAL_CONNECTIONS = "total_connections_received波动过大";
     private static final String CONNECTED_CLIENTS = "connected_clients波动过大";
@@ -464,18 +465,37 @@ public class RedisAlarmer extends AbstractRedisAlarmer {
         RedisTemplate redisTemplate = redisAlarmTemplateService.findAlarmTemplateByTemplateName(alarmConfig.getAlarmTemplate());
 
         //主从数量不一致告警
-        if (item.getMasterNum() != item.getSlaveNum()) {
+        if (item.getMasterNum() > item.getSlaveNum()) {
             AlarmDetail alarmDetail = new AlarmDetail(alarmConfig);
             flag = true;
-            alarmDetail.setAlarmTitle(MASTER_SLAVE_DIFF)
-                    .setAlarmDetail(item.getClusterName() + ":" + MASTER_SLAVE_DIFF)
+            alarmDetail.setAlarmTitle(MASTER_MORE_THAN_SLAVE)
+                    .setAlarmDetail(item.getClusterName() + ":" + MASTER_MORE_THAN_SLAVE)
                     .setMailMode(redisTemplate.isMailMode())
                     .setSmsMode(redisTemplate.isSmsMode())
                     .setWeixinMode(redisTemplate.isWeixinMode())
                     .setCreateTime(new Date());
 
             AlarmRecord alarmRecord = new AlarmRecord();
-            alarmRecord.setAlarmTitle(MASTER_SLAVE_DIFF)
+            alarmRecord.setAlarmTitle(MASTER_MORE_THAN_SLAVE)
+                    .setClusterName(item.getClusterName())
+                    .setIp(null)
+                    .setCreateTime(new Date());
+
+            alarmRecordDao.insert(alarmRecord);
+
+            redisEvent.put(alarmDetail);
+        }else if (item.getMasterNum() != item.getSlaveNum()) {
+            AlarmDetail alarmDetail = new AlarmDetail(alarmConfig);
+            flag = true;
+            alarmDetail.setAlarmTitle(MASTER_LESS_THAN_SLAVE)
+                    .setAlarmDetail(item.getClusterName() + ":" + MASTER_LESS_THAN_SLAVE)
+                    .setMailMode(redisTemplate.isMailMode())
+                    .setSmsMode(redisTemplate.isSmsMode())
+                    .setWeixinMode(redisTemplate.isWeixinMode())
+                    .setCreateTime(new Date());
+
+            AlarmRecord alarmRecord = new AlarmRecord();
+            alarmRecord.setAlarmTitle(MASTER_LESS_THAN_SLAVE)
                     .setClusterName(item.getClusterName())
                     .setIp(null)
                     .setCreateTime(new Date());

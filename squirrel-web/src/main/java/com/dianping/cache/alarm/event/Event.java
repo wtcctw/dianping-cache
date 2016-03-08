@@ -104,6 +104,10 @@ public abstract class Event {
         String receiver = alarmDetail.getReceiver();
 
         boolean sendToBusiness = alarmDetail.isToBusiness();
+        //某些情况不发送业务线
+        if(alarmDetail.getAlarmDetail().contains("集群实例无法连接")||alarmDetail.getAlarmDetail().contains("Master数量比Slave多")){
+            sendToBusiness = false;
+        }
 
             if (alarmDetail.isMailMode()) {
                 notifyEmail(title, message, receiver, domain, sendToBusiness);
