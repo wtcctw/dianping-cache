@@ -465,7 +465,7 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
             //短时间内波动分析
             //1.开关 2.是否高于flucBase 3.上升率 4.历史数据分析
 
-            logger.info("isMemFlucAlarm:cur qps="+qps+" "+item.getCacheKey());
+            logger.info("isQpsFlucAlarm:cur qps="+qps+" "+item.getCacheKey());
 
             //1.开关
             if (!qpsSwitch) {
@@ -478,20 +478,6 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
             if (qps < qpsBase) {
                 continue;
             }
-
-            Server serverQps = serverService.findByAddress(server);
-            if(null == serverQps){
-                continue;
-            }
-            int id = serverQps.getId();
-
-            //获取指定时间间隔之前的数值
-            MemcachedStats memcachedStats = memcacheStatsFlucService.getMemcacheStatsByTime(qpsInterval, id);
-
-            if (null == memcachedStats) {
-                continue;
-            }
-
 
             // long flucQps = (memcachedStats.getGet_hits() + memcachedStats.getGet_misses() + memcachedStats.getCmd_set()) / 30;
 
@@ -645,7 +631,7 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
             //短时间内波动分析
             //1.开关 2.是否高于flucBase 3.上升率 4.历史数据分析
 
-            logger.info("isMemFlucAlarm:cur conn="+conn+" "+item.getCacheKey());
+            logger.info("isConnFlucAlarm:cur conn="+conn+" "+item.getCacheKey());
 
             //1.开关
             if (!connSwitch) {
@@ -735,7 +721,7 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
                     if(null == memcachedStatsQps){
                         break;
                     }
-                    long flucQps = (memcachedStatsQps.getGet_hits() + memcachedStatsQps.getGet_misses() + memcachedStatsQps.getCmd_set()) / 30;
+                    long flucQps = (memcachedStatsQps.getGet_hits() + memcachedStatsQps.getGet_misses() + memcachedStatsQps.getCmd_set())/ 30;
                     minValCacheService.updateMinVal(minName, new MinVal(ALARMTYPE, type, new Date(), flucQps));
                     break;
                 case CONN:
@@ -804,6 +790,9 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
                     }
                 }
 
+                if(null == tmpMinVal){
+                    tmpMinVal = 0;
+                }
                 MinVal newMinVal = new MinVal(ALARMTYPE,type,new Date(),tmpMinVal);
                 minValCacheService.updateMinVal(minName, newMinVal);
             }
@@ -814,7 +803,7 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
             Object obj = new String("0");
             return obj;
         }else {
-            return minValCacheService.getMinValByName(minName).getVal();
+            return result.getVal();
         }
     }
 
