@@ -412,6 +412,9 @@ public class RedisAlarmer extends AbstractRedisAlarmer {
             switch (type) {
                 case MEMUSAGE:
                     float flucUsage = redisStatsFlucService.getRedisMemUsageByTime(interval, node.getMaster().getAddress());
+                    if(0 == flucUsage){
+                        flucUsage = (Float)curVal;
+                    }
                     minValCacheService.updateMinVal(minName, new MinVal(ALARMTYPE, type, new Date(), flucUsage));
                     break;
                 case QPS:
@@ -422,6 +425,9 @@ public class RedisAlarmer extends AbstractRedisAlarmer {
                     int id =  server.getId();
                     RedisStats redisStat = redisStatsFlucService.getRedisStatsByTime(interval, id);
                     long flucQps = redisStat.getQps();
+                    if(0 == flucQps){
+                        flucQps = (Long)curVal;
+                    }
                     minValCacheService.updateMinVal(minName, new MinVal(ALARMTYPE, type, new Date(), flucQps));
                     break;
             }

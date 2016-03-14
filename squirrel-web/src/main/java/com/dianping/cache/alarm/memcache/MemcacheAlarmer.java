@@ -720,6 +720,9 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
             switch (type) {
                 case MEMUSAGE:
                     float flucUsage = memcacheStatsFlucService.getMemcacheMemUsageByTime(interval, server);
+                    if(0 == flucUsage){
+                        flucUsage = (Float)curVal;
+                    }
                     minValCacheService.updateMinVal(minName, new MinVal(ALARMTYPE, type, new Date(), flucUsage));
                     break;
                 case QPS:
@@ -734,6 +737,9 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
                         break;
                     }
                     long flucQps = (memcachedStatsQps.getGet_hits() + memcachedStatsQps.getGet_misses() + memcachedStatsQps.getCmd_set())/ 30;
+                    if(0 == flucQps){
+                        flucQps = (Long) curVal;
+                    }
                     minValCacheService.updateMinVal(minName, new MinVal(ALARMTYPE, type, new Date(), flucQps));
                     break;
                 case CONN:
@@ -747,6 +753,9 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
                         break;
                     }
                     long flucConn = memcachedStatsConn.getCurr_conn();
+                    if(0 == flucConn){
+                        flucConn = (Long) curVal;
+                    }
                     minValCacheService.updateMinVal(minName, new MinVal(ALARMTYPE, type, new Date(), flucConn));
                     break;
             }
