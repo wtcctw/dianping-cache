@@ -318,6 +318,9 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
             }
 
             float minMemUsage = Float.parseFloat(getMinVal(MEMUSAGE, server, memInterval, usage).toString());
+            if(0 == minMemUsage){
+                continue;
+            }
             logger.info("isMemFlucAlarm:minMemUsage="+minMemUsage+" "+item.getCacheKey());
 
 //          float flucUsage = memcacheStatsFlucService.getMemcacheMemUsageByTime(memInterval, server);
@@ -482,6 +485,11 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
             // long flucQps = (memcachedStats.getGet_hits() + memcachedStats.getGet_misses() + memcachedStats.getCmd_set()) / 30;
 
             long minQps = Long.parseLong(getMinVal(QPS, server, qpsInterval, qps).toString());
+
+            if(0 == minQps){
+                continue;
+            }
+
             logger.info("isQpsFlucAlarm:minQps="+minQps+" "+item.getCacheKey());
 
             boolean alarmFlag = true;
@@ -651,6 +659,10 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
 //          long flucConn = memcachedStats.getCurr_conn();
 
             long minConn = Long.parseLong(getMinVal(CONN, server, connInterval, conn).toString());
+
+            if(0 == minConn){
+                continue;
+            }
 
             logger.info("isConnFlucAlarm:minConn="+minConn+" "+item.getCacheKey());
 

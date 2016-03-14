@@ -257,6 +257,10 @@ public class RedisAlarmer extends AbstractRedisAlarmer {
 //            long minQps = redisStat.getQps();
             long minQps = Long.parseLong(getMinVal(QPS, node, qpsInterval,node.getMaster().getInfo().getQps()).toString());
 
+            if(0 == minQps){
+                return flag;
+            }
+
             logger.info("isQpsFlucAlarm: cur qps="+node.getMaster().getInfo().getQps()+" "+item.getClusterName());
             logger.info("isQpsFlucAlarm: minQps ="+minQps+" "+item.getClusterName());
 
@@ -338,6 +342,9 @@ public class RedisAlarmer extends AbstractRedisAlarmer {
 
 //        float minMemUsage = redisStatsFlucService.getRedisMemUsageByTime(memInterval, node.getMaster().getAddress());
         float minMemUsage = Float.parseFloat(getMinVal(MEMUSAGE, node, memInterval,node.getMaster().getInfo().getUsed()).toString());
+        if(0==minMemUsage){
+            return flag;
+        }
         logger.info("isMemFlucAlarm: curMemUsage="+node.getMaster().getInfo().getUsed()*100+" "+item.getClusterName());
         logger.info("isMemFlucAlarm: minMemUsage="+minMemUsage+" "+item.getClusterName());
         if (memSwitch && (0 != minMemUsage) && (node.getMaster().getInfo().getUsed() * 100 < memBase)) {
