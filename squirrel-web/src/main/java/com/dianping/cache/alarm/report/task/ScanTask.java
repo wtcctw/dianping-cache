@@ -438,7 +438,8 @@ public class ScanTask {
                     for (int k = 0; k < projectElements.size(); k++) {
                         Element e = projectElements.get(k);
 
-                        if ((Double.parseDouble(e.attribute("failPercent").getValue()) > 0.1) || (Double.parseDouble(e.attribute("avg").getValue())) > 10) {
+                        if ((Integer.parseInt(e.attribute("totalCount").getValue())>20000)&&((Double.parseDouble(e.attribute("failPercent").getValue()) > 0.1) || (Double.parseDouble(e.attribute("avg").getValue())) > 10)
+                                ||(Double.parseDouble(e.attribute("failPercent").getValue()) > 3)||(Double.parseDouble(e.attribute("avg").getValue()) > 50)) {
 
                             ScanDetail scanDetail = new ScanDetail();
                             scanDetail.setCacheName(attr.getStringValue())

@@ -54,7 +54,7 @@ public class BaselineCacheServiceImpl implements BaselineCacheService {
 
         baselineCache.setMemcacheBaselineMap(stringMemcacheBaselineMap);
 
-        baselineCache.setRedisBaselineMap(redisBaselineMap);
+        baselineCache.setRedisBaselineMap(stringRedisBaselineMap);
 
 
         BaselineCache.setInstance(baselineCache);
