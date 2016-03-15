@@ -180,6 +180,7 @@ public class TaskManager {
                 setServiceConfiguration(entry.getKey(), entry.getValue());
             }
         }
+
         // 重新同步一下数据
         serviceConfig = getServiceClusterConfigurationMap();
 
@@ -199,7 +200,7 @@ public class TaskManager {
             List<String> forRemoveFromServiceServer = new ArrayList<String>();
 
             if(serviceServers == null)
-                continue;
+                serviceServers = new ArrayList<String>();
 
             for (String server : serviceServers) {
                 if (!managerServers.contains(server)) {
@@ -359,25 +360,6 @@ public class TaskManager {
     }
 
     public void start() throws Exception {
-//        try {
-//            curatorClient.create().creatingParentsIfNeeded().forPath(Constants.INIT_STAT_LOCK);
-//            init();
-//            // TODO 下面一段可以干掉 不合逻辑 init 留下 那个脚本第一次可以额外执行
-//            List<String> clusters = getManagerClusters();
-//            final List<String> clusterInUse = curatorClient.getChildren().forPath(Constants.SERVICE_PATH);
-//            filterServers();
-//            for (String cluster : clusters) {
-//                if (!clusterInUse.contains(cluster)) {
-//                    curatorClient.create().creatingParentsIfNeeded().forPath(Constants.SERVICE_PATH + "/" + cluster);
-//                }
-//                //setServers(concatZkPath(Constants.SERVICE_PATH, cluster), getManagerClusterServers(cluster));
-//                CacheConfiguration configuration = getManagerClusterCinfiguration(cluster);
-//                setServiceConfiguration(cluster, configuration);
-//            }
-//            curatorClient.delete().forPath(Constants.INIT_STAT_LOCK);
-//        } catch (KeeperException e) {
-//            e.printStackTrace();
-//        }
 
         final Runnable task = new Runnable() {
             @Override
