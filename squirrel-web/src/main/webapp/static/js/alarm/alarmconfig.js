@@ -91,8 +91,10 @@ module
         function ($rootScope, $scope, $http, Paginator, ngDialog, $interval) {
 
             $scope.clusterTypes = ["Memcache", "Redis"];
+            $scope.alarmTypes = ["Memcache宕机","Memcache内存", "MemcacheQPS","Memcache连接数","Redis宕机","Redis内存","RedisQPS"];
             $scope.memcacheAlarmTemplates;
             $scope.redisAlarmTemplates;
+            $scope.alarmTemplates;
             $scope.thresholdTypes = ["上阈值", "下阈值"];
             $scope.memcacheClusters;
             $scope.redisCluters;
@@ -199,18 +201,6 @@ module
                     });
             }
 
-
-            $scope.baselineCompute = function () {
-                $http
-                    .post(
-                    window.contextPath + "/config/alarm/baselineCompute"
-                )
-                    .success(
-                    function (data) {
-                        alert("计算任务已启动……")
-                    }
-                );
-            };
 
             $scope.query();
             $scope.clearModal();
@@ -517,6 +507,123 @@ module
 
             $scope.redisQuery();
             $scope.redisClearModal();
+
+
+
+
+
+            //alarmTemplate
+
+            var alarmfetchFunction = function (offset, limit, callback) {
+                $scope.alarmSearchEntity = {
+                    offset: offset,
+                    limit: limit
+                };
+                console.log($scope.alarmSearchEntity);
+                $http.get(window.contextPath + $scope.alarmsuburl, {
+                    params: $scope.alarmSearchEntity
+                }).success(callback);
+            };
+            $scope.alarmsuburl = "/setting/alarmtemplate/list";
+            $scope.PageSize = 30000;
+            $scope.queryCount = 0;
+
+            $scope.alarmQuery = function () {
+                $scope.alarmTemplateSearchPaginator = Paginator(
+                    alarmfetchFunction, $scope.PageSize
+                );
+            }
+
+            $scope.alarmrefreshpage = function (alarmForm) {
+                $('#alarmTemplateModal').modal('hide');
+                console.log($scope.alarmTemplateConfigEntity);
+                $http
+                    .post(
+                    window.contextPath + '/setting/alarmtemplate/create',
+                    $scope.alarmTemplateConfigEntity
+                )
+                    .success(
+                    function (data) {
+                        $scope.alarmTemplateSearchPaginator = Paginator(
+                            alarmfetchFunction,
+                            $scope.PageSize
+                        );
+                    }
+                );
+            }
+
+            $scope.alarmClearModal = function () {
+                $scope.alarmTemplateConfigEntity = {};
+                $scope.alarmTemplateConfigEntity.isUpdate = false;
+            }
+
+            $scope.alarmsetModalInput = function (index) {
+                $scope.alarmTemplateConfigEntity.id = $scope.alarmTemplateSearchPaginator.currentPageItems[index].id;
+                $scope.alarmTemplateConfigEntity.templateName = $scope.alarmTemplateSearchPaginator.currentPageItems[index].templateName;
+                $scope.alarmTemplateConfigEntity.alarmType = $scope.alarmTemplateSearchPaginator.currentPageItems[index].alarmType;
+                $scope.alarmTemplateConfigEntity.alarmSwitch = $scope.alarmTemplateSearchPaginator.currentPageItems[index].alarmSwitch;
+                $scope.alarmTemplateConfigEntity.threshold = $scope.alarmTemplateSearchPaginator.currentPageItems[index].threshold;
+                $scope.alarmTemplateConfigEntity.flucSwitch = $scope.alarmTemplateSearchPaginator.currentPageItems[index].flucSwitch;
+                $scope.alarmTemplateConfigEntity.fluc = $scope.alarmTemplateSearchPaginator.currentPageItems[index].fluc;
+                $scope.alarmTemplateConfigEntity.base = $scope.alarmTemplateSearchPaginator.currentPageItems[index].base;
+                $scope.alarmTemplateConfigEntity.alarmInterval = $scope.alarmTemplateSearchPaginator.currentPageItems[index].alarmInterval;
+                $scope.alarmTemplateConfigEntity.mailMode = $scope.alarmTemplateSearchPaginator.currentPageItems[index].mailMode;
+                $scope.alarmTemplateConfigEntity.smsMode = $scope.alarmTemplateSearchPaginator.currentPageItems[index].smsMode;
+                $scope.alarmTemplateConfigEntity.weixinMode = $scope.alarmTemplateSearchPaginator.currentPageItems[index].weixinMode;
+                $scope.alarmTemplateConfigEntity.isUpdate = true;
+            }
+
+            $rootScope.alarmremoverecord = function (cid) {
+                console.log(cid);
+                $http
+                    .get(
+                    window.contextPath + "/setting/alarmtemplate/remove",
+                    {
+                        params: {
+                            id: cid
+                        }
+                    }
+                )
+                    .success(
+                    function (data) {
+                        $scope.alarmTemplateSearchPaginator = Paginator(
+                            alarmfetchFunction,
+                            $scope.PageSize
+                        );
+                    }
+                );
+                return true;
+            }
+
+            $scope.alarmDialog = function (cid) {
+                $rootScope.cid = cid;
+                ngDialog
+                    .open({
+                        template: '\
+                        <div class = "widget-box">\
+                        <div class="widget-header">\
+                            <h4 class="widget-title">警告</h4>\
+                        </div>\
+                        <div class="widget-body">\
+                            <div class="widget-main">\
+                                <p class="alert alert-info">\
+                                    您确认要删除吗？\
+                                </p>\
+                            </div>\
+                             <div class="modal-footer">\
+                                <button type="button" class="btn btn-default" ng-click="closeThisDialog()">取消</button>\
+                                <button type="button" class="btn btn-primary" ng-click="alarmremoverecord(cid)&&closeThisDialog()">确定</button>\
+                             </div>\
+                        </div>\
+                        </div>',
+                        plain: true,
+                        className: 'ngdialog-theme-default'
+                    });
+            };
+
+            $scope.alarmQuery();
+            $scope.alarmClearModal();
+
 
 
         }

@@ -2,6 +2,7 @@ package com.dianping.cache.alarm.redis;
 
 import com.dianping.cache.alarm.AlarmType;
 import com.dianping.cache.alarm.alarmconfig.AlarmConfigService;
+import com.dianping.cache.alarm.alarmtemplate.AlarmTemplateService;
 import com.dianping.cache.alarm.alarmtemplate.RedisAlarmTemplateService;
 import com.dianping.cache.alarm.dao.AlarmRecordDao;
 import com.dianping.cache.alarm.dataanalyse.baselineCache.BaselineCacheService;
@@ -73,6 +74,9 @@ public class RedisAlarmer extends AbstractRedisAlarmer {
     RedisAlarmTemplateService redisAlarmTemplateService;
 
     @Autowired
+    AlarmTemplateService alarmTemplateService;
+
+    @Autowired
     RedisBaselineService redisBaselineService;
 
     @Autowired
@@ -123,22 +127,25 @@ public class RedisAlarmer extends AbstractRedisAlarmer {
                 if (null == node.getMaster() || null == node.getMaster().getInfo()) {
                     continue;
                 }
-                boolean isMemAlarm = isMemAlarm(item, node, alarmConfig, redisTemplate, redisEvent);
+                AlarmTemplate alarmTemplate = getAlarmTemplate(alarmConfig.getAlarmTemplate(),"Redis内存");
+                boolean isMemAlarm = isMemAlarm(item, node, alarmConfig, alarmTemplate, redisEvent);
 
+                alarmTemplate = getAlarmTemplate(alarmConfig.getAlarmTemplate(),"Redis内存");
+                boolean isMemFlucAlarm = isMemFlucAlarm(item, node, alarmConfig, alarmTemplate, redisEvent);
 
-                boolean isMemFlucAlarm = isMemFlucAlarm(item, node, alarmConfig, redisTemplate, redisEvent);
+                alarmTemplate = getAlarmTemplate(alarmConfig.getAlarmTemplate(),"RedisQPS");
+                boolean isQpsAlarm = isQpsAlarm(item, node, alarmConfig, alarmTemplate, redisEvent);
 
+                alarmTemplate = getAlarmTemplate(alarmConfig.getAlarmTemplate(),"RedisQPS");
+                boolean isQpsFlucAlarm = isQpsFlucAlarm(item, node, alarmConfig, alarmTemplate, redisEvent);
 
-                boolean isQpsAlarm = isQpsAlarm(item, node, alarmConfig, redisTemplate, redisEvent);
+//                alarmTemplate = getAlarmTemplate(alarmConfig.getAlarmTemplate(),"RedisHistory");
+//                boolean isHistoryAlarm = false;
+//                if (redisTemplate.isCheckHistory()) {//是否进行历史数据分析开关
+//                    isHistoryAlarm = isHistoryAlarm(item, node, alarmConfig, redisTemplate, redisEvent);
+//                }
 
-                boolean isQpsFlucAlarm = isQpsFlucAlarm(item, node, alarmConfig, redisTemplate, redisEvent);
-
-                boolean isHistoryAlarm = false;
-                if (redisTemplate.isCheckHistory()) {//是否进行历史数据分析开关
-                    isHistoryAlarm = isHistoryAlarm(item, node, alarmConfig, redisTemplate, redisEvent);
-                }
-
-                if ((false == isReport) && (isMemAlarm || isMemFlucAlarm || isQpsAlarm || isQpsFlucAlarm || isHistoryAlarm)) {
+                if ((false == isReport) && (isMemAlarm || isMemFlucAlarm || isQpsAlarm || isQpsFlucAlarm )) {
                     isReport = true;
                 }
             }
@@ -157,7 +164,15 @@ public class RedisAlarmer extends AbstractRedisAlarmer {
 
     }
 
-    private boolean isHistoryAlarm(RedisClusterData item, RedisNode node, AlarmConfig alarmConfig, RedisTemplate redisTemplate, RedisEvent redisEvent) {
+    private AlarmTemplate getAlarmTemplate(String templateName, String type) {
+        AlarmTemplate alarmTemplate = alarmTemplateService.findAlarmTemplateByTemplateNameAndType(templateName,type);
+        if(null == alarmTemplate){
+            alarmTemplate = alarmTemplateService.findAlarmTemplateByTemplateNameAndType("Default", type);
+        }
+        return alarmTemplate;
+    }
+
+    private boolean isHistoryAlarm(RedisClusterData item, RedisNode node, AlarmConfig alarmConfig, AlarmTemplate alarmTemplate, RedisEvent redisEvent) {
 
         boolean flag = false;
 
@@ -176,7 +191,7 @@ public class RedisAlarmer extends AbstractRedisAlarmer {
 
             flag = true;
             String detail = item.getClusterName() + ":" + node.getMaster().getAddress() + "," + TOTAL_CONNECTIONS;
-            putToChannel(alarmConfig, TOTAL_CONNECTIONS, item, redisTemplate, node, detail, redisEvent, null);
+            putToChannel(alarmConfig, TOTAL_CONNECTIONS, item, alarmTemplate, node, detail, redisEvent, null);
 
         }
 
@@ -185,7 +200,7 @@ public class RedisAlarmer extends AbstractRedisAlarmer {
 
             flag = true;
             String detail = item.getClusterName() + ":" + node.getMaster().getAddress() + "," + CONNECTED_CLIENTS;
-            putToChannel(alarmConfig, CONNECTED_CLIENTS, item, redisTemplate, node, detail, redisEvent, null);
+            putToChannel(alarmConfig, CONNECTED_CLIENTS, item, alarmTemplate, node, detail, redisEvent, null);
 
         }
 
@@ -194,7 +209,7 @@ public class RedisAlarmer extends AbstractRedisAlarmer {
         if (fluctTooMuch((double) node.getMaster().getInfo().getInput_kbps(), (double) redisBaselineService.findByName(name).get(0).getInput_kbps())) {
             flag = true;
             String detail = item.getClusterName() + ":" + node.getMaster().getAddress() + "," + INPUT_KBPS;
-            putToChannel(alarmConfig, INPUT_KBPS, item, redisTemplate, node, detail, redisEvent, null);
+            putToChannel(alarmConfig, INPUT_KBPS, item, alarmTemplate, node, detail, redisEvent, null);
 
         }
 
@@ -203,7 +218,7 @@ public class RedisAlarmer extends AbstractRedisAlarmer {
 
             flag = true;
             String detail = item.getClusterName() + ":" + node.getMaster().getAddress() + "," + OUTPUT_KBPS;
-            putToChannel(alarmConfig, OUTPUT_KBPS, item, redisTemplate, node, detail, redisEvent, null);
+            putToChannel(alarmConfig, OUTPUT_KBPS, item, alarmTemplate, node, detail, redisEvent, null);
 
 
         }
@@ -212,7 +227,7 @@ public class RedisAlarmer extends AbstractRedisAlarmer {
         if (fluctTooMuch((double) node.getMaster().getInfo().getUsed_cpu_sys(), (double) redisBaselineService.findByName(name).get(0).getUsed_cpu_sys())) {
             flag = true;
             String detail = item.getClusterName() + ":" + node.getMaster().getAddress() + "," + USED_CPU_SYS;
-            putToChannel(alarmConfig, USED_CPU_SYS, item, redisTemplate, node, detail, redisEvent, null);
+            putToChannel(alarmConfig, USED_CPU_SYS, item, alarmTemplate, node, detail, redisEvent, null);
 
         }
 
@@ -222,14 +237,14 @@ public class RedisAlarmer extends AbstractRedisAlarmer {
 
             flag = true;
             String detail = item.getClusterName() + ":" + node.getMaster().getAddress() + "," + USED_CPU_USER;
-            putToChannel(alarmConfig, USED_CPU_USER, item, redisTemplate, node, detail, redisEvent, null);
+            putToChannel(alarmConfig, USED_CPU_USER, item, alarmTemplate, node, detail, redisEvent, null);
 
         }
 
         return flag;
     }
 
-    private boolean isQpsFlucAlarm(RedisClusterData item, RedisNode node, AlarmConfig alarmConfig, RedisTemplate redisTemplate, RedisEvent redisEvent) {
+    private boolean isQpsFlucAlarm(RedisClusterData item, RedisNode node, AlarmConfig alarmConfig, AlarmTemplate alarmTemplate, RedisEvent redisEvent) {
         logger.info("isQpsFlucAlarm: start……"+item.getClusterName());
         boolean flag = false;
 
@@ -238,10 +253,10 @@ public class RedisAlarmer extends AbstractRedisAlarmer {
             return flag;
         }
 
-        boolean qpsSwitch = redisTemplate.isQpsSwitch();
-        int qpsFluc = redisTemplate.getQpsFluc();
-        int qpsBase = redisTemplate.getQpsBase();
-        int qpsInterval = redisTemplate.getQpsInterval();
+        boolean qpsSwitch = alarmTemplate.isFlucSwitch();
+        int qpsFluc = alarmTemplate.getFluc();
+        int qpsBase = alarmTemplate.getBase();
+        int qpsInterval = alarmTemplate.getAlarmInterval();
 
         //短时间内波动分析
         //1.开关 2.是否高于flucBase 3.上升率 4.历史数据分析
@@ -298,7 +313,7 @@ public class RedisAlarmer extends AbstractRedisAlarmer {
                         flag = true;
                         String val = QPS_INCREASE_TOO_MUCH + ",QPS在" + qpsInterval + "分钟内从" + minQps + "增长到" + node.getMaster().getInfo().getQps();
 
-                        putToChannel(alarmConfig, QPS_INCREASE_TOO_MUCH, item, redisTemplate, node, detail, redisEvent, val);
+                        putToChannel(alarmConfig, QPS_INCREASE_TOO_MUCH, item, alarmTemplate, node, detail, redisEvent, val);
 
                     }
                 }
@@ -308,34 +323,37 @@ public class RedisAlarmer extends AbstractRedisAlarmer {
         return flag;
     }
 
-    private boolean isQpsAlarm(RedisClusterData item, RedisNode node, AlarmConfig alarmConfig, RedisTemplate redisTemplate, RedisEvent redisEvent) {
+    private boolean isQpsAlarm(RedisClusterData item, RedisNode node, AlarmConfig alarmConfig, AlarmTemplate alarmTemplate, RedisEvent redisEvent) {
 
         boolean flag = false;
+        if(false == alarmTemplate.isAlarmSwitch()){
+            return flag;
+        }
 
         //QPS
         if (null == node.getMaster() || null == node.getMaster().getInfo()) {
             return flag;
         }
 
-        if (node.getMaster().getInfo().getQps() > redisTemplate.getQpsThreshold()) {
+        if (node.getMaster().getInfo().getQps() > alarmTemplate.getThreshold()) {
             flag = true;
             String detail = item.getClusterName() + ":" + node.getMaster().getAddress() + "," + QPS_TOO_HIGH + ";使用率为" + node.getMaster().getInfo().getQps();
-            putToChannel(alarmConfig, QPS_TOO_HIGH, item, redisTemplate, node, detail, redisEvent, node.getMaster().getInfo().getQps());
+            putToChannel(alarmConfig, QPS_TOO_HIGH, item, alarmTemplate, node, detail, redisEvent, node.getMaster().getInfo().getQps());
 
         }
         return flag;
     }
 
-    private boolean isMemFlucAlarm(RedisClusterData item, RedisNode node, AlarmConfig alarmConfig, RedisTemplate redisTemplate, RedisEvent redisEvent) {
+    private boolean isMemFlucAlarm(RedisClusterData item, RedisNode node, AlarmConfig alarmConfig, AlarmTemplate alarmTemplate, RedisEvent redisEvent) {
         logger.info("isMemFlucAlarm: start……"+item.getClusterName());
 
 
         boolean flag = false;
 
-        boolean memSwitch = redisTemplate.isMemSwitch();
-        int memFluc = redisTemplate.getMemFluc();
-        int memBase = redisTemplate.getMemBase();
-        int memInterval = redisTemplate.getMemInterval();
+        boolean memSwitch = alarmTemplate.isFlucSwitch();
+        int memFluc = alarmTemplate.getFluc();
+        int memBase = alarmTemplate.getBase();
+        int memInterval = alarmTemplate.getAlarmInterval();
 
         //短时间内波动分析
         //1.开关 2.是否高于flucBase 3.上升率 4.历史数据分析
@@ -382,7 +400,7 @@ public class RedisAlarmer extends AbstractRedisAlarmer {
 
                     String val = MEMUSAGE_INCREASE_TOO_MUCH + ",使用率在" + memInterval + "分钟内从" + minMemUsage + "增长到" + node.getMaster().getInfo().getUsed();
 
-                    putToChannel(alarmConfig, MEMUSAGE_INCREASE_TOO_MUCH, item, redisTemplate, node, detail, redisEvent, val);
+                    putToChannel(alarmConfig, MEMUSAGE_INCREASE_TOO_MUCH, item, alarmTemplate, node, detail, redisEvent, val);
 
                 }
             }
@@ -392,13 +410,16 @@ public class RedisAlarmer extends AbstractRedisAlarmer {
         return flag;
     }
 
-    private boolean isMemAlarm(RedisClusterData item, RedisNode node, AlarmConfig alarmConfig, RedisTemplate redisTemplate, RedisEvent redisEvent) {
+    private boolean isMemAlarm(RedisClusterData item, RedisNode node, AlarmConfig alarmConfig, AlarmTemplate alarmTemplate, RedisEvent redisEvent) {
         boolean flag = false;
+        if(false == alarmTemplate.isAlarmSwitch()){
+            return flag;
+        }
 
-        if (node.getMaster().getInfo().getUsed() > redisTemplate.getMemThreshold()) {
+        if (node.getMaster().getInfo().getUsed() > alarmTemplate.getThreshold()) {
             flag = true;
             String detail = item.getClusterName() + ":" + node.getMaster().getAddress() + "," + MEMUSAGE_TOO_HIGH + ";使用率为" + node.getMaster().getInfo().getUsed();
-            putToChannel(alarmConfig, MEMUSAGE_TOO_HIGH, item, redisTemplate, node, detail, redisEvent, node.getMaster().getInfo().getUsedMemory());
+            putToChannel(alarmConfig, MEMUSAGE_TOO_HIGH, item, alarmTemplate, node, detail, redisEvent, node.getMaster().getInfo().getUsedMemory());
         }
 
         return flag;
@@ -552,18 +573,19 @@ public class RedisAlarmer extends AbstractRedisAlarmer {
             alarmConfigService.insert(alarmConfig);
         }
 
-        RedisTemplate redisTemplate = redisAlarmTemplateService.findAlarmTemplateByTemplateName(alarmConfig.getAlarmTemplate());
+
+        AlarmTemplate alarmTemplate = alarmTemplateService.findAlarmTemplateByTemplateNameAndType(alarmConfig.getAlarmTemplate(),"Redis宕机");
 
         //cluster down
-        if (redisTemplate.isDown()) {
+        if (alarmTemplate.isAlarmSwitch()) {
             for (RedisServer redisServer : item.getFailedServers()) {
                 AlarmDetail alarmDetail = new AlarmDetail(alarmConfig);
                 flag = true;
                 alarmDetail.setAlarmTitle(CLUSTER_DOWN)
                         .setAlarmDetail(item.getClusterName() + ":" + redisServer.getAddress() + ";" + CLUSTER_DOWN)
-                        .setMailMode(redisTemplate.isMailMode())
-                        .setSmsMode(redisTemplate.isSmsMode())
-                        .setWeixinMode(redisTemplate.isWeixinMode())
+                        .setMailMode(alarmTemplate.isMailMode())
+                        .setSmsMode(alarmTemplate.isSmsMode())
+                        .setWeixinMode(alarmTemplate.isWeixinMode())
                         .setCreateTime(new Date());
 
                 AlarmRecord alarmRecord = new AlarmRecord();
@@ -582,16 +604,16 @@ public class RedisAlarmer extends AbstractRedisAlarmer {
         return flag;
     }
 
-    private void putToChannel(AlarmConfig alarmConfig, String type, RedisClusterData item, RedisTemplate redisTemplate, RedisNode node, String detail, RedisEvent redisEvent, Object o) {
+    private void putToChannel(AlarmConfig alarmConfig, String type, RedisClusterData item, AlarmTemplate alarmTemplate, RedisNode node, String detail, RedisEvent redisEvent, Object o) {
 
         try {
             AlarmDetail alarmDetail = new AlarmDetail(alarmConfig);
 
             alarmDetail.setAlarmTitle(item.getClusterName() + type)
                     .setAlarmDetail(detail)
-                    .setMailMode(redisTemplate.isMailMode())
-                    .setSmsMode(redisTemplate.isSmsMode())
-                    .setWeixinMode(redisTemplate.isWeixinMode())
+                    .setMailMode(alarmTemplate.isMailMode())
+                    .setSmsMode(alarmTemplate.isSmsMode())
+                    .setWeixinMode(alarmTemplate.isWeixinMode())
                     .setCreateTime(new Date());
 
             AlarmRecord alarmRecord = new AlarmRecord();
