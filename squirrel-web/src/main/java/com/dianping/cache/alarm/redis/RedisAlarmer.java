@@ -290,7 +290,7 @@ public class RedisAlarmer extends AbstractRedisAlarmer {
             if (null != redisStat) {
 
 //            long minQps = redisStat.getQps();
-                long minQps = Long.parseLong(getMinVal(QPS, node, qpsInterval, node.getMaster().getInfo().getQps()).toString());
+                int minQps = Integer.parseInt(getMinVal(QPS, node, qpsInterval, node.getMaster().getInfo().getQps()).toString());
 
                 if (0 == minQps) {
                     return flag;
@@ -488,9 +488,9 @@ public class RedisAlarmer extends AbstractRedisAlarmer {
                     }
                     int id = server.getId();
                     RedisStats redisStat = redisStatsFlucService.getRedisStatsByTime(interval, id);
-                    long flucQps = redisStat.getQps();
+                    int flucQps = redisStat.getQps();
                     if (0 == flucQps) {
-                        flucQps = (Long) curVal;
+                        flucQps = (Integer) curVal;
                     }
                     minValCacheService.updateMinVal(minName, new MinVal(ALARMTYPE, type, new Date(), flucQps));
                     break;
@@ -523,11 +523,11 @@ public class RedisAlarmer extends AbstractRedisAlarmer {
                             }
                             int id = server.getId();
                             RedisStats redisStat = redisStatsFlucService.getRedisStatsByTime(i, id);
-                            long flucQps = redisStat.getQps();
+                            int flucQps = redisStat.getQps();
                             if (null == tmpMinVal) {
                                 tmpMinVal = flucQps;
                             } else {
-                                if (Long.parseLong(tmpMinVal.toString()) > flucQps) {
+                                if (Integer.parseInt(tmpMinVal.toString()) > flucQps) {
                                     tmpMinVal = flucQps;
                                 }
                             }
@@ -618,10 +618,6 @@ public class RedisAlarmer extends AbstractRedisAlarmer {
 
     private boolean isDownAlarm(RedisClusterData item, List<RedisClusterData> redisClusterDatas, RedisEvent redisEvent) {
        try {
-           System.out.println(item.getClusterName());
-           if("redis-account".equals(item.getClusterName())){
-               System.out.println("here");
-           }
            boolean flag = false;
            AlarmConfig alarmConfig = alarmConfigService.findByClusterTypeAndName(ALARMTYPE, item.getClusterName());
 

@@ -57,49 +57,53 @@ public class ScanTask {
 
 
     public void run() throws InterruptedException, DocumentException, URISyntaxException, MessagingException {
-        logger.info("ScanTask run");
+        try {
+            logger.info("ScanTask run");
 
-        List<ScanDetail> scanDetailList = AlarmScanDetails();
+            List<ScanDetail> scanDetailList = AlarmScanDetails();
 
-        List<ScanDetail>scanDetails = addProjectRdduty(scanDetailList);
+            List<ScanDetail> scanDetails = addProjectRdduty(scanDetailList);
 
-        saveToDb(scanDetails);
+            saveToDb(scanDetails);
 
-        Map<String, List<ScanDetail>> detail = dealScanDetal(scanDetails);
+            Map<String, List<ScanDetail>> detail = dealScanDetal(scanDetails);
 
-        List<String> rdReceiver = new ArrayList<String>();
-        rdReceiver.add("rdTeam");
+            List<String> rdReceiver = new ArrayList<String>();
+            rdReceiver.add("rdTeam");
 
-        sendMail(detail.get("delayDetailLists"), detail.get("failDetailLists"), rdReceiver);
+            sendMail(detail.get("delayDetailLists"), detail.get("failDetailLists"), rdReceiver);
 
 
-        //按项目将异常分类
-        Map<String, List<ScanDetail>> diffScanDetails = splitScanDetails(scanDetails);
+            //按项目将异常分类
+            Map<String, List<ScanDetail>> diffScanDetails = splitScanDetails(scanDetails);
 
-        logger.info("ScanTask SendEmail");
-        for (Map.Entry<String, List<ScanDetail>> entry : diffScanDetails.entrySet()) {
+            logger.info("ScanTask SendEmail");
+            for (Map.Entry<String, List<ScanDetail>> entry : diffScanDetails.entrySet()) {
 
-            List<String> receiverEmail = new ArrayList<String>();
-            if("not found".equals(entry.getKey())){
-                receiverEmail.add("rdTeam");
-            }else {
-
-                CmdbResult<CmdbProject> result = CmdbManager.getProject(entry.getKey());
-                String receiver;
-                if (null == result || null == result.cmdbResult) {
-                    receiver = "shiyun.lv";
+                List<String> receiverEmail = new ArrayList<String>();
+                if ("not found".equals(entry.getKey())) {
+                    receiverEmail.add("rdTeam");
                 } else {
-                    receiver = result.cmdbResult.getRd_duty();
+
+                    CmdbResult<CmdbProject> result = CmdbManager.getProject(entry.getKey());
+                    String receiver;
+                    if (null == result || null == result.cmdbResult) {
+                        receiver = "shiyun.lv";
+                    } else {
+                        receiver = result.cmdbResult.getRd_duty();
+                    }
+
+                    receiverEmail = getReceiverEmails(receiver);
                 }
+                Map<String, List<ScanDetail>> detailMap = dealScanDetal(entry.getValue());
 
-                receiverEmail = getReceiverEmails(receiver);
+                if ((detailMap.get("delayDetailLists").size() > 0) || (detailMap.get("failDetailLists").size() > 0)) {
+
+                    sendMail(detailMap.get("delayDetailLists"), detailMap.get("failDetailLists"), receiverEmail);
+                }
             }
-            Map<String, List<ScanDetail>> detailMap = dealScanDetal(entry.getValue());
-
-            if ((detailMap.get("delayDetailLists").size() > 0) || (detailMap.get("failDetailLists").size() > 0)) {
-
-                sendMail(detailMap.get("delayDetailLists"), detailMap.get("failDetailLists"), receiverEmail);
-            }
+        }catch (Exception e){
+            logger.error("ScanTask Error:" + e);
         }
     }
 
