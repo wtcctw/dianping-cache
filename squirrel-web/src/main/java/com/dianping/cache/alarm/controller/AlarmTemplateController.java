@@ -57,6 +57,7 @@ public class AlarmTemplateController extends AbstractSidebarController {
         AlarmTemplate redisDownAlarmTemplate = new AlarmTemplate(5,"Default","Redis宕机",false,0,false,0,0,0,false,false,false,new Date(),new Date());
         AlarmTemplate redisMemAlarmTemplate = new AlarmTemplate(6,"Default","Redis内存",false,85,false,10,50,60,false,false,false,new Date(),new Date());
         AlarmTemplate redisQPSAlarmTemplate = new AlarmTemplate(7,"Default","RedisQPS",false,80000,false,5000,50000,60,false,false,false,new Date(),new Date());
+        AlarmTemplate redisConsistencyAlarmTemplate = new AlarmTemplate(8,"Default","Redis主从一致",false,0,false,0,0,0,false,false,false,new Date(),new Date());
 
         List<AlarmTemplate> alarmTemplateList = new ArrayList<AlarmTemplate>();
         alarmTemplateList.add(memcacheDownAlarmTemplate);
@@ -66,6 +67,7 @@ public class AlarmTemplateController extends AbstractSidebarController {
         alarmTemplateList.add(redisDownAlarmTemplate);
         alarmTemplateList.add(redisMemAlarmTemplate);
         alarmTemplateList.add(redisQPSAlarmTemplate);
+        alarmTemplateList.add(redisConsistencyAlarmTemplate);
         return alarmTemplateList;
     }
 

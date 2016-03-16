@@ -91,7 +91,7 @@ module
         function ($rootScope, $scope, $http, Paginator, ngDialog, $interval) {
 
             $scope.clusterTypes = ["Memcache", "Redis"];
-            $scope.alarmTypes = ["Memcache宕机","Memcache内存", "MemcacheQPS","Memcache连接数","Redis宕机","Redis内存","RedisQPS"];
+            $scope.alarmTypes = ["Memcache宕机","Memcache内存", "MemcacheQPS","Memcache连接数","Redis宕机","Redis内存","RedisQPS","Redis主从一致"];
             $scope.memcacheAlarmTemplates;
             $scope.redisAlarmTemplates;
             $scope.alarmTemplates;
