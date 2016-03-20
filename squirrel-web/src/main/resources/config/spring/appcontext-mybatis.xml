@@ -129,6 +129,12 @@
 		<property name="sqlSessionFactory" ref="sqlSessionFactory"/>
 	</bean>
 
+	<bean id="scanStatisticsDao" class="org.mybatis.spring.mapper.MapperFactoryBean">
+		<property name="mapperInterface" value="com.dianping.cache.alarm.dao.ScanStatisticsDao"/>
+		<property name="sqlSessionFactory" ref="sqlSessionFactory"/>
+	</bean>
+
+
     <bean id="taskDao" class="org.mybatis.spring.mapper.MapperFactoryBean">
         <property name="mapperInterface" value="com.dianping.squirrel.dao.TaskDao"/>
         <property name="sqlSessionFactory" ref="sqlSessionFactory"/>

@@ -1,7 +1,8 @@
 package com.dianping.cache.controller;
 
-
-
+import com.dianping.cache.alarm.entity.ScanStatistics;
+import com.dianping.cache.alarm.report.scanService.ScanStatisticsService;
+import com.dianping.cache.alarm.utils.DateUtil;
 import com.dianping.cache.controller.vo.IndexData;
 import com.dianping.cache.controller.vo.MemcachedDashBoardData;
 import com.dianping.cache.controller.vo.RedisDashBoardData;
@@ -15,12 +16,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
+import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-
 @Controller
 public class IndexController extends AbstractMenuController{
+	private static final long MS_PER_HOUR = 1000 * 60 * 60;
+	private static final long MS_PER_DAY = MS_PER_HOUR * 24;
 
 	@Autowired
 	private CacheConfigurationService cacheConfigurationService;
@@ -34,6 +39,10 @@ public class IndexController extends AbstractMenuController{
 	@Autowired
 	private PaasApiService paasApiService;
 
+
+	@Autowired
+	private ScanStatisticsService scanStatisticsService;
+
 	@RequestMapping(value = "/")
 	public ModelAndView allApps() {
 		return new ModelAndView("cluster/dashboard",createViewMap());
@@ -43,6 +52,18 @@ public class IndexController extends AbstractMenuController{
 	@ResponseBody
 	public IndexData dashdata(){
 		IndexData data = new IndexData();
+
+		getMemcacheRedisIndexData(data);
+
+		getMachineStatusIndexData(data);
+
+		getScanStatistics(data);
+
+		return data;
+	}
+
+
+	private void getMemcacheRedisIndexData(IndexData data){
 		long start = (System.currentTimeMillis() - TimeUnit.MILLISECONDS.convert(7, TimeUnit.DAYS))/1000;
 		int total = 0;
 		int redisCount = 0,memcachedCount = 0,redisInc = 0,memcachedInc=0;
@@ -73,13 +94,14 @@ public class IndexController extends AbstractMenuController{
 			memcachedCapacity += ms.getMaxMemory();
 		}
 
-
-
 		data.setTotalNum(total);
 		data.setCountInc(redisInc+memcachedInc);
 		data.setRedisCapacity(redisCapacity);
 		data.setMemcachedCapacity(memcachedCapacity);
 		data.setCapacity(redisCapacity + memcachedCapacity);
+	}
+
+	private void getMachineStatusIndexData(IndexData data) {
 
 		List<MachineStatusBean> beans = paasApiService.getMachineStatus();
 		long totalMC = 0,freeMC = 0;
@@ -89,11 +111,41 @@ public class IndexController extends AbstractMenuController{
 			//System.out.println(bean.getIp() + "/" + bean.getMemoryFree());
 		}
 		data.setTotalMachines(beans.size());
-		data.setTotalMachineCapacity((int) (totalMC/1024/1024/1024/2));
-		data.setFreeMachineCapacity((int) (freeMC/1024/1024/1024/2));
+		data.setTotalMachineCapacity((int) (totalMC / 1024 / 1024 / 1024 / 2));
+		data.setFreeMachineCapacity((int) (freeMC / 1024 / 1024 / 1024 / 2));
 
-		return data;
 	}
 
+	private void getScanStatistics(IndexData data) {
+
+		List<ScanStatistics> scanStatisticsList = new ArrayList<ScanStatistics>();
+		Date now = new Date();
+		for(int i = 1;i <= 7;i ++){
+			Date day = new Date(now.getTime() - i * MS_PER_DAY);
+			String dayText =   DateUtil.getCatDayString(day);
+			List<ScanStatistics> statistics = scanStatisticsService.findByCreateTime(dayText);
+			if(0 != statistics.size()) {
+				scanStatisticsList.add(statistics.get(0));
+			}
+		}
+
+		List<String> createTimeList = new ArrayList<String>();
+		List<Long> totalCountList = new ArrayList<Long>();
+		List<Double> failurePercentList = new ArrayList<Double>();
+		List<Double> avgDelayList = new ArrayList<Double>();
+
+		DecimalFormat df   = new DecimalFormat("######0.00");
+		for(ScanStatistics statistics: scanStatisticsList){
+			createTimeList.add(statistics.getCreateTime());
+			totalCountList.add(statistics.getTotalCount()/100000000);
+			failurePercentList.add(Double.parseDouble(df.format(statistics.getFailurePercent()*100000)));
+			avgDelayList.add(Double.parseDouble(df.format(statistics.getAvgDelay())));
+		}
+
+		data.setCreateTimeList(createTimeList);
+		data.setTotalCountList(totalCountList);
+		data.setFailurePercentList(failurePercentList);
+		data.setAvgDelayList(avgDelayList);
+	}
 
 }

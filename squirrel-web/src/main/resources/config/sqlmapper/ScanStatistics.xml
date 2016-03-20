@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.dianping.cache.alarm.dao.ScanStatisticsDao">
+
+    <resultMap id="ScanStatisticsResult" type="ScanStatistics">
+        <result column="id" property="id"/>
+        <result column="totalCount" property="totalCount"/>
+        <result column="failureCount" property="failureCount"/>
+        <result column="failurePercent" property="failurePercent"/>
+        <result column="avgDelay" property="avgDelay"/>
+        <result column="createTime" property="createTime"/>
+        <result column="updateTime" property="updateTime"/>
+    </resultMap>
+
+    <insert id="insert" parameterType="ScanStatistics">
+        INSERT INTO scan_statistics(id,totalCount, failureCount,failurePercent,avgDelay,createTime,updateTime)
+        VALUES(#{id},#{totalCount}, #{failureCount},#{failurePercent},#{avgDelay},#{createTime},#{updateTime})
+    </insert>
+
+    <select id="findByCreateTime" resultMap="ScanStatisticsResult" parameterType="String">
+        SELECT id,totalCount, failureCount,failurePercent,avgDelay,createTime,updateTime
+        FROM scan_statistics
+        WHERE createTime = #{createTime}
+        ORDER BY id DESC
+    </select>
+
+    <select id="findAll" resultMap="ScanStatisticsResult">
+        SELECT id,totalCount, failureCount,failurePercent,avgDelay,createTime,updateTime
+        FROM scan_statistics
+        ORDER BY id ASC
+    </select>
+
+    <select id="findByPage" resultMap="ScanStatisticsResult" parameterType="map">
+        SELECT id,totalCount, failureCount,failurePercent,avgDelay,createTime,updateTime
+        FROM scan_statistics
+        ORDER BY id DESC
+        LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+    
+
+    <select id="search" resultType="ScanStatistics">
+        ${paramSQL}
+    </select>
+
+</mapper>

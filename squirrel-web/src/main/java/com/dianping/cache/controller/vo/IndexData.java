@@ -1,5 +1,7 @@
 package com.dianping.cache.controller.vo;
 
+import java.util.List;
+
 /**
  * hui.wang@dianping.com
  * Created by hui.wang on 16/1/22.
@@ -24,6 +26,16 @@ public class IndexData {
     private int freeMachineCapacity;
     private String totalMachineCapacityString;
     private String freeMachineCapacityString;
+
+
+    private List<String> createTimeList;
+
+    private List<Long> totalCountList;
+
+    private List<Double>failurePercentList;
+
+    private List<Double>avgDelayList;
+
 
     public int getTotalNum() {
         return totalNum;
@@ -157,6 +169,38 @@ public class IndexData {
 
     public void setFreeMachineCapacityString(String freeMachineCapacityString) {
         this.freeMachineCapacityString = freeMachineCapacityString;
+    }
+
+    public List<String> getCreateTimeList() {
+        return createTimeList;
+    }
+
+    public void setCreateTimeList(List<String> createTimeList) {
+        this.createTimeList = createTimeList;
+    }
+
+    public List<Long> getTotalCountList() {
+        return totalCountList;
+    }
+
+    public void setTotalCountList(List<Long> totalCountList) {
+        this.totalCountList = totalCountList;
+    }
+
+    public List<Double> getFailurePercentList() {
+        return failurePercentList;
+    }
+
+    public void setFailurePercentList(List<Double> failurePercentList) {
+        this.failurePercentList = failurePercentList;
+    }
+
+    public List<Double> getAvgDelayList() {
+        return avgDelayList;
+    }
+
+    public void setAvgDelayList(List<Double> avgDelayList) {
+        this.avgDelayList = avgDelayList;
     }
 
     private String convertT(int capacity){
