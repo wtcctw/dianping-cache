@@ -141,7 +141,7 @@ public class IndexController extends AbstractMenuController{
 		for(ScanStatistics statistics: scanStatisticsList){
 			createTimeList.add(statistics.getCreateTime());
 			totalCountListSquirrel.add(statistics.getTotalCountSquirrel() / 100000000);
-			totalCountListCache.add(statistics.getTotalCountSquirrel() / 100000000);
+			totalCountListCache.add(statistics.getTotalCountCache() / 100000000);
 			failurePercentListSquirrel.add(statistics.getFailurePercentSquirrel());
 			failurePercentListCache.add(statistics.getFailurePercentCache());
 			avgDelayListSquirrel.add(Double.parseDouble(df.format(statistics.getAvgDelaySquirrel())));
