@@ -130,22 +130,32 @@ public class IndexController extends AbstractMenuController{
 		}
 
 		List<String> createTimeList = new ArrayList<String>();
-		List<Long> totalCountList = new ArrayList<Long>();
-		List<Double> failurePercentList = new ArrayList<Double>();
-		List<Double> avgDelayList = new ArrayList<Double>();
+		List<Long> totalCountListSquirrel = new ArrayList<Long>();
+		List<Double> failurePercentListSquirrel = new ArrayList<Double>();
+		List<Double> avgDelayListSquirrel = new ArrayList<Double>();
+		List<Long> totalCountListCache = new ArrayList<Long>();
+		List<Double> failurePercentListCache = new ArrayList<Double>();
+		List<Double> avgDelayListCache = new ArrayList<Double>();
 
 		DecimalFormat df   = new DecimalFormat("######0.00");
 		for(ScanStatistics statistics: scanStatisticsList){
 			createTimeList.add(statistics.getCreateTime());
-			totalCountList.add(statistics.getTotalCount()/100000000);
-			failurePercentList.add(Double.parseDouble(df.format(statistics.getFailurePercent()*100000)));
-			avgDelayList.add(Double.parseDouble(df.format(statistics.getAvgDelay())));
+			totalCountListSquirrel.add(statistics.getTotalCountSquirrel() / 100000000);
+			totalCountListCache.add(statistics.getTotalCountSquirrel() / 100000000);
+			failurePercentListSquirrel.add(statistics.getFailurePercentSquirrel());
+			failurePercentListCache.add(statistics.getFailurePercentCache());
+			avgDelayListSquirrel.add(Double.parseDouble(df.format(statistics.getAvgDelaySquirrel())));
+			avgDelayListCache.add(Double.parseDouble(df.format(statistics.getAvgDelayCache())));
+
 		}
 
 		data.setCreateTimeList(createTimeList);
-		data.setTotalCountList(totalCountList);
-		data.setFailurePercentList(failurePercentList);
-		data.setAvgDelayList(avgDelayList);
+		data.setTotalCountListSquirrel(totalCountListSquirrel);
+		data.setTotalCountListCache(totalCountListCache);
+		data.setFailurePercentListSquirrel(failurePercentListSquirrel);
+		data.setFailurePercentListCache(failurePercentListCache);
+		data.setAvgDelayListSquirrel(avgDelayListSquirrel);
+		data.setAvgDelayListCache(avgDelayListCache);
 	}
 
 }

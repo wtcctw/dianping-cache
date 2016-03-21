@@ -7,13 +7,21 @@ public class ScanStatistics {
 
     private int id;
 
-    private long totalCount;
+    private long totalCountSquirrel;
 
-    private long failureCount;
+    private long failureCountSquirrel;
 
-    private double failurePercent;
+    private double failurePercentSquirrel;
 
-    private double avgDelay;
+    private double avgDelaySquirrel;
+
+    private long totalCountCache;
+
+    private long failureCountCache;
+
+    private double failurePercentCache;
+
+    private double avgDelayCache;
 
     private String createTime;
 
@@ -23,24 +31,19 @@ public class ScanStatistics {
 
     }
 
-    public ScanStatistics(long totalCount, long failureCount, double failurePercent, double avgDelay, String createTime, String updateTime) {
-        this.setTotalCount(totalCount)
-                .setFailureCount(failureCount)
-                .setFailurePercent(failurePercent)
-                .setAvgDelay(avgDelay)
+    public ScanStatistics(long totalCountSquirrel, long failureCountSquirrel, double failurePercentSquirrel, double avgDelaySquirrel,long totalCountCache, long failureCountCache, double failurePercentCache, double avgDelayCache, String createTime, String updateTime) {
+        this.setTotalCountSquirrel(totalCountSquirrel)
+                .setTotalCountCache(totalCountCache)
+                .setFailureCountSquirrel(failureCountSquirrel)
+                .setFailureCountCache(failureCountCache)
+                .setFailurePercentSquirrel(failurePercentSquirrel)
+                .setFailureCountCache(failureCountCache)
+                .setAvgDelaySquirrel(avgDelaySquirrel)
+                .setAvgDelayCache(avgDelayCache)
                 .setCreateTime(createTime)
                 .setUpdateTime(updateTime);
     }
 
-    public ScanStatistics(int id, long totalCount, long failureCount, double failurePercent, double avgDelay, String createTime, String updateTime){
-        this.setId(id)
-                .setTotalCount(totalCount)
-                .setFailureCount(failureCount)
-                .setFailurePercent(failurePercent)
-                .setAvgDelay(avgDelay)
-                .setCreateTime(createTime)
-                .setUpdateTime(updateTime);
-    }
 
     public int getId() {
         return id;
@@ -51,39 +54,75 @@ public class ScanStatistics {
         return this;
     }
 
-    public long getTotalCount() {
-        return totalCount;
+    public long getTotalCountSquirrel() {
+        return totalCountSquirrel;
     }
 
-    public ScanStatistics setTotalCount(long totalCount) {
-        this.totalCount = totalCount;
+    public ScanStatistics setTotalCountSquirrel(long totalCountSquirrel) {
+        this.totalCountSquirrel = totalCountSquirrel;
         return this;
     }
 
-    public long getFailureCount() {
-        return failureCount;
+    public long getFailureCountSquirrel() {
+        return failureCountSquirrel;
     }
 
-    public ScanStatistics setFailureCount(long failureCount) {
-        this.failureCount = failureCount;
+    public ScanStatistics setFailureCountSquirrel(long failureCountSquirrel) {
+        this.failureCountSquirrel = failureCountSquirrel;
         return this;
     }
 
-    public double getFailurePercent() {
-        return failurePercent;
+    public double getFailurePercentSquirrel() {
+        return failurePercentSquirrel;
     }
 
-    public ScanStatistics setFailurePercent(double failurePercent) {
-        this.failurePercent = failurePercent;
+    public ScanStatistics setFailurePercentSquirrel(double failurePercentSquirrel) {
+        this.failurePercentSquirrel = failurePercentSquirrel;
         return this;
     }
 
-    public double getAvgDelay() {
-        return avgDelay;
+    public double getAvgDelaySquirrel() {
+        return avgDelaySquirrel;
     }
 
-    public ScanStatistics setAvgDelay(double avgDelay) {
-        this.avgDelay = avgDelay;
+    public ScanStatistics setAvgDelaySquirrel(double avgDelaySquirrel) {
+        this.avgDelaySquirrel = avgDelaySquirrel;
+        return this;
+    }
+
+    public long getTotalCountCache() {
+        return totalCountCache;
+    }
+
+    public ScanStatistics setTotalCountCache(long totalCountCache) {
+        this.totalCountCache = totalCountCache;
+        return this;
+    }
+
+    public long getFailureCountCache() {
+        return failureCountCache;
+    }
+
+    public ScanStatistics setFailureCountCache(long failureCountCache) {
+        this.failureCountCache = failureCountCache;
+        return this;
+    }
+
+    public double getFailurePercentCache() {
+        return failurePercentCache;
+    }
+
+    public ScanStatistics setFailurePercentCache(double failurePercentCache) {
+        this.failurePercentCache = failurePercentCache;
+        return this;
+    }
+
+    public double getAvgDelayCache() {
+        return avgDelayCache;
+    }
+
+    public ScanStatistics setAvgDelayCache(double avgDelayCache) {
+        this.avgDelayCache = avgDelayCache;
         return this;
     }
 

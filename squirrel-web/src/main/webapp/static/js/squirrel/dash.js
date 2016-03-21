@@ -8,16 +8,16 @@ module.controller('IndexController', ['$scope', '$http', '$document', function (
             params: {}
         }).success(function (data) {
             $scope.indexData = data;
-            newChart('containerQPS','一周内请求量',$scope.indexData.createTimeList,'请求量/亿次',$scope.indexData.totalCountList,'请求量');
-            newChart('containerFailure','一周内失败率',$scope.indexData.createTimeList,'失败率/千万分之一',$scope.indexData.failurePercentList,'失败率');
-            newChart('containerAvgDelay','一周内平均延迟',$scope.indexData.createTimeList,'平均延迟/ms',$scope.indexData.avgDelayList,'平均延迟');
+            newChart('containerQPS', '一周内请求量', $scope.indexData.createTimeList, '请求量/亿次', $scope.indexData.totalCountListSquirrel, 'Squirrel',$scope.indexData.totalCountListCache, 'Cache');
+            newChart('containerFailure', '一周内失败率', $scope.indexData.createTimeList, '失败率/%', $scope.indexData.failurePercentListSquirrel, 'Squirrel',$scope.indexData.failurePercentListCache, 'Cache');
+            newChart('containerAvgDelay', '一周内平均延迟', $scope.indexData.createTimeList, '平均延迟/ms', $scope.indexData.avgDelayListSquirrel, 'Squirrel',$scope.indexData.avgDelayListCache, 'Cache');
         });
 
     }
 
     $scope.init();
 
-    function newChart(renderto,title,createTimeList,yAxisTitle,totalCountList,seriesName){
+    function newChart(renderto, title, createTimeList, yAxisTitle, listSquirrel, seriesNameSquirrel,listCache, seriesNameCache) {
         chart = new Highcharts.Chart({
             chart: {
                 renderTo: renderto
@@ -50,10 +50,12 @@ module.controller('IndexController', ['$scope', '$http', '$document', function (
                 borderWidth: 0
             },
             series: [{
-                name: seriesName,
-                data: totalCountList
-            }]
-        });
+                name: seriesNameSquirrel,
+                data: listSquirrel
+            }, {
+                    name: seriesNameCache,
+                    data: listCache
+                }]});
     }
 
 

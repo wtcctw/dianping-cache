@@ -30,11 +30,17 @@ public class IndexData {
 
     private List<String> createTimeList;
 
-    private List<Long> totalCountList;
+    private List<Long> totalCountListSquirrel;
 
-    private List<Double>failurePercentList;
+    private List<Double>failurePercentListSquirrel;
 
-    private List<Double>avgDelayList;
+    private List<Double>avgDelayListSquirrel;
+
+    private List<Long> totalCountListCache;
+
+    private List<Double>failurePercentListCache;
+
+    private List<Double>avgDelayListCache;
 
 
     public int getTotalNum() {
@@ -179,28 +185,52 @@ public class IndexData {
         this.createTimeList = createTimeList;
     }
 
-    public List<Long> getTotalCountList() {
-        return totalCountList;
+    public List<Long> getTotalCountListSquirrel() {
+        return totalCountListSquirrel;
     }
 
-    public void setTotalCountList(List<Long> totalCountList) {
-        this.totalCountList = totalCountList;
+    public void setTotalCountListSquirrel(List<Long> totalCountListSquirrel) {
+        this.totalCountListSquirrel = totalCountListSquirrel;
     }
 
-    public List<Double> getFailurePercentList() {
-        return failurePercentList;
+    public List<Double> getFailurePercentListSquirrel() {
+        return failurePercentListSquirrel;
     }
 
-    public void setFailurePercentList(List<Double> failurePercentList) {
-        this.failurePercentList = failurePercentList;
+    public void setFailurePercentListSquirrel(List<Double> failurePercentListSquirrel) {
+        this.failurePercentListSquirrel = failurePercentListSquirrel;
     }
 
-    public List<Double> getAvgDelayList() {
-        return avgDelayList;
+    public List<Double> getAvgDelayListSquirrel() {
+        return avgDelayListSquirrel;
     }
 
-    public void setAvgDelayList(List<Double> avgDelayList) {
-        this.avgDelayList = avgDelayList;
+    public void setAvgDelayListSquirrel(List<Double> avgDelayListSquirrel) {
+        this.avgDelayListSquirrel = avgDelayListSquirrel;
+    }
+
+    public List<Long> getTotalCountListCache() {
+        return totalCountListCache;
+    }
+
+    public void setTotalCountListCache(List<Long> totalCountListCache) {
+        this.totalCountListCache = totalCountListCache;
+    }
+
+    public List<Double> getFailurePercentListCache() {
+        return failurePercentListCache;
+    }
+
+    public void setFailurePercentListCache(List<Double> failurePercentListCache) {
+        this.failurePercentListCache = failurePercentListCache;
+    }
+
+    public List<Double> getAvgDelayListCache() {
+        return avgDelayListCache;
+    }
+
+    public void setAvgDelayListCache(List<Double> avgDelayListCache) {
+        this.avgDelayListCache = avgDelayListCache;
     }
 
     private String convertT(int capacity){
