@@ -265,7 +265,7 @@ public class RedisAlarmer extends AbstractRedisAlarmer {
 
         try {
 
-            logger.info("isQpsFlucAlarm: start……" + item.getClusterName());
+//            logger.info("isQpsFlucAlarm: start……" + item.getClusterName());
             boolean flag = false;
 
             //QPS
@@ -296,11 +296,11 @@ public class RedisAlarmer extends AbstractRedisAlarmer {
                     return flag;
                 }
 
-                logger.info("isQpsFlucAlarm: cur qps=" + node.getMaster().getInfo().getQps() + " " + item.getClusterName());
-                logger.info("isQpsFlucAlarm: minQps =" + minQps + " " + item.getClusterName());
+//                logger.info("isQpsFlucAlarm: cur qps=" + node.getMaster().getInfo().getQps() + " " + item.getClusterName());
+//                logger.info("isQpsFlucAlarm: minQps =" + minQps + " " + item.getClusterName());
 
                 if (qpsSwitch && (0 != minQps) && (node.getMaster().getInfo().getQps() < qpsBase)) {
-                    logger.info("isQpsFlucAlarm: qps fluc too much ……" + item.getClusterName());
+//                    logger.info("isQpsFlucAlarm: qps fluc too much ……" + item.getClusterName());
                     boolean alarmFlag = true;
 
                     if ((node.getMaster().getInfo().getQps() - minQps) > qpsFluc) {
@@ -379,7 +379,7 @@ public class RedisAlarmer extends AbstractRedisAlarmer {
         try {
 
 
-            logger.info("isMemFlucAlarm: start……" + item.getClusterName());
+//            logger.info("isMemFlucAlarm: start……" + item.getClusterName());
             boolean flag = false;
 
             boolean memSwitch = alarmTemplate.isFlucSwitch();
@@ -395,10 +395,10 @@ public class RedisAlarmer extends AbstractRedisAlarmer {
             if (0 == minMemUsage) {
                 return flag;
             }
-            logger.info("isMemFlucAlarm: curMemUsage=" + node.getMaster().getInfo().getUsed() * 100 + " " + item.getClusterName());
-            logger.info("isMemFlucAlarm: minMemUsage=" + minMemUsage + " " + item.getClusterName());
+//            logger.info("isMemFlucAlarm: curMemUsage=" + node.getMaster().getInfo().getUsed() * 100 + " " + item.getClusterName());
+//            logger.info("isMemFlucAlarm: minMemUsage=" + minMemUsage + " " + item.getClusterName());
             if (memSwitch && (0 != minMemUsage) && (node.getMaster().getInfo().getUsed() * 100 < memBase)) {
-                logger.info("isMemFlucAlarm: memusage fluc too much……" + item.getClusterName());
+//                logger.info("isMemFlucAlarm: memusage fluc too much……" + item.getClusterName());
 
                 boolean alarmFlag = true;
 
