@@ -11,9 +11,13 @@ public class ScanDetail {
 
     private String project;
 
-    private int totalCount;
+    private String projectName;
 
-    private int failCount;
+    private String rdDuty;
+
+    private long totalCount;
+
+    private long failCount;
 
     private double failPercent;
 
@@ -104,20 +108,38 @@ public class ScanDetail {
         return this;
     }
 
-    public int getTotalCount() {
+    public String getProjectName() {
+        return projectName;
+    }
+
+    public ScanDetail setProjectName(String projectName) {
+        this.projectName = projectName;
+        return this;
+    }
+
+    public String getRdDuty() {
+        return rdDuty;
+    }
+
+    public ScanDetail setRdDuty(String rdDuty) {
+        this.rdDuty = rdDuty;
+        return this;
+    }
+
+    public long getTotalCount() {
         return totalCount;
     }
 
-    public ScanDetail setTotalCount(int totalCount) {
+    public ScanDetail setTotalCount(long totalCount) {
         this.totalCount = totalCount;
         return this;
     }
 
-    public int getFailCount() {
+    public long getFailCount() {
         return failCount;
     }
 
-    public ScanDetail setFailCount(int failCount) {
+    public ScanDetail setFailCount(long failCount) {
         this.failCount = failCount;
         return this;
     }

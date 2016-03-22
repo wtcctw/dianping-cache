@@ -9,6 +9,8 @@
         <result column="id" property="id"/>
         <result column="cacheName" property="cacheName"/>
         <result column="project" property="project"/>
+        <result column="projectName" property="projectName"/>
+        <result column="rdDuty" property="rdDuty"/>
         <result column="totalCount" property="totalCount"/>
         <result column="failCount" property="failCount"/>
         <result column="failPercent" property="failPercent"/>
@@ -26,25 +28,25 @@
     </resultMap>
 
     <insert id="insert" parameterType="ScanDetail">
-        INSERT INTO scan_detail(cacheName, project,totalCount,failCount,failPercent,minVal,maxVal,avgVal,sumVal,sum2,std,tps,line95Value,line99Value,createTime,updateTime)
-        VALUES(#{cacheName}, #{project},#{totalCount},#{failCount},#{failPercent},#{minVal},#{maxVal},#{avgVal},#{sumVal},#{sum2},#{std},#{tps},#{line95Value},#{line99Value},#{createTime},#{updateTime})
+        INSERT INTO scan_detail(cacheName, project,projectName,rdDuty,totalCount,failCount,failPercent,minVal,maxVal,avgVal,sumVal,sum2,std,tps,line95Value,line99Value,createTime,updateTime)
+        VALUES(#{cacheName}, #{project},#{projectName},#{rdDuty},#{totalCount},#{failCount},#{failPercent},#{minVal},#{maxVal},#{avgVal},#{sumVal},#{sum2},#{std},#{tps},#{line95Value},#{line99Value},#{createTime},#{updateTime})
     </insert>
 
     <select id="findByCreateTime" resultMap="ScanDetailResult" parameterType="String">
-        SELECT id,cacheName, project,totalCount,failCount,failPercent,minVal,maxVal,avgVal,sumVal,sum2,std,tps,line95Value,line99Value,createTime,updateTime
+        SELECT id,cacheName, project,projectName,rdDuty,totalCount,failCount,failPercent,minVal,maxVal,avgVal,sumVal,sum2,std,tps,line95Value,line99Value,createTime,updateTime
         FROM scan_detail
         WHERE createTime = #{createTime}
         ORDER BY id DESC
     </select>
 
     <select id="findAll" resultMap="ScanDetailResult">
-        SELECT id,cacheName, project,totalCount,failCount,failPercent,minVal,maxVal,avgVal,sumVal,sum2,std,tps,line95Value,line99Value,createTime,updateTime
+        SELECT id,cacheName, project,projectName,rdDuty,totalCount,failCount,failPercent,minVal,maxVal,avgVal,sumVal,sum2,std,tps,line95Value,line99Value,createTime,updateTime
         FROM scan_detail
         ORDER BY cacheName DESC
     </select>
 
     <select id="findByPage" resultMap="ScanDetailResult" parameterType="map">
-        SELECT id,cacheName, project,totalCount,failCount,failPercent,minVal,maxVal,avgVal,sumVal,sum2,std,tps,line95Value,line99Value,createTime,updateTime
+        SELECT id,cacheName, project,projectName,rdDuty,totalCount,failCount,failPercent,minVal,maxVal,avgVal,sumVal,sum2,std,tps,line95Value,line99Value,createTime,updateTime
         FROM scan_detail
         ORDER BY id DESC
         LIMIT #{limit} OFFSET #{offset}

@@ -4,8 +4,9 @@ import com.dianping.ba.hris.md.api.dto.EmployeeDto;
 import com.dianping.ba.hris.md.api.service.EmployeeService;
 import com.dianping.cache.alarm.email.SpringMailSender;
 import com.dianping.cache.alarm.entity.ScanDetail;
-import com.dianping.cache.alarm.receiver.ReceiverService;
+import com.dianping.cache.alarm.entity.ScanStatistics;
 import com.dianping.cache.alarm.report.scanService.ScanDetailService;
+import com.dianping.cache.alarm.report.scanService.ScanStatisticsService;
 import com.dianping.cache.alarm.utils.DateUtil;
 import com.dianping.cache.entity.CategoryToApp;
 import com.dianping.cache.service.CategoryToAppService;
@@ -51,6 +52,9 @@ public class ScanTask {
     ScanDetailService scanDetailService;
 
     @Autowired
+    ScanStatisticsService scanStatisticsService;
+
+    @Autowired
     CategoryToAppService categoryToAppService;
 
     @Autowired
@@ -58,47 +62,120 @@ public class ScanTask {
 
 
     public void run() throws InterruptedException, DocumentException, URISyntaxException, MessagingException {
-        logger.info("ScanTask run");
+        try {
+            logger.info("ScanTask run");
 
-        List<ScanDetail> scanDetails = AlarmScanDetails();
+            List<ScanDetail> scanDetailList = AlarmScanDetails();
 
-        saveToDb(scanDetails);
+            List<ScanDetail> scanDetails = addProjectRdduty(scanDetailList);
 
-        Map<String, List<ScanDetail>> diffScanDetails = splitScanDetails(scanDetails);
+            saveToDb(scanDetails);
 
-        logger.info("ScanTask SendEmail");
-        for (Map.Entry<String, List<ScanDetail>> entry : diffScanDetails.entrySet()) {
+            Map<String, List<ScanDetail>> detail = dealScanDetal(scanDetails);
 
-            CmdbResult<CmdbProject> result = CmdbManager.getProject(entry.getKey());
-            String receiver;
-            if(null == result){
-                receiver = "shiyun.lv";
+            List<String> rdReceiver = new ArrayList<String>();
+            rdReceiver.add("rdTeam");
+
+            sendMail(detail.get("delayDetailLists"), detail.get("failDetailLists"), rdReceiver);
+
+
+            //按项目将异常分类
+            Map<String, List<ScanDetail>> diffScanDetails = splitScanDetails(scanDetails);
+
+            logger.info("ScanTask SendEmail");
+            for (Map.Entry<String, List<ScanDetail>> entry : diffScanDetails.entrySet()) {
+
+                List<String> receiverEmail = new ArrayList<String>();
+                if ("not found".equals(entry.getKey())) {
+                    receiverEmail.add("rdTeam");
+                } else {
+
+                    CmdbResult<CmdbProject> result = CmdbManager.getProject(entry.getKey());
+                    String receiver;
+                    if (null == result || null == result.cmdbResult) {
+                        receiver = "shiyun.lv";
+                    } else {
+                        receiver = result.cmdbResult.getRd_duty();
+                    }
+
+                    receiverEmail = getReceiverEmails(receiver);
+                }
+                Map<String, List<ScanDetail>> detailMap = dealScanDetal(entry.getValue());
+
+                if ((detailMap.get("delayDetailLists").size() > 0) || (detailMap.get("failDetailLists").size() > 0)) {
+
+                    sendMail(detailMap.get("delayDetailLists"), detailMap.get("failDetailLists"), receiverEmail);
+                }
+            }
+        }catch (Exception e){
+            logger.error("ScanTask Error:" + e);
+        }
+    }
+
+    private List<String> getReceiverEmails(String receiver) {
+
+        List<String> receiverEmail = new ArrayList<String>();
+        String[] receivers;
+        if(receiver.contains(",")){
+            receivers = receiver.split(",");
+
+            for(int i=0;i<receivers.length;i++){
+                List<EmployeeDto> userDtoList = employeeService.queryEmployeeByKeyword(receivers[i]);
+
+                if (0 == userDtoList.size()) {
+                    receiverEmail.add("shiyun.lv@dianping.com");
+                } else {
+                    receiverEmail.add(userDtoList.get(0).getEmail());
+                }
             }
 
-            receiver= result.cmdbResult.getRd_duty();
-
+        }else {
             List<EmployeeDto> userDtoList = employeeService.queryEmployeeByKeyword(receiver);
-            String receiverEmail = userDtoList.get(0).getEmail();
 
-            Map<String, List<ScanDetail>> detailMap = dealScanDetal(entry.getValue());
-
-            if ((detailMap.get("delayDetailLists").size() > 0) && (detailMap.get("failDetailLists").size() > 0)) {
-
-                sendMail(detailMap.get("delayDetailLists"), detailMap.get("failDetailLists"), receiverEmail);
+            if (0 == userDtoList.size()) {
+                receiverEmail.add("shiyun.lv@dianping.com");
+            } else {
+                receiverEmail.add(userDtoList.get(0).getEmail());
             }
         }
+
+        return receiverEmail;
+    }
+
+    private List<ScanDetail> addProjectRdduty(List<ScanDetail> scanDetails) {
+
+        for (ScanDetail scanDetail : scanDetails) {
+            String category = scanDetail.getProject().split(":")[0];
+
+            String appName;
+            List<CategoryToApp> categoryToAppList = categoryToAppService.findByCategory(category);
+            if (0 != categoryToAppList.size()) {
+                appName = categoryToAppService.findByCategory(category).get(0).getApplication();
+            } else {
+                appName = "not found";
+            }
+            scanDetail.setProjectName(appName);
+            CmdbResult<CmdbProject> result = CmdbManager.getProject(appName);
+
+            if((null != result)&&(null != result.cmdbResult)){
+                scanDetail.setRdDuty(result.cmdbResult.getRd_duty());
+            }else {
+                scanDetail.setRdDuty("Don't know!");
+            }
+        }
+
+        return scanDetails;
     }
 
     private void saveToDb(List<ScanDetail> scanDetails) {
         Map<String, ScanDetail> dealedDetails = new HashMap<String, ScanDetail>();
 
-
         for (ScanDetail scanDetail : scanDetails) {
             String name = scanDetail.getCacheName() + scanDetail.getProject();
 
             if (null != dealedDetails.get(name)) {
-                int total = dealedDetails.get(name).getTotalCount() + scanDetail.getTotalCount();
-                int failure = dealedDetails.get(name).getFailCount() + scanDetail.getFailCount();
+                long total = dealedDetails.get(name).getTotalCount() + scanDetail.getTotalCount();
+                long failure = dealedDetails.get(name).getFailCount() + scanDetail.getFailCount();
                 double failurePercent = failure / total;
                 double min = Math.min(dealedDetails.get(name).getMinVal(), scanDetail.getMinVal());
                 double max = Math.max(dealedDetails.get(name).getMaxVal(), scanDetail.getMaxVal());
@@ -118,149 +195,153 @@ public class ScanTask {
             }
         }
 
-        for(Map.Entry<String,ScanDetail> entry:dealedDetails.entrySet()){
+        for (Map.Entry<String, ScanDetail> entry : dealedDetails.entrySet()) {
             scanDetailService.insert(entry.getValue());
         }
     }
 
-        private Map<String, List<ScanDetail>> splitScanDetails (List < ScanDetail > scanDetails) {
-            Map<String, List<ScanDetail>> diffScanDetailMap = new HashMap<String, List<ScanDetail>>();
+    private Map<String, List<ScanDetail>> splitScanDetails(List<ScanDetail> scanDetails) {
+        Map<String, List<ScanDetail>> diffScanDetailMap = new HashMap<String, List<ScanDetail>>();
 
-            for (ScanDetail scanDetail : scanDetails) {
-                String category = scanDetail.getProject().split(":")[0];
-
-                String appName;
-                List<CategoryToApp> categoryToAppList = categoryToAppService.findByCategory(category);
-                if (0 != categoryToAppList.size()) {
-                    appName = categoryToAppService.findByCategory(category).get(0).getApplication();
-                } else {
-                    appName = "not found";
-                }
-                if (null != diffScanDetailMap.get(appName)) {
-                    diffScanDetailMap.get(appName).add(scanDetail);
-                } else {
-                    List<ScanDetail> list = new ArrayList<ScanDetail>();
-                    list.add(scanDetail);
-                    diffScanDetailMap.put(appName, list);
-                }
-            }
-
-            return diffScanDetailMap;
+        for(ScanDetail scanDetail:scanDetails){
+            scanDetail.setRowspan(0);
         }
 
-        Map<String, List<ScanDetail>> dealScanDetal (List < ScanDetail > scanDetails) {
-            Map<String, ScanDetail> failDetails = new HashMap<String, ScanDetail>();
-            Map<String, ScanDetail> delayDetails = new HashMap<String, ScanDetail>();
+        for (ScanDetail scanDetail : scanDetails) {
+            String category = scanDetail.getProject().split(":")[0];
 
-            for (ScanDetail scanDetail : scanDetails) {
-                String name = scanDetail.getCacheName() + scanDetail.getProject();
-                if (scanDetail.getAvgVal() > 10) {
-                    if (null != delayDetails.get(name)) {
-                        int total = delayDetails.get(name).getTotalCount() + scanDetail.getTotalCount();
-                        int failure = delayDetails.get(name).getFailCount() + scanDetail.getFailCount();
-                        double failurePercent = failure / total;
-                        double min = Math.min(delayDetails.get(name).getMinVal(), scanDetail.getMinVal());
-                        double max = Math.max(delayDetails.get(name).getMaxVal(), scanDetail.getMaxVal());
-                        double avg = (delayDetails.get(name).getAvgVal() * delayDetails.get(name).getTotalCount() +
-                                scanDetail.getAvgVal() * scanDetail.getTotalCount()) / (delayDetails.get(name).getTotalCount()
-                                + scanDetail.getTotalCount());
-
-                        delayDetails.get(name).setTotalCount(total)
-                                .setFailCount(failure)
-                                .setFailPercent(failurePercent)
-                                .setMinVal(min)
-                                .setMaxVal(max)
-                                .setAvgVal(avg);
-
-                    } else {
-                        delayDetails.put(name, scanDetail);
-                    }
-
-                } else if (scanDetail.getFailPercent() > 0.1) {
-
-                    if (null != failDetails.get(name)) {
-                        int total = failDetails.get(name).getTotalCount() + scanDetail.getTotalCount();
-                        int failure = failDetails.get(name).getFailCount() + scanDetail.getFailCount();
-                        double failurePercent = failure / total;
-                        double min = Math.min(failDetails.get(name).getMinVal(), scanDetail.getMinVal());
-                        double max = Math.max(failDetails.get(name).getMaxVal(), scanDetail.getMaxVal());
-                        double avg = (failDetails.get(name).getAvgVal() * failDetails.get(name).getTotalCount() +
-                                scanDetail.getAvgVal() * scanDetail.getTotalCount()) / (failDetails.get(name).getTotalCount()
-                                + scanDetail.getTotalCount());
-
-                        failDetails.get(name).setTotalCount(total)
-                                .setFailCount(failure)
-                                .setFailPercent(failurePercent)
-                                .setMinVal(min)
-                                .setMaxVal(max)
-                                .setAvgVal(avg);
-
-                    } else {
-                        failDetails.put(name, scanDetail);
-                    }
-                }
+            String appName;
+            List<CategoryToApp> categoryToAppList = categoryToAppService.findByCategory(category);
+            if (0 != categoryToAppList.size()) {
+                appName = categoryToAppService.findByCategory(category).get(0).getApplication();
+            } else {
+                appName = "not found";
             }
-
-            List<ScanDetail> failDetailList = new ArrayList<ScanDetail>();
-            List<ScanDetail> delayDetailList = new ArrayList<ScanDetail>();
-
-            for (Map.Entry<String, ScanDetail> entry : failDetails.entrySet()) {
-                ScanDetail detail = failDetails.get(entry.getKey());
-
-                failDetailList.add(detail);
+            if (null != diffScanDetailMap.get(appName)) {
+                diffScanDetailMap.get(appName).add(scanDetail);
+            } else {
+                List<ScanDetail> list = new ArrayList<ScanDetail>();
+                list.add(scanDetail);
+                diffScanDetailMap.put(appName, list);
             }
-
-            for (Map.Entry<String, ScanDetail> entry : delayDetails.entrySet()) {
-                ScanDetail detail = delayDetails.get(entry.getKey());
-                delayDetailList.add(detail);
-            }
-
-
-            List<ScanDetail> failDetailLists = dealRowSpan(failDetailList);
-            List<ScanDetail> delayDetailLists = dealRowSpan(delayDetailList);
-
-            Map<String, List<ScanDetail>> detailMap = new HashMap<String, List<ScanDetail>>();
-            detailMap.put("failDetailLists", failDetailLists);
-            detailMap.put("delayDetailLists", delayDetailLists);
-
-            return detailMap;
         }
 
-        private List<ScanDetail> dealRowSpan (List < ScanDetail > detailList) {
+        return diffScanDetailMap;
+    }
 
-            Map<String, List<ScanDetail>> detailMap = new HashMap<String, List<ScanDetail>>();
+    Map<String, List<ScanDetail>> dealScanDetal(List<ScanDetail> scanDetails) {
+        Map<String, ScanDetail> failDetails = new HashMap<String, ScanDetail>();
+        Map<String, ScanDetail> delayDetails = new HashMap<String, ScanDetail>();
 
-            List<ScanDetail> scanDetailList = new ArrayList<ScanDetail>();
+        for (ScanDetail scanDetail : scanDetails) {
+            String name = scanDetail.getCacheName() + scanDetail.getProject();
+            if (scanDetail.getAvgVal() > 10) {
+                if (null != delayDetails.get(name)) {
+                    long total = delayDetails.get(name).getTotalCount() + scanDetail.getTotalCount();
+                    long failure = delayDetails.get(name).getFailCount() + scanDetail.getFailCount();
+                    double failurePercent = failure / total;
+                    double min = Math.min(delayDetails.get(name).getMinVal(), scanDetail.getMinVal());
+                    double max = Math.max(delayDetails.get(name).getMaxVal(), scanDetail.getMaxVal());
+                    double avg = (delayDetails.get(name).getAvgVal() * delayDetails.get(name).getTotalCount() +
+                            scanDetail.getAvgVal() * scanDetail.getTotalCount()) / (delayDetails.get(name).getTotalCount()
+                            + scanDetail.getTotalCount());
 
-            for (ScanDetail scanDetail : detailList) {
-                if (null != detailMap.get(scanDetail.getCacheName())) {
-                    detailMap.get(scanDetail.getCacheName()).add(scanDetail);
+                    delayDetails.get(name).setTotalCount(total)
+                            .setFailCount(failure)
+                            .setFailPercent(failurePercent)
+                            .setMinVal(min)
+                            .setMaxVal(max)
+                            .setAvgVal(avg);
+
                 } else {
-                    List<ScanDetail> list = new ArrayList<ScanDetail>();
-                    list.add(scanDetail);
-                    detailMap.put(scanDetail.getCacheName(), list);
+                    delayDetails.put(name, scanDetail);
+                }
+
+            } else if (scanDetail.getFailPercent() > 0.1) {
+
+                if (null != failDetails.get(name)) {
+                    long total = failDetails.get(name).getTotalCount() + scanDetail.getTotalCount();
+                    long failure = failDetails.get(name).getFailCount() + scanDetail.getFailCount();
+                    double failurePercent = failure / total;
+                    double min = Math.min(failDetails.get(name).getMinVal(), scanDetail.getMinVal());
+                    double max = Math.max(failDetails.get(name).getMaxVal(), scanDetail.getMaxVal());
+                    double avg = (failDetails.get(name).getAvgVal() * failDetails.get(name).getTotalCount() +
+                            scanDetail.getAvgVal() * scanDetail.getTotalCount()) / (failDetails.get(name).getTotalCount()
+                            + scanDetail.getTotalCount());
+
+                    failDetails.get(name).setTotalCount(total)
+                            .setFailCount(failure)
+                            .setFailPercent(failurePercent)
+                            .setMinVal(min)
+                            .setMaxVal(max)
+                            .setAvgVal(avg);
+
+                } else {
+                    failDetails.put(name, scanDetail);
                 }
             }
+        }
 
-            for (Map.Entry<String, List<ScanDetail>> entry : detailMap.entrySet()) {
-                List<ScanDetail> list = detailMap.get(entry.getKey());
-                list.get(0).setRowspan(list.size());
-                scanDetailList.addAll(list);
-            }
+        List<ScanDetail> failDetailList = new ArrayList<ScanDetail>();
+        List<ScanDetail> delayDetailList = new ArrayList<ScanDetail>();
 
-            return scanDetailList;
+        for (Map.Entry<String, ScanDetail> entry : failDetails.entrySet()) {
+            ScanDetail detail = failDetails.get(entry.getKey());
 
+            failDetailList.add(detail);
+        }
+
+        for (Map.Entry<String, ScanDetail> entry : delayDetails.entrySet()) {
+            ScanDetail detail = delayDetails.get(entry.getKey());
+            delayDetailList.add(detail);
         }
 
 
-        /**
-         *  * 使用Velocity模板发送邮件
-         *  *
-         *  * @throws MessagingException
-         *  
-         */
+        List<ScanDetail> failDetailLists = dealRowSpan(failDetailList);
+        List<ScanDetail> delayDetailLists = dealRowSpan(delayDetailList);
 
-    private void sendMail(List<ScanDetail> delayDetails, List<ScanDetail> failDetails, String receiver) throws MessagingException {
+        Map<String, List<ScanDetail>> detailMap = new HashMap<String, List<ScanDetail>>();
+        detailMap.put("failDetailLists", failDetailLists);
+        detailMap.put("delayDetailLists", delayDetailLists);
+
+        return detailMap;
+    }
+
+    private List<ScanDetail> dealRowSpan(List<ScanDetail> detailList) {
+
+        Map<String, List<ScanDetail>> detailMap = new HashMap<String, List<ScanDetail>>();
+
+        List<ScanDetail> scanDetailList = new ArrayList<ScanDetail>();
+
+        for (ScanDetail scanDetail : detailList) {
+            if (null != detailMap.get(scanDetail.getCacheName())) {
+                detailMap.get(scanDetail.getCacheName()).add(scanDetail);
+            } else {
+                List<ScanDetail> list = new ArrayList<ScanDetail>();
+                list.add(scanDetail);
+                detailMap.put(scanDetail.getCacheName(), list);
+            }
+        }
+
+        for (Map.Entry<String, List<ScanDetail>> entry : detailMap.entrySet()) {
+            List<ScanDetail> list = detailMap.get(entry.getKey());
+            list.get(0).setRowspan(list.size());
+            scanDetailList.addAll(list);
+        }
+
+        return scanDetailList;
+
+    }
+
+
+    /**
+     *  * 使用Velocity模板发送邮件
+     *  *
+     *  * @throws MessagingException
+     *  
+     */
+
+    private void sendMail(List<ScanDetail> delayDetails, List<ScanDetail> failDetails, List<String> receiver) throws MessagingException {
 
         SpringMailSender mailSender = new SpringMailSender();
 
@@ -275,7 +356,6 @@ public class ScanTask {
         try {
             VelocityEngine velocityEngine = v.createVelocityEngine();
 
-
             // 声明Map对象，并填入用来填充模板文件的键值对
             Map<String, Object> model = new HashMap<String, Object>();
             model.put("delayDetails", delayDetails);
@@ -286,10 +366,20 @@ public class ScanTask {
 
             MimeMessageHelper helper = new MimeMessageHelper(msg, true);
             helper.setFrom(mailSender.getMailSender().getUsername());
-//            String[] receiverList =new String[]{"shiyun.lv@dianping.com","xiaoxiong.dai@dianping.com","dp.wang@dianping.com","enlight.chen@dianping.com","xiang.wu@dianping.com","faping.miao@dianping.com"};
-            String[] receiverList = new String[]{"shiyun.lv@dianping.com", receiver};
+            String[] receiverList;
+            if ("rdTeam".equals(receiver.get(0))) {
+                receiverList = new String[]{"shiyun.lv@dianping.com", "xiaoxiong.dai@dianping.com", "dp.wang@dianping.com", "enlight.chen@dianping.com", "xiang.wu@dianping.com", "faping.miao@dianping.com"};
+//                receiverList = new String[]{"shiyun.lv@dianping.com"};
+            } else {
+                receiver.add("shiyun.lv@dianping.com");
+                final int size = receiver.size();
+                receiverList = (String[])receiver.toArray(new String[size]);
+
+//                receiverList = new String[]{"shiyun.lv@dianping.com"};
+            }
+
             helper.setTo(receiverList);
-            helper.setSubject("缓存异常报表");
+            helper.setSubject("KV红黑榜日报表");
 
             msg.setContent(emailText, "text/html; charset=UTF-8");
 
@@ -318,21 +408,19 @@ public class ScanTask {
                 .setParameter("date", yesterdayText).setParameter("forceDownload", "xml").build();
         HttpConfig httpConfig = new HttpConfig();
         httpConfig.setRedirect(false);
-        httpConfig.setTimeout(10000);
+        httpConfig.setTimeout(100000);
         HttpGetter HTTP_GETTER = HttpGetter.create(httpConfig);
 
         HttpResult httpResult = HTTP_GETTER.getWithoutException(uri);
         int count = 0;
         while ((!httpResult.isSuccess || httpResult.response == null) && (count < 5)) {
             count++;
-            Thread.sleep(10000);
+            Thread.sleep(100000);
             httpResult = HTTP_GETTER.getWithoutException(uri);
         }
         if (httpResult.response.trim().length() == 0) {
             return null;
         }
-
-
         Document document = DocumentHelper.parseText(httpResult.response);
         org.dom4j.Element rootElement = document.getRootElement();
 
@@ -345,6 +433,19 @@ public class ScanTask {
             return null;
         }
 
+        long totalCountSquirrel = 0;
+        long failureCountSquirrel = 0;
+        double failurePercentSquirrel = 0;
+        double avgDelaySquirrel = 0;
+
+
+        long totalCountCache = 0;
+        long failureCountCache = 0;
+        double failurePercentCache = 0;
+        double avgDelayCache = 0;
+
+
+
         for (int i = 0; i < machineElement.size(); i++) {
 
             List<Element> typeElements = machineElement.get(i).elements("type");
@@ -356,36 +457,70 @@ public class ScanTask {
                     for (int k = 0; k < projectElements.size(); k++) {
                         Element e = projectElements.get(k);
 
-                        if ((Double.parseDouble(e.attribute("failPercent").getValue()) > 0.1) || (Double.parseDouble(e.attribute("avg").getValue())) > 10) {
+                        try {
+                            if(attr.getStringValue().contains("Squirrel")) {
+                                totalCountSquirrel += Long.parseLong(e.attribute("totalCount").getValue());
+                                failureCountSquirrel += Long.parseLong(e.attribute("failCount").getValue());
 
-                            ScanDetail scanDetail = new ScanDetail();
-                            scanDetail.setCacheName(attr.getStringValue())
-                                    .setProject(e.attribute("id").getStringValue())
-                                    .setTotalCount(Integer.parseInt(e.attribute("totalCount").getValue()))
-                                    .setFailCount(Integer.parseInt(e.attribute("failCount").getValue()))
-                                    .setFailPercent(Double.parseDouble(e.attribute("failPercent").getValue()))
-                                    .setMinVal(Double.parseDouble(e.attribute("min").getValue()))
-                                    .setMaxVal(Double.parseDouble(e.attribute("max").getValue()))
-                                    .setAvgVal(Double.parseDouble(e.attribute("avg").getValue()))
-                                    .setSumVal(Double.parseDouble(e.attribute("sum").getValue()))
-                                    .setSum2(Double.parseDouble(e.attribute("sum2").getValue()))
-                                    .setStd(Double.parseDouble(e.attribute("std").getValue()))
-                                    .setTps(Double.parseDouble(e.attribute("tps").getValue()))
-                                    .setLine95Value(Double.parseDouble(e.attribute("line95Value").getValue()))
-                                    .setLine99Value(Double.parseDouble(e.attribute("line99Value").getValue()))
-                                    .setCreateTime(yesterdayText)
-                                    .setUpdateTime(nowText);
+                                long curTotalCount = Long.parseLong(e.attribute("totalCount").getValue());
+                                double curDelay = Double.parseDouble(e.attribute("avg").getValue());
 
-                            scanDetailList.add(scanDetail);
+                                double avgDelayTotal = (curDelay * curTotalCount + avgDelaySquirrel * totalCountSquirrel) / (curTotalCount + totalCountSquirrel);
+                                avgDelaySquirrel = avgDelayTotal;
+                            }else if(attr.getStringValue().contains("Cache.")){
+                                totalCountCache += Long.parseLong(e.attribute("totalCount").getValue());
+                                failureCountCache += Long.parseLong(e.attribute("failCount").getValue());
 
-//                            scanDetailService.insert(scanDetail);
+                                long curTotalCount = Long.parseLong(e.attribute("totalCount").getValue());
+                                double curDelay = Double.parseDouble(e.attribute("avg").getValue());
 
+                                double avgDelayTotal = (curDelay * curTotalCount + avgDelayCache * totalCountCache) / (curTotalCount + totalCountCache);
+                                avgDelayCache = avgDelayTotal;
+                            }
+
+                        } catch (Exception e1){
+                            logger.error("AlarmScanDetails():"+e1);
+                        }
+                        try {
+
+                            if ((Integer.parseInt(e.attribute("totalCount").getValue()) > 20000) && ((Double.parseDouble(e.attribute("failPercent").getValue()) > 0.1) || (Double.parseDouble(e.attribute("avg").getValue())) > 10)
+                                    || (Double.parseDouble(e.attribute("failPercent").getValue()) > 3) || (Double.parseDouble(e.attribute("avg").getValue()) > 50)) {
+
+                                ScanDetail scanDetail = new ScanDetail();
+                                scanDetail.setCacheName(attr.getStringValue())
+                                        .setProject(e.attribute("id").getStringValue())
+                                        .setTotalCount(Long.parseLong(e.attribute("totalCount").getValue()))
+                                        .setFailCount(Long.parseLong(e.attribute("failCount").getValue()))
+                                        .setFailPercent(Double.parseDouble(e.attribute("failPercent").getValue()))
+                                        .setMinVal(Double.parseDouble(e.attribute("min").getValue()))
+                                        .setMaxVal(Double.parseDouble(e.attribute("max").getValue()))
+                                        .setAvgVal(Double.parseDouble(e.attribute("avg").getValue()))
+                                        .setSumVal(Double.parseDouble(e.attribute("sum").getValue()))
+                                        .setSum2(Double.parseDouble(e.attribute("sum2").getValue()))
+                                        .setStd(Double.parseDouble(e.attribute("std").getValue()))
+                                        .setTps(Double.parseDouble(e.attribute("tps").getValue()))
+                                        .setLine95Value(Double.parseDouble(e.attribute("line95Value").getValue()))
+                                        .setLine99Value(Double.parseDouble(e.attribute("line99Value").getValue()))
+                                        .setCreateTime(yesterdayText)
+                                        .setUpdateTime(nowText);
+
+                                scanDetailList.add(scanDetail);
+
+                            }
+                        } catch (Exception e2){
+                            logger.error("AlarmScanDetails() setScanDetail:"+ e2);
                         }
                     }
                 }
             }
 
         }
+
+        failurePercentSquirrel = (double)((double)failureCountSquirrel/(double)totalCountSquirrel);
+        failurePercentCache = (double)((double)failureCountCache/(double)totalCountCache);
+
+        ScanStatistics scanStatistics = new ScanStatistics(totalCountSquirrel,failureCountSquirrel,failurePercentSquirrel,avgDelaySquirrel,totalCountCache,failureCountCache,failurePercentCache,avgDelayCache,yesterdayText,nowText);
+        scanStatisticsService.insert(scanStatistics);
 
         return scanDetailList;
     }
