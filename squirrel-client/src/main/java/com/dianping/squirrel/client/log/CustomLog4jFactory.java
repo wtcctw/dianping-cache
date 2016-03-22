@@ -11,7 +11,10 @@ public class CustomLog4jFactory {
 	private static final String DEFAULT_LOG_DIR = "/data/applogs/squirrel/squirrel.log";
 
 	public static void init() {
-		System.getProperties().putIfAbsent(LOG_DIR_PROPERTY_KEY,DEFAULT_LOG_DIR);
+		//System.getProperties().putIfAbsent(LOG_DIR_PROPERTY_KEY,DEFAULT_LOG_DIR);
+		if(System.getProperty(LOG_DIR_PROPERTY_KEY) == null){
+			System.setProperty(LOG_DIR_PROPERTY_KEY,DEFAULT_LOG_DIR);
+		}
 		new DOMConfigurator().doConfigure(CustomLog4jFactory.class.getClassLoader().getResource("squirrel_log4j.xml"),
 				LogManager.getLoggerRepository());
 		ConfigManager configManager = ConfigManagerLoader.getConfigManager();
