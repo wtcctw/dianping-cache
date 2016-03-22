@@ -1,11 +1,16 @@
 package com.dianping.cache.remote.jms;
 
-import java.io.IOException;
-import java.io.Serializable;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import com.dianping.cat.Cat;
+import com.dianping.squirrel.common.config.ConfigManager;
+import com.dianping.squirrel.common.config.ConfigManagerLoader;
+import com.dianping.squirrel.common.domain.*;
+import com.dianping.squirrel.common.util.BoundedLinkedList;
+import com.dianping.squirrel.common.util.JsonUtils;
+import com.dianping.squirrel.common.util.PathUtils;
+import com.dianping.squirrel.common.util.SedesUtils;
+import com.geekhua.filequeue.Config;
+import com.geekhua.filequeue.FileQueue;
+import com.geekhua.filequeue.FileQueueImpl;
 import org.apache.commons.lang.StringUtils;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
@@ -17,21 +22,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 
-import com.dianping.cat.Cat;
-import com.dianping.squirrel.common.config.ConfigManager;
-import com.dianping.squirrel.common.config.ConfigManagerLoader;
-import com.dianping.squirrel.common.domain.CacheConfigurationDTO;
-import com.dianping.squirrel.common.domain.CacheConfigurationRemoveDTO;
-import com.dianping.squirrel.common.domain.CacheKeyConfigurationDTO;
-import com.dianping.squirrel.common.domain.CacheKeyTypeVersionUpdateDTO;
-import com.dianping.squirrel.common.domain.SingleCacheRemoveDTO;
-import com.dianping.squirrel.common.util.BoundedLinkedList;
-import com.dianping.squirrel.common.util.JsonUtils;
-import com.dianping.squirrel.common.util.PathUtils;
-import com.dianping.squirrel.common.util.SedesUtils;
-import com.geekhua.filequeue.Config;
-import com.geekhua.filequeue.FileQueue;
-import com.geekhua.filequeue.FileQueueImpl;
+import java.io.IOException;
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class CacheMessageNotifier implements Serializable, InitializingBean, MQSender {
 
@@ -142,9 +137,9 @@ public class CacheMessageNotifier implements Serializable, InitializingBean, MQS
     }
 
     public void notifyServiceConfigRemove(CacheConfigurationRemoveDTO serviceConfig) {
-        String path = PathUtils.getServicePath(serviceConfig.getCacheKey());
+        String path = PathUtils.getManagerPath(serviceConfig.getCacheKey());
         if (StringUtils.isNotBlank(serviceConfig.getSwimlane())) {
-            path = PathUtils.getServicePath(serviceConfig.getCacheKey(), serviceConfig.getSwimlane());
+            path = PathUtils.getManagerPath(serviceConfig.getCacheKey(), serviceConfig.getSwimlane());
         }
         try {
             //remove Node

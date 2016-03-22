@@ -1,5 +1,8 @@
 package com.dianping.squirrel.common.util;
 
+import com.dianping.squirrel.common.config.ConfigManager;
+import com.dianping.squirrel.common.config.ConfigManagerLoader;
+
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
@@ -7,12 +10,10 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 
-import com.dianping.squirrel.common.config.ConfigManager;
-import com.dianping.squirrel.common.config.ConfigManagerLoader;
-
 public class PathUtils {
 
     public static final String CACHE_SERVICE_PATH = "/dp/cache/service";
+    public static final String CACHE_MANAGER_PATH = "/dp/cache/manager";
     public static final String CACHE_CATEGORY_PATH = "/dp/cache/category";
     public static final String CACHE_RUNTIME_PATH = "/dp/cache/runtime";
     private static final String LOCAL_IP = getFirstLocalIp();
@@ -97,6 +98,16 @@ public class PathUtils {
     public static String getServicePath(String service) {
         StringBuilder buf = new StringBuilder(80);
         buf.append(CACHE_SERVICE_PATH).append('/').append(service);
+        return buf.toString();
+    }
+
+    public static String getManagerPath(String service,String swimlane) {
+        return getManagerPath(service) + "/" + swimlane;
+    }
+
+    public static String getManagerPath(String service) {
+        StringBuilder buf = new StringBuilder(80);
+        buf.append(CACHE_MANAGER_PATH).append('/').append(service);
         return buf.toString();
     }
 

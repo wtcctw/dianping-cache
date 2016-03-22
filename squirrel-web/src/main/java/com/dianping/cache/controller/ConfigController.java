@@ -95,10 +95,14 @@ public class ConfigController extends AbstractSidebarController {
         return info;
     }
 
-    @RequestMapping(value = "/config/cluster/update")
-    @ResponseBody
-    public void update() {
 
+    @RequestMapping(value = "/config/cluster/sync2zkm")
+    @ResponseBody
+    public void sync2zkmanager() {
+        List<CacheConfiguration> configurations = cacheConfigurationService.findAll();
+        for(CacheConfiguration configuration : configurations){
+            cacheConfigurationService.update(configuration);
+        }
     }
 
     @Override
