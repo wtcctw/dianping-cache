@@ -62,6 +62,8 @@ public interface CacheConfigurationService {
 	CacheConfiguration create(CacheConfiguration config) throws DuplicatedIdentityException;
 	
 	CacheConfiguration update(CacheConfiguration config);
+
+	void sync2zkservice(CacheConfiguration config);
 	
 	void delete(String key);
 

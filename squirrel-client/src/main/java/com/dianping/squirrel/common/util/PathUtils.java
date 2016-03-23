@@ -13,7 +13,7 @@ import java.util.List;
 public class PathUtils {
 
     public static final String CACHE_SERVICE_PATH = "/dp/cache/service";
-    public static final String CACHE_MANAGER_PATH = "/dp/cache/manager";
+    public static final String CACHE_MANAGER_PATH = "/dp/cache/monitor/manager";
     public static final String CACHE_CATEGORY_PATH = "/dp/cache/category";
     public static final String CACHE_RUNTIME_PATH = "/dp/cache/runtime";
     private static final String LOCAL_IP = getFirstLocalIp();

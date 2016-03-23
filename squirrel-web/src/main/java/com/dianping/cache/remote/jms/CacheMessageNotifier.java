@@ -120,10 +120,7 @@ public class CacheMessageNotifier implements Serializable, InitializingBean, MQS
     }
 
     public void notifyServiceConfigChange(CacheConfigurationDTO serviceConfig) {
-        String path = PathUtils.getServicePath(serviceConfig.getCacheKey());
-        if (StringUtils.isNotBlank(serviceConfig.getSwimlane())) {
-            path = PathUtils.getServicePath(serviceConfig.getCacheKey(), serviceConfig.getSwimlane());
-        }
+        String path = getPath(serviceConfig);
         try {
             String content = JsonUtils.toStr(serviceConfig);
             updateNode(path, content);
@@ -133,6 +130,39 @@ public class CacheMessageNotifier implements Serializable, InitializingBean, MQS
             Cat.logEvent(CAT_EVENT_TYPE, "service.change:" + serviceConfig.getCacheKey(),
                     "-1", e.getMessage());
             logger.error("failed to notify service config change: " + serviceConfig, e);
+        }
+    }
+
+    private String getPath(CacheConfigurationDTO serviceConfig){
+        String path;
+        if(serviceConfig.getServers().contains("redis")){
+            if (StringUtils.isNotBlank(serviceConfig.getSwimlane())) {
+                path = PathUtils.getServicePath(serviceConfig.getCacheKey(), serviceConfig.getSwimlane());
+            } else {
+                path = PathUtils.getServicePath(serviceConfig.getCacheKey());
+            }
+        } else {
+            if (StringUtils.isNotBlank(serviceConfig.getSwimlane())) {
+                path = PathUtils.getManagerPath(serviceConfig.getCacheKey(), serviceConfig.getSwimlane());
+            } else {
+                path = PathUtils.getManagerPath(serviceConfig.getCacheKey());
+            }
+        }
+        return path;
+    }
+
+    public void sycDB2ZKservice(CacheConfigurationDTO serviceConfig) {
+        serviceConfig.setKey(null);
+        serviceConfig.setDetail(null);
+        String path = PathUtils.getServicePath(serviceConfig.getCacheKey());
+        if (StringUtils.isNotBlank(serviceConfig.getSwimlane())) {
+            path = PathUtils.getServicePath(serviceConfig.getCacheKey(), serviceConfig.getSwimlane());
+        }
+        try {
+            String content = JsonUtils.toStr(serviceConfig);
+            updateNode(path, content);
+        } catch (Exception e) {
+            logger.error("failed to sycDB2ZKservice: " + serviceConfig, e);
         }
     }
 
