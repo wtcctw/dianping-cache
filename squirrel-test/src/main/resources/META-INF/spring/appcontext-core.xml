@@ -22,7 +22,7 @@
 		<property name="propertiesPath" value="config/applicationContext.properties" />
 	</bean>
 
-	<avatar:cache />
+	<!--<avatar:cache />-->
 
 	<pigeon:annotation />
 </beans>

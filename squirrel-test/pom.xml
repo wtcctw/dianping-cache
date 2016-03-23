@@ -15,7 +15,7 @@
     <name>squirrel-test</name>
 
     <properties>
-        <spring.version>2.5.6</spring.version>
+        <spring.version>3.2.9.RELEASE</spring.version>
     </properties>
     
     <dependencies>
@@ -98,6 +98,12 @@
             <groupId>com.cedarsoftware</groupId>
             <artifactId>json-io</artifactId>
             <version>4.1.6</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-test</artifactId>
+            <version>3.2.9.RELEASE</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
     <build>
