@@ -4,20 +4,14 @@ import com.dianping.cache.entity.CacheConfiguration;
 import com.dianping.cache.monitor.Constants;
 import com.dianping.cache.monitor.CuratorManager;
 import com.dianping.cache.monitor.MemberMonitor;
-import com.dianping.cache.monitor2.ServerState;
 import com.dianping.squirrel.common.util.JsonUtils;
-import net.sf.ehcache.exceptionhandler.CacheExceptionHandler;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.retry.RetryNTimes;
 import org.apache.zookeeper.KeeperException;
-import org.apache.zookeeper.data.Stat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import sun.misc.Cache;
 
-import java.io.UnsupportedEncodingException;
-import java.lang.management.BufferPoolMXBean;
 import java.util.*;
 import java.util.concurrent.*;
 
@@ -32,13 +26,11 @@ public class TaskManager {
 
     private final int CORES = Runtime.getRuntime().availableProcessors();
 
-    private static Map<String, ServerState> serverStatMap = new HashMap<String, ServerState>();
+    private static Map<String, TaskRunner> serverStatMap = new HashMap<String, TaskRunner>();
 
     private ScheduledThreadPoolExecutor monitorThreadPool;
 
     private ExecutorService taskRunnerThreadPool;
-
-    private ExecutorService judgeRunnerThreadPool;
 
     private static final Logger logger = LoggerFactory.getLogger(TaskRunner.class);
 
@@ -48,7 +40,6 @@ public class TaskManager {
         this.memberMonitor = new MemberMonitor();
         monitorThreadPool = new ScheduledThreadPoolExecutor(1);
         taskRunnerThreadPool = Executors.newCachedThreadPool();
-        judgeRunnerThreadPool = Executors.newCachedThreadPool();
         CuratorManager.getInstance().ensurePath(Constants.MANAGER_PATH);
         curatorClient = CuratorManager.getInstance().getCuratorClient();
     }
@@ -69,6 +60,32 @@ public class TaskManager {
         curatorClient.delete().forPath(path);
     }
 
+    private String getMarkDownPath(String memcached) {
+        StringBuilder buf = new StringBuilder(128);
+        buf.append(Constants.MARKDOWN_PATH).append('/').append(memcached);
+        return buf.toString();
+    }
+
+    private boolean isAlive(String server) {
+        String path = getMarkDownPath(server);
+        try {
+            List<String> status = curatorClient.getChildren().watched().forPath(path);
+            int memberCount = memberMonitor.getMemberCount();
+
+            if(status.size() >= memberCount * percent) {
+                return false;
+            } else {
+                return true;
+            }
+        } catch (KeeperException.NoNodeException e) {
+            return true;
+        } catch (Exception e) {
+            System.out.println(e.getCause());
+            e.printStackTrace();
+            return true;
+        }
+    }
+
     private CacheConfiguration getServersFromZkData(String path) throws Exception {
         byte[] data = curatorClient.getData().watched().forPath(path);
         if(data == null || data.length==0) {
@@ -78,6 +95,7 @@ public class TaskManager {
         CacheConfiguration config = JsonUtils.fromStr(value, CacheConfiguration.class);
         return config;
     }
+
     private CacheConfiguration getManagerClusterCinfiguration(String cluster) throws Exception {
         // : 从 manager path 那个地方获得本 cluster 的所有机器
         return getServersFromZkData(concatZkPath(Constants.MANAGER_PATH, cluster));
@@ -106,6 +124,8 @@ public class TaskManager {
         List<String> clusters = getServiceClusters();
         Map<String, CacheConfiguration> map = new HashMap<String, CacheConfiguration>();
         for(String cluster : clusters) {
+            if(!cluster.startsWith("memcached"))
+                continue;
             CacheConfiguration config = getServiceClusterCinfiguration(cluster);
             map.put(cluster, config);
         }
@@ -114,6 +134,9 @@ public class TaskManager {
 
     private void setServiceConfiguration(String cluster, CacheConfiguration config) throws Exception {
         // : 设置线上的机器集群状态
+        if(!cluster.startsWith("memcached"))
+            return ;
+
         String result = JsonUtils.toStr(config);
 
         String path = concatZkPath(Constants.SERVICE_PATH, cluster);
@@ -152,207 +175,106 @@ public class TaskManager {
         return curatorClient.getChildren().forPath(Constants.SERVICE_PATH);
     }
 
-    private void addServiceCluster(CacheConfiguration cacheConfiguration) throws Exception {
-        String path = concatZkPath(Constants.SERVICE_PATH, cacheConfiguration.getCacheKey());
-        curatorClient.create().creatingParentsIfNeeded().forPath(path, JsonUtils.toStr(cacheConfiguration).getBytes("UTF-8"));
-    }
-
     private void removeServiceCluster(String cluster) throws Exception {
+        if(!cluster.startsWith("memcached"))
+            return;
         String path = concatZkPath(Constants.SERVICE_PATH, cluster);
         zkDelete(path);
     }
 
-    void filterLiveNodes() throws Exception {
-        //  在 servicePath markDownPath markUpPath 处删掉所有的不在管理员列表中的节点
+    void syncMachineState() throws Exception {
         Map<String, CacheConfiguration> managerConfig = getManagerClusterConfigurationMap();
         Map<String, CacheConfiguration> serviceConfig = getServiceClusterConfigurationMap();
 
-        // 管理员删除了 cluster
-        for(Map.Entry<String, CacheConfiguration> entry : serviceConfig.entrySet()) {
-            if(!managerConfig.keySet().contains(entry.getKey())) {
-                removeServiceCluster(entry.getKey());
+        // 增加 管理员增加的 cluster
+        for(String key : managerConfig.keySet()) {
+            if(!serviceConfig.keySet().contains(key)) {
+                setServiceConfiguration(key, managerConfig.get(key));
             }
         }
 
-        // 管理员添加了 cluster 默认是上线的
-        for(Map.Entry<String, CacheConfiguration> entry : managerConfig.entrySet()) {
-            if(!serviceConfig.keySet().contains(entry.getKey())) {
-                setServiceConfiguration(entry.getKey(), entry.getValue());
+        // 删除 管理员删除的 cluster
+        for(String key : serviceConfig.keySet()) {
+            if(!managerConfig.keySet().contains(key)) {
+                removeServiceCluster(key);
             }
         }
 
-        // 重新同步一下数据
+        // 给所有 manager 上面的机器 增加机器的监控
+        for(String key : managerConfig.keySet()) {
+            CacheConfiguration configuration = managerConfig.get(key);
+            List<String> machines = configuration.getServerList();
+            for(String server : machines) {
+                if(serverStatMap.get(server) == null) {
+                    TaskRunner taskRunner = new TaskRunner(server);
+                    serverStatMap.put(server, taskRunner);
+                }
+            }
+        }
+
+        boolean change = false;
+
+        // 根据监控的情况上线
         serviceConfig = getServiceClusterConfigurationMap();
 
-        // 根据 manager 中的数据同步线上的数据
-        for(Map.Entry<String, CacheConfiguration> entry : managerConfig.entrySet()) {
-
-            String cluster = entry.getKey();
-
-            CacheConfiguration managerClusterConfig = entry.getValue();
-            CacheConfiguration serviceClusterConfig = serviceConfig.get(cluster);
-
-            List<String> managerServers = managerClusterConfig.getServerList();
-            boolean change = false;
-
-            // 去掉 service 中管理员去掉了的 cluster 中的某些机器
-            List<String> serviceServers = serviceClusterConfig.getServerList();
-            List<String> forRemoveFromServiceServer = new ArrayList<String>();
+        for(String managerClusterKey : managerConfig.keySet()) {
+            CacheConfiguration managerConfiguration = managerConfig.get(managerClusterKey);
+            CacheConfiguration serviceConfiguration = serviceConfig.get(managerClusterKey);
+            List<String> managerServers = managerConfiguration.getServerList();
+            List<String> serviceServers = serviceConfiguration.getServerList();
 
             if(serviceServers == null)
                 serviceServers = new ArrayList<String>();
 
-            for (String server : serviceServers) {
-                if (!managerServers.contains(server)) {
-                    forRemoveFromServiceServer.add(server);
+            List<String> newServiceServers = new ArrayList<String>();
+            newServiceServers.addAll(serviceServers);
+
+            for(String server : managerServers) {
+                if(isAlive(server) && !serviceServers.contains(server)) {
+                    newServiceServers.add(server);
                     change = true;
                 }
             }
-
-            for(String s : forRemoveFromServiceServer) {
-                serviceServers.remove(s);
-            }
-
-            List<String> forAddFromServiceServer = new ArrayList<String>();
-            // 管理员添加了 cluster 中的某些机器
-            for (String server : managerServers) {
-                if (!serviceServers.contains(server)) {
-                    forAddFromServiceServer.add(server);
-                    change = true;
-                }
-            }
-            serviceServers.addAll(forAddFromServiceServer);
-            // 使得修改生效
             if(change) {
-                serviceClusterConfig.setServerList(serviceServers);
-                setServiceConfiguration(cluster, serviceClusterConfig);
+                serviceConfiguration.setServerList(newServiceServers);
+                setServiceConfiguration(managerClusterKey, serviceConfiguration);
+                change = false;
             }
         }
 
-        //清理 MARK DOWN 和 MARK UP 只需要将多余的节点( manager 没有配置过的 )删除
-        Set<String> allManagerServers = new HashSet<String>();// 唯一的 key
-        for (CacheConfiguration cacheConfiguration : managerConfig.values()) {
-            if(cacheConfiguration.getServerList() == null)
-                continue;
-            allManagerServers.addAll(cacheConfiguration.getServerList());
-        }
+        change = false;
+        // 根据监控情况下线
+        for(String serviceCluserKey : serviceConfig.keySet()) {
+            CacheConfiguration managerConfiguration = managerConfig.get(serviceCluserKey);
+            CacheConfiguration serviceConfiguration = serviceConfig.get(serviceCluserKey);
+            List<String> managerServers = managerConfiguration.getServerList();
+            List<String> serviceServers = serviceConfiguration.getServerList();
 
-        List<String> markDownChildren = getMarkDownChildren();
-        List<String> markUpChildren = getMarkUpChildren();
+            if(serviceServers == null)
+                serviceServers = new ArrayList<String>();
 
-        for (String hostPort : markDownChildren) {
-            if (!allManagerServers.contains(hostPort))
-                zkDelete(concatZkPath(Constants.MONITOR_MARKDOWN_PATH, hostPort));
-        }
-
-        for (String hostPort : markUpChildren) {
-            if (!allManagerServers.contains(hostPort))
-                zkDelete(concatZkPath(Constants.MONITOR_MARKUP_PATH, hostPort));
-        }
-
-    }
-
-
-    private List<String> getMarkDownChildren() throws Exception {
-        return curatorClient.getChildren().forPath(Constants.MONITOR_MARKDOWN_PATH);
-    }
-
-
-    private List<String> getMarkUpChildren() throws Exception {
-        return curatorClient.getChildren().forPath(Constants.MONITOR_MARKUP_PATH);
-    }
-
-
-    private void changeNodeMode(boolean add, String cluster) throws Exception {
-        CacheConfiguration managerConfig = getManagerClusterCinfiguration(cluster);
-        CacheConfiguration serviceConfig = getServiceClusterCinfiguration(cluster);
-        List<String> serviceServers = serviceConfig.getServerList();
-        List<String> managerServers = managerConfig.getServerList();
-        boolean change = false;
-        for(String server : managerServers) {
-
-            List<String> internalChildren;
-
-            if(add) {
-                internalChildren = getMarkUpChildren();
-            } else {
-                internalChildren = getMarkDownChildren();
-            }
-
-            List<String> children = internalChildren;
-            if(children.size() > memberMonitor.getMemberCount() * percent) {
-                if (add && serviceServers != null && !serviceServers.contains(server)) {
-                    if(serviceServers == null) {
-                        serviceServers = new ArrayList<String>();
-                    }
-                    serviceServers.add(server);
-                    change = true;
-                }
-                if (!add && serviceServers != null && serviceServers.contains(server)) {
-                    serviceServers.remove(server);
+            List<String> newServiceServers = new ArrayList<String>();
+            newServiceServers.addAll(serviceServers);
+            for(String server : serviceServers) {
+                if(!isAlive(server) || !managerServers.contains(server)) { // 死了 或者 管理员下线了
+                    newServiceServers.remove(server);
                     change = true;
                 }
             }
-        }
-        if(change) {
-            serviceConfig.setServerList(serviceServers);
-            setServiceConfiguration(cluster, serviceConfig);
-        }
-
-    }
-
-    void addLiveNode(String cluster) throws Exception {
-        changeNodeMode(true, cluster);
-    }
-
-    void removeDeadNode(String cluster) throws Exception {
-        changeNodeMode(false, cluster);
-    }
-
-    private void judgeMachineState() throws Exception {
-        curatorClient.create().creatingParentsIfNeeded().forPath(Constants.MONITOR_JUDGE_LOCK);
-        try {
-            filterLiveNodes(); // 把管理员的更改同步到内部状态中
-            List<String> managerClusters = getManagerClusters();
-
-            // 把监测结果同步到 service path 中
-            final CountDownLatch latch = new CountDownLatch(managerClusters.size() * 2);
-            for (final String cluster : managerClusters) {
-                // 把内部监测信息反馈到状态中
-                judgeRunnerThreadPool.submit(new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            addLiveNode(cluster);
-                        } catch (Exception e) {
-                            logger.error("addLiveNode failed  cluster : " + cluster + " " + e.getMessage());
-                        } finally {
-                            latch.countDown();
-                        }
-                    }
-                });
-                judgeRunnerThreadPool.submit(new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            removeDeadNode(cluster);
-                        } catch (Exception e) {
-                            logger.error("removeDeadNode failed  cluster : " + cluster + " " + e.getMessage());
-                        } finally {
-                            latch.countDown();
-                        }
-                    }
-                });
+            if(change) {
+                serviceConfiguration.setServerList(newServiceServers);
+                setServiceConfiguration(serviceCluserKey, serviceConfiguration);
+                change = false;
             }
-            latch.await();
-        } finally {
-            curatorClient.delete().forPath(Constants.MONITOR_JUDGE_LOCK);
         }
+
+
     }
+
 
     private void init() throws Exception {
         // 创建必要的四个节点 路径如下
-        String[] paths = {Constants.SERVICE_PATH, Constants.MANAGER_PATH, Constants.MONITOR_MARKDOWN_PATH, Constants.MONITOR_MARKUP_PATH};
+        String[] paths = {Constants.SERVICE_PATH, Constants.MANAGER_PATH};
         for(String node : paths) {
             if(curatorClient.checkExists().forPath(node) == null)
                 curatorClient.create().creatingParentsIfNeeded().forPath(node);
@@ -360,30 +282,15 @@ public class TaskManager {
     }
 
     public void start() throws Exception {
-
         final Runnable task = new Runnable() {
             @Override
             public void run() {
+                for(TaskRunner t : serverStatMap.values())
+                    taskRunnerThreadPool.submit(t);
                 try {
-                    List<String> clusters = getManagerClusters();
-                    Map<String, Boolean> mp = new HashMap<String, Boolean>(); // 一个 server 可能被配置到多个 cate
-                    for(String cluster : clusters) {
-                        CacheConfiguration configuration = getManagerClusterCinfiguration(cluster);
-                        List<String> servers = configuration.getServerList();
-                        for(String server : servers) {
-                            if(mp.get(server) != null) {
-                                continue;
-                            }
-                            mp.put(server, new Boolean(true));
-                            if(serverStatMap.get(server) == null)
-                                serverStatMap.put(server, new ServerState(server));
-                            TaskRunner taskRunner = new TaskRunner(serverStatMap.get(server));
-                            taskRunnerThreadPool.submit(taskRunner);
-                        }
-                        judgeMachineState();
-                    }
+                    syncMachineState(); // 把管理员的更改同步到内部状态中
                 } catch (Exception e) {
-                    logger.error("task running error " + e.getMessage());
+                    logger.error("syncMachineState error " + e.getMessage());
                 }
             }
         };
@@ -420,52 +327,24 @@ public class TaskManager {
         copyToAlpha(betaPath, alphaPath, betaClient, this.curatorClient);
     }
 
-    public void testServerChange() {
-        try {
-            // 准备数据
-            CacheConfiguration config = getManagerClusterCinfiguration("memcached-tuangou");
-            List<String> servers = config.getServerList();
-            String newServer = "192.168.8.45:11211";
-            servers.add(newServer);
-            config.setServerList(servers);
-            setManagerConfiguration("memcached-tuangou", config);
-            this.init();
-            this.start();
-
-            Thread.sleep(10000);
-
-            CacheConfiguration config2= getServiceClusterCinfiguration("memcached-tuangou");
-            List<String> serviceServer = config2.getServerList();
-            boolean have = serviceServer.contains(newServer);
-
-            CacheConfiguration config3 = getManagerClusterCinfiguration("memcached-tuangou");
-            List<String> servers3 = config.getServerList();
-            String newServer3 = "192.168.8.45:11211";
-            servers3.remove(newServer3);
-            config3.setServerList(servers3);
-            setManagerConfiguration("memcached-tuangou", config3);
-
-            Thread.sleep(10000);
-
-            CacheConfiguration config4= getServiceClusterCinfiguration("memcached-tuangou");
-            List<String> serviceServer4 = config4.getServerList();
-            have = serviceServer4.contains(newServer);
-            int a = 1;
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-    }
-
     public void removeAllData() throws Exception {
-        String[] paths = {Constants.INIT_STAT_LOCK, Constants.MONITOR_JUDGE_LOCK, Constants.SERVICE_PATH, Constants.MANAGER_PATH, Constants.MONITOR_MARKDOWN_PATH, Constants.MONITOR_MARKUP_PATH};
+        String[] paths = {Constants.INIT_STAT_LOCK, Constants.MONITOR_JUDGE_LOCK, Constants.MANAGER_PATH};
         for(String path : paths) {
             if(curatorClient.checkExists().forPath(path) != null) {
                 zkDelete(path);
             }
         }
     }
-
+    public void addNewServer() throws Exception {
+        String s = "192.168.8.45:11212";
+        String or = "10.66.11.117:11211";
+        String cluster = "memcached-yy";
+        CacheConfiguration cacheConfiguration = getManagerClusterCinfiguration(cluster);
+        List<String> servers = cacheConfiguration.getServerList();
+        servers.add(s);
+        cacheConfiguration.setServerList(servers);
+        setManagerConfiguration(cluster, cacheConfiguration);
+    }
     public void prepareManagerData() throws Exception {
         String path = Constants.MANAGER_PATH + "/" + "memcached-tuangou";
         String testClusterInfo = "{\"cacheKey\":\"memcached-tuangou\",\"clientClazz\":\"com.dianping.cache.memcached.MemcachedClientImpl\",\"servers\":\"10.66.11.117:11211\",\"transcoderClazz\":\"com.dianping.cache.memcached.HessianTranscoder\",\"addTime\":1452755302947,\"serverList\":[\"10.66.11.117:11211\"]}";
@@ -475,7 +354,7 @@ public class TaskManager {
     public static void main(String[] args) {
         try {
             TaskManager taskManager = new TaskManager();
-            taskManager.removeAllData();
+///            taskManager.removeAllData();
             taskManager.prepareBetaData();
             taskManager.start();
         } catch (Exception e) {

@@ -1,6 +1,8 @@
 package com.dianping.cache.monitor2;
 
 import com.dianping.cache.monitor.*;
+import com.dianping.cache.monitor.ServerListener;
+import com.dianping.cache.monitor.ServerState;
 import com.dianping.squirrel.client.util.IPUtils;
 import net.spy.memcached.MemcachedClient;
 import net.spy.memcached.internal.OperationFuture;
@@ -11,26 +13,33 @@ import org.apache.zookeeper.KeeperException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.concurrent.ConcurrentHashMap;
+import net.spy.memcached.MemcachedClient;
+import net.spy.memcached.internal.OperationFuture;
 
-/**
- * Created by thunder on 16/1/29.
- */
-public class TaskRunner implements Runnable{
+import org.apache.commons.lang.RandomStringUtils;
+import org.apache.curator.framework.CuratorFramework;
+import org.apache.zookeeper.CreateMode;
+import org.apache.zookeeper.KeeperException.NoNodeException;
+import org.apache.zookeeper.KeeperException.NodeExistsException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.dianping.squirrel.client.util.IPUtils;
+
+public class TaskRunner implements Runnable, ServerListener {
 
     private static final Logger logger = LoggerFactory.getLogger(TaskRunner.class);
 
     private static final String NODE_MONITOR_KEY = "node.monitor.key";
-
     private static final int NODE_DEFAULT_EXPIRATION = 60; // seconds
 
     private final int LOG_THRESHOLD = 100;
 
-    private String LOCAL_IP = IPUtils.getFirstNoLoopbackIP4Address();
+    private final String LOCAL_IP = IPUtils.getFirstNoLoopbackIP4Address();
 
     private String server;
 
-    private ServerState serverState;
+    private com.dianping.cache.monitor.ServerState serverState;
 
     private long lastCheckTime = System.currentTimeMillis();
 
@@ -38,52 +47,44 @@ public class TaskRunner implements Runnable{
 
     private CuratorFramework curatorClient;
 
-    public TaskRunner(ServerState state) {
-        this.server = state.getServer();
-        this.serverState = state;
+    public TaskRunner(String server) {
+        this.server = server;
+        this.serverState = new com.dianping.cache.monitor.ServerState(server);
+        serverState.setServerListener(this);
         curatorClient = CuratorManager.getInstance().getCuratorClient();
-        pushServerStatus();
     }
-
 
     @Override
     public void run() {
-        doCheck();
+        try {
+            doCheck();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
-    private void doCheck() {
+    private void doCheck() throws Exception {
         boolean alive = false;
         long start = System.currentTimeMillis();
         try {
             alive = checkNode();
         } catch (Throwable e) {
             alive = false;
-            if(serverState.getDeadCount() % LOG_THRESHOLD == 0) {
-                logger.error("failed to check server status: " + server, e);
-            } else {
-                logger.error("failed to check server status: " + server + ", error: " + e.getMessage());
-            }
+            logger.error(server + " is died");
         } finally {
             lastCheckTime = System.currentTimeMillis();
-            //TODO:这是测试代码
-            for(int i = 0; i < 10; i ++) {
-                serverState.setAlive(alive, new ServerListener() {
-                    @Override
-                    public void serverDead() {
-                        TaskRunner.this.pushServerStatus();
-                    }
-
-                    @Override
-                    public void serverAlive() {
-                        TaskRunner.this.pushServerStatus();
-                    }
-                });
-            }
             logger.info(serverState + ", time: " + (lastCheckTime-start));
+            if(alive) {
+                markUp(server);
+                logger.error(server + "is alive");
+            } else
+                markDown(server);
         }
+
     }
 
     boolean checkNode() throws Exception {
+        int a = 1;
         String value = RandomStringUtils.randomAlphanumeric(8);
         MemcachedClient mc = MemcachedClientFactory.getInstance().getClient(server);
         // go through the set & get circle
@@ -92,26 +93,24 @@ public class TaskRunner implements Runnable{
             return false;
         String value2 = (String) mc.get(NODE_MONITOR_KEY);
         return value.equals(value2);
+
     }
 
-    public void pushServerStatus() {
-        switch(serverState.getState()) {
-            case Alive:
-                try {
-                    markUp(server);
-                } catch (Exception e) {
-                    logger.error("failed to mark up server " + server );
-                }
-                break;
-            case Dead:
-                try {
-                    markDown(server);
-                } catch (Exception e) {
-                    logger.error("failed to mark down server " + server );
-                }
-                break;
-            case Unknown:
-                // do nothing
+    @Override
+    public void serverDead(String server) {
+        try {
+            markDown(server);
+        } catch (Exception e) {
+            logger.error("failed to mark down " + server, e);
+        }
+    }
+
+    @Override
+    public void serverAlive(String server) {
+        try {
+            markUp(server);
+        } catch (Exception e) {
+            logger.error("failed to mark up " + server, e);
         }
     }
 
@@ -120,54 +119,29 @@ public class TaskRunner implements Runnable{
         // first delete then create to ensure the ZK node is owned by this session
         try {
             curatorClient.delete().forPath(path);
-        } catch(Exception e) {
+        } catch(NoNodeException e) {
         }
-
-        try {
-            curatorClient.delete().forPath(getMarkUpPath(memcached));
-        } catch(Exception e) {
-        }
-
         try {
             curatorClient.create().creatingParentsIfNeeded().withMode(CreateMode.EPHEMERAL).forPath(path);
             logger.info("server " + memcached + " marked down");
-        } catch(KeeperException.NodeExistsException e) {
+        } catch(NodeExistsException e) {
             logger.warn("server " + memcached + " already marked down");
         }
     }
 
     public void markUp(String memcached) throws Exception {
-        String path = getMarkUpPath(memcached);
-        // first delete then create to ensure the ZK node is owned by this session
-        try {
-            curatorClient.delete().forPath(getMarkDownPath(path));
-        } catch(Exception e) {
-            logger.info(getMarkDownPath(path) + " is not exist");
-        }
-
+        String path = getMarkDownPath(memcached);
         try {
             curatorClient.delete().forPath(path);
-        } catch(Exception e) {
-            logger.info(path + " is not exist");
-        }
-
-        try {
-            curatorClient.create().creatingParentsIfNeeded().withMode(CreateMode.EPHEMERAL).forPath(path);
             logger.info("server " + memcached + " marked up");
-        } catch(KeeperException.NodeExistsException e) {
+        } catch(NoNodeException e) {
             logger.warn("server " + memcached + " already marked up");
         }
     }
 
-    private String getMarkUpPath(String memcached) {
-        StringBuilder buf = new StringBuilder(128);
-        buf.append(Constants.MONITOR_MARKUP_PATH).append('/').append(memcached).append('/').append(LOCAL_IP);
-        return buf.toString();
-    }
-
     private String getMarkDownPath(String memcached) {
         StringBuilder buf = new StringBuilder(128);
-        buf.append(Constants.MONITOR_MARKDOWN_PATH).append('/').append(memcached).append('/').append(LOCAL_IP);
+        buf.append(Constants.MARKDOWN_PATH).append('/').append(memcached).append('/').append(LOCAL_IP);
         return buf.toString();
     }
 

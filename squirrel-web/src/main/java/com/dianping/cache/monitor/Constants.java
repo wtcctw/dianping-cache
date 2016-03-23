@@ -8,6 +8,7 @@ public interface Constants {
 
     String MONITOR_PATH = "memecached";
 
+    String MARKDOWN_PATH = "/dp/cache/monitor/markdown";
     String MANAGER_PATH = "/dp/cache/monitor/manager";
     String SERVICE_PATH = "/dp/cache/service";
 
@@ -17,8 +18,6 @@ public interface Constants {
 
 
     String MEMBER_PATH = "/dp/cache/cache-server";
-    String MONITOR_MARKUP_PATH = "/dp/cache/monitor/monitor_markup";
-    String MONITOR_MARKDOWN_PATH = "/dp/cache/monitor/monitor_markdown";
     String KEY_MONITOR_ENABLE = "avatar-cache.monitor.enable";
     boolean DEFAULT_MONITOR_ENABLE = true;
     
