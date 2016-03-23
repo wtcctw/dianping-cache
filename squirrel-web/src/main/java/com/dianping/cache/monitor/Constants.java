@@ -13,10 +13,6 @@ public interface Constants {
     String SERVICE_PATH = "/dp/cache/service";
 
 
-    String MONITOR_JUDGE_LOCK = "/dp/cache/monitor/judge";
-    String INIT_STAT_LOCK = "/dp/cache/monitor/initMonitorState";
-
-
     String MEMBER_PATH = "/dp/cache/cache-server";
     String KEY_MONITOR_ENABLE = "avatar-cache.monitor.enable";
     boolean DEFAULT_MONITOR_ENABLE = true;

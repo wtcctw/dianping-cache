@@ -1,8 +1,8 @@
 package com.dianping.cache.monitor2;
 
 import com.dianping.cache.monitor.*;
-import com.dianping.cache.monitor.ServerListener;
-import com.dianping.cache.monitor.ServerState;
+import com.dianping.cache.monitor2.ServerListener;
+import com.dianping.cache.monitor2.ServerState;
 import com.dianping.squirrel.client.util.IPUtils;
 import net.spy.memcached.MemcachedClient;
 import net.spy.memcached.internal.OperationFuture;
@@ -39,7 +39,7 @@ public class TaskRunner implements Runnable, ServerListener {
 
     private String server;
 
-    private com.dianping.cache.monitor.ServerState serverState;
+    private com.dianping.cache.monitor2.ServerState serverState;
 
     private long lastCheckTime = System.currentTimeMillis();
 
@@ -49,7 +49,7 @@ public class TaskRunner implements Runnable, ServerListener {
 
     public TaskRunner(String server) {
         this.server = server;
-        this.serverState = new com.dianping.cache.monitor.ServerState(server);
+        this.serverState = new com.dianping.cache.monitor2.ServerState(server);
         serverState.setServerListener(this);
         curatorClient = CuratorManager.getInstance().getCuratorClient();
     }
@@ -72,6 +72,7 @@ public class TaskRunner implements Runnable, ServerListener {
             alive = false;
             logger.error(server + " is died");
         } finally {
+            this.serverState.setAlive(alive, this);
             lastCheckTime = System.currentTimeMillis();
             logger.info(serverState + ", time: " + (lastCheckTime-start));
             if(alive) {
@@ -97,8 +98,9 @@ public class TaskRunner implements Runnable, ServerListener {
     }
 
     @Override
-    public void serverDead(String server) {
+    public void serverDead() {
         try {
+            NotifyManager.getInstance().notify("offline " + server, "offline " + server);
             markDown(server);
         } catch (Exception e) {
             logger.error("failed to mark down " + server, e);
@@ -106,8 +108,9 @@ public class TaskRunner implements Runnable, ServerListener {
     }
 
     @Override
-    public void serverAlive(String server) {
+    public void serverAlive() {
         try {
+            NotifyManager.getInstance().notify("online " + server, "online " + server);
             markUp(server);
         } catch (Exception e) {
             logger.error("failed to mark up " + server, e);

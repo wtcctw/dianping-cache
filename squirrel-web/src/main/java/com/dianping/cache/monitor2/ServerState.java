@@ -43,10 +43,6 @@ public class ServerState {
         deadThreshold = configManager.getIntValue(Constants.KEY_DEAD_THRESHOLD, Constants.DEFAULT_DEAD_THRESHOLD);
         liveThreshold = configManager.getIntValue(Constants.KEY_LIVE_THRESHOLD, Constants.DEFAULT_LIVE_THRESHOLD);
 
-        //TODO: 这个地方要去掉
-        deadThreshold = 3;
-        liveThreshold = 3;
-
         try {
             configManager.registerConfigChangeListener(new ConfigChangeListener() {
 
@@ -66,44 +62,19 @@ public class ServerState {
     }
 
     public void setAlive(boolean currentAlive, ServerListener listener) {
-        boolean prevAlive = alive;
         alive = currentAlive;
         if(alive) {
-            if(!prevAlive) {
-                logger.info("server " + server + " status changed to alive");
-                deadCount = 0;
-                liveCount = 1;
-            } else {
-                if(++liveCount < 0) {
-                    liveCount = liveThreshold + 1;
-                }
-            }
-            if(liveCount == liveThreshold) {
-                logger.warn("server " + server + " status confirmed to be alive");
-                prevState = state;
+            if(++liveCount % liveThreshold == 0) {
+                listener.serverAlive();
                 state = State.Alive;
-                if(prevState == State.Dead) {
-                    listener.serverAlive();
-                }
             }
+            deadCount = 0;
         } else {
-            if(prevAlive) {
-                logger.warn("server " + server + " status changed to dead");
-                liveCount = 0;
-                deadCount = 1;
-            } else {
-                if(++deadCount < 0) {
-                    deadCount = deadThreshold + 1;
-                }
-            }
-            if(deadCount == deadThreshold) {
-                logger.warn("server " + server + " status confirmed to be dead");
-                prevState = state;
+            if(++deadCount % deadThreshold == 0) {
+                listener.serverDead();
                 state = State.Dead;
-                if(prevState != State.Dead) {
-                    listener.serverDead();
-                }
             }
+            liveCount = 0;
         }
     }
 

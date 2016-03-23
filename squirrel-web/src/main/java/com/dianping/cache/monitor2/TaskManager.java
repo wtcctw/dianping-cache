@@ -4,6 +4,7 @@ import com.dianping.cache.entity.CacheConfiguration;
 import com.dianping.cache.monitor.Constants;
 import com.dianping.cache.monitor.CuratorManager;
 import com.dianping.cache.monitor.MemberMonitor;
+import com.dianping.cache.monitor.NotifyManager;
 import com.dianping.squirrel.common.util.JsonUtils;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
@@ -159,11 +160,9 @@ public class TaskManager {
         List<String> result = new ArrayList<String>();
         List<String> clusters = curatorClient.getChildren().forPath(Constants.MANAGER_PATH);
         for(String cluster : clusters) {
-            if(!cluster.startsWith("memcached"))
+            if(!cluster.startsWith("memcached")) //memcached-mopay
                 continue;
-            CacheConfiguration config = getManagerClusterCinfiguration(cluster);
-            if(config == null || config.getServerList() == null)
-                continue;
+            //CacheConfiguration config = getManagerClusterCinfiguration(cluster);
             result.add(cluster);
         }
         return result;
@@ -204,6 +203,8 @@ public class TaskManager {
         for(String key : managerConfig.keySet()) {
             CacheConfiguration configuration = managerConfig.get(key);
             List<String> machines = configuration.getServerList();
+            if(machines == null)
+                continue;
             for(String server : machines) {
                 if(serverStatMap.get(server) == null) {
                     TaskRunner taskRunner = new TaskRunner(server);
@@ -229,6 +230,8 @@ public class TaskManager {
             List<String> newServiceServers = new ArrayList<String>();
             newServiceServers.addAll(serviceServers);
 
+            if(managerServers == null)
+                continue;
             for(String server : managerServers) {
                 if(isAlive(server) && !serviceServers.contains(server)) {
                     newServiceServers.add(server);
@@ -290,7 +293,8 @@ public class TaskManager {
                 try {
                     syncMachineState(); // 把管理员的更改同步到内部状态中
                 } catch (Exception e) {
-                    logger.error("syncMachineState error " + e.getMessage());
+                    e.printStackTrace();
+                    logger.error("syncMachineState error ");
                 }
             }
         };
@@ -304,7 +308,11 @@ public class TaskManager {
 
         if(children == null || children.size() == 0) {
             byte[] data = betaClient.getData().forPath(betaPath);
-            alphaClient.create().creatingParentsIfNeeded().forPath(alphaPath, data);
+            try {
+                alphaClient.create().creatingParentsIfNeeded().forPath(alphaPath, data);
+            } catch (Exception e) {
+                alphaClient.setData().forPath(alphaPath, data);
+            }
             return ;
         }
 
@@ -328,7 +336,7 @@ public class TaskManager {
     }
 
     public void removeAllData() throws Exception {
-        String[] paths = {Constants.INIT_STAT_LOCK, Constants.MONITOR_JUDGE_LOCK, Constants.MANAGER_PATH};
+        String[] paths = {Constants.MANAGER_PATH};
         for(String path : paths) {
             if(curatorClient.checkExists().forPath(path) != null) {
                 zkDelete(path);
@@ -354,7 +362,7 @@ public class TaskManager {
     public static void main(String[] args) {
         try {
             TaskManager taskManager = new TaskManager();
-///            taskManager.removeAllData();
+//            taskManager.removeAllData();
             taskManager.prepareBetaData();
             taskManager.start();
         } catch (Exception e) {
