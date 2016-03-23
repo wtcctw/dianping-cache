@@ -51,6 +51,9 @@ public class MemcacheStatsFlucService {
         String endTime = startTimeList.get(1);
 
         Float memUsage = getMemcacheUsage(startTime, endTime, server);
+        if(null == memUsage){
+            memUsage = (float)0;
+        }
 
         return memUsage;
     }

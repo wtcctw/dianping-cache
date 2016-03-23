@@ -15,9 +15,9 @@ public class ScanDetail {
 
     private String rdDuty;
 
-    private long totalCount;
+    private int totalCount;
 
-    private long failCount;
+    private int failCount;
 
     private double failPercent;
 
@@ -126,20 +126,20 @@ public class ScanDetail {
         return this;
     }
 
-    public long getTotalCount() {
+    public int getTotalCount() {
         return totalCount;
     }
 
-    public ScanDetail setTotalCount(long totalCount) {
+    public ScanDetail setTotalCount(int totalCount) {
         this.totalCount = totalCount;
         return this;
     }
 
-    public long getFailCount() {
+    public int getFailCount() {
         return failCount;
     }
 
-    public ScanDetail setFailCount(long failCount) {
+    public ScanDetail setFailCount(int failCount) {
         this.failCount = failCount;
         return this;
     }

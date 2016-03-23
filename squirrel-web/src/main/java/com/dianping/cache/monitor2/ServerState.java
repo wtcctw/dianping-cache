@@ -1,11 +1,12 @@
-package com.dianping.cache.monitor;
+package com.dianping.cache.monitor2;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import com.dianping.cache.monitor.Constants;
+import com.dianping.cache.monitor2.ServerListener;
 import com.dianping.squirrel.common.config.ConfigChangeListener;
 import com.dianping.squirrel.common.config.ConfigManager;
 import com.dianping.squirrel.common.config.ConfigManagerLoader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ServerState {
 
@@ -41,6 +42,7 @@ public class ServerState {
         this.server = server;
         deadThreshold = configManager.getIntValue(Constants.KEY_DEAD_THRESHOLD, Constants.DEFAULT_DEAD_THRESHOLD);
         liveThreshold = configManager.getIntValue(Constants.KEY_LIVE_THRESHOLD, Constants.DEFAULT_LIVE_THRESHOLD);
+
         try {
             configManager.registerConfigChangeListener(new ConfigChangeListener() {
 
@@ -59,45 +61,20 @@ public class ServerState {
         }
     }
 
-    public void setAlive(boolean currentAlive) {
-        boolean prevAlive = alive;
+    public void setAlive(boolean currentAlive, ServerListener listener) {
         alive = currentAlive;
         if(alive) {
-            if(!prevAlive) {
-                logger.info("server " + server + " status changed to alive");
-                deadCount = 0;
-                liveCount = 1;
-            } else {
-                if(++liveCount < 0) {
-                    liveCount = liveThreshold + 1;
-                }
-            }
-            if(liveCount == liveThreshold) {
-                logger.warn("server " + server + " status confirmed to be alive");
-                prevState = state;
+            if(++liveCount % liveThreshold == 0) {
+                listener.serverAlive();
                 state = State.Alive;
-                if(prevState == State.Dead) {
-                    fireServerAlive();
-                }
             }
+            deadCount = 0;
         } else {
-            if(prevAlive) {
-                logger.warn("server " + server + " status changed to dead");
-                liveCount = 0;
-                deadCount = 1;
-            } else {
-                if(++deadCount < 0) {
-                    deadCount = deadThreshold + 1;
-                }
-            }
-            if(deadCount == deadThreshold) {
-                logger.warn("server " + server + " status confirmed to be dead");
-                prevState = state;
+            if(++deadCount % deadThreshold == 0) {
+                listener.serverDead();
                 state = State.Dead;
-                if(prevState != State.Dead) {
-                    fireServerDead();
-                }
             }
+            liveCount = 0;
         }
     }
 
@@ -117,29 +94,8 @@ public class ServerState {
         return liveCount;
     }
     
-    
     public State getState() {
         return state;
-    }
-    
-    private void fireServerDead() {
-        if(taskListener != null) {
-            try {
-                taskListener.serverDead(server);
-            } catch(Throwable t) {
-                logger.error("failed to notify server dead", t);
-            }
-        }
-    }
-
-    private void fireServerAlive() {
-        if(taskListener != null) {
-            try {
-                taskListener.serverAlive(server);
-            } catch(Throwable t) {
-                logger.error("failed to notify server alive", t);
-            }
-        }
     }
 
     public void setServerListener(ServerListener taskListener) {

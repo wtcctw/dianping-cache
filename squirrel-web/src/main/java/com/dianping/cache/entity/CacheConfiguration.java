@@ -16,6 +16,7 @@
 package com.dianping.cache.entity;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -71,8 +72,13 @@ public class CacheConfiguration implements Serializable {
 		if (servers == null) {
 			return null;
 		}
-		return Arrays.asList(servers.split(LIST_SEPARATOR));
-	}
+        String[] temp = servers.split(LIST_SEPARATOR);
+        List<String> result = new ArrayList<String>();
+	    for(String s : temp) {
+            result.add(s);
+        }
+        return result;
+    }
 	
 	public void setServers(String servers) {
 		this.servers = servers;

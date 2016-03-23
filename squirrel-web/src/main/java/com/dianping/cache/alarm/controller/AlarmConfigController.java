@@ -1,7 +1,6 @@
 package com.dianping.cache.alarm.controller;
 
 import com.dianping.cache.alarm.alarmconfig.AlarmConfigService;
-import com.dianping.cache.alarm.alarmtemplate.AlarmTemplateService;
 import com.dianping.cache.alarm.alarmtemplate.MemcacheAlarmTemplateService;
 import com.dianping.cache.alarm.alarmtemplate.RedisAlarmTemplateService;
 import com.dianping.cache.alarm.controller.dto.AlarmConfigDto;
@@ -10,13 +9,14 @@ import com.dianping.cache.alarm.dataanalyse.task.BaselineTaskFactory;
 import com.dianping.cache.alarm.dataanalyse.thread.BaselineComputeThread;
 import com.dianping.cache.alarm.dataanalyse.thread.BaselineThreadFactory;
 import com.dianping.cache.alarm.entity.AlarmConfig;
-import com.dianping.cache.alarm.entity.AlarmTemplate;
+import com.dianping.cache.alarm.entity.MemcacheTemplate;
+import com.dianping.cache.alarm.entity.RedisTemplate;
 import com.dianping.cache.alarm.threadmanager.ThreadManager;
 import com.dianping.cache.controller.AbstractSidebarController;
 import com.dianping.cache.controller.RedisDataUtil;
 import com.dianping.cache.entity.CacheConfiguration;
-import com.dianping.cache.service.CacheConfigurationService;
 import com.dianping.squirrel.view.highcharts.statsdata.RedisClusterData;
+import com.dianping.cache.service.CacheConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -43,9 +43,6 @@ public class AlarmConfigController extends AbstractSidebarController {
 
     @Autowired
     private RedisAlarmTemplateService redisAlarmTemplateService;
-
-    @Autowired
-    private AlarmTemplateService alarmTemplateService;
 
     @Autowired
     private BaselineTaskFactory baselineTaskFactory;
@@ -132,19 +129,10 @@ public class AlarmConfigController extends AbstractSidebarController {
     @ResponseBody
     public List<String> findMemcacheTemplates() {
         List<String> templateNames = new ArrayList<String>();
-        List<AlarmTemplate> alarmTemplates = alarmTemplateService.findAll();
-        List<AlarmTemplate>memcacheAlarmTemplates = new ArrayList<AlarmTemplate>();
-        for(AlarmTemplate alarmTemplate:alarmTemplates){
-            if(alarmTemplate.getAlarmType().contains("Memcache")){
-                    memcacheAlarmTemplates.add(alarmTemplate);
-            }
-        }
+        List<MemcacheTemplate> memcacheTemplates = memcacheAlarmTemplateService.findAll();
 
-
-        for (AlarmTemplate alarmTemplate : memcacheAlarmTemplates) {
-            if(!templateNames.contains(alarmTemplate.getTemplateName())) {
-                templateNames.add(alarmTemplate.getTemplateName());
-            }
+        for (MemcacheTemplate memcacheTemplate : memcacheTemplates) {
+            templateNames.add(memcacheTemplate.getTemplateName());
         }
 
         return templateNames;
@@ -155,18 +143,10 @@ public class AlarmConfigController extends AbstractSidebarController {
     @ResponseBody
     public List<String> findRedisTemplates() {
         List<String> templateNames = new ArrayList<String>();
-        List<AlarmTemplate> alarmTemplates = alarmTemplateService.findAll();
-        List<AlarmTemplate>redisTemplates = new ArrayList<AlarmTemplate>();
-        for(AlarmTemplate alarmTemplate:alarmTemplates){
-            if(alarmTemplate.getAlarmType().contains("Redis")){
-                redisTemplates.add(alarmTemplate);
-            }
-        }
+        List<RedisTemplate> redisTemplates = redisAlarmTemplateService.findAll();
 
-        for (AlarmTemplate redisTemplate : redisTemplates) {
-            if(!templateNames.contains(redisTemplate.getTemplateName())) {
-                templateNames.add(redisTemplate.getTemplateName());
-            }
+        for (RedisTemplate redisTemplate : redisTemplates) {
+            templateNames.add(redisTemplate.getTemplateName());
         }
 
         return templateNames;
@@ -175,6 +155,7 @@ public class AlarmConfigController extends AbstractSidebarController {
     @RequestMapping(value = "/config/alarm/baselineCompute")
     @ResponseBody
     public void baselineCompute() {
+        System.out.println("Hello world");
 
         BaselineComputeThread baselineComputeThread = baselineThreadFactory.createBaselineComputeThread();
 
