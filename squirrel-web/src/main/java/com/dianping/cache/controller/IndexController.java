@@ -18,6 +18,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -138,6 +139,7 @@ public class IndexController extends AbstractMenuController{
 		List<Double> avgDelayListCache = new ArrayList<Double>();
 
 		DecimalFormat df   = new DecimalFormat("######0.00");
+		Collections.reverse(scanStatisticsList);
 		for(ScanStatistics statistics: scanStatisticsList){
 			createTimeList.add(statistics.getCreateTime());
 			totalCountListSquirrel.add(statistics.getTotalCountSquirrel() / 100000000);
