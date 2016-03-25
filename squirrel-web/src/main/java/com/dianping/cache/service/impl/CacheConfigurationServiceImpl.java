@@ -15,23 +15,6 @@
  */
 package com.dianping.cache.service.impl;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
-
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.InitializingBean;
-import org.springframework.util.Assert;
-
 import com.dianping.avatar.exception.DuplicatedIdentityException;
 import com.dianping.cache.dao.CacheConfigurationDao;
 import com.dianping.cache.entity.CacheConfiguration;
@@ -46,6 +29,7 @@ import com.dianping.cache.service.CacheKeyConfigurationService;
 import com.dianping.cache.service.OperationLogService;
 import com.dianping.cache.service.ServerGroupService;
 import com.dianping.cache.util.Migrator;
+import com.dianping.cache.util.SpringLocator;
 import com.dianping.lion.Environment;
 import com.dianping.ops.cmdb.CmdbManager;
 import com.dianping.ops.cmdb.CmdbProject;
@@ -62,6 +46,18 @@ import com.dianping.squirrel.common.domain.CacheKeyTypeVersionUpdateDTO;
 import com.dianping.squirrel.common.domain.SingleCacheRemoveDTO;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.util.Assert;
+
+import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 /**
  * CacheConfigurationService to provide cache configuration data
@@ -184,6 +180,18 @@ public class CacheConfigurationServiceImpl implements CacheConfigurationService,
 		} catch (RuntimeException e) {
 			logger.error("Update cache configuration failed.", e);
 			logConfigurationUpdate(oldConfig, config, false);
+			throw e;
+		}
+	}
+
+
+	public void sync2zkservice(CacheConfiguration config) {
+		CacheConfiguration oldConfig = null;
+		try {
+			CacheMessageNotifier notifier = SpringLocator.getBean(CacheMessageNotifier.class);
+			notifier.sycDB2ZKservice(translator.translate(config));
+		} catch (RuntimeException e) {
+			logger.error("Update cache configuration failed.", e);
 			throw e;
 		}
 	}

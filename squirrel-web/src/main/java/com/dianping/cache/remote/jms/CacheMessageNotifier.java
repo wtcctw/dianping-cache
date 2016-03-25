@@ -1,11 +1,16 @@
 package com.dianping.cache.remote.jms;
 
-import java.io.IOException;
-import java.io.Serializable;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import com.dianping.cat.Cat;
+import com.dianping.squirrel.common.config.ConfigManager;
+import com.dianping.squirrel.common.config.ConfigManagerLoader;
+import com.dianping.squirrel.common.domain.*;
+import com.dianping.squirrel.common.util.BoundedLinkedList;
+import com.dianping.squirrel.common.util.JsonUtils;
+import com.dianping.squirrel.common.util.PathUtils;
+import com.dianping.squirrel.common.util.SedesUtils;
+import com.geekhua.filequeue.Config;
+import com.geekhua.filequeue.FileQueue;
+import com.geekhua.filequeue.FileQueueImpl;
 import org.apache.commons.lang.StringUtils;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
@@ -17,21 +22,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 
-import com.dianping.cat.Cat;
-import com.dianping.squirrel.common.config.ConfigManager;
-import com.dianping.squirrel.common.config.ConfigManagerLoader;
-import com.dianping.squirrel.common.domain.CacheConfigurationDTO;
-import com.dianping.squirrel.common.domain.CacheConfigurationRemoveDTO;
-import com.dianping.squirrel.common.domain.CacheKeyConfigurationDTO;
-import com.dianping.squirrel.common.domain.CacheKeyTypeVersionUpdateDTO;
-import com.dianping.squirrel.common.domain.SingleCacheRemoveDTO;
-import com.dianping.squirrel.common.util.BoundedLinkedList;
-import com.dianping.squirrel.common.util.JsonUtils;
-import com.dianping.squirrel.common.util.PathUtils;
-import com.dianping.squirrel.common.util.SedesUtils;
-import com.geekhua.filequeue.Config;
-import com.geekhua.filequeue.FileQueue;
-import com.geekhua.filequeue.FileQueueImpl;
+import java.io.IOException;
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class CacheMessageNotifier implements Serializable, InitializingBean, MQSender {
 
@@ -125,10 +120,7 @@ public class CacheMessageNotifier implements Serializable, InitializingBean, MQS
     }
 
     public void notifyServiceConfigChange(CacheConfigurationDTO serviceConfig) {
-        String path = PathUtils.getServicePath(serviceConfig.getCacheKey());
-        if (StringUtils.isNotBlank(serviceConfig.getSwimlane())) {
-            path = PathUtils.getServicePath(serviceConfig.getCacheKey(), serviceConfig.getSwimlane());
-        }
+        String path = getPath(serviceConfig);
         try {
             String content = JsonUtils.toStr(serviceConfig);
             updateNode(path, content);
@@ -138,6 +130,39 @@ public class CacheMessageNotifier implements Serializable, InitializingBean, MQS
             Cat.logEvent(CAT_EVENT_TYPE, "service.change:" + serviceConfig.getCacheKey(),
                     "-1", e.getMessage());
             logger.error("failed to notify service config change: " + serviceConfig, e);
+        }
+    }
+
+    private String getPath(CacheConfigurationDTO serviceConfig){
+        String path;
+        if(serviceConfig.getServers().contains("redis")){
+            if (StringUtils.isNotBlank(serviceConfig.getSwimlane())) {
+                path = PathUtils.getServicePath(serviceConfig.getCacheKey(), serviceConfig.getSwimlane());
+            } else {
+                path = PathUtils.getServicePath(serviceConfig.getCacheKey());
+            }
+        } else {
+            if (StringUtils.isNotBlank(serviceConfig.getSwimlane())) {
+                path = PathUtils.getManagerPath(serviceConfig.getCacheKey(), serviceConfig.getSwimlane());
+            } else {
+                path = PathUtils.getManagerPath(serviceConfig.getCacheKey());
+            }
+        }
+        return path;
+    }
+
+    public void sycDB2ZKservice(CacheConfigurationDTO serviceConfig) {
+        serviceConfig.setKey(null);
+        serviceConfig.setDetail(null);
+        String path = PathUtils.getServicePath(serviceConfig.getCacheKey());
+        if (StringUtils.isNotBlank(serviceConfig.getSwimlane())) {
+            path = PathUtils.getServicePath(serviceConfig.getCacheKey(), serviceConfig.getSwimlane());
+        }
+        try {
+            String content = JsonUtils.toStr(serviceConfig);
+            updateNode(path, content);
+        } catch (Exception e) {
+            logger.error("failed to sycDB2ZKservice: " + serviceConfig, e);
         }
     }
 

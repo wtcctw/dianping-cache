@@ -101,6 +101,16 @@ public class ConfigController extends AbstractSidebarController {
 
     }
 
+
+    @RequestMapping(value = "/config/cluster/sync2zks")
+    @ResponseBody
+    public void sync2zkservice() {
+        List<CacheConfiguration> configurations = cacheConfigurationService.findAll();
+        for(CacheConfiguration configuration : configurations){
+            cacheConfigurationService.sync2zkservice(configuration);
+        }
+    }
+
     @Override
     protected String getSide() {
         return "config";
