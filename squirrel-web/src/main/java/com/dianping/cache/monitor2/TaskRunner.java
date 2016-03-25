@@ -101,6 +101,7 @@ public class TaskRunner implements Runnable, ServerListener {
     public void serverDead() {
         try {
             NotifyManager.getInstance().notify("offline " + server, "offline " + server);
+            logger.info("server is mark down " + server);
             markDown(server);
         } catch (Exception e) {
             logger.error("failed to mark down " + server, e);
@@ -126,7 +127,6 @@ public class TaskRunner implements Runnable, ServerListener {
         }
         try {
             curatorClient.create().creatingParentsIfNeeded().withMode(CreateMode.EPHEMERAL).forPath(path);
-            logger.info("server " + memcached + " marked down");
         } catch(NodeExistsException e) {
             logger.warn("server " + memcached + " already marked down");
         }

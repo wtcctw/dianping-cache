@@ -52,6 +52,7 @@ public class TaskManager {
     private void zkDelete(String path) throws Exception {
         List<String> children = curatorClient.getChildren().forPath(path);
         if (children == null || children.size() == 0) {
+            logger.info("remove zookeeper path " + path);
             curatorClient.delete().forPath(path);
             return ;
         }
@@ -81,8 +82,7 @@ public class TaskManager {
         } catch (KeeperException.NoNodeException e) {
             return true;
         } catch (Exception e) {
-            System.out.println(e.getCause());
-            e.printStackTrace();
+            logger.error("unknown server in monitor " + server);
             return true;
         }
     }
@@ -189,6 +189,7 @@ public class TaskManager {
         for(String key : managerConfig.keySet()) {
             if(!serviceConfig.keySet().contains(key)) {
                 setServiceConfiguration(key, managerConfig.get(key));
+                logger.info("add new cluster " + key);
             }
         }
 
@@ -196,6 +197,7 @@ public class TaskManager {
         for(String key : serviceConfig.keySet()) {
             if(!managerConfig.keySet().contains(key)) {
                 removeServiceCluster(key);
+                logger.info("remove sluter " + key);
             }
         }
 
@@ -235,6 +237,7 @@ public class TaskManager {
             for(String server : managerServers) {
                 if(isAlive(server) && !serviceServers.contains(server)) {
                     newServiceServers.add(server);
+                    logger.info("add new server in cluster " + managerClusterKey + " server " + server);
                     change = true;
                 }
             }
@@ -261,6 +264,7 @@ public class TaskManager {
             for(String server : serviceServers) {
                 if(!isAlive(server) || !managerServers.contains(server)) { // 死了 或者 管理员下线了
                     newServiceServers.remove(server);
+                    logger.info("remove new server in cluster " + serviceCluserKey + " server " + server);
                     change = true;
                 }
             }
@@ -291,9 +295,9 @@ public class TaskManager {
                 for(TaskRunner t : serverStatMap.values())
                     taskRunnerThreadPool.submit(t);
                 try {
+                    logger.info("start sync machine state");
                     syncMachineState(); // 把管理员的更改同步到内部状态中
                 } catch (Exception e) {
-                    e.printStackTrace();
                     logger.error("syncMachineState error ");
                 }
             }
