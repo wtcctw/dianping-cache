@@ -280,6 +280,7 @@ public class TaskManager {
     }
 
     public void start() throws Exception {
+        initManagerNode();
         final Runnable task = new Runnable() {
             @Override
             public void run() {
@@ -354,12 +355,39 @@ public class TaskManager {
         String testClusterInfo = "{\"cacheKey\":\"memcached-tuangou\",\"clientClazz\":\"com.dianping.cache.memcached.MemcachedClientImpl\",\"servers\":\"10.66.11.117:11211\",\"transcoderClazz\":\"com.dianping.cache.memcached.HessianTranscoder\",\"addTime\":1452755302947,\"serverList\":[\"10.66.11.117:11211\"]}";
         curatorClient.create().creatingParentsIfNeeded().forPath(path, testClusterInfo.getBytes("UTF-8"));
     }
+    private void initManagerNode() throws Exception {
+        String servicePath = Constants.REAL_SERVICE_PATH;
+        String managerPath = Constants.MANAGER_PATH;
+        copyFromServiceToManager(servicePath, managerPath);
+    }
+    private void copyFromServiceToManager(String servicePath, String managerPath) throws Exception {
+        List<String> children = this.curatorClient.getChildren().forPath(servicePath);
+
+        if(children == null || children.size() == 0) {
+            byte[] data = this.curatorClient.getData().forPath(servicePath);
+            try {
+                this.curatorClient.create().creatingParentsIfNeeded().forPath(managerPath, data);
+            } catch (Exception e) {
+                this.curatorClient.setData().forPath(managerPath, data);
+            }
+            return ;
+        }
+
+        for(String c : children) {
+            String newservicePath = servicePath + "/" + c;
+            String newmanagerPaht = managerPath + "/" + c;
+            copyFromServiceToManager(newservicePath, newmanagerPaht);
+        }
+
+        byte[] data = this.curatorClient.getData().forPath(servicePath);
+        this.curatorClient.setData().forPath(managerPath, data);
+    }
 
     public static void main(String[] args) {
         try {
             TaskManager taskManager = new TaskManager();
 //            taskManager.removeAllData();
-            taskManager.prepareBetaData();
+//            taskManager.prepareBetaData();
             taskManager.start();
         } catch (Exception e) {
             e.printStackTrace();
