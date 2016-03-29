@@ -10,7 +10,7 @@ public interface Constants {
 
     String MARKDOWN_PATH = "/dp/cache/monitor/markdown";
     String MANAGER_PATH = "/dp/cache/monitor/manager";
-    String SERVICE_PATH = "/dp/cache/service";
+    String SERVICE_PATH = "/dp/cache/serviceTemp";
 
 
     String MEMBER_PATH = "/dp/cache/cache-server";
