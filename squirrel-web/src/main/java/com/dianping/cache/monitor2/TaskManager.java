@@ -138,8 +138,8 @@ public class TaskManager {
         if(!cluster.startsWith("memcached"))
             return ;
 
-        String result = JsonUtils.toStr(config);
-
+        String result2 = JsonUtils.toStr(config);
+        String result = result2.replace("\"swimlane\":\"\",", "");// remove swimlane
         String path = concatZkPath(Constants.SERVICE_PATH, cluster);
         if(curatorClient.checkExists().forPath(concatZkPath(Constants.SERVICE_PATH, cluster)) == null) {
             curatorClient.create().creatingParentsIfNeeded().forPath(path, result.getBytes("UTF-8"));
@@ -230,8 +230,8 @@ public class TaskManager {
                 serviceServers = new ArrayList<String>();
 
             List<String> newServiceServers = new ArrayList<String>();
-            newServiceServers.addAll(serviceServers);
-
+            for(String server : serviceServers)
+                newServiceServers.add(server);
             if(managerServers == null)
                 continue;
             for(String server : managerServers) {
@@ -260,11 +260,12 @@ public class TaskManager {
                 serviceServers = new ArrayList<String>();
 
             List<String> newServiceServers = new ArrayList<String>();
-            newServiceServers.addAll(serviceServers);
+            for(String server : serviceServers)
+                newServiceServers.add(server);
             for(String server : serviceServers) {
                 if(!isAlive(server) || !managerServers.contains(server)) { // 死了 或者 管理员下线了
                     newServiceServers.remove(server);
-                    logger.info("remove new server in cluster " + serviceCluserKey + " server " + server);
+                    logger.info("remove server in cluster " + serviceCluserKey + " server " + server);
                     change = true;
                 }
             }
@@ -276,16 +277,6 @@ public class TaskManager {
         }
 
 
-    }
-
-
-    private void init() throws Exception {
-        // 创建必要的四个节点 路径如下
-        String[] paths = {Constants.SERVICE_PATH, Constants.MANAGER_PATH};
-        for(String node : paths) {
-            if(curatorClient.checkExists().forPath(node) == null)
-                curatorClient.create().creatingParentsIfNeeded().forPath(node);
-        }
     }
 
     public void start() throws Exception {
@@ -312,6 +303,7 @@ public class TaskManager {
 
         if(children == null || children.size() == 0) {
             byte[] data = betaClient.getData().forPath(betaPath);
+            String dataStr = new String(data);
             try {
                 alphaClient.create().creatingParentsIfNeeded().forPath(alphaPath, data);
             } catch (Exception e) {
@@ -340,7 +332,7 @@ public class TaskManager {
     }
 
     public void removeAllData() throws Exception {
-        String[] paths = {Constants.MANAGER_PATH};
+        String[] paths = {Constants.MANAGER_PATH, Constants.SERVICE_PATH, Constants.MARKDOWN_PATH};
         for(String path : paths) {
             if(curatorClient.checkExists().forPath(path) != null) {
                 zkDelete(path);

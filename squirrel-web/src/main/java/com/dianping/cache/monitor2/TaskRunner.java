@@ -47,6 +47,8 @@ public class TaskRunner implements Runnable, ServerListener {
 
     private CuratorFramework curatorClient;
 
+    private ServerState.State preState = ServerState.State.Unknown;
+
     public TaskRunner(String server) {
         this.server = server;
         this.serverState = new com.dianping.cache.monitor2.ServerState(server);
@@ -70,16 +72,11 @@ public class TaskRunner implements Runnable, ServerListener {
             alive = checkNode();
         } catch (Throwable e) {
             alive = false;
-            logger.error(server + " is died");
+            logger.error(server + " checked to be died");
         } finally {
             this.serverState.setAlive(alive, this);
             lastCheckTime = System.currentTimeMillis();
             logger.info(serverState + ", time: " + (lastCheckTime-start));
-            if(alive) {
-                markUp(server);
-                logger.error(server + "is alive");
-            } else
-                markDown(server);
         }
 
     }
@@ -100,7 +97,10 @@ public class TaskRunner implements Runnable, ServerListener {
     @Override
     public void serverDead() {
         try {
-            NotifyManager.getInstance().notify("offline " + server, "offline " + server);
+            if(preState != ServerState.State.Dead) {
+                preState = ServerState.State.Dead;
+                NotifyManager.getInstance().notify("offline " + server, "offline " + server);
+            }
             logger.info("server is mark down " + server);
             markDown(server);
         } catch (Exception e) {
@@ -111,7 +111,10 @@ public class TaskRunner implements Runnable, ServerListener {
     @Override
     public void serverAlive() {
         try {
-            NotifyManager.getInstance().notify("online " + server, "online " + server);
+            if(preState != ServerState.State.Alive) {
+                preState = ServerState.State.Alive;
+                NotifyManager.getInstance().notify("online " + server, "online " + server);
+            }
             markUp(server);
         } catch (Exception e) {
             logger.error("failed to mark up " + server, e);
