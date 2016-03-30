@@ -237,7 +237,8 @@ public class TaskManager {
             for(String server : managerServers) {
                 if(isAlive(server) && !serviceServers.contains(server)) {
                     newServiceServers.add(server);
-                    logger.info("add new server in cluster " + managerClusterKey + " server " + server);
+                    logger.info("online server in cluster " + managerClusterKey + " server " + server);
+                    NotifyManager.getInstance().notifyWeixin("online server in cluster " + managerClusterKey + " server " + server);
                     change = true;
                 }
             }
@@ -265,7 +266,9 @@ public class TaskManager {
             for(String server : serviceServers) {
                 if(!isAlive(server) || !managerServers.contains(server)) { // 死了 或者 管理员下线了
                     newServiceServers.remove(server);
-                    logger.info("remove server in cluster " + serviceCluserKey + " server " + server);
+                    logger.info("offline server in cluster " + serviceCluserKey + " server " + server);
+                    NotifyManager.getInstance().notifyWeixin("offline server in cluster " + serviceCluserKey + " server " + server);
+
                     change = true;
                 }
             }

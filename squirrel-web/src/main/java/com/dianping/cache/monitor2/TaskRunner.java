@@ -99,7 +99,9 @@ public class TaskRunner implements Runnable, ServerListener {
         try {
             if(preState != ServerState.State.Dead) {
                 preState = ServerState.State.Dead;
-                NotifyManager.getInstance().notify("offline " + server, "offline " + server);
+//                NotifyManager.getInstance().notify("offline " + server, "offline " + server);
+//                NotifyManager.getInstance().notifyWeixin("offline " + server);
+
             }
             logger.info("server is mark down " + server);
             markDown(server);
@@ -113,7 +115,8 @@ public class TaskRunner implements Runnable, ServerListener {
         try {
             if(preState != ServerState.State.Alive) {
                 preState = ServerState.State.Alive;
-                NotifyManager.getInstance().notify("online " + server, "online " + server);
+//                NotifyManager.getInstance().notify("online " + server, "online " + server);
+//                NotifyManager.getInstance().notifyWeixin("online " + server);
             }
             markUp(server);
         } catch (Exception e) {
