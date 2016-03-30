@@ -56,5 +56,6 @@ public interface Constants {
     String KEY_NOTIFY_WEIXIN_TYPE = "avatar-cache.notify.weixin.type";
     int DEFAULT_NOTIFY_WEIXIN_TYPE = 54;// 运维平台
     String KEY_NOTIFY_WEIXIN_LIST = "avatar-cache.notify.weixin.list";
+//    String DEFAULT_NOTIFY_WEIXIN_LIST = "0023415,0000558,0014852,0005503,0003769,0021910";
     String DEFAULT_NOTIFY_WEIXIN_LIST = "0023415,0000558,0014852,0005503,0003769,0021910";
 }

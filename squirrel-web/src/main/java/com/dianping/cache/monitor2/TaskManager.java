@@ -385,6 +385,7 @@ public class TaskManager {
 
     public static void main(String[] args) {
         try {
+            NotifyManager.getInstance().notifyWeixin("qweqwe");
             TaskManager taskManager = new TaskManager();
 //            taskManager.removeAllData();
 //            taskManager.prepareBetaData();

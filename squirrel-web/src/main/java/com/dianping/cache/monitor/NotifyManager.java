@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.dianping.lion.client.Lion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,8 +59,8 @@ public class NotifyManager {
         smsType = configManager.getIntValue(Constants.KEY_NOTIFY_SMS_TYPE, Constants.DEFAULT_NOTIFY_SMS_TYPE);
         smsList = configManager.getStringValue(Constants.KEY_NOTIFY_SMS_LIST, Constants.DEFAULT_NOTIFY_SMS_LIST);
         weixinType = configManager.getIntValue(Constants.KEY_NOTIFY_WEIXIN_TYPE, Constants.DEFAULT_NOTIFY_WEIXIN_TYPE);
-        weixinList = configManager.getStringValue(Constants.KEY_NOTIFY_WEIXIN_LIST, Constants.DEFAULT_NOTIFY_WEIXIN_LIST);
-        
+//        weixinList = configManager.getStringValue(Constants.KEY_NOTIFY_WEIXIN_LIST, Constants.DEFAULT_NOTIFY_WEIXIN_LIST);
+        weixinList = Lion.get(Constants.KEY_NOTIFY_WEIXIN_LIST);
         try {
             configManager.registerConfigChangeListener(new ConfigChangeListener() {
 
