@@ -127,28 +127,28 @@ public class RedisAlarmer extends AbstractRedisAlarmer {
                     }
                     AlarmTemplate alarmTemplate = getAlarmTemplate(alarmConfig.getAlarmTemplate(), "Redis内存");
                     if (null == alarmTemplate) {
-                        logger.info(item.getClusterName() + "not config template");
+//                        logger.info(item.getClusterName() + "not config template");
                         alarmTemplate = alarmTemplateService.findAlarmTemplateByTemplateNameAndType("Default", "Redis内存");
                     }
                     boolean isMemAlarm = isMemAlarm(item, node, alarmConfig, alarmTemplate, redisEvent);
 
                     alarmTemplate = getAlarmTemplate(alarmConfig.getAlarmTemplate(), "Redis内存");
                     if (null == alarmTemplate) {
-                        logger.info(item.getClusterName() + "not config template");
+//                        logger.info(item.getClusterName() + "not config template");
                         alarmTemplate = alarmTemplateService.findAlarmTemplateByTemplateNameAndType("Default", "Redis内存");
                     }
                     boolean isMemFlucAlarm = isMemFlucAlarm(item, node, alarmConfig, alarmTemplate, redisEvent);
 
                     alarmTemplate = getAlarmTemplate(alarmConfig.getAlarmTemplate(), "RedisQPS");
                     if (null == alarmTemplate) {
-                        logger.info(item.getClusterName() + "not config template");
+//                        logger.info(item.getClusterName() + "not config template");
                         alarmTemplate = alarmTemplateService.findAlarmTemplateByTemplateNameAndType("Default", "RedisQPS");
                     }
                     boolean isQpsAlarm = isQpsAlarm(item, node, alarmConfig, alarmTemplate, redisEvent);
 
                     alarmTemplate = getAlarmTemplate(alarmConfig.getAlarmTemplate(), "RedisQPS");
                     if (null == alarmTemplate) {
-                        logger.info(item.getClusterName() + "not config template");
+//                        logger.info(item.getClusterName() + "not config template");
                         alarmTemplate = alarmTemplateService.findAlarmTemplateByTemplateNameAndType("Default", "RedisQPS");
                     }
                     boolean isQpsFlucAlarm = isQpsFlucAlarm(item, node, alarmConfig, alarmTemplate, redisEvent);
@@ -564,7 +564,7 @@ public class RedisAlarmer extends AbstractRedisAlarmer {
         AlarmTemplate alarmTemplate = alarmTemplateService.findAlarmTemplateByTemplateNameAndType(alarmConfig.getAlarmTemplate(), "Redis主从一致");
 
         if (null == alarmTemplate) {
-            logger.info(item.getClusterName() + "not config template");
+//            logger.info(item.getClusterName() + "not config template");
             alarmTemplate = alarmTemplateService.findAlarmTemplateByTemplateNameAndType("Default", "Redis主从一致");
         }
 
@@ -632,7 +632,7 @@ public class RedisAlarmer extends AbstractRedisAlarmer {
 
 
            if (null == alarmTemplate) {
-               logger.info(item.getClusterName() + "not config template");
+//               logger.info(item.getClusterName() + "not config template");
                alarmTemplate = alarmTemplateService.findAlarmTemplateByTemplateNameAndType("Default", "Redis宕机");
            }
 
