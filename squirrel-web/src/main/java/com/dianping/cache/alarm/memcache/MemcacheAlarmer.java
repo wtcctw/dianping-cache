@@ -174,7 +174,7 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
         AlarmTemplate alarmTemplate = alarmTemplateService.findAlarmTemplateByTemplateNameAndType(alarmConfig.getAlarmTemplate(), "Memcache宕机");
 
         if (null == alarmTemplate) {
-            logger.info(item.getCacheKey() + "not config template");
+//            logger.info(item.getCacheKey() + "not config template");
             alarmTemplate = alarmTemplateService.findAlarmTemplateByTemplateNameAndType("Default", "Memcache宕机");
         }
 
@@ -219,7 +219,7 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
         AlarmTemplate alarmTemplate = alarmTemplateService.findAlarmTemplateByTemplateNameAndType(alarmConfig.getAlarmTemplate(), "Memcache内存");
 
         if (null == alarmTemplate) {
-            logger.info(item.getCacheKey() + "not config template");
+//            logger.info(item.getCacheKey() + "not config template");
             alarmTemplate = alarmTemplateService.findAlarmTemplateByTemplateNameAndType("Default","Memcache内存");
         }
 
@@ -284,7 +284,7 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
 
 
         if (null == alarmTemplate) {
-            logger.info(item.getCacheKey() + "not config template");
+//            logger.info(item.getCacheKey() + "not config template");
             alarmTemplate = alarmTemplateService.findAlarmTemplateByTemplateNameAndType("Default", "Memcache内存");
         }
 
@@ -408,7 +408,7 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
 
 
         if (null == alarmTemplate) {
-            logger.info(item.getCacheKey() + "not config template");
+//            logger.info(item.getCacheKey() + "not config template");
             alarmTemplate = alarmTemplateService.findAlarmTemplateByTemplateNameAndType("Default", "MemcacheQPS");
         }
 
@@ -467,7 +467,7 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
 
 
         if (null == alarmTemplate) {
-            logger.info(item.getCacheKey() + "not config template");
+//            logger.info(item.getCacheKey() + "not config template");
             alarmTemplate = alarmTemplateService.findAlarmTemplateByTemplateNameAndType("Default", "MemcacheQPS");
         }
 
@@ -587,7 +587,7 @@ public class MemcacheAlarmer extends AbstractMemcacheAlarmer {
         AlarmTemplate alarmTemplate = alarmTemplateService.findAlarmTemplateByTemplateNameAndType(alarmConfig.getAlarmTemplate(), "Memcache连接数");
 
         if (null == alarmTemplate) {
-            logger.info(item.getCacheKey() + "not config template");
+//            logger.info(item.getCacheKey() + "not config template");
             alarmTemplate = alarmTemplateService.findAlarmTemplateByTemplateNameAndType("Default", "Memcache连接数");
         }
 
