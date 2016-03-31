@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.dianping.cache.alarm.dao.ScanStatisticsDao">
+
+    <resultMap id="ScanStatisticsResult" type="ScanStatistics">
+        <result column="id" property="id"/>
+        <result column="totalCountSquirrel" property="totalCountSquirrel"/>
+        <result column="failureCountSquirrel" property="failureCountSquirrel"/>
+        <result column="failurePercentSquirrel" property="failurePercentSquirrel"/>
+        <result column="avgDelaySquirrel" property="avgDelaySquirrel"/>
+        <result column="totalCountCache" property="totalCountCache"/>
+        <result column="failureCountCache" property="failureCountCache"/>
+        <result column="failurePercentCache" property="failurePercentCache"/>
+        <result column="avgDelayCache" property="avgDelayCache"/>
+        <result column="createTime" property="createTime"/>
+        <result column="updateTime" property="updateTime"/>
+    </resultMap>
+
+    <insert id="insert" parameterType="ScanStatistics">
+        INSERT INTO scan_statistics(id,totalCountSquirrel, failureCountSquirrel,failurePercentSquirrel,avgDelaySquirrel,totalCountCache, failureCountCache,failurePercentCache,avgDelayCache,createTime,updateTime)
+        VALUES(#{id},#{totalCountSquirrel}, #{failureCountSquirrel},#{failurePercentSquirrel},#{avgDelaySquirrel},#{totalCountCache}, #{failureCountCache},#{failurePercentCache},#{avgDelayCache},#{createTime},#{updateTime})
+    </insert>
+
+    <select id="findByCreateTime" resultMap="ScanStatisticsResult" parameterType="String">
+        SELECT id,totalCountSquirrel, failureCountSquirrel,failurePercentSquirrel,avgDelaySquirrel,totalCountCache, failureCountCache,failurePercentCache,avgDelayCache,createTime,updateTime
+        FROM scan_statistics
+        WHERE createTime = #{createTime}
+        ORDER BY id DESC
+    </select>
+
+    <select id="findAll" resultMap="ScanStatisticsResult">
+        SELECT id,totalCountSquirrel, failureCountSquirrel,failurePercentSquirrel,avgDelaySquirrel,totalCountCache, failureCountCache,failurePercentCache,avgDelayCache,createTime,updateTime
+        FROM scan_statistics
+        ORDER BY id ASC
+    </select>
+
+    <select id="findByPage" resultMap="ScanStatisticsResult" parameterType="map">
+        SELECT id,totalCountSquirrel, failureCountSquirrel,failurePercentSquirrel,avgDelaySquirrel,totalCountCache, failureCountCache,failurePercentCache,avgDelayCache,createTime,updateTime
+        FROM scan_statistics
+        ORDER BY id DESC
+        LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+    
+
+    <select id="search" resultType="ScanStatistics">
+        ${paramSQL}
+    </select>
+
+</mapper>

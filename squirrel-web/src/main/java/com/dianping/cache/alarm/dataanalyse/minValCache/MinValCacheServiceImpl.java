@@ -39,7 +39,6 @@ public class MinValCacheServiceImpl implements MinValCacheService {
             default:
                 return true;
         }
-
     }
 
     @Override

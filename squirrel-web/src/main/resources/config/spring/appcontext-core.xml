@@ -29,7 +29,7 @@
         <property name="zkAddress" value="${avatar-cache.zookeeper.address}" />
     </bean>
 
-    <bean id="monitor" class="com.dianping.cache.monitor2.TaskManager" init-method="start" />
+    <bean id="monitor" class="com.dianping.cache.monitor.TaskManager" init-method="start" />
 
     <bean class="com.dianping.cache.alarm.lifecycle.LifecycleComponentManager" />
 

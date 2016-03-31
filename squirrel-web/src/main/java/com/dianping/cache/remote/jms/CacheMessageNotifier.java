@@ -120,7 +120,10 @@ public class CacheMessageNotifier implements Serializable, InitializingBean, MQS
     }
 
     public void notifyServiceConfigChange(CacheConfigurationDTO serviceConfig) {
-        String path = getPath(serviceConfig);
+        String path = PathUtils.getServicePath(serviceConfig.getCacheKey());
+        if (StringUtils.isNotBlank(serviceConfig.getSwimlane())) {
+            path = PathUtils.getServicePath(serviceConfig.getCacheKey(), serviceConfig.getSwimlane());
+        }
         try {
             String content = JsonUtils.toStr(serviceConfig);
             updateNode(path, content);
@@ -133,43 +136,10 @@ public class CacheMessageNotifier implements Serializable, InitializingBean, MQS
         }
     }
 
-    private String getPath(CacheConfigurationDTO serviceConfig){
-        String path;
-        if(serviceConfig.getServers().contains("redis")){
-            if (StringUtils.isNotBlank(serviceConfig.getSwimlane())) {
-                path = PathUtils.getServicePath(serviceConfig.getCacheKey(), serviceConfig.getSwimlane());
-            } else {
-                path = PathUtils.getServicePath(serviceConfig.getCacheKey());
-            }
-        } else {
-            if (StringUtils.isNotBlank(serviceConfig.getSwimlane())) {
-                path = PathUtils.getManagerPath(serviceConfig.getCacheKey(), serviceConfig.getSwimlane());
-            } else {
-                path = PathUtils.getManagerPath(serviceConfig.getCacheKey());
-            }
-        }
-        return path;
-    }
-
-    public void sycDB2ZKservice(CacheConfigurationDTO serviceConfig) {
-        serviceConfig.setKey(null);
-        serviceConfig.setDetail(null);
-        String path = PathUtils.getServicePath(serviceConfig.getCacheKey());
-        if (StringUtils.isNotBlank(serviceConfig.getSwimlane())) {
-            path = PathUtils.getServicePath(serviceConfig.getCacheKey(), serviceConfig.getSwimlane());
-        }
-        try {
-            String content = JsonUtils.toStr(serviceConfig);
-            updateNode(path, content);
-        } catch (Exception e) {
-            logger.error("failed to sycDB2ZKservice: " + serviceConfig, e);
-        }
-    }
-
     public void notifyServiceConfigRemove(CacheConfigurationRemoveDTO serviceConfig) {
-        String path = PathUtils.getServicePath(serviceConfig.getCacheKey());
+        String path = PathUtils.getManagerPath(serviceConfig.getCacheKey());
         if (StringUtils.isNotBlank(serviceConfig.getSwimlane())) {
-            path = PathUtils.getServicePath(serviceConfig.getCacheKey(), serviceConfig.getSwimlane());
+            path = PathUtils.getManagerPath(serviceConfig.getCacheKey(), serviceConfig.getSwimlane());
         }
         try {
             //remove Node
