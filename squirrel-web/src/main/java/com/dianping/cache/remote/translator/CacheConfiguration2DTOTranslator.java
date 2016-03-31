@@ -17,16 +17,11 @@ package com.dianping.cache.remote.translator;
 
 import com.dianping.cache.entity.CacheConfiguration;
 import com.dianping.cache.entity.SupportedSpecification.SupportedCacheClients;
-import com.dianping.remote.cache.dto.*;
+import com.dianping.squirrel.client.util.DTOUtils;
+import com.dianping.squirrel.common.domain.*;
+
 //import com.dianping.remote.cache.dto.XMemcachedConfigDetailDTO;
 //import com.dianping.remote.cache.dto.DCacheConfigDetailDTO;
-import com.dianping.squirrel.client.util.DTOUtils;
-import com.dianping.squirrel.common.domain.CacheConfigDetailDTO;
-import com.dianping.squirrel.common.domain.CacheConfigurationDTO;
-import com.dianping.squirrel.common.domain.DangaConfigDetailDTO;
-import com.dianping.squirrel.common.domain.DcacheConfigDetailDTO;
-import com.dianping.squirrel.common.domain.EhcacheConfigDetailDTO;
-import com.dianping.squirrel.common.domain.MemcachedConfigDetailDTO;
  
 /**
  * CacheConfiguration2DTO Translator
@@ -42,6 +37,7 @@ public class CacheConfiguration2DTOTranslator implements Translator<CacheConfigu
 			CacheConfigurationDTO configuration = new CacheConfigurationDTO();
 			DTOUtils.copyProperties(configuration, source);
 			configuration.setKey(source.getCacheKey());
+			configuration.setSwimlane(source.getSwimlane());
 			configuration.setDetail(translate2detail(source));
 			return configuration;
 		}

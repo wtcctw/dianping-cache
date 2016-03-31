@@ -18,11 +18,7 @@ public class ServerState {
     private String server;
     
     private ConfigManager configManager = ConfigManagerLoader.getConfigManager();
-
-    public String getServer() {
-        return server;
-    }
-
+    
     private volatile int deadThreshold;
 
     private volatile int liveThreshold;

@@ -17,7 +17,7 @@ public interface AlarmTemplateService {
 
     AlarmTemplate findById(int id);
 
-    AlarmTemplate findAlarmTemplateByTemplateNameAndType(String templateName, String alarmType);
+    AlarmTemplate findAlarmTemplateByTemplateNameAndType(String templateName,String alarmType);
 
     int deleteById(int id);
 

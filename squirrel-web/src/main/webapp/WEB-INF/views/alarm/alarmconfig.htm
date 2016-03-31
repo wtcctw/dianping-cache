@@ -15,19 +15,27 @@
                     </a>
                 </li>
 
+                <!--<li>-->
+                    <!--<a data-toggle="tab" href="#MemcacheAlarmTemplate">-->
+                        <!--Memcache告警模板-->
+                        <!--<span class="badge badge-danger">Memcache</span>-->
+                    <!--</a>-->
+                <!--</li>-->
+
+                <!--<li>-->
+                    <!--<a data-toggle="tab" href="#RedisAlarmTemplate">-->
+                        <!--Redis告警模板-->
+                        <!--<span class="badge badge-danger">Redis</span>-->
+                    <!--</a>-->
+                <!--</li>-->
+
                 <li>
-                    <a data-toggle="tab" href="#MemcacheAlarmTemplate">
-                        Memcache告警模板
-                        <span class="badge badge-danger">Memcache</span>
+                    <a data-toggle="tab" href="#AlarmTemplate">
+                        告警模板
+                        <span class="badge badge-danger">Alarm</span>
                     </a>
                 </li>
 
-                <li>
-                    <a data-toggle="tab" href="#RedisAlarmTemplate">
-                        Redis告警模板
-                        <span class="badge badge-danger">Redis</span>
-                    </a>
-                </li>
             </ul>
 
             <div class="tab-content">
@@ -316,9 +324,89 @@
                             </div>
                         </div>
                     </div>
+                </div>
+
+
+                <div id="AlarmTemplate" class="tab-pane fade in active">
+                    <div class="page-content" id="alarmTemplatecontainer">
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <table id="alarmTemplateConfigTable"
+                                       class="table table-bordered">
+                                    <thead>
+                                    <tr>
+                                        <!--<td><input type="checkbox" id="check-all"></td>-->
+                                        <!--<th>告警集群类型</th>-->
+                                        <th>模板名称</th>
+                                        <th>类型</th>
+                                        <th>阈值及波动(波动基数，波动粒度，间隔时间/分钟)</th>
+                                        <th>告警方式</th>
+                                        <th>操作
+                                            <a class="breadcrumbs-btn" href="#alarmTemplateModal"
+                                               ng-click="alarmClearModal()" data-toggle="modal">
+                                                <i class="ace-icon fa fa-plus green"></i>
+                                            </a>
+                                        </th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr ng-repeat="e in alarmTemplateSearchPaginator.currentPageItems">
+                                        <!--<td style="text-align: center;"><input type="checkbox" name="check-list" value="{{e.id}}"></td>-->
+                                        <td style="text-align: center;">{{e.templateName}}</td>
+                                        <td style="text-align: center;">{{e.alarmType}}</td>
+
+                                        <td style="text-align: center;">
+                                            <span class="badge"
+                                                  ng-class="{'label-success':e.alarmSwitch==true,'label-danger':e.alarmSwitch==false}">
+                                             阈值：{{e.threshold}}
+                                             </span>
+                                            <span class="badge" ng-class="{'label-success':e.flucSwitch==true,'label-danger':e.flucSwitch==false}">
+                                                波动基数：{{e.base}}
+                                            </span>
+                                            <span class="badge" ng-class="{'label-success':e.flucSwitch==true,'label-danger':e.flucSwitch==false}">
+                                                波动粒度：{{e.fluc}}
+                                            </span>
+                                            <span class="badge" ng-class="{'label-success':e.flucSwitch==true,'label-danger':e.flucSwitch==false}">
+                                                间隔时间：{{e.alarmInterval}}分钟
+                                            </span>
+                                        </td>
+
+                                        <td style="text-align: center;">
+                                            <span class="sticker">
+                                                <span class="label arrowed-in" ng-class="{'label-success':e.mailMode==true,'label-danger':e.mailMode==false}">
+                                                    <i class="bigger-110" ng-class="{'ace-icon fa fa-check':e.mailMode==true,'ace-icon fa fa-times':e.mailMode==false}">邮件</i>
+                                                </span>
+                                                <span class="label arrowed-in" ng-class="{'label-success':e.smsMode==true,'label-danger':e.smsMode==false}">
+                                                    <i class="bigger-110" ng-class="{'ace-icon fa fa-check':e.smsMode==true,'ace-icon fa fa-times':e.smsMode==false}">短信</i>
+                                                </span>
+                                                <span class="label arrowed-in" ng-class="{'label-success':e.weixinMode==true,'label-danger':e.weixinMode==false}">
+                                                    <i class="bigger-110" ng-class="{'ace-icon fa fa-check':e.weixinMode==true,'ace-icon fa fa-times':e.weixinMode==false}">微信</i>
+                                                </span>
+                                            </span>
+                                        </td>
+                                        <td style="text-align: center;">
+                                            <a href="#alarmTemplateModal" ng-click="alarmsetModalInput($index);"
+                                               data-toggle="modal"
+                                               class="edit-config-btn">编辑
+                                                <i class="ace-icon fa fa-edit" rel="tooltip"
+                                                   data-original-title="编辑配置值"></i>
+                                            </a>
+                                            <a href="" ng-click="alarmDialog(e.id);" class="edit-config-btn">删除
+                                                <i class="ace-icon fa fa-times" rel="tooltip"
+                                                   data-original-title="删除配置项"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    <tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
 
 
                 </div>
+
+
 
             </div>
         </div>
@@ -811,6 +899,132 @@
         </div>
 
 
+
+        <!--模态框(Modal)告警配置修改-->
+        <div class="modal fade" id="alarmTemplateModal" tabindex="-1" role="dialog"
+             aria-labelledby="alarmTemplateModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal"
+                                aria-hidden="true">&times;</button>
+                        <h4 class="modal-title" id="alarmTemplateModalLabel">编辑告警模板配置信息</h4>
+                    </div>
+                    <div class="modal-body">
+                        <form method="post"
+                              class="form-horizontal bs-example bs-example-form" role="form"
+                              name="alarmForm" ng-submit="alarmrefreshpage(alarmForm)">
+                            <div class="input-group">
+
+                                <div class="col-xs-12 form-group">
+                                    <label class="col-xs-3 control-label control-label no-padding-right">模板名称：</label>
+
+                                    <div class="col-xs-9">
+                                        <input type="text" class="form-control"
+                                               ng-model="alarmTemplateConfigEntity.templateName"
+                                               name="alarmtemplateName">
+                                    </div>
+                                </div>
+
+                                <div class="col-xs-12 form-group">
+                                    <label class="col-xs-3 control-label control-label no-padding-right">类型：</label>
+
+                                    <div class="col-xs-9">
+                                        <select class="col-xs-12" ng-model="alarmTemplateConfigEntity.alarmType"
+                                                name="alarmType" ng-options="o as o for o in alarmTypes" required>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="col-xs-12">
+                                    <label class="col-xs-2 control-label control-label no-padding-right">告警开关</label>
+                                    <label>
+                                        <input class="ace ace-switch ace-switch-3" ng-model="alarmTemplateConfigEntity.alarmSwitch" type="checkbox">
+                                        <span class="lbl middle"></span>
+                                    </label>
+                                </div>
+
+                                <div class="col-xs-12 form-group">
+                                    <label class="col-xs-3 control-label control-label no-padding-right">阈值：</label>
+
+                                    <div class="col-xs-9">
+                                        <input type="text" class="form-control"ng-model="alarmTemplateConfigEntity.threshold" name="threshold">
+                                    </div>
+                                </div>
+
+                                <div class="col-xs-12">
+                                    <label class="col-xs-2 control-label control-label no-padding-right">波动开关</label>
+                                    <label>
+                                        <input class="ace ace-switch ace-switch-3" ng-model="alarmTemplateConfigEntity.flucSwitch" type="checkbox">
+                                        <span class="lbl middle"></span>
+                                    </label>
+                                </div>
+
+                                <div class="col-xs-12 form-group">
+                                    <div class="col-xs-6">
+                                        <label class="col-xs-6 control-label control-label no-padding-right">波动基数：</label>
+
+                                        <div class="col-xs-6">
+                                            <input type="text" class="form-control"
+                                                   ng-model="alarmTemplateConfigEntity.base"
+                                                   name="base">
+                                        </div>
+                                    </div>
+                                    <div class="col-xs-6">
+                                        <label class="col-xs-6 control-label control-label no-padding-right">波动粒度：</label>
+
+                                        <div class="col-xs-6">
+                                            <input type="text" class="form-control"
+                                                   ng-model="alarmTemplateConfigEntity.fluc"
+                                                   name="fluc">
+                                        </div>
+                                    </div>
+                                    <div class="col-xs-6">
+                                        <label class="col-xs-6 control-label control-label no-padding-right">时间间隔：</label>
+
+                                        <div class="col-xs-6">
+                                            <input type="text" class="form-control"
+                                                   ng-model="alarmTemplateConfigEntity.alarmInterval"
+                                                   name="alarmInterval">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-xs-12 form-group">
+                                    <label class="col-xs-3 control-label control-label no-padding-right">告警方式：</label>
+
+                                    <div class="col-xs-9" style="font-size: 15px">
+                                        邮件：
+                                        <input type="checkbox" ng-model="alarmTemplateConfigEntity.mailMode"
+                                               name="mailMode">
+                                        &nbsp&nbsp短信：
+                                        <input type="checkbox" ng-model="alarmTemplateConfigEntity.smsMode"
+                                               name="smsMode">
+                                        &nbsp&nbsp微信：
+                                        <input type="checkbox" ng-model="alarmTemplateConfigEntity.weixinMode"
+                                               name="weixinMode">
+                                    </div>
+                                </div>
+
+
+                                <div class="control-group" style="margin-top: 20px;text-align: center;">
+                                    <div class="controls">
+                                        <button type="button" class="btn btn-default"
+                                                data-dismiss="modal">关闭
+                                        </button>
+                                        <button type="submit" class="btn btn-success">提交</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+
     </div>
 
 </div>
@@ -839,3 +1053,29 @@
         }, 200);
     });
 </script>
+
+
+<!-- inline scripts related to this page -->
+<script type="application/javascript">
+    $(document).ready(function () {
+        setTimeout(function () {
+            $('#alarmTemplateConfigTable').dataTable({
+                "bAutoWidth": true,
+                "bPaginate": true, //翻页功能
+                "bLengthChange": true, //改变每页显示数据数量
+                "bFilter": true, //过滤功能
+                "bSort": true, //排序功能
+                "bInfo": true,//页脚信息
+                "bStateSave": false,
+                "aaSorting": [],
+                "sScrollY": "400px",
+                "iDisplayLength": 50,
+                "aoColumns": [
+                    null, null, null, null,
+                    {"bSortable": false}
+                ]
+            });
+        }, 200);
+    });
+</script>
+

@@ -130,23 +130,23 @@ public class TaskMonitor implements CuratorHandler {
             return;
         }
         switch (state) {
-            case Alive:
-                if (prevState == State.Dead) {
-                    logger.info("effective server status change: " + server + ", monitors: "
-                            + StringUtils.join(status, ','));
-                    fireServerAlive(server, status);
-                }
-                break;
-            case Dead:
-                if (prevState != State.Dead) {
-                    logger.info("effective server status change: " + server + ", monitors: "
-                            + StringUtils.join(status, ','));
-                    fireServerDead(server, status);
-                }
-                break;
-            case Unsure:
-                // do nothing
-                break;
+        case Alive:
+            if (prevState == State.Dead) {
+                logger.info("effective server status change: " + server + ", monitors: "
+                        + StringUtils.join(status, ','));
+                fireServerAlive(server, status);
+            }
+            break;
+        case Dead:
+            if (prevState != State.Dead) {
+                logger.info("effective server status change: " + server + ", monitors: "
+                        + StringUtils.join(status, ','));
+                fireServerDead(server, status);
+            }
+            break;
+        case Unsure:
+            // do nothing
+            break;
         }
     }
 
