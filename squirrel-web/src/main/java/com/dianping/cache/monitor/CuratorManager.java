@@ -154,7 +154,7 @@ public class CuratorManager {
         if(we.getPath() == null) {
             return;
         }
-        logger.info("received monitor event: " + we.getType() + " => " + we.getPath());
+        //logger.info("received monitor event: " + we.getType() + " => " + we.getPath());
         for(CuratorHandler handler : handlers) {
             try {
                 handler.eventReceived(we);

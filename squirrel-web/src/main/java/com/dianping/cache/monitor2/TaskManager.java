@@ -138,8 +138,8 @@ public class TaskManager {
         if(!cluster.startsWith("memcached"))
             return ;
 
-        String result = JsonUtils.toStr(config);
-
+        String result2 = JsonUtils.toStr(config);
+        String result = result2.replace("\"swimlane\":\"\",", "");// remove swimlane
         String path = concatZkPath(Constants.SERVICE_PATH, cluster);
         if(curatorClient.checkExists().forPath(concatZkPath(Constants.SERVICE_PATH, cluster)) == null) {
             curatorClient.create().creatingParentsIfNeeded().forPath(path, result.getBytes("UTF-8"));
@@ -230,14 +230,15 @@ public class TaskManager {
                 serviceServers = new ArrayList<String>();
 
             List<String> newServiceServers = new ArrayList<String>();
-            newServiceServers.addAll(serviceServers);
-
+            for(String server : serviceServers)
+                newServiceServers.add(server);
             if(managerServers == null)
                 continue;
             for(String server : managerServers) {
                 if(isAlive(server) && !serviceServers.contains(server)) {
                     newServiceServers.add(server);
-                    logger.info("add new server in cluster " + managerClusterKey + " server " + server);
+                    logger.info("online server in cluster " + managerClusterKey + " server " + server);
+                    NotifyManager.getInstance().notifyWeixin("online server in cluster " + managerClusterKey + " server " + server);
                     change = true;
                 }
             }
@@ -260,11 +261,14 @@ public class TaskManager {
                 serviceServers = new ArrayList<String>();
 
             List<String> newServiceServers = new ArrayList<String>();
-            newServiceServers.addAll(serviceServers);
+            for(String server : serviceServers)
+                newServiceServers.add(server);
             for(String server : serviceServers) {
                 if(!isAlive(server) || !managerServers.contains(server)) { // 死了 或者 管理员下线了
                     newServiceServers.remove(server);
-                    logger.info("remove new server in cluster " + serviceCluserKey + " server " + server);
+                    logger.info("offline server in cluster " + serviceCluserKey + " server " + server);
+                    NotifyManager.getInstance().notifyWeixin("offline server in cluster " + serviceCluserKey + " server " + server);
+
                     change = true;
                 }
             }
@@ -278,17 +282,8 @@ public class TaskManager {
 
     }
 
-
-    private void init() throws Exception {
-        // 创建必要的四个节点 路径如下
-        String[] paths = {Constants.SERVICE_PATH, Constants.MANAGER_PATH};
-        for(String node : paths) {
-            if(curatorClient.checkExists().forPath(node) == null)
-                curatorClient.create().creatingParentsIfNeeded().forPath(node);
-        }
-    }
-
     public void start() throws Exception {
+        initManagerNode();
         final Runnable task = new Runnable() {
             @Override
             public void run() {
@@ -312,6 +307,7 @@ public class TaskManager {
 
         if(children == null || children.size() == 0) {
             byte[] data = betaClient.getData().forPath(betaPath);
+            String dataStr = new String(data);
             try {
                 alphaClient.create().creatingParentsIfNeeded().forPath(alphaPath, data);
             } catch (Exception e) {
@@ -340,7 +336,7 @@ public class TaskManager {
     }
 
     public void removeAllData() throws Exception {
-        String[] paths = {Constants.MANAGER_PATH};
+        String[] paths = {Constants.MANAGER_PATH, Constants.SERVICE_PATH, Constants.MARKDOWN_PATH};
         for(String path : paths) {
             if(curatorClient.checkExists().forPath(path) != null) {
                 zkDelete(path);
@@ -362,12 +358,40 @@ public class TaskManager {
         String testClusterInfo = "{\"cacheKey\":\"memcached-tuangou\",\"clientClazz\":\"com.dianping.cache.memcached.MemcachedClientImpl\",\"servers\":\"10.66.11.117:11211\",\"transcoderClazz\":\"com.dianping.cache.memcached.HessianTranscoder\",\"addTime\":1452755302947,\"serverList\":[\"10.66.11.117:11211\"]}";
         curatorClient.create().creatingParentsIfNeeded().forPath(path, testClusterInfo.getBytes("UTF-8"));
     }
+    private void initManagerNode() throws Exception {
+        String servicePath = Constants.REAL_SERVICE_PATH;
+        String managerPath = Constants.MANAGER_PATH;
+        copyFromServiceToManager(servicePath, managerPath);
+    }
+    private void copyFromServiceToManager(String servicePath, String managerPath) throws Exception {
+        List<String> children = this.curatorClient.getChildren().forPath(servicePath);
+
+        if(children == null || children.size() == 0) {
+            byte[] data = this.curatorClient.getData().forPath(servicePath);
+            try {
+                this.curatorClient.create().creatingParentsIfNeeded().forPath(managerPath, data);
+            } catch (Exception e) {
+                this.curatorClient.setData().forPath(managerPath, data);
+            }
+            return ;
+        }
+
+        for(String c : children) {
+            String newservicePath = servicePath + "/" + c;
+            String newmanagerPaht = managerPath + "/" + c;
+            copyFromServiceToManager(newservicePath, newmanagerPaht);
+        }
+
+        byte[] data = this.curatorClient.getData().forPath(servicePath);
+        this.curatorClient.setData().forPath(managerPath, data);
+    }
 
     public static void main(String[] args) {
         try {
+            NotifyManager.getInstance().notifyWeixin("qweqwe");
             TaskManager taskManager = new TaskManager();
 //            taskManager.removeAllData();
-            taskManager.prepareBetaData();
+//            taskManager.prepareBetaData();
             taskManager.start();
         } catch (Exception e) {
             e.printStackTrace();
