@@ -39,7 +39,7 @@ public class TaskRunner implements Runnable, ServerListener {
 
     private String server;
 
-    private com.dianping.cache.monitor2.ServerState serverState;
+    private ServerState serverState;
 
     private long lastCheckTime = System.currentTimeMillis();
 
@@ -47,11 +47,9 @@ public class TaskRunner implements Runnable, ServerListener {
 
     private CuratorFramework curatorClient;
 
-    private ServerState.State preState = ServerState.State.Unknown;
-
     public TaskRunner(String server) {
         this.server = server;
-        this.serverState = new com.dianping.cache.monitor2.ServerState(server);
+        this.serverState = new ServerState(server);
         serverState.setServerListener(this);
         curatorClient = CuratorManager.getInstance().getCuratorClient();
     }
@@ -72,11 +70,16 @@ public class TaskRunner implements Runnable, ServerListener {
             alive = checkNode();
         } catch (Throwable e) {
             alive = false;
-            logger.error(server + " checked to be died");
+            logger.error(server + " is died");
         } finally {
             this.serverState.setAlive(alive, this);
             lastCheckTime = System.currentTimeMillis();
             logger.info(serverState + ", time: " + (lastCheckTime-start));
+            if(alive) {
+                markUp(server);
+                logger.error(server + "is alive");
+            } else
+                markDown(server);
         }
 
     }
@@ -97,12 +100,7 @@ public class TaskRunner implements Runnable, ServerListener {
     @Override
     public void serverDead() {
         try {
-            if(preState != ServerState.State.Dead) {
-                preState = ServerState.State.Dead;
-//                NotifyManager.getInstance().notify("offline " + server, "offline " + server);
-//                NotifyManager.getInstance().notifyWeixin("offline " + server);
-
-            }
+            NotifyManager.getInstance().notify("offline " + server, "offline " + server);
             logger.info("server is mark down " + server);
             markDown(server);
         } catch (Exception e) {
@@ -113,11 +111,7 @@ public class TaskRunner implements Runnable, ServerListener {
     @Override
     public void serverAlive() {
         try {
-            if(preState != ServerState.State.Alive) {
-                preState = ServerState.State.Alive;
-//                NotifyManager.getInstance().notify("online " + server, "online " + server);
-//                NotifyManager.getInstance().notifyWeixin("online " + server);
-            }
+            NotifyManager.getInstance().notify("online " + server, "online " + server);
             markUp(server);
         } catch (Exception e) {
             logger.error("failed to mark up " + server, e);

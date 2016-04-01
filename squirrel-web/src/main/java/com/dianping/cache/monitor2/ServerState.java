@@ -36,7 +36,7 @@ public class ServerState {
     
     private volatile State state = State.Unknown;
     
-    private volatile State prevNotifyState = State.Unknown;
+    private volatile State prevState = State.Unknown;
     
     public ServerState(String server) {
         this.server = server;
