@@ -404,26 +404,26 @@ public class RedisAlarmer extends AbstractRedisAlarmer {
 
                 if ((node.getMaster().getInfo().getUsed() - minMemUsage) * 100 > memFluc) {
 
-                    SimpleDateFormat sdf = new SimpleDateFormat("EEEE:HH:mm", Locale.ENGLISH);
-                    Date nameDate = new Date();
+//                    SimpleDateFormat sdf = new SimpleDateFormat("EEEE:HH:mm", Locale.ENGLISH);
+//                    Date nameDate = new Date();
 
-                    for (int i = -1; i < 1; i++) {
-                        GregorianCalendar gc = new GregorianCalendar();
-                        gc.setTime(nameDate);
-                        gc.add(12, i);
-                        String name = "Redis_" + sdf.format(gc.getTime()) + "_" + node.getMaster().getAddress();
-
-                        RedisBaseline redisBaseline = baselineCacheService.getRedisBaselineByName(name);
-                        if (null == redisBaseline) {
-                            continue;
-                        }
-
-                        if ((node.getMaster().getInfo().getUsed() - redisBaseline.getMem()) < 0) {
-                            logger.info("isMemFlucAlarm: memusage is lower than history baseline……" + item.getClusterName());
-                            alarmFlag = false;
-                            break;
-                        }
-                    }
+//                    for (int i = -1; i < 1; i++) {
+//                        GregorianCalendar gc = new GregorianCalendar();
+//                        gc.setTime(nameDate);
+//                        gc.add(12, i);
+//                        String name = "Redis_" + sdf.format(gc.getTime()) + "_" + node.getMaster().getAddress();
+//
+//                        RedisBaseline redisBaseline = baselineCacheService.getRedisBaselineByName(name);
+//                        if (null == redisBaseline) {
+//                            continue;
+//                        }
+//
+//                        if ((node.getMaster().getInfo().getUsed() - redisBaseline.getMem()) < 0) {
+//                            logger.info("isMemFlucAlarm: memusage is lower than history baseline……" + item.getClusterName());
+//                            alarmFlag = false;
+//                            break;
+//                        }
+//                    }
 
                     if (alarmFlag) {
                         logger.info("isMemFlucAlarm:alarm……" + item.getClusterName());
