@@ -110,9 +110,9 @@ public class EhcacheStoreClientImpl extends AbstractStoreClient {
 		}
 		if (manager == null) {
 			manager = CacheManager.create();
-		}
-		MBeanServer server = ManagementFactory.getPlatformMBeanServer();
-		ManagementService.registerMBeans(manager, server, true, true, true, true);
+            MBeanServer server = ManagementFactory.getPlatformMBeanServer();
+            ManagementService.registerMBeans(manager, server, true, true, true, true);
+        }
 	}
 
 	@Override
