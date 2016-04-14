@@ -15,14 +15,6 @@
  */
 package com.dianping.squirrel.client.core;
 
-import static com.google.common.base.Preconditions.*;
-
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.dianping.lion.Environment;
 import com.dianping.squirrel.client.StoreClient;
 import com.dianping.squirrel.client.auth.AuthException;
@@ -33,6 +25,13 @@ import com.dianping.squirrel.common.exception.StoreException;
 import com.dianping.squirrel.common.lifecycle.Authorizable;
 import com.dianping.squirrel.common.lifecycle.Configurable;
 import com.dianping.squirrel.common.lifecycle.Lifecycle;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Build cache client from configuration file. Each cache key will be built only
@@ -139,6 +138,7 @@ public class StoreClientBuilder {
 	 * Close the store client by store type.
 	 */
 	public synchronized static void closeStoreClient(String storeType) {
+		logger.warn("close cache client " + storeType);
 		if (storeType == null) {
 			return;
 		}

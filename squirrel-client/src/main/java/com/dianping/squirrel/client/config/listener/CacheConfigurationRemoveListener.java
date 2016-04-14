@@ -19,7 +19,7 @@ public class CacheConfigurationRemoveListener {
             StoreClientConfigManager.getInstance().removeCacheConfig(cacheKey);
             StoreClientBuilder.closeStoreClient(cacheKey);
             com.dianping.squirrel.client.core.CacheConfiguration.removeCache(cacheKey);
-            logger.info("Removed CacheConfiguration {} success !",cacheKey);
+            logger.warn("Removed CacheConfiguration {} success !",cacheKey);
         }
     }
 }

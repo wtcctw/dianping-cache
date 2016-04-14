@@ -1,8 +1,8 @@
 package com.dianping.cache.test;
 
+import com.dianping.squirrel.client.StoreClient;
 import com.dianping.squirrel.client.StoreClientFactory;
 import com.dianping.squirrel.client.StoreKey;
-import com.dianping.squirrel.client.impl.redis.RedisStoreClient;
 import org.junit.Test;
 /**
  * Created by dp on 15/12/8.
@@ -10,9 +10,12 @@ import org.junit.Test;
 public class TestClient {
     @Test
     public void test(){
-        RedisStoreClient storeClient = (RedisStoreClient) StoreClientFactory.getStoreClientByCategory("HuiUserTicket");
-        StoreKey sk = new StoreKey("mt-spu-shop",195234455);
+        StoreClient storeClient = StoreClientFactory.getStoreClient();
+        StoreKey sk = new StoreKey("oReviewAllRankNew",195234455);
         storeClient.set(sk,1);
         storeClient.get(sk);
     }
+
+
+
 }
