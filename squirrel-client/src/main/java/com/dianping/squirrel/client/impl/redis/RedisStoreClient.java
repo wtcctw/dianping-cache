@@ -30,7 +30,23 @@ public interface RedisStoreClient extends StoreClient, Locatable,
 	 * 		false if key does not exist or does not have an associated timeout.
 	 */
 	Boolean persist(StoreKey key);
-	
+
+	Long append(StoreKey key, String value);
+
+	<T> T getSet(StoreKey key, Object value);
+
+	Boolean getBit(StoreKey key, long offset);
+
+	Boolean setBit(StoreKey key, long offset, boolean value);
+
+	Long bitCount(StoreKey key, long start, long end);
+
+	Long bitCount(StoreKey key);
+
+	Boolean setRaw(StoreKey key,Object value);
+
+	<T> T getRaw(StoreKey key);
+
 	JedisCluster getJedisClient();
 
 }

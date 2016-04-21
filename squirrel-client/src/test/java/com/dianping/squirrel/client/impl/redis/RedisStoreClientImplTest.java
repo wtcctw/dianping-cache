@@ -1,18 +1,18 @@
 package com.dianping.squirrel.client.impl.redis;
 
-import static org.junit.Assert.*;
+import com.dianping.squirrel.client.StoreClientFactory;
+import com.dianping.squirrel.client.StoreKey;
+import com.dianping.squirrel.client.impl.Bean;
+import com.dianping.squirrel.client.impl.User;
+import org.junit.Test;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.junit.Test;
-
-import com.dianping.squirrel.client.StoreClientFactory;
-import com.dianping.squirrel.client.StoreKey;
-import com.dianping.squirrel.client.impl.Bean;
-import com.dianping.squirrel.client.impl.User;
+import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 public class RedisStoreClientImplTest {
     
@@ -448,5 +448,23 @@ public class RedisStoreClientImplTest {
         result = client.zrangeByScore(key, 0.1d, 0.3d, 1, 1);
         assertEquals(((Set)result).size(), 0);
     }
-    
+
+    @Test
+    public void testRawCommand(){
+        RedisStoreClient client = (RedisStoreClient) StoreClientFactory.getStoreClientByCategory(CATEGORY);
+        StoreKey key = new StoreKey(CATEGORY, "raw");
+        client.delete(key);
+
+        client.setRaw(key,"abc^&*(sdfasfw3");
+        assertEquals("abc^&*(sdfasfw3",client.getRaw(key));
+
+        client.append(key,"def");
+        assertEquals("abc^&*(sdfasfw3def",client.getRaw(key));
+
+        client.setBit(key,1,true);
+        assertEquals("abc^&*(sdfasfw3def",client.getRaw(key));
+
+
+    }
+
 }

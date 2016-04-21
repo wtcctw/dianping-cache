@@ -1,33 +1,5 @@
 package com.dianping.squirrel.client.impl.redis;
 
-import static com.google.common.base.Preconditions.*;
-
-import java.net.ConnectException;
-import java.net.SocketTimeoutException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.Set;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeoutException;
-import java.util.concurrent.atomic.AtomicInteger;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import redis.clients.jedis.HostAndPort;
-import redis.clients.jedis.JedisCallback;
-import redis.clients.jedis.JedisCluster;
-import redis.clients.jedis.exceptions.JedisAskDataException;
-import redis.clients.jedis.exceptions.JedisConnectionException;
-import redis.clients.jedis.exceptions.JedisDataException;
-import redis.clients.jedis.exceptions.JedisMovedDataException;
-
 import com.dianping.cat.Cat;
 import com.dianping.cat.message.Message;
 import com.dianping.cat.message.Transaction;
@@ -40,12 +12,29 @@ import com.dianping.squirrel.client.core.StoreCallback;
 import com.dianping.squirrel.client.core.StoreFuture;
 import com.dianping.squirrel.client.core.Transcoder;
 import com.dianping.squirrel.client.impl.AbstractStoreClient;
-import com.dianping.squirrel.client.impl.AbstractStoreClient.Command;
 import com.dianping.squirrel.client.monitor.KeyCountMonitor;
 import com.dianping.squirrel.client.monitor.StatusHolder;
 import com.dianping.squirrel.common.exception.StoreException;
 import com.dianping.squirrel.common.exception.StoreTimeoutException;
 import com.dianping.squirrel.common.lifecycle.Authorizable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import redis.clients.jedis.HostAndPort;
+import redis.clients.jedis.JedisCallback;
+import redis.clients.jedis.JedisCluster;
+import redis.clients.jedis.exceptions.JedisAskDataException;
+import redis.clients.jedis.exceptions.JedisConnectionException;
+import redis.clients.jedis.exceptions.JedisDataException;
+import redis.clients.jedis.exceptions.JedisMovedDataException;
+
+import java.net.ConnectException;
+import java.net.SocketTimeoutException;
+import java.util.*;
+import java.util.concurrent.Future;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 public class RedisStoreClientImpl extends AbstractStoreClient implements RedisStoreClient, Authorizable {
 
@@ -716,6 +705,26 @@ public class RedisStoreClientImpl extends AbstractStoreClient implements RedisSt
             }
             
         }, categoryConfig, finalKey, "hset");
+    }
+
+    @Override
+    public Long hsetnx(StoreKey key,final String field,final String value) {
+        checkNotNull(key, "store key is null");
+        checkNotNull(field, "hash field is null");
+        final StoreCategoryConfig categoryConfig = configManager.findCacheKeyType(key.getCategory());
+        checkNotNull(categoryConfig, "%s's category config is null", key.getCategory());
+        final String finalKey = categoryConfig.getKey(key.getParams());
+
+        return executeWithMonitor(new Command() {
+
+            @Override
+            public Object execute() throws Exception {
+                String serialized = transcoder.encode(value);
+                Long result = clientManager.getClient().hsetnx(finalKey, field, serialized);
+                return result;
+            }
+
+        }, categoryConfig, finalKey, "hsetnx");
     }
 
     @Override
@@ -1653,7 +1662,7 @@ public class RedisStoreClientImpl extends AbstractStoreClient implements RedisSt
 
             @Override
             public Object execute() throws Exception {
-                Set<String> strSet = clientManager.getClient().zrevrangeByScore(finalKey, min, max);
+                Set<String> strSet = clientManager.getClient().zrevrangeByScore(finalKey, max, min);
                 if(strSet != null) {
                     Set<Object> objSet = new LinkedHashSet<Object>(strSet.size());
                     for(String str : strSet) {
@@ -1679,7 +1688,7 @@ public class RedisStoreClientImpl extends AbstractStoreClient implements RedisSt
 
             @Override
             public Object execute() throws Exception {
-                Set<String> strSet = clientManager.getClient().zrevrangeByScore(finalKey, min, max, offset, count);
+                Set<String> strSet = clientManager.getClient().zrevrangeByScore(finalKey, max, min, offset, count);
                 if(strSet != null) {
                     Set<Object> objSet = new LinkedHashSet<Object>(strSet.size());
                     for(String str : strSet) {
@@ -1750,4 +1759,197 @@ public class RedisStoreClientImpl extends AbstractStoreClient implements RedisSt
         return clientManager.getClient();
     }
 
+
+    // new commands
+    @Override
+    public Boolean setRaw(StoreKey key, Object value) {
+        checkNotNull(key, "store key is null");
+        final StoreCategoryConfig categoryConfig = configManager.findCacheKeyType(key.getCategory());
+        checkNotNull(categoryConfig, "%s's category config is null", key.getCategory());
+        final String finalKey = categoryConfig.getKey(key.getParams());
+        String result;
+        if (categoryConfig.getDurationSeconds() > 0)
+            result = clientManager.getClient().setex(finalKey, categoryConfig.getDurationSeconds(), value.toString());
+        else
+            result = clientManager.getClient().set(finalKey, value.toString());
+        return OK.equals(result);
+    }
+
+    @Override
+    public <T> T getRaw(StoreKey key) {
+        checkNotNull(key, "store key is null");
+        final StoreCategoryConfig categoryConfig = configManager.findCacheKeyType(key.getCategory());
+        checkNotNull(categoryConfig, "%s's category config is null", key.getCategory());
+        final String finalKey = categoryConfig.getKey(key.getParams());
+        return (T) clientManager.getClient().get(finalKey);
+    }
+
+
+    @Override
+    public Long append(StoreKey key, final String value) {
+        checkNotNull(key, "store key is null");
+        final StoreCategoryConfig categoryConfig = configManager.findCacheKeyType(key.getCategory());
+        checkNotNull(categoryConfig, "%s's category config is null", key.getCategory());
+        final String finalKey = categoryConfig.getKey(key.getParams());
+
+        return executeWithMonitor(new Command() {
+            @Override
+            public Long execute() throws Exception {
+                return  clientManager.getClient().append(finalKey,value);
+            }
+        }, categoryConfig, finalKey, "append");
+    }
+
+    @Override
+    public <T> T getSet(StoreKey key, final Object value) {
+        checkNotNull(key, "store key is null");
+        final StoreCategoryConfig categoryConfig = configManager.findCacheKeyType(key.getCategory());
+        checkNotNull(categoryConfig, "%s's category config is null", key.getCategory());
+        final String finalKey = categoryConfig.getKey(key.getParams());
+        final String str = transcoder.encode(value);
+        return executeWithMonitor(new Command() {
+            @Override
+            public T execute() throws Exception {
+                String strValue = clientManager.getClient().getSet(finalKey,str);
+                if(strValue != null) {
+                    T object = transcoder.decode(strValue);
+                    return object;
+                } else {
+                    return null;
+                }
+            }
+        }, categoryConfig, finalKey, "getSet");
+    }
+
+    @Override
+    public Boolean getBit(StoreKey key, final long offset) {
+        checkNotNull(key, "store key is null");
+        final StoreCategoryConfig categoryConfig = configManager.findCacheKeyType(key.getCategory());
+        checkNotNull(categoryConfig, "%s's category config is null", key.getCategory());
+        final String finalKey = categoryConfig.getKey(key.getParams());
+
+        return executeWithMonitor(new Command() {
+            @Override
+            public Boolean execute() throws Exception {
+                return  clientManager.getClient().getbit(finalKey,offset);
+            }
+        }, categoryConfig, finalKey, "getBit");
+    }
+
+    @Override
+    public Boolean setBit(final StoreKey key, final long offset, final boolean value) {
+        checkNotNull(key, "store key is null");
+        final StoreCategoryConfig categoryConfig = configManager.findCacheKeyType(key.getCategory());
+        checkNotNull(categoryConfig, "%s's category config is null", key.getCategory());
+        final String finalKey = categoryConfig.getKey(key.getParams());
+
+        return executeWithMonitor(new Command() {
+            @Override
+            public Boolean execute() throws Exception {
+                return  clientManager.getClient().setbit(finalKey,offset,value);
+            }
+        }, categoryConfig, finalKey, "setBit");
+    }
+
+    @Override
+    public Long bitCount(StoreKey key, final long start, final long end) {
+        checkNotNull(key, "store key is null");
+        final StoreCategoryConfig categoryConfig = configManager.findCacheKeyType(key.getCategory());
+        checkNotNull(categoryConfig, "%s's category config is null", key.getCategory());
+        final String finalKey = categoryConfig.getKey(key.getParams());
+
+        return executeWithMonitor(new Command() {
+            @Override
+            public Long execute() throws Exception {
+                return  clientManager.getClient().bitcount(finalKey,start,end);
+            }
+        }, categoryConfig, finalKey, "bitCount");
+    }
+
+    @Override
+    public Long bitCount(StoreKey key) {
+        checkNotNull(key, "store key is null");
+        final StoreCategoryConfig categoryConfig = configManager.findCacheKeyType(key.getCategory());
+        checkNotNull(categoryConfig, "%s's category config is null", key.getCategory());
+        final String finalKey = categoryConfig.getKey(key.getParams());
+
+        return executeWithMonitor(new Command() {
+            @Override
+            public Long execute() throws Exception {
+                return  clientManager.getClient().bitcount(finalKey);
+            }
+        }, categoryConfig, finalKey, "bitCount");
+    }
+
+    @Override
+    public Long hlen(StoreKey key) {
+        checkNotNull(key, "store key is null");
+        final StoreCategoryConfig categoryConfig = configManager.findCacheKeyType(key.getCategory());
+        checkNotNull(categoryConfig, "%s's category config is null", key.getCategory());
+        final String finalKey = categoryConfig.getKey(key.getParams());
+        return executeWithMonitor(new Command() {
+            @Override
+            public Long execute() throws Exception {
+                return  clientManager.getClient().hlen(finalKey);
+            }
+        }, categoryConfig, finalKey, "hlen");
+    }
+
+    @Override
+    public Boolean hExists(StoreKey key, final String field) {
+        checkNotNull(key, "store key is null");
+        final StoreCategoryConfig categoryConfig = configManager.findCacheKeyType(key.getCategory());
+        checkNotNull(categoryConfig, "%s's category config is null", key.getCategory());
+        final String finalKey = categoryConfig.getKey(key.getParams());
+        return executeWithMonitor(new Command() {
+            @Override
+            public Boolean execute() throws Exception {
+                return  clientManager.getClient().hexists(finalKey,field);
+            }
+        }, categoryConfig, finalKey, "hExists");
+    }
+
+    @Override
+    public Long lpushx(StoreKey key, final Object... objects) {
+        checkNotNull(key, "store key is null");
+        final StoreCategoryConfig categoryConfig = configManager.findCacheKeyType(key.getCategory());
+        checkNotNull(categoryConfig, "%s's category config is null", key.getCategory());
+        final String finalKey = categoryConfig.getKey(key.getParams());
+        return executeWithMonitor(new Command() {
+            @Override
+            public Long execute() throws Exception {
+                String[] strings = new String[objects.length];
+                for (int i = 0; i < objects.length; i++) {
+                    Object object = objects[i];
+                    if (object == null) {
+                        throw new IllegalArgumentException("one of the list values is null");
+                    }
+                    strings[i] = transcoder.encode(object);
+                }
+                return  clientManager.getClient().lpushx(finalKey,strings);
+            }
+        }, categoryConfig, finalKey, "lpushx");
+    }
+
+    @Override
+    public Long rpushx(StoreKey key,final Object... objects) {
+        checkNotNull(key, "store key is null");
+        final StoreCategoryConfig categoryConfig = configManager.findCacheKeyType(key.getCategory());
+        checkNotNull(categoryConfig, "%s's category config is null", key.getCategory());
+        final String finalKey = categoryConfig.getKey(key.getParams());
+        return executeWithMonitor(new Command() {
+            @Override
+            public Long execute() throws Exception {
+                String[] strings = new String[objects.length];
+                for (int i = 0; i < objects.length; i++) {
+                    Object object = objects[i];
+                    if (object == null) {
+                        throw new IllegalArgumentException("one of the list values is null");
+                    }
+                    strings[i] = transcoder.encode(object);
+                }
+                return  clientManager.getClient().rpushx(finalKey,strings);
+            }
+        }, categoryConfig, finalKey, "rpushx");
+    }
 }

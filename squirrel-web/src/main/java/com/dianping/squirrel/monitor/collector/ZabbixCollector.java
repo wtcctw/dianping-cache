@@ -53,6 +53,8 @@ public class ZabbixCollector extends AbstractCollector {
                 Data data = collectData(hostIdEntity.getKey(),hostIdEntity.getValue());
                 dataManager.addData(data);
             }
+        }else {
+            logger.warn("can't collect zabbix data!");
         }
     }
 
