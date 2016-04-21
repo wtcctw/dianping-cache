@@ -170,6 +170,12 @@
 			<artifactId>squirrel-client</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+				<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>servlet-api</artifactId>
+			<version>2.5</version>
+			<scope>compile</scope>
+		</dependency>
 		<dependency>
 			<groupId>qq-central</groupId>
 			<artifactId>dcache_client_api</artifactId>
@@ -281,12 +287,7 @@
 			<version>4.12</version>
 			<scope>test</scope>
 		</dependency>
-		<dependency>
-			<groupId>javax.servlet</groupId>
-			<artifactId>servlet-api</artifactId>
-			<version>2.5-20081211</version>
-			<scope>provided</scope>
-		</dependency>
+
 		<dependency>
 			<groupId>com.dianping.swallow</groupId>
 			<artifactId>swallow-client</artifactId>
