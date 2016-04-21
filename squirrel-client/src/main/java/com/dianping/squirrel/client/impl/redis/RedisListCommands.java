@@ -1,8 +1,8 @@
 package com.dianping.squirrel.client.impl.redis;
 
-import java.util.List;
-
 import com.dianping.squirrel.client.StoreKey;
+
+import java.util.List;
 
 public interface RedisListCommands {
 
@@ -52,5 +52,8 @@ public interface RedisListCommands {
     Boolean ltrim(StoreKey key, long start, long end);
 
     Long lrem(StoreKey key, long count, Object value);
-    
+
+    Long lpushx(StoreKey key, final Object... string);
+
+    Long rpushx(StoreKey key, final Object... string);
 }

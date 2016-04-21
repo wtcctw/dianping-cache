@@ -1,10 +1,10 @@
 package com.dianping.squirrel.client.impl.redis;
 
+import com.dianping.squirrel.client.StoreKey;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import com.dianping.squirrel.client.StoreKey;
 
 public interface RedisHashCommands {
 
@@ -14,6 +14,8 @@ public interface RedisHashCommands {
      *      0 if field already exists in the hash and the value was updated
      */
     Long hset(StoreKey key, String field, Object value);
+
+
 
     <T> T hget(StoreKey key, String field);
 
@@ -39,4 +41,13 @@ public interface RedisHashCommands {
     
     Long hincrBy(StoreKey key, String field, int amount);
 
+    /**
+     * Set the specified hash field to the specified value if the field not exists. <b>Time
+     * complexity:</b> O(1)
+     * @return If the field already exists, 0 is returned, otherwise if a new field is created 1 is
+     *         returned.
+     */
+    Long hsetnx(StoreKey key, final String field, final String value);
+    Long hlen(StoreKey key);
+    Boolean hExists(StoreKey key, String field);
 }
