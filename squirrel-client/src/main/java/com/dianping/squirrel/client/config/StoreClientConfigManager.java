@@ -57,6 +57,8 @@ public class StoreClientConfigManager {
 
 	private static transient Logger logger = LoggerFactory.getLogger(StoreClientConfigManager.class);
 
+	private static StoreClientConfigManager instance;
+
 	private ConcurrentMap<String, StoreClientConfig> configMap = new ConcurrentHashMap<String, StoreClientConfig>();
 
 	private Set<String> usedCacheServices = new ConcurrentSkipListSet<String>();
@@ -64,8 +66,6 @@ public class StoreClientConfigManager {
 	private CacheCuratorClient cacheCuratorClient = CacheCuratorClient.getInstance();
 	
 	private ConfigManager configManager = ConfigManagerLoader.getConfigManager();
-
-	private static StoreClientConfigManager instance;
 	
 	private Map<String, List<StoreClientConfigListener>> configListenerMap = new HashMap<String, List<StoreClientConfigListener>>();
 	
@@ -116,40 +116,40 @@ public class StoreClientConfigManager {
 	    }
     }
 	
-	public StoreClient findCacheClient(String cacheKey) {
-	    if(StringUtils.isBlank(cacheKey)) {
+	public StoreClient findCacheClient(String storeType) {
+	    if(StringUtils.isBlank(storeType)) {
 	        throw new NullPointerException("cache service is empty");
 	    }
-		if (!usedCacheServices.contains(cacheKey)) {
-			usedCacheServices.add(cacheKey);
+		if (!usedCacheServices.contains(storeType)) {
+			usedCacheServices.add(storeType);
 		}
-		return init(cacheKey);
+		return init(storeType);
 	}
 
-	public StoreClient init(String cacheKey) throws StoreException {
-		StoreClientConfig clientConfig = configMap.get(cacheKey);
+	public StoreClient init(String storeType) throws StoreException {
+		StoreClientConfig clientConfig = configMap.get(storeType);
 		if (clientConfig == null) {
 			synchronized (this) {
-			    clientConfig = configMap.get(cacheKey);
+			    clientConfig = configMap.get(storeType);
 				if (clientConfig == null) {
 					CacheConfigurationDTO configDto;
                     try {
-                        configDto = loadCacheClientConfig(cacheKey);
+                        configDto = loadCacheClientConfig(storeType);
                     } catch (Exception e) {
-                        throw new StoreException("failed to load store client config: " + cacheKey, e);
+                        throw new StoreException("failed to load store client config: " + storeType, e);
                     }
                     if (configDto == null) {
-                        throw new StoreException("store client config is null: " + cacheKey);
+                        throw new StoreException("store client config is null: " + storeType);
                     }
                     clientConfig = parse(configDto);
                     if(clientConfig != null) {
-                        configMap.put(cacheKey, clientConfig);
+                        configMap.put(storeType, clientConfig);
                     }
 				}
 			}
 		}
 		if(clientConfig != null) {
-		    return StoreClientBuilder.buildStoreClient(cacheKey, clientConfig);
+		    return StoreClientBuilder.buildStoreClient(storeType, clientConfig);
 		}
 		return null;
 	}
