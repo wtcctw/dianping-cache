@@ -467,4 +467,22 @@ public class RedisStoreClientImplTest {
 
     }
 
+
+    @Test
+    public void test(){
+        RedisStoreClient client = (RedisStoreClient) StoreClientFactory.getStoreClientByCategory(CATEGORY);
+        StoreKey key = new StoreKey(CATEGORY, "bean");
+//        Bean bean = new Bean(12345678, "paasbean");
+//        Map<String, Bean> map = new HashMap<String, Bean>();
+//        map.put("bean",bean);
+//        client.delete(key);
+//        client.hset(key,"bean",bean);
+        Map<String, Object> mapb = client.hgetAll(key);
+        for (Map.Entry<String, Object> entry : mapb.entrySet()) {
+            System.out.println(entry.getValue());
+        }
+//        System.out.println("1");
+//        System.out.println(bean);
+//        System.out.println(bean1);
+    }
 }
