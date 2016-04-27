@@ -19,115 +19,6 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>org.hibernate</groupId>
-			<artifactId>hibernate-validator</artifactId>
-			<version>4.2.0.Final</version>
-		</dependency>
-		<dependency>
-			<groupId>com.dianping.dpsf</groupId>
-			<artifactId>dpsf-net</artifactId>
-			<scope>compile</scope>
-		</dependency>
-		<dependency>
-			<groupId>com.dianping.cat</groupId>
-			<artifactId>cat-core</artifactId>
-			<scope>compile</scope>
-		</dependency>
-		<dependency>
-			<groupId>com.dianping.lion</groupId>
-			<artifactId>lion-client</artifactId>
-			<scope>compile</scope>
-		</dependency>
-		<dependency>
-			<groupId>de.ruedigermoeller</groupId>
-			<artifactId>fst</artifactId>
-			<version>1.63</version>
-			<scope>compile</scope>
-		</dependency>
-		<dependency>
-			<groupId>io.protostuff</groupId>
-			<artifactId>protostuff-runtime</artifactId>
-			<version>1.1.0</version>
-			<scope>compile</scope>
-		</dependency>
-		<dependency>
-			<artifactId>protostuff-core</artifactId>
-			<groupId>io.protostuff</groupId>
-			<version>1.1.0</version>
-			<scope>compile</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.objenesis</groupId>
-			<artifactId>objenesis</artifactId>
-			<version>2.1</version>
-			<scope>compile</scope>
-		</dependency>
-		<dependency>
-			<groupId>${project.groupId}</groupId>
-			<artifactId>squirrel-client</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>qq-central</groupId>
-			<artifactId>dcache_client_api</artifactId>
-			<scope>compile</scope>
-		</dependency>
-		<dependency>
-			<groupId>com.dianping</groupId>
-			<artifactId>avatar-cache</artifactId>
-			<version>2.8.2</version>
-			<exclusions>
-				<exclusion>
-					<artifactId>jedis</artifactId>
-					<groupId>redis.clients</groupId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-		<dependency>
-			<groupId>com.dianping</groupId>
-			<artifactId>avatar-jms</artifactId>
-			<version>2.1.7</version>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-jms</artifactId>
-			<version>${spring.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.dianping</groupId>
-			<artifactId>avatar-core</artifactId>
-			<version>2.2.5</version>
-			<exclusions>
-				<exclusion>
-					<groupId>org.slf4j</groupId>
-					<artifactId>jcl-over-slf4j</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-		<dependency>
-			<groupId>com.dianping</groupId>
-			<artifactId>avatar-common-remote</artifactId>
-			<version>2.0.3</version>
-		</dependency>
-		<dependency>
-			<groupId>com.dianping</groupId>
-			<artifactId>avatar-dao</artifactId>
-			<version>2.1.7</version>
-			<type>jar</type>
-		</dependency>
-
-		<dependency>
-			<groupId>com.dianping</groupId>
-			<artifactId>simple-queue</artifactId>
-			<version>1.0.1</version>
-			<exclusions>
-				<exclusion>
-					<groupId>org.slf4j</groupId>
-					<artifactId>jcl-over-slf4j</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-core</artifactId>
 			<version>${spring.version}</version>   <!-- 8.5 add -->
@@ -218,6 +109,122 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
+
+		<dependency>
+			<groupId>com.dianping</groupId>
+			<artifactId>simple-queue</artifactId>
+			<version>1.0.1</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.slf4j</groupId>
+					<artifactId>jcl-over-slf4j</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-validator</artifactId>
+			<version>4.2.0.Final</version>
+		</dependency>
+		<dependency>
+			<groupId>com.dianping.dpsf</groupId>
+			<artifactId>dpsf-net</artifactId>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.dianping.cat</groupId>
+			<artifactId>cat-core</artifactId>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.dianping.lion</groupId>
+			<artifactId>lion-client</artifactId>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>de.ruedigermoeller</groupId>
+			<artifactId>fst</artifactId>
+			<version>1.63</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>io.protostuff</groupId>
+			<artifactId>protostuff-runtime</artifactId>
+			<version>1.1.0</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<artifactId>protostuff-core</artifactId>
+			<groupId>io.protostuff</groupId>
+			<version>1.1.0</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.objenesis</groupId>
+			<artifactId>objenesis</artifactId>
+			<version>2.1</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>squirrel-client</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+				<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>servlet-api</artifactId>
+			<version>2.5</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>qq-central</groupId>
+			<artifactId>dcache_client_api</artifactId>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.dianping</groupId>
+			<artifactId>avatar-cache</artifactId>
+			<version>2.8.2</version>
+			<exclusions>
+				<exclusion>
+					<artifactId>jedis</artifactId>
+					<groupId>redis.clients</groupId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>com.dianping</groupId>
+			<artifactId>avatar-jms</artifactId>
+			<version>2.1.7</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-jms</artifactId>
+			<version>${spring.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.dianping</groupId>
+			<artifactId>avatar-core</artifactId>
+			<version>2.2.5</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.slf4j</groupId>
+					<artifactId>jcl-over-slf4j</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>com.dianping</groupId>
+			<artifactId>avatar-common-remote</artifactId>
+			<version>2.0.3</version>
+		</dependency>
+		<dependency>
+			<groupId>com.dianping</groupId>
+			<artifactId>avatar-dao</artifactId>
+			<version>2.1.7</version>
+			<type>jar</type>
+		</dependency>
+
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-flex</artifactId>
@@ -280,12 +287,7 @@
 			<version>4.12</version>
 			<scope>test</scope>
 		</dependency>
-		<dependency>
-			<groupId>javax.servlet</groupId>
-			<artifactId>servlet-api</artifactId>
-			<version>2.5</version>
-			<scope>provided</scope>
-		</dependency>
+
 		<dependency>
 			<groupId>com.dianping.swallow</groupId>
 			<artifactId>swallow-client</artifactId>
