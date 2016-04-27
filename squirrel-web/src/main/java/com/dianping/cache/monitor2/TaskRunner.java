@@ -1,21 +1,11 @@
 package com.dianping.cache.monitor2;
 
-import com.dianping.cache.monitor.*;
-import com.dianping.cache.monitor2.ServerListener;
-import com.dianping.cache.monitor2.ServerState;
+import com.dianping.cache.monitor.Constants;
+import com.dianping.cache.monitor.CuratorManager;
+import com.dianping.cache.monitor.MemcachedClientFactory;
 import com.dianping.squirrel.client.util.IPUtils;
 import net.spy.memcached.MemcachedClient;
 import net.spy.memcached.internal.OperationFuture;
-import org.apache.commons.lang.RandomStringUtils;
-import org.apache.curator.framework.CuratorFramework;
-import org.apache.zookeeper.CreateMode;
-import org.apache.zookeeper.KeeperException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import net.spy.memcached.MemcachedClient;
-import net.spy.memcached.internal.OperationFuture;
-
 import org.apache.commons.lang.RandomStringUtils;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.zookeeper.CreateMode;
@@ -23,8 +13,6 @@ import org.apache.zookeeper.KeeperException.NoNodeException;
 import org.apache.zookeeper.KeeperException.NodeExistsException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.dianping.squirrel.client.util.IPUtils;
 
 public class TaskRunner implements Runnable, ServerListener {
 
@@ -72,11 +60,11 @@ public class TaskRunner implements Runnable, ServerListener {
             alive = checkNode();
         } catch (Throwable e) {
             alive = false;
-            logger.error(server + " checked to be died");
+            //logger.error(server + " checked to be died");
         } finally {
             this.serverState.setAlive(alive, this);
             lastCheckTime = System.currentTimeMillis();
-            logger.info(serverState + ", time: " + (lastCheckTime-start));
+            //logger.info(serverState + ", time: " + (lastCheckTime-start));
         }
 
     }

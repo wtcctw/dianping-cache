@@ -9,6 +9,7 @@ import com.dianping.cache.service.CacheConfigurationService;
 import com.dianping.cache.service.CacheKeyConfigurationService;
 import com.dianping.cache.service.RedisService;
 import com.dianping.cache.service.ReshardService;
+import com.dianping.cache.util.NetUtil;
 import com.dianping.squirrel.service.AuthService;
 import com.dianping.squirrel.task.RedisReshardTask;
 import com.dianping.squirrel.task.TaskManager;
@@ -205,12 +206,13 @@ public class RedisController extends AbstractSidebarController{
 
 	@RequestMapping(value = "/redis/reshard")
 	@ResponseBody
-	public void reshard(@RequestBody RedisReshardParams redisReshardParams) {
+	public String reshard(@RequestBody RedisReshardParams redisReshardParams) {
 
 		ReshardPlan reshardPlan = reshardService.createReshardPlan(redisReshardParams);
 		RedisReshardTask task = new RedisReshardTask(reshardPlan);
 
 		TaskManager.submit(task);
+		return NetUtil.getFirstLocalIp();
 	}
 
 	@RequestMapping(value = "/redis/failover")
