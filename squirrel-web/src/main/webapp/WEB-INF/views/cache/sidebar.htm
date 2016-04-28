@@ -9,15 +9,109 @@
     </script>
     <ul class="nav nav-list">
         <li class="#if($subside == 'dashboard') active #end"><a
-                href="${rc.contextPath}/"> <i class="menu-icon  fa fa-tachometer"></i> 首页
+                href="${rc.contextPath}/"> <i class="menu-icon  fa fa-tachometer"></i> Dashboard
         </a></li>
 
-        <li class="#if($side == 'cluster') active open #end">
+        <!--<li class="#if($side  =='cluster') active open #end">-->
+            <!--<a href="#" class="dropdown-toggle"> <i class="menu-icon  fa fa-cloud  bigger-130"></i> <span-->
+                    <!--class="menu-text">集群</span> <b class="arrow fa fa-angle-down"></b>-->
+            <!--</a>-->
+            <!--<ul class="submenu">-->
+
+                <!--<li class="#if($subside == 'redis') active #end"><a-->
+                        <!--href="${rc.contextPath}/redis"> <i-->
+                        <!--class="icon-globe"></i> Redis集群-->
+                <!--</a></li>-->
+                <!--<li class="#if($subside == 'memcached') active #end"><a-->
+                        <!--href="${rc.contextPath}/memcached"> <i-->
+                        <!--class="icon-globe"></i> Memcached集群-->
+                <!--</a></li>-->
+                <!--<li class="#if($subside == 'dcache') active #end"><a-->
+                        <!--href="#"> <i-->
+                        <!--class="icon-globe"></i> Dcache集群-->
+                <!--</a></li>-->
+                <!--<li class="#if($subside == 'ehcache') active #end"><a-->
+                        <!--href="#"> <i-->
+                        <!--class="icon-globe"></i> Ehcache集群-->
+                <!--</a></li>-->
+            <!--</ul>-->
+        <!--</li>-->
+        <!--<li class="#if($side == 'data') active open #end">-->
+            <!--<a href="#" class="dropdown-toggle"> <i class="menu-icon  fa fa-database  bigger-130"></i> <span-->
+                    <!--class="menu-text">数据</span> <b class="arrow fa fa-angle-down"></b>-->
+            <!--</a>-->
+            <!--<ul class="submenu">-->
+                <!--<li class="#if($subside == 'query') active #end"><a-->
+                        <!--href="${rc.contextPath}/data/query"> <i-->
+                        <!--class="icon-globe"></i> 存储查询-->
+                <!--</a></li>-->
+                <!--&lt;!&ndash;<li class="#if($subside == 'clean') active #end"><a&ndash;&gt;-->
+                        <!--&lt;!&ndash;href="${rc.contextPath}/data/clean"> <i&ndash;&gt;-->
+                        <!--&lt;!&ndash;class="icon-globe"></i> 存储清理&ndash;&gt;-->
+                <!--&lt;!&ndash;</a></li>&ndash;&gt;-->
+                <!--<li class="#if($subside == 'stat') active #end"><a-->
+                        <!--href="${rc.contextPath}/rdb/stat"> <i-->
+                        <!--class="icon-globe"></i> 空间统计-->
+                <!--</a></li>-->
+
+            <!--</ul>-->
+        <!--</li>-->
+
+        <!--<li class="#if($side == 'config') active open #end"><a href="#"-->
+                                                               <!--class="dropdown-toggle"> <i-->
+                <!--class="menu-icon  fa fa-gavel bigger-130"></i> <span-->
+                <!--class="menu-text">配置</span> <b class="arrow fa fa-angle-down"></b>-->
+        <!--</a>-->
+            <!--<ul class="submenu">-->
+                <!--<li class="#if($subside == 'clusterconfig') active #end"><a-->
+                        <!--href="${rc.contextPath}/config/cluster"> <i-->
+                        <!--class="icon-globe"></i> 集群管理-->
+                <!--</a></li>-->
+                <!--<li class="#if($subside == 'categoryconfig') active #end"><a-->
+                        <!--href="${rc.contextPath}/config/category"> <i-->
+                        <!--class="icon-globe"></i> 类别管理-->
+                <!--</a></li>-->
+                <!--<li class="#if($subside == 'alarmconfig') active #end"><a-->
+                        <!--href="${rc.contextPath}/config/alarm"> <i-->
+                        <!--class="icon-globe"></i> 告警管理-->
+                <!--</a></li>-->
+                <!--<li class="#if($subside == 'userconfig') active #end"><a-->
+                        <!--href="${rc.contextPath}/config/user"> <i-->
+                        <!--class="icon-globe"></i> 用户管理-->
+                <!--</a></li>-->
+
+            <!--</ul>-->
+        <!--</li>-->
+        <!--<li class="#if($side == 'log') active open #end"><a href="#"-->
+                                                              <!--class="dropdown-toggle"> <i-->
+                <!--class="menu-icon fa fa-tasks bigger-130"></i> <span-->
+                <!--class="menu-text">日志</span> <b class="arrow fa fa-angle-down"></b>-->
+        <!--</a>-->
+            <!--<ul class="submenu">-->
+                <!--<li class="#if($subside == 'event') active #end"><a-->
+                        <!--href="${rc.contextPath}/event"> <i-->
+                        <!--class="icon-globe"></i> 事件-->
+                <!--</a></li>-->
+                <!--<li class="#if($subside == 'auditlog') active #end"><a-->
+                        <!--href="${rc.contextPath}/auditlog"> <i-->
+                        <!--class="icon-globe"></i> 操作日志-->
+                <!--</a></li>-->
+                <!--<li class="#if($subside == 'tasks') active #end"><a-->
+                        <!--href="${rc.contextPath}/task"> <i-->
+                        <!--class="icon-globe"></i> 任务-->
+                <!--</a></li>-->
+                <!--<li class="#if($subside == 'task') active #end"><a-->
+                        <!--href="${rc.contextPath}/report"> <i-->
+                        <!--class="icon-globe"></i> 报表-->
+                <!--</a></li>-->
+            <!--</ul>-->
+        <!--</li>-->
+
+        <li class="#if($side  =='cluster') active open #end">
             <a href="#" class="dropdown-toggle"> <i class="menu-icon  fa fa-cloud  bigger-130"></i> <span
-                    class="menu-text">集群</span> <b class="arrow fa fa-angle-down"></b>
+                    class="menu-text">集群状态</span> <b class="arrow fa fa-angle-down"></b>
             </a>
             <ul class="submenu">
-
                 <li class="#if($subside == 'redis') active #end"><a
                         href="${rc.contextPath}/redis"> <i
                         class="icon-globe"></i> Redis集群
@@ -36,69 +130,68 @@
                 </a></li>
             </ul>
         </li>
-        <li class="#if($side == 'data') active open #end">
-            <a href="#" class="dropdown-toggle"> <i class="menu-icon  fa fa-database  bigger-130"></i> <span
-                    class="menu-text">数据</span> <b class="arrow fa fa-angle-down"></b>
-            </a>
-            <ul class="submenu">
-                <li class="#if($subside == 'query') active #end"><a
-                        href="${rc.contextPath}/data/query"> <i
-                        class="icon-globe"></i> 存储查询
-                </a></li>
-                <!--<li class="#if($subside == 'clean') active #end"><a-->
-                        <!--href="${rc.contextPath}/data/clean"> <i-->
-                        <!--class="icon-globe"></i> 存储清理-->
-                <!--</a></li>-->
-                <li class="#if($subside == 'stat') active #end"><a
-                        href="${rc.contextPath}/rdb/stat"> <i
-                        class="icon-globe"></i> 空间统计
-                </a></li>
 
+        <li class="#if($side == 'consumer') active open #end"><a href="#" class="dropdown-toggle"> <i
+                class="menu-icon  fa fa-heart bigger-130"></i> <span
+                class="menu-text">自助服务</span> <b class="arrow fa fa-angle-down"></b>
+        </a>
+            <ul class="submenu">
+                <li class="#if($subside == 'tools') active #end"><a
+                        href="${rc.contextPath}/consumer/tools"> <i
+                        class="icon-globe"></i> 常用功能
+                </a></li>
+                <li class="#if($subside == 'myprocess') active #end"><a
+                        href="${rc.contextPath}/consumer/myProcess"> <i
+                        class="icon-globe"></i> 我的申请
+                </a></li>
             </ul>
         </li>
 
-        <li class="#if($side == 'config') active open #end"><a href="#"
-                                                               class="dropdown-toggle"> <i
+        <li class="#if($side == 'manage') active open #end"><a href="#" class="dropdown-toggle"> <i
                 class="menu-icon  fa fa-gavel bigger-130"></i> <span
-                class="menu-text">配置</span> <b class="arrow fa fa-angle-down"></b>
+                class="menu-text">审批与管理</span> <b class="arrow fa fa-angle-down"></b>
         </a>
             <ul class="submenu">
-                <li class="#if($subside == 'clusterconfig') active #end"><a
+                <li class="#if($subside == 'applicationManage') active #end"><a
+                        href="${rc.contextPath}/manage/applicationManage"> <i
+                        class="icon-globe"></i> 需求审批
+                </a></li>
+                <li class="#if($subside == 'physicalmachine') active #end"><a
+                        href="${rc.contextPath}/manage/physicalMachine"> <i
+                        class="icon-globe"></i> 物理机资源
+                </a></li>
+                <li class="#if($subside == 'cluster') active #end"><a
                         href="${rc.contextPath}/config/cluster"> <i
                         class="icon-globe"></i> 集群管理
                 </a></li>
                 <li class="#if($subside == 'categoryconfig') active #end"><a
                         href="${rc.contextPath}/config/category"> <i
-                        class="icon-globe"></i> 类别管理
+                        class="icon-globe"></i> Category管理
                 </a></li>
-                <li class="#if($subside == 'alarmconfig') active #end"><a
+                <li class="#if($subside == 'alarm') active #end"><a
                         href="${rc.contextPath}/config/alarm"> <i
                         class="icon-globe"></i> 告警管理
                 </a></li>
-                <li class="#if($subside == 'userconfig') active #end"><a
-                        href="${rc.contextPath}/config/user"> <i
+                <li class="#if($subside == 'userManage') active #end"><a
+                        href="${rc.contextPath}/manage/userManage"> <i
                         class="icon-globe"></i> 用户管理
                 </a></li>
-
             </ul>
         </li>
+
         <li class="#if($side == 'log') active open #end"><a href="#"
-                                                              class="dropdown-toggle"> <i
-                class="menu-icon fa fa-tasks bigger-130"></i> <span
-                class="menu-text">日志</span> <b class="arrow fa fa-angle-down"></b>
+                                                            class="dropdown-toggle"> <i
+                class="menu-icon fa fa-file-text-o bigger-130"></i> <span
+                class="menu-text">日志查看</span> <b class="arrow fa fa-angle-down"></b>
         </a>
             <ul class="submenu">
                 <li class="#if($subside == 'event') active #end"><a
                         href="${rc.contextPath}/event"> <i
-                        class="icon-globe"></i> 事件
+                        class="icon-globe"></i> 告警日志
                 </a></li>
                 <li class="#if($subside == 'auditlog') active #end"><a
                         href="${rc.contextPath}/auditlog"> <i
                         class="icon-globe"></i> 操作日志
-                </a></li>
-                <li class="#if($subside == 'tasks') active #end"><a
-                        href="${rc.contextPath}/task"> <i
-                        class="icon-globe"></i> 任务
                 </a></li>
                 <li class="#if($subside == 'task') active #end"><a
                         href="${rc.contextPath}/report"> <i
@@ -106,8 +199,6 @@
                 </a></li>
             </ul>
         </li>
-
-
 
     </ul>
 

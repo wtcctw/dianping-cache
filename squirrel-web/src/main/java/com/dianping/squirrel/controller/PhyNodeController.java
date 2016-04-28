@@ -42,14 +42,14 @@ public class PhyNodeController extends AbstractMenuController {
     }
 
     private MachineStatus copyPaasMachine(MachineStatusBean bean){
-        MachineStatus status = new MachineStatus();
+        MachineStatus machine = new MachineStatus();
         try {
-            BeanUtils.copyProperties(status,bean);
+            BeanUtils.copyProperties(machine,bean);
         } catch (IllegalAccessException e) {
             e.printStackTrace();
         } catch (InvocationTargetException e) {
             e.printStackTrace();
         }
-        return status;
+        return machine;
     }
 }
