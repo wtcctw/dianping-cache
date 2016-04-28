@@ -1,21 +1,19 @@
 package com.dianping.squirrel.task;
 
-import java.util.Date;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
-
-import com.dianping.cache.service.RedisService;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.dianping.cache.config.ConfigManager;
 import com.dianping.cache.config.ConfigManagerLoader;
 import com.dianping.cache.service.MemcachedStatsService;
 import com.dianping.cache.service.OperationLogService;
+import com.dianping.cache.service.RedisService;
 import com.dianping.cache.service.ServerStatsService;
 import com.dianping.cache.util.SpringLocator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.Date;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class PurgeHistoryDataTask {
     
@@ -53,7 +51,7 @@ public class PurgeHistoryDataTask {
 				cleanRedisStats();
 			}
 			
-		},20 , 24 * 60 * 60, TimeUnit.SECONDS);
+		}, 3 , 60 , TimeUnit.MINUTES);
 	}
 	
 	private void init(){

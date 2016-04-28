@@ -137,9 +137,9 @@ public class CacheMessageNotifier implements Serializable, InitializingBean, MQS
     }
 
     public void notifyServiceConfigRemove(CacheConfigurationRemoveDTO serviceConfig) {
-        String path = PathUtils.getManagerPath(serviceConfig.getCacheKey());
+        String path = PathUtils.getServicePath(serviceConfig.getCacheKey());
         if (StringUtils.isNotBlank(serviceConfig.getSwimlane())) {
-            path = PathUtils.getManagerPath(serviceConfig.getCacheKey(), serviceConfig.getSwimlane());
+            path = PathUtils.getServicePath(serviceConfig.getCacheKey(), serviceConfig.getSwimlane());
         }
         try {
             //remove Node

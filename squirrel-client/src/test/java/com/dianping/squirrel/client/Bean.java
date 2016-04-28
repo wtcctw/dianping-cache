@@ -1,11 +1,13 @@
-package com.dianping.squirrel.client.impl;
-
-import java.io.Serializable;
+package com.dianping.squirrel.client;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 
+import java.io.Serializable;
+
 public class Bean implements Serializable {
+
+
 
     private int id;
     private String name;
