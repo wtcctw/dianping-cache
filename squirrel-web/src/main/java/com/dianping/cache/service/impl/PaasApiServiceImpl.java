@@ -66,7 +66,7 @@ public class PaasApiServiceImpl implements PaasApiService{
 
         syncThread.setName("paas_machine_syncthread");
         syncThread.setDaemon(true);
-        syncThread.run();
+        syncThread.start();
     }
 
     private List<Machine> getStaticMachinesFromPaas() throws IOException {
@@ -130,9 +130,9 @@ public class PaasApiServiceImpl implements PaasApiService{
         @Override
         public void run() {
             while (!interrupted()) {
-                // 每10秒进行一次同步
+                // 每6秒进行一次同步
                 try {
-                    TimeUnit.SECONDS.sleep(10);
+                    TimeUnit.SECONDS.sleep(6);
                 } catch (InterruptedException e) {
                     return;
                 }
