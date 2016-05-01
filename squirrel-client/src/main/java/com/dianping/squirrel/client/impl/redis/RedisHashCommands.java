@@ -47,7 +47,7 @@ public interface RedisHashCommands {
      * @return If the field already exists, 0 is returned, otherwise if a new field is created 1 is
      *         returned.
      */
-    Long hsetnx(StoreKey key, final String field, final String value);
+    Long hsetnx(StoreKey key, String field, Object value);
     Long hlen(StoreKey key);
     Boolean hExists(StoreKey key, String field);
 }
