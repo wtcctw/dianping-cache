@@ -36,7 +36,6 @@
 			<!--  refactor  -->
 			<mvc:mapping path="/"/>
 			<mvc:mapping path="/consumer/*"/>
-			<mvc:mapping path="/manage/*"/>
 			<mvc:mapping path="/log/*"/>
 
 			<bean class="com.dianping.squirrel.view.ModelAndViewInterceptor">

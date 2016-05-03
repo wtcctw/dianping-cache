@@ -6,9 +6,8 @@ import com.dianping.cache.service.PaasApiService;
 import com.dianping.cache.util.RequestUtil;
 import com.dianping.squirrel.common.config.ConfigManagerLoader;
 import com.dianping.squirrel.common.util.JsonUtils;
-import org.apache.commons.beanutils.BeanUtils;
-import org.apache.commons.lang.StringUtils;
 import com.fasterxml.jackson.core.type.TypeReference;
+import org.apache.commons.beanutils.BeanUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -34,7 +33,9 @@ public class PaasApiServiceImpl implements PaasApiService{
 
     private static final Logger logger = LoggerFactory.getLogger(PaasApiServiceImpl.class);
 
-    private final String PASSMACHINE_STATUS_API_PATTERN = "machine/status?machine_ip=%s";
+    private final String PASSMACHINE_STATUS_PARAM_KEY = "machineIps";
+
+    private final String PASSMACHINE_STATUS_API_PATTERN = "batch/status";
 
     private final String DEFAULT_PAASMACHINEURL = "http://10.3.21.21:8080/api/v1/machines/";
 
@@ -57,7 +58,7 @@ public class PaasApiServiceImpl implements PaasApiService{
             ipList.add(machine.getIp());
         }
 
-        Map<String,MachineStatusBean> machineStatus = getMachineStatusFromPaas(StringUtils.join(ipList, ","));
+        Map<String,MachineStatusBean> machineStatus = getMachineStatusFromPaas(ipList);
         checkNotNull(machineStatus);
 
         for (MachineStatusBean entity : machineStatus.values()) {
@@ -66,20 +67,23 @@ public class PaasApiServiceImpl implements PaasApiService{
 
         syncThread.setName("paas_machine_syncthread");
         syncThread.setDaemon(true);
-        syncThread.run();
+        syncThread.start();
     }
 
     private List<Machine> getStaticMachinesFromPaas() throws IOException {
-        String jsonString = RequestUtil.sendGet(paasUrl+"/static",null);
+        String jsonString = RequestUtil.sendGet(paasUrl+"static",null);
         Machine[] machines = JsonUtils.fromStr(jsonString,Machine[].class);
 
         return Arrays.asList(machines);
     }
 
-    private Map<String,MachineStatusBean> getMachineStatusFromPaas(String ip) throws IOException, IllegalArgumentException {
-        String machineStatusUrl = String.format(paasUrl + PASSMACHINE_STATUS_API_PATTERN,ip);
-        String jsonString = RequestUtil.sendGet(machineStatusUrl, null);
-        checkArgument(jsonString != null && !"".equals(jsonString), "sendGet error url=" + machineStatusUrl);
+    private Map<String,MachineStatusBean> getMachineStatusFromPaas(List<String> ipList) throws IOException, IllegalArgumentException {
+        String machineStatusUrl = paasUrl + PASSMACHINE_STATUS_API_PATTERN;
+        Map<String,List<String>> params = new HashMap<String,List<String>>();
+        params.put(PASSMACHINE_STATUS_PARAM_KEY,ipList);
+
+        String jsonString = RequestUtil.sendPost(machineStatusUrl, JsonUtils.toStr(params));
+        checkArgument(jsonString != null && !"".equals(jsonString), "sendPost error url=" + machineStatusUrl);
 
         Map<String,MachineStatusBean> result = JsonUtils.fromStr(jsonString, new TypeReference<HashMap<String,MachineStatusBean>>(){});
 
@@ -130,9 +134,9 @@ public class PaasApiServiceImpl implements PaasApiService{
         @Override
         public void run() {
             while (!interrupted()) {
-                // 每10秒进行一次同步
+                // 每6秒进行一次同步
                 try {
-                    TimeUnit.SECONDS.sleep(10);
+                    TimeUnit.SECONDS.sleep(6);
                 } catch (InterruptedException e) {
                     return;
                 }
@@ -171,7 +175,7 @@ public class PaasApiServiceImpl implements PaasApiService{
             }
 
             try {
-                Map<String,MachineStatusBean> machineStatus = getMachineStatusFromPaas(StringUtils.join(ipList, ","));
+                Map<String,MachineStatusBean> machineStatus = getMachineStatusFromPaas(ipList);
                 checkNotNull(machineStatus);
 
                 for(MachineStatusBean newNode : machineStatus.values()) {

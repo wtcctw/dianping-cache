@@ -1,6 +1,5 @@
-package com.dianping.squirrel.controller;
+package com.dianping.cache.controller;
 
-import com.dianping.cache.controller.AbstractMenuController;
 import com.dianping.cache.controller.vo.MachineStatus;
 import com.dianping.cache.scale.instance.docker.paasbean.MachineStatusBean;
 import com.dianping.cache.service.PaasApiService;
@@ -20,17 +19,20 @@ import java.util.List;
  * Created by hui.wang on 16/4/18.
  */
 @Controller
-public class PhyNodeController extends AbstractMenuController {
+public class PaasMachineController extends AbstractSidebarController {
 
     @Autowired
     PaasApiService paasApiService;
 
-    @RequestMapping(value = "/phy")
+    private String subside;
+
+    @RequestMapping(value = "/config/physicalMachine")
     public ModelAndView allPhysicalNodes() {
-        return new ModelAndView("phy/nodes",createViewMap());
+        subside = "physicalmachine";
+        return new ModelAndView("config/phymachine",createViewMap());
     }
 
-    @RequestMapping(value = "/phy/nodes")
+    @RequestMapping(value = "/config/getMachineInfo")
     @ResponseBody
     public List<MachineStatus> phyNodesData(){
         List<MachineStatus> allMachines = new ArrayList<MachineStatus>();
@@ -51,5 +53,15 @@ public class PhyNodeController extends AbstractMenuController {
             e.printStackTrace();
         }
         return machine;
+    }
+
+    @Override
+    protected String getSide() {
+        return "config";
+    }
+
+    @Override
+    public String getSubSide() {
+        return subside;
     }
 }

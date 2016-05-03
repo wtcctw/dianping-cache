@@ -1,5 +1,10 @@
 package com.dianping.cache.util;
 
+import org.springframework.web.context.request.RequestAttributes;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
+
+import javax.servlet.http.HttpServletRequest;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -8,12 +13,6 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.List;
 import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-
-import org.springframework.web.context.request.RequestAttributes;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
 
 public class RequestUtil {
 	
@@ -58,6 +57,8 @@ public class RequestUtil {
             // 打开和URL之间的连接
             URLConnection connection = realUrl.openConnection();
             // 设置通用的请求属性
+            connection.setConnectTimeout(1000);
+            connection.setReadTimeout(5000);
             connection.setRequestProperty("accept", "*/*");
             connection.setRequestProperty("connection", "Keep-Alive");
             connection.setRequestProperty("user-agent",
@@ -108,6 +109,9 @@ public class RequestUtil {
             URL realUrl = new URL(url);
             // 打开和URL之间的连接
             URLConnection conn = realUrl.openConnection();
+
+            conn.setConnectTimeout(2000);
+            conn.setReadTimeout(10000);
             conn.setRequestProperty("Content-Type", "application/json");
             // 设置通用的请求属性
 //            conn.setRequestProperty("accept", "*/*");
