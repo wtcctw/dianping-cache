@@ -19,20 +19,20 @@ import java.util.List;
  * Created by hui.wang on 16/4/18.
  */
 @Controller
-public class PaasMachineController extends AbstractMenuController {
+public class PaasMachineController extends AbstractSidebarController {
 
     @Autowired
     PaasApiService paasApiService;
 
     private String subside;
 
-    @RequestMapping(value = "/manage/physicalMachine")
+    @RequestMapping(value = "/config/physicalMachine")
     public ModelAndView allPhysicalNodes() {
-        subside = "physicalMachine";
-        return new ModelAndView("manage/phymachine",createViewMap());
+        subside = "physicalmachine";
+        return new ModelAndView("config/phymachine",createViewMap());
     }
 
-    @RequestMapping(value = "/manage/getMachineInfo")
+    @RequestMapping(value = "/config/getMachineInfo")
     @ResponseBody
     public List<MachineStatus> phyNodesData(){
         List<MachineStatus> allMachines = new ArrayList<MachineStatus>();
@@ -53,5 +53,15 @@ public class PaasMachineController extends AbstractMenuController {
             e.printStackTrace();
         }
         return machine;
+    }
+
+    @Override
+    protected String getSide() {
+        return "config";
+    }
+
+    @Override
+    public String getSubSide() {
+        return subside;
     }
 }
