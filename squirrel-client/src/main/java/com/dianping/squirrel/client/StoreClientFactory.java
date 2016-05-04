@@ -2,11 +2,6 @@ package com.dianping.squirrel.client;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import java.util.ServiceLoader;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.dianping.squirrel.client.config.StoreCategoryConfig;
 import com.dianping.squirrel.client.config.StoreCategoryConfigManager;
 import com.dianping.squirrel.client.config.StoreClientConfigManager;
@@ -18,12 +13,6 @@ public class StoreClientFactory {
 
 	static {
 		LoggerLoader.init();
-	}
-
-	private static Logger logger = LoggerFactory.getLogger(StoreClientFactory.class);
-
-	static {
-		loadStoreClients();
 	}
 
 	private static StoreClient storeClient = null;
@@ -56,8 +45,7 @@ public class StoreClientFactory {
 	@SuppressWarnings("unchecked")
 	public static <T extends StoreClient> T getStoreClient(String storeType) {
 		checkNotNull(storeType, "store type is null");
-		StoreClient storeClient = clientConfigManager.findCacheClient(storeType);
-		return (T) storeClient;
+		return (T) clientConfigManager.findCacheClient(storeType);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -68,12 +56,4 @@ public class StoreClientFactory {
 		checkNotNull(categoryConfig.getCacheType(), "%s's category store type is null", category);
 		return (T) clientConfigManager.findCacheClient(categoryConfig.getCacheType());
 	}
-
-	private static void loadStoreClients() {
-		ServiceLoader<StoreClient> serviceLoader = ServiceLoader.load(StoreClient.class);
-		for (StoreClient service : serviceLoader) {
-			logger.info("loaded store client: " + service.getScheme());
-		}
-	}
-
 }

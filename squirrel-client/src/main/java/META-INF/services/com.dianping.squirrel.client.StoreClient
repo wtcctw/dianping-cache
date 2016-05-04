@@ -1,3 +1,0 @@
-com.dianping.squirrel.client.impl.memcached.MemcachedStoreClientImpl
-com.dianping.squirrel.client.impl.redis.RedisStoreClientImpl
-com.dianping.squirrel.client.impl.ehcache.EhcacheStoreClientImpl

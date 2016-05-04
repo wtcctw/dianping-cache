@@ -32,18 +32,14 @@ import org.slf4j.LoggerFactory;
 
 import com.dianping.squirrel.client.StoreClient;
 import com.dianping.squirrel.client.config.zookeeper.CacheCuratorClient;
-import com.dianping.squirrel.client.core.CacheConfiguration;
 import com.dianping.squirrel.client.core.StoreClientBuilder;
 import com.dianping.squirrel.client.impl.dcache.DCacheStoreClientImpl;
 import com.dianping.squirrel.client.impl.ehcache.EhcacheStoreClientImpl;
 import com.dianping.squirrel.client.impl.memcached.MemcachedStoreClientImpl;
 import com.dianping.squirrel.client.impl.redis.RedisStoreClientImpl;
-import com.dianping.squirrel.common.config.ConfigManager;
-import com.dianping.squirrel.common.config.ConfigManagerLoader;
 import com.dianping.squirrel.common.domain.CacheConfigurationDTO;
 import com.dianping.squirrel.common.exception.StoreException;
 import com.dianping.squirrel.common.exception.StoreInitializeException;
-import com.dianping.squirrel.common.util.PathUtils;
 
 
 /**
@@ -56,7 +52,7 @@ public class StoreClientConfigManager {
 
 	private static transient Logger logger = LoggerFactory.getLogger(StoreClientConfigManager.class);
 
-	private static StoreClientConfigManager instance;
+	private static volatile StoreClientConfigManager instance;
 
 	private ConcurrentMap<String, StoreClientConfig> configMap = new ConcurrentHashMap<String, StoreClientConfig>();
 
@@ -64,7 +60,7 @@ public class StoreClientConfigManager {
 
 	private CacheCuratorClient cacheCuratorClient = CacheCuratorClient.getInstance();
 	
-	private ConfigManager configManager = ConfigManagerLoader.getConfigManager();
+//	private ConfigManager configManager = ConfigManagerLoader.getConfigManager();
 	
 	private Map<String, List<StoreClientConfigListener>> configListenerMap = new HashMap<String, List<StoreClientConfigListener>>();
 	
@@ -154,8 +150,7 @@ public class StoreClientConfigManager {
 	}
 
 	private CacheConfigurationDTO loadCacheClientConfig(String cacheKey) throws Exception {
-	    CacheConfigurationDTO serviceConfig = cacheCuratorClient.getServiceConfig(cacheKey);
-	    return serviceConfig;
+	    return cacheCuratorClient.getServiceConfig(cacheKey);
 	}
 
 	public Set<String> getCacheClientKeys() {
@@ -188,8 +183,8 @@ public class StoreClientConfigManager {
         } else if(storeType.startsWith("web") || storeType.startsWith("ehcache")) {
             configDto.setClientClazz(EhcacheStoreClientImpl.class.getName());
         } 
-        StoreClientConfig clientConfig = StoreClientConfigHelper.parse(configDto);
-        return clientConfig;
+
+        return StoreClientConfigHelper.parse(configDto);
     }
 
     /**
@@ -197,57 +192,56 @@ public class StoreClientConfigManager {
 	 * @param configuration
 	 * @throws StoreInitializeException
 	 */
-	private synchronized StoreClientConfig registerCache(CacheConfigurationDTO configuration) throws StoreInitializeException {
-		logger.warn("register cache service: " + configuration);
-		String cacheKey = configuration.getCacheKey();
-
-		if(cacheKey.startsWith("memcache")) {
-		    configuration.setClientClazz(MemcachedStoreClientImpl.class.getName());
-		} else if (cacheKey.startsWith("dcache")) {
-		    configuration.setClientClazz(DCacheStoreClientImpl.class.getName());
-		} else if (cacheKey.startsWith("redis")) {
-            configuration.setClientClazz(RedisStoreClientImpl.class.getName());
-        } else if(cacheKey.startsWith("web") || cacheKey.startsWith("ehcache")) {
-            configuration.setClientClazz(EhcacheStoreClientImpl.class.getName());
-        }
-		
-		StoreClientConfig cacheClientConfig = StoreClientConfigHelper.parse(configuration);
-		if (cacheClientConfig != null) {
-		    configMap.put(cacheKey, cacheClientConfig);
-		}
-		
-		CacheConfiguration.removeCache(cacheKey);
-		CacheConfiguration.addCache(cacheKey, configuration.getClientClazz());
-		StoreClientBuilder.closeStoreClient(cacheKey);
-
-		return cacheClientConfig;
-	}
+//	private synchronized StoreClientConfig registerCache(CacheConfigurationDTO configuration) throws StoreInitializeException {
+//		logger.warn("register cache service: " + configuration);
+//		String cacheKey = configuration.getCacheKey();
+//
+//		if(cacheKey.startsWith("memcache")) {
+//		    configuration.setClientClazz(MemcachedStoreClientImpl.class.getName());
+//		} else if (cacheKey.startsWith("dcache")) {
+//		    configuration.setClientClazz(DCacheStoreClientImpl.class.getName());
+//		} else if (cacheKey.startsWith("redis")) {
+//            configuration.setClientClazz(RedisStoreClientImpl.class.getName());
+//        } else if(cacheKey.startsWith("web") || cacheKey.startsWith("ehcache")) {
+//            configuration.setClientClazz(EhcacheStoreClientImpl.class.getName());
+//        }
+//		
+//		StoreClientConfig cacheClientConfig = StoreClientConfigHelper.parse(configuration);
+//		if (cacheClientConfig != null) {
+//		    configMap.put(cacheKey, cacheClientConfig);
+//		}
+//		
+//		CacheConfiguration.removeCache(cacheKey);
+//		CacheConfiguration.addCache(cacheKey, configuration.getClientClazz());
+//		StoreClientBuilder.closeStoreClient(cacheKey);
+//
+//		return cacheClientConfig;
+//	}
 
 	public void init() throws Exception {
 		initCacheServices();
 	}
 	
 	private void initCacheServices() {
-	    // TODO test
-        if (PathUtils.isZookeeperEnabled() && false) {
-            String appName = configManager.getAppName();
-            if (StringUtils.isNotEmpty(appName)) {
-                try {
-                    String services = cacheCuratorClient.getRuntimeServices(appName);
-                    if (StringUtils.isNotEmpty(services)) {
-                        logger.info("initializing cache services: " + services);
-                        String[] cacheServices = StringUtils.split(services, ',');
-                        for (String cacheService : cacheServices) {
-                            if(StringUtils.isNotBlank(cacheService)) {
-                                init(cacheService.trim());
-                            }
-                        }
-                    }
-                } catch (Exception e) {
-                    logger.error("failed to initialize cache services", e);
-                }
-            }
-        }
+//        if (PathUtils.isZookeeperEnabled()) {
+//            String appName = configManager.getAppName();
+//            if (StringUtils.isNotEmpty(appName)) {
+//                try {
+//                    String services = cacheCuratorClient.getRuntimeServices(appName);
+//                    if (StringUtils.isNotEmpty(services)) {
+//                        logger.info("initializing cache services: " + services);
+//                        String[] cacheServices = StringUtils.split(services, ',');
+//                        for (String cacheService : cacheServices) {
+//                            if(StringUtils.isNotBlank(cacheService)) {
+//                                init(cacheService.trim());
+//                            }
+//                        }
+//                    }
+//                } catch (Exception e) {
+//                    logger.error("failed to initialize cache services", e);
+//                }
+//            }
+//        }
 	}
 
 	public void removeCacheConfig(String cacheKey) {
