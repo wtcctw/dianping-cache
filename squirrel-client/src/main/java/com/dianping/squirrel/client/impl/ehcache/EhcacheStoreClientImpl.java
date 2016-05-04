@@ -73,6 +73,7 @@ public class EhcacheStoreClientImpl extends AbstractStoreClient {
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	public <T> T get(StoreCategoryConfig categoryConfig, String key) {
 		Element element = findCache(categoryConfig.getCategory()).get(key);
 		return (T) (element == null ? null : element.getObjectValue());

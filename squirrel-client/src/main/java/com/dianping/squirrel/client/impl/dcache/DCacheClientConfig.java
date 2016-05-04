@@ -73,6 +73,7 @@ public class DCacheClientConfig implements StoreClientConfig {
 		this.transcoder = transcoder;
 	}
 
+	@SuppressWarnings("unchecked")
 	public void setTranscoderClass(Class<?> transcoderClass) throws Exception {
 		Transcoder<Object> transcoder = (Transcoder<Object>) transcoderClass.newInstance();
 		setTranscoder(transcoder);

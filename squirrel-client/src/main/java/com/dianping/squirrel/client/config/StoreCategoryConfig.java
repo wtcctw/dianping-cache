@@ -225,7 +225,7 @@ public class StoreCategoryConfig {
 	    }
     }
 
-    public Class getDataTypeClass() {
+    public Class<?> getDataTypeClass() {
 	    if(extendedProps != null) {
 	        String dataType = extendedProps.get("dataType");
 	        if(dataType == null) {

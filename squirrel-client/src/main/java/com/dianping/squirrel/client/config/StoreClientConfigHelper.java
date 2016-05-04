@@ -42,7 +42,7 @@ import com.dianping.squirrel.common.exception.StoreInitializeException;
  */
 public class StoreClientConfigHelper {
 	private static transient Logger logger = LoggerFactory.getLogger(StoreClientConfigHelper.class);
-	private static Map<Class, StoreClientConfigParser> parserMap = new ConcurrentHashMap<Class, StoreClientConfigParser>();
+	private static Map<Class<?>, StoreClientConfigParser> parserMap = new ConcurrentHashMap<Class<?>, StoreClientConfigParser>();
 
 	static {
 		register(MemcachedStoreClientImpl.class, new MemcachedClientConfigParser());
@@ -52,7 +52,7 @@ public class StoreClientConfigHelper {
 		register(DangaStoreClientImpl.class, new DangaClientConfigParser());
 	}
 
-	public static void register(Class clientClazz, StoreClientConfigParser parser) {
+	public static void register(Class<?> clientClazz, StoreClientConfigParser parser) {
 		parserMap.put(clientClazz, parser);
 	}
 
@@ -62,7 +62,7 @@ public class StoreClientConfigHelper {
 	 */
 	public static StoreClientConfig parse(CacheConfigurationDTO detail) throws StoreInitializeException {
 		try {
-			Class clientClazz = Class.forName(detail.getClientClazz());
+			Class<?> clientClazz = Class.forName(detail.getClientClazz());
 			StoreClientConfig config = parserMap.get(clientClazz).parse(detail);
 			config.init();
 			return config;

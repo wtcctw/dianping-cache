@@ -126,7 +126,8 @@ public class DCacheStoreClientImpl extends AbstractStoreClient implements DCache
         }
     }
 
-    @Override
+	@Override
+	@SuppressWarnings("unchecked")
     protected <T> T doGet(StoreCategoryConfig categoryConfig, String finalKey) throws Exception {
         KVCacheResult result = getKVClient().get(finalKey);
         if (result != null) {
@@ -200,7 +201,8 @@ public class DCacheStoreClientImpl extends AbstractStoreClient implements DCache
         final StoreFuture<T> future = new StoreFuture<T>(finalKey);
         ClientCallback<KVCacheResult> dcacheCallback = new ClientCallback<KVCacheResult>() {
 
-            @Override
+            @SuppressWarnings("unchecked")
+			@Override
             public void onCompleted(KVCacheResult result) {
                 if (result.getCode() == DCacheConst.ET_SUCC) {
                     future.onSuccess((T) result.getValue());
@@ -327,7 +329,8 @@ public class DCacheStoreClientImpl extends AbstractStoreClient implements DCache
     protected <T> Void doAsyncGet(StoreCategoryConfig categoryConfig, String finalKey, final StoreCallback<T> callback) throws Exception {
         ClientCallback<KVCacheResult> dcacheCallback = new ClientCallback<KVCacheResult>() {
 
-            @Override
+            @SuppressWarnings("unchecked")
+			@Override
             public void onCompleted(KVCacheResult result) {
                 if (result.getCode() == DCacheConst.ET_SUCC) {
                     callback.onSuccess((T) result.getValue());
@@ -458,7 +461,8 @@ public class DCacheStoreClientImpl extends AbstractStoreClient implements DCache
         throw new UnsupportedOperationException("dcache does not support decrease operation");
     }
 
-    @Override
+    @SuppressWarnings("unchecked")
+	@Override
     protected <T> Map<String, T> doMultiGet(StoreCategoryConfig categoryConfig, List<String> keys) throws Exception {
         Map<String, T> result = null;
         List<Object> list = new ArrayList<Object>(keys);
@@ -488,7 +492,8 @@ public class DCacheStoreClientImpl extends AbstractStoreClient implements DCache
                                        final StoreCallback<Map<String, T>> callback) throws Exception {
         ClientCallback<BatchKVCacheResult> dcacheCallback = new ClientCallback<BatchKVCacheResult>() {
 
-            @Override
+            @SuppressWarnings("unchecked")
+			@Override
             public void onCompleted(BatchKVCacheResult result) {
                 if (result.getCode() == DCacheConst.ET_SUCC) {
                     Map<Object, CacheValue> dcacheResults = result.getValueMap();

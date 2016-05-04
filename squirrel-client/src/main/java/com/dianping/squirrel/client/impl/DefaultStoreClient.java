@@ -250,7 +250,7 @@ public class DefaultStoreClient implements StoreClient {
 			throws StoreException {
 	    checkNotNull(keys, "store key list is null");
         if(keys.size() == 0) {
-            return Collections.EMPTY_MAP;
+            return Collections.emptyMap();
         }
         
         StoreClient storeClient = StoreClientFactory.getStoreClientByCategory(keys.get(0).getCategory());
@@ -268,7 +268,7 @@ public class DefaultStoreClient implements StoreClient {
 	    checkNotNull(keys, "store key list is null");
         checkNotNull(callback, "callback is null");
         if(keys.size() == 0) {
-            callback.onSuccess(Collections.EMPTY_MAP);
+            callback.onSuccess(Collections.<StoreKey, T> emptyMap());
             return null;
         }
         

@@ -3,7 +3,12 @@ package com.dianping.squirrel.common.serialize;
 
 public class SerializeException extends Exception {
     
-    public SerializeException(Throwable t) {
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -7265924355794067458L;
+
+	public SerializeException(Throwable t) {
         super(t);
     }
     

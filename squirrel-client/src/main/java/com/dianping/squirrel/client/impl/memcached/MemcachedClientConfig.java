@@ -103,6 +103,7 @@ public class MemcachedClientConfig implements StoreClientConfig {
 		this.transcoder = transcoder;
 	}
 
+	@SuppressWarnings("unchecked")
 	public void setTranscoderClass(Class<?> transcoderClass) throws Exception {
 		Transcoder<Object> transcoder = (Transcoder<Object>) transcoderClass.newInstance();
 		setTranscoder(transcoder);
@@ -123,7 +124,7 @@ public class MemcachedClientConfig implements StoreClientConfig {
 
     private void ensureSpymemcachedVersion() throws StoreInitializeException {
         try {
-            Class clazz = Class.forName("net.spy.memcached.internal.GetCompletionListener");
+            Class.forName("net.spy.memcached.internal.GetCompletionListener");
         } catch (ClassNotFoundException e) {
             throw new StoreInitializeException("spymemcached version is too low, please upgrade to version 2.11.x or above", e);
         }
