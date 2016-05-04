@@ -34,7 +34,6 @@ import com.dianping.squirrel.client.StoreClient;
 import com.dianping.squirrel.client.config.zookeeper.CacheCuratorClient;
 import com.dianping.squirrel.client.core.CacheConfiguration;
 import com.dianping.squirrel.client.core.StoreClientBuilder;
-import com.dianping.squirrel.client.impl.danga.DangaStoreClientImpl;
 import com.dianping.squirrel.client.impl.dcache.DCacheStoreClientImpl;
 import com.dianping.squirrel.client.impl.ehcache.EhcacheStoreClientImpl;
 import com.dianping.squirrel.client.impl.memcached.MemcachedStoreClientImpl;
@@ -188,10 +187,7 @@ public class StoreClientConfigManager {
             configDto.setClientClazz(RedisStoreClientImpl.class.getName());
         } else if(storeType.startsWith("web") || storeType.startsWith("ehcache")) {
             configDto.setClientClazz(EhcacheStoreClientImpl.class.getName());
-        } else if(storeType.startsWith("danga")){
-        	configDto.setClientClazz(DangaStoreClientImpl.class.getName());
-        }
-        
+        } 
         StoreClientConfig clientConfig = StoreClientConfigHelper.parse(configDto);
         return clientConfig;
     }
