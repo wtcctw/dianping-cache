@@ -1759,7 +1759,6 @@ public class RedisStoreClientImpl extends AbstractStoreClient implements RedisSt
         return clientManager.getClient();
     }
 
-
     // new commands
     @Override
     public Boolean setRaw(StoreKey key, Object value) {
