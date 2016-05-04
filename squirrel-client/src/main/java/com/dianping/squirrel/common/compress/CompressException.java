@@ -2,7 +2,12 @@ package com.dianping.squirrel.common.compress;
 
 public class CompressException extends Exception {
     
-    public CompressException(String message) {
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 2407719416074685845L;
+
+	public CompressException(String message) {
         super(message);
     }
 

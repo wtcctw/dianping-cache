@@ -21,8 +21,6 @@ public class LionConfigManager extends AbstractConfigManager {
 
 	private static Logger logger = LoggerFactory.getLogger(LionConfigManager.class);
 
-	private static String appName = null;
-
 	private ConfigCache configCache = null;
 
 	public LionConfigManager() {

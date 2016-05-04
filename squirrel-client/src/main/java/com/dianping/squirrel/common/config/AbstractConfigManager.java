@@ -97,6 +97,7 @@ public abstract class AbstractConfigManager implements ConfigManager {
 		return getPropertyFromLocal(key, String.class);
 	}
 
+	@SuppressWarnings("unchecked")
 	private <T> T getPropertyFromLocal(String key, Class<T> type) {
 		String strValue = null;
 		if (localCache.containsKey(key)) {
@@ -149,6 +150,7 @@ public abstract class AbstractConfigManager implements ConfigManager {
 		return getProperty(key, String.class);
 	}
 
+	@SuppressWarnings("unchecked")
 	private <T> T getProperty(String key, Class<T> type) {
 		String strValue = null;
 		if (localCache.containsKey(key)) {
@@ -270,7 +272,7 @@ public abstract class AbstractConfigManager implements ConfigManager {
 
 	@Override
 	public void init(Properties properties) {
-		for (Iterator ir = properties.keySet().iterator(); ir.hasNext();) {
+		for (Iterator<?> ir = properties.keySet().iterator(); ir.hasNext();) {
 			String key = ir.next().toString();
 			String value = properties.getProperty(key);
 			localCache.put(key, value);
