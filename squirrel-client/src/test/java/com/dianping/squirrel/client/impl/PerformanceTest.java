@@ -10,7 +10,6 @@ public class PerformanceTest {
 
     private String category = "myredis";
     private StoreClient client = StoreClientFactory.getStoreClient();
-    private StoreKey key = new StoreKey(category, "perf");
     private Bean bean = new Bean(1111, "1111");
     private Bean bean2 = new Bean(2222, "2222");
     

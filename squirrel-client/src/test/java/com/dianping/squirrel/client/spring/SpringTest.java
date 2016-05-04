@@ -13,9 +13,10 @@ public class SpringTest {
 
     @Autowired
     private StoreClient storeClient;
+	private static ApplicationContext context;
     
     public static void main(String[] args) {
-        ApplicationContext context = new ClassPathXmlApplicationContext("applicationContext.xml");
+        context = new ClassPathXmlApplicationContext("applicationContext.xml");
         StoreClient sc = (StoreClient) context.getBean("storeClient");
         Object value = sc.get(new StoreKey("myredis", "string"));
         System.out.println(value);
