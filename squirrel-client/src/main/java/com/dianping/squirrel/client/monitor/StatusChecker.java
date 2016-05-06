@@ -8,6 +8,7 @@ import com.dianping.squirrel.common.config.ConfigManagerLoader;
 public class StatusChecker implements Runnable {
 
 	private static final Logger logger = LoggerFactory.getLogger(StatusChecker.class);
+	
 	public static final int logPeriod = ConfigManagerLoader.getConfigManager().getIntValue(
 			"squirrel-client.stat.log.period", 5000);
 	public static final int logMinQps = ConfigManagerLoader.getConfigManager().getIntValue(

@@ -1,19 +1,23 @@
 package com.dianping.squirrel.client.impl.redis;
 
-import com.dianping.squirrel.client.StoreClientFactory;
-import com.dianping.squirrel.client.StoreKey;
-import com.dianping.squirrel.client.impl.Bean;
-import com.dianping.squirrel.client.impl.User;
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static org.junit.Assert.*;
-import static org.junit.Assert.assertEquals;
+import org.junit.Test;
 
+import com.dianping.squirrel.client.StoreClientFactory;
+import com.dianping.squirrel.client.StoreKey;
+import com.dianping.squirrel.client.impl.Bean;
+import com.dianping.squirrel.client.impl.User;
+
+@SuppressWarnings({"rawtypes","deprecation"})
 public class RedisStoreClientImplTest {
     
     private static final String STORE_TYPE = "redis-default";
@@ -22,7 +26,7 @@ public class RedisStoreClientImplTest {
     
     @Test
     public void testCommon() throws InterruptedException {
-        RedisStoreClient redisClient = (RedisStoreClient) StoreClientFactory.getStoreClient(STORE_TYPE);
+		RedisStoreClient redisClient = (RedisStoreClient) StoreClientFactory.getStoreClient(STORE_TYPE);
         StoreKey key = new StoreKey(CATEGORY, "string");
         Object value = redisClient.delete(key);
         value = redisClient.ttl(key);
@@ -78,7 +82,7 @@ public class RedisStoreClientImplTest {
         fail("Not yet implemented");
     }
 
-    @Test
+	@Test
     public void testHash() {
         RedisStoreClient redisClient = (RedisStoreClient) StoreClientFactory.getStoreClient(STORE_TYPE);
         StoreKey key = new StoreKey(CATEGORY, "hash");

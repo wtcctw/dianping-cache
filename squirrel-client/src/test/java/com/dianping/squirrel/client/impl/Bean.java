@@ -7,7 +7,11 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 
 public class Bean implements Serializable {
 
-    private int id;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -3483667107992147318L;
+	private int id;
     private String name;
     
     public Bean() {}

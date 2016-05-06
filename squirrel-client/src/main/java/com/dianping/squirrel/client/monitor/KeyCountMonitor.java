@@ -11,13 +11,13 @@ public class KeyCountMonitor {
 
 	private static Logger logger = LoggerFactory.getLogger(KeyCountMonitor.class);
 
-	private static final String keyCountRangeConfig = ConfigManagerLoader.getConfigManager().getStringValue(
-			"squirrel-client.monitor.keycount.range", "4,8,16,32,64,128,256");
+	private static final String keyCountRangeConfig = ConfigManagerLoader.getConfigManager()
+			.getStringValue("squirrel-client.monitor.keycount.range", "4,8,16,32,64,128,256");
 
 	private static int[] keyCountRangeArray;
 
-	private static final boolean enableMonitor = ConfigManagerLoader.getConfigManager().getBooleanValue(
-			"squirrel-client.monitor.keycount.enable", true);
+	private static final boolean enableMonitor = ConfigManagerLoader.getConfigManager()
+			.getBooleanValue("squirrel-client.monitor.keycount.enable", true);
 
 	private static class KeyCountHolder {
 		public static final KeyCountMonitor INSTANCE = new KeyCountMonitor();
@@ -66,11 +66,13 @@ public class KeyCountMonitor {
 
 	private void log(int size, int[] rangeArray, String eventName) {
 		if (rangeArray != null && rangeArray.length > 0) {
-			String value = ">=" + rangeArray[rangeArray.length - 1];
+			String value = null;
 			if (rangeArray.length > size) {
 				value = "<=" + rangeArray[size];
+			} else {
+				value = ">=" + rangeArray[rangeArray.length - 1];
 			}
-			Cat.getProducer().logEvent(eventName, value, Event.SUCCESS, size + "");
+			Cat.getProducer().logEvent(eventName, value, Event.SUCCESS, String.valueOf(size));
 		}
 	}
 }

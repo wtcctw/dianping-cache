@@ -13,8 +13,9 @@ public class StoreClientFactoryTest {
     }
 
     @Test
+    @SuppressWarnings("deprecation")
     public void testGetStoreClientString() {
-        StoreClient storeClient = StoreClientFactory.getStoreClient("redis-hua");
+		StoreClient storeClient = StoreClientFactory.getStoreClient("redis-hua");
         assertNotNull(storeClient);
     }
 

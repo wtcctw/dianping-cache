@@ -708,7 +708,7 @@ public class RedisStoreClientImpl extends AbstractStoreClient implements RedisSt
     }
 
     @Override
-    public Long hsetnx(StoreKey key,final String field,final String value) {
+    public Long hsetnx(StoreKey key,final String field,final Object value) {
         checkNotNull(key, "store key is null");
         checkNotNull(field, "hash field is null");
         final StoreCategoryConfig categoryConfig = configManager.findCacheKeyType(key.getCategory());
@@ -1952,4 +1952,5 @@ public class RedisStoreClientImpl extends AbstractStoreClient implements RedisSt
             }
         }, categoryConfig, finalKey, "rpushx");
     }
+
 }

@@ -201,14 +201,42 @@ public interface StoreClient {
      */
 	<T> Void asyncMultiSet(List<StoreKey> keys, List<T> values, StoreCallback<Boolean> callback);
 	
+	/**
+	 * 获取指定 Key 的值
+     * @param finalKey 要获取的最终Key
+     * @return finalKey 对应的值，如果 finalKey 不存在，返回 null
+     * @throws StoreException 异常都是 StoreException 的子类且是 RuntimeException，可以根据需要捕获相应异常。
+     *         如：如果需要捕获超时异常，可以捕获 StoreTimeoutException
+	 */
 	public <T> T get(String finalKey) throws StoreException;
 	
+	/**
+     * 删除指定 Key
+     * @param finalKey 要删除的最终Key
+     * @return 如果 Key 存在且被删除，返回 true<br>
+     *         如果 Key 不存在，返回 false
+     * @throws StoreException 异常都是 StoreException 的子类且是 RuntimeException，可以根据需要捕获相应异常。
+     *         如：如果需要捕获超时异常，可以捕获 StoreTimeoutException
+     */
 	public Boolean delete(String finalKey) throws StoreException;
 	
+	/**
+	 * 获取最终拼接而成的key
+	 * @param storeKey
+	 * @return 获取最终拼接而成的key
+	 */
 	public String getFinalKey(StoreKey storeKey);
 
+	/**
+	 * 
+	 * @return 返回是否是分布式缓存，目前，除了ehcache之外，其余包括memcached,redis,dcache均是分布式缓存
+	 */
     public boolean isDistributed();
     
+    /**
+     * 
+     * @return 返回缓存类型
+     */
     public String getScheme();
 
 }

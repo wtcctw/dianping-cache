@@ -6,20 +6,16 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import org.apache.commons.lang.StringUtils;
+
+import com.dianping.squirrel.client.impl.memcached.NodeMonitor;
+
 import net.spy.memcached.MemcachedClient;
 import net.spy.memcached.internal.CheckedOperationTimeoutException;
 import net.spy.memcached.internal.GetFuture;
 
-import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.dianping.squirrel.client.impl.memcached.NodeMonitor;
-
 public class RetryLoop {
 
-	private static Logger logger = LoggerFactory.getLogger(RetryLoop.class);
-	
 	private static int retryLimit = 0;
 	private static Integer[] timeoutMillis;
 	private boolean done = false;
@@ -72,7 +68,7 @@ public class RetryLoop {
 	public RetryLoop() {
 	}
 
-	public void takeException(Exception e, Future future) throws Exception {
+	public void takeException(Exception e, Future<?> future) throws Exception {
 		if (future != null) {
 			future.cancel(true);
 		}

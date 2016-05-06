@@ -11,6 +11,11 @@ import org.slf4j.LoggerFactory;
 
 
 public class CapacityBucket implements Serializable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -2886718426836028478L;
+
 	private static final Logger logger = LoggerFactory.getLogger(CapacityBucket.class);
 
 	private AtomicInteger requests = new AtomicInteger();

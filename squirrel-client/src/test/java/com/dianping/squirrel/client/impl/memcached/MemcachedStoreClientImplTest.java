@@ -17,6 +17,7 @@ import com.dianping.squirrel.client.core.StoreCallback;
 import com.dianping.squirrel.client.impl.Bean;
 import com.dianping.squirrel.client.impl.ResultHolder;
 
+@SuppressWarnings({"rawtypes","deprecation"})
 public class MemcachedStoreClientImplTest {
 
     private static final String CATEGORY = "mymemcache";

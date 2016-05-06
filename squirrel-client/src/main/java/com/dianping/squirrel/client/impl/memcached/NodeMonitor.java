@@ -353,7 +353,8 @@ public class NodeMonitor {
 		}
 	}
 
-    public void logNode(OperationFuture future) {
+    @SuppressWarnings("rawtypes")
+	public void logNode(OperationFuture future) {
         boolean enableMonitor = enableMonitorServer;
         if (enableMonitor) {
             boolean isHit = random.nextInt(serverMonitorPercent) < 1;
@@ -373,7 +374,8 @@ public class NodeMonitor {
         }
     }
     
-    private MemcachedNode getNode(OperationFuture future) throws Exception {
+    @SuppressWarnings("rawtypes")
+	private MemcachedNode getNode(OperationFuture future) throws Exception {
         if(opField != null && future != null) {
             Operation op = (Operation) opField.get(future);
             if(op != null) {
@@ -383,6 +385,7 @@ public class NodeMonitor {
         return null;
     }
 
+    @SuppressWarnings("rawtypes")
     public void logNode(GetFuture future) {
         boolean enableMonitor = enableMonitorServer;
         if (enableMonitor) {
@@ -403,7 +406,8 @@ public class NodeMonitor {
         }
     }
 
-    private MemcachedNode getNode(GetFuture future) throws Exception {
+    @SuppressWarnings("rawtypes")
+	private MemcachedNode getNode(GetFuture future) throws Exception {
         if(rvField != null && future != null) {
             OperationFuture rv = (OperationFuture) rvField.get(future);
             if(opField != null && rv != null) {
@@ -416,7 +420,8 @@ public class NodeMonitor {
         return null;
     }
 
-    public void logNode(BulkFuture future) {
+    @SuppressWarnings("rawtypes")
+	public void logNode(BulkFuture future) {
         boolean enableMonitor = enableMonitorServerForMget;
         if (enableMonitor) {
             boolean isHit = random.nextInt(serverMonitorPercent) < 1;
@@ -438,9 +443,10 @@ public class NodeMonitor {
         }
     }
 
-    private List<MemcachedNode> getNodes(BulkFuture future) throws Exception {
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+	private List<MemcachedNode> getNodes(BulkFuture future) throws Exception {
         if(opsField != null && future != null) {
-            Collection<Operation> ops = (Collection<Operation>) opsField.get(future);
+			Collection<Operation> ops = (Collection<Operation>) opsField.get(future);
             if(ops != null) {
                 List<MemcachedNode> nodes = new ArrayList<MemcachedNode>(ops.size());
                 for(Operation op : ops) {

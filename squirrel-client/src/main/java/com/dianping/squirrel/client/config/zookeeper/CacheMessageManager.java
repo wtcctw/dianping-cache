@@ -3,11 +3,8 @@ package com.dianping.squirrel.client.config.zookeeper;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.dianping.squirrel.client.config.StoreClientConfigManager;
 import com.dianping.squirrel.client.config.StoreCategoryConfigManager;
+import com.dianping.squirrel.client.config.StoreClientConfigManager;
 import com.dianping.squirrel.client.core.CacheConfigurationListener;
 import com.dianping.squirrel.common.domain.CacheConfigurationDTO;
 import com.dianping.squirrel.common.domain.CacheKeyConfigurationDTO;
@@ -17,8 +14,6 @@ import com.dianping.squirrel.common.util.PathUtils;
 
 public class CacheMessageManager implements CacheConfigurationListener {
 
-    private static Logger logger = LoggerFactory.getLogger(CacheMessageManager.class);
-    
 	private static final CacheMessageManager INSTANCE = new CacheMessageManager();
 
 	private static ConcurrentMap<String, Long> versionChangeMap = new ConcurrentHashMap<String, Long>();

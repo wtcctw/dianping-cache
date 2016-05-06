@@ -1,21 +1,20 @@
 package com.dianping.squirrel.client.impl.redis;
 
-import com.dianping.squirrel.client.impl.Bean;
-import com.dianping.squirrel.common.serialize.HessianSerializer;
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
 
 import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
+import org.junit.Test;
+
+import com.dianping.squirrel.client.impl.Bean;
 
 public class RedisStringTranscoderTest {
 
     @Test
     public void testAll() throws Exception {
         RedisStringTranscoder transcoder = new RedisStringTranscoder();
-        HessianSerializer hs = new HessianSerializer();
         Bean bean = new Bean(12345678, "paasbean");
         // long
         String output = transcoder.encode(12345678L);
@@ -50,7 +49,6 @@ public class RedisStringTranscoderTest {
         Map<String,Bean> mapb = new HashMap<String, Bean>();
         mapb.put("bean",bean);
         output = transcoder.encode(mapb);
-        Map<String,Bean> obm = transcoder.decode(output);
         Map<String, com.dianping.squirrel.client.Bean> obm2 =  transcoder.decode(output);
         for(Map.Entry<String, com.dianping.squirrel.client.Bean> ite: obm2.entrySet()){
             System.out.println(ite.getValue().getName());

@@ -39,8 +39,7 @@ public class TimeMonitor {
 
 	private void init() {
 		timeRangeArray = initRangeArray(timeRangeConfig);
-		Cat.getProducer();
-		Transaction t = Cat.newTransaction("System", "StoreClientStart");
+		Transaction t = Cat.getProducer().newTransaction("System", "StoreClientStart");
 		t.setStatus("0");
 		t.complete();
 	}

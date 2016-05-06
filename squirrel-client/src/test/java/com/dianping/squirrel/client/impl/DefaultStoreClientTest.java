@@ -18,10 +18,6 @@ import com.dianping.squirrel.client.core.StoreCallback;
 
 public class DefaultStoreClientTest extends TestCase {
     
-    private static final String[] CATEGORIES = {
-            "mymemcache", "mydcache", "myredis", "myehcache", "mydanga"
-    };
-    
     static String CATEGORY = "testRedis";
     
     private static final String VALUE = "dp@123456";
@@ -303,9 +299,9 @@ public class DefaultStoreClientTest extends TestCase {
         keys.add(key4);
         keys.add(key5);
         Object result = client.multiGet(keys);
-        assertEquals(4, ((Map)result).size());
-        assertNull(((Map)result).get(key6));
-        assertEquals(new Bean(4, "value4"), ((Map)result).get(key4));
+        assertEquals(4, ((Map<?, ?>)result).size());
+        assertNull(((Map<?, ?>)result).get(key6));
+        assertEquals(new Bean(4, "value4"), ((Map<?, ?>)result).get(key4));
     }
 
     @Test
