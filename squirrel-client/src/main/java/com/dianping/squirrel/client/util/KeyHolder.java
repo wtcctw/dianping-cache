@@ -31,7 +31,7 @@ public class KeyHolder {
     
     public <T> Map<StoreKey, T> convertKeys(Map<String, T> from) {
         if(from ==  null || from.size() == 0)
-            return Collections.EMPTY_MAP;
+            return Collections.emptyMap();
         Map<StoreKey, T> to = new HashMap<StoreKey, T>((int) (from.size() * 1.5));
         for(Map.Entry<String, T> entry : from.entrySet()) {
             StoreKey sk = keyMap.get(entry.getKey());

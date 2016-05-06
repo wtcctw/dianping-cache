@@ -7,9 +7,9 @@ import java.io.Serializable;
 
 public class Bean implements Serializable {
 
+	private static final long serialVersionUID = -3047363560244774655L;
 
-
-    private int id;
+	private int id;
     private String name;
     
     public Bean() {}

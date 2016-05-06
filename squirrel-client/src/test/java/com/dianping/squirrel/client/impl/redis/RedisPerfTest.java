@@ -91,7 +91,7 @@ public class RedisPerfTest {
         StoreClient client = StoreClientFactory.getStoreClient();
         List<StoreKey> keys = getKeys(keyBatch);
         for(int i=0; i<loop; i++) {
-            Map<StoreKey, String> getResult = client.multiGet(keys);
+            client.multiGet(keys);
         }
     }
     
@@ -107,7 +107,7 @@ public class RedisPerfTest {
     private void perfTestAsyncGet(int loop, int keyBatch, int valueSize) throws Exception {
         StoreClient client = StoreClientFactory.getStoreClient();
         List<StoreKey> keys = getKeys(keyBatch);
-        List<String> values = getValues(keyBatch, valueSize);
+        getValues(keyBatch, valueSize);
         final CountDownLatch latch = new CountDownLatch(loop);;
         for(int i=0; i<loop; i++) {
             client.asyncMultiGet(keys, new StoreCallback<Map<StoreKey, String>>() {

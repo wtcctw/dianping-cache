@@ -12,13 +12,12 @@
  */
 package com.dianping.squirrel.client.impl.ehcache;
 
-import java.lang.reflect.Field;
 import java.net.URL;
-
-import net.sf.ehcache.CacheManager;
 
 import com.dianping.squirrel.client.config.StoreClientConfig;
 import com.dianping.squirrel.common.exception.StoreInitializeException;
+
+import net.sf.ehcache.CacheManager;
 
 /**
  * The configuration for ehcache client implementation
@@ -82,8 +81,8 @@ public class EhcacheClientConfig implements StoreClientConfig {
 
 	private void ensureEhcacheVersion() throws StoreInitializeException {
 		try {
-			Class clazz = Class.forName("net.sf.ehcache.constructs.EhcacheDecoratorAdapter");
-			Field field = clazz.getDeclaredField("underlyingCache");
+			Class<?> clazz = Class.forName("net.sf.ehcache.constructs.EhcacheDecoratorAdapter");
+			clazz.getDeclaredField("underlyingCache");
 		} catch (ClassNotFoundException e) {
 			throw new StoreInitializeException(e);
 		} catch (SecurityException e) {

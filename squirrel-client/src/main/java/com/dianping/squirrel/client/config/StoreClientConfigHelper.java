@@ -21,8 +21,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.dianping.squirrel.client.impl.danga.DangaClientConfigParser;
-import com.dianping.squirrel.client.impl.danga.DangaStoreClientImpl;
 import com.dianping.squirrel.client.impl.dcache.DCacheClientConfigParser;
 import com.dianping.squirrel.client.impl.dcache.DCacheStoreClientImpl;
 import com.dianping.squirrel.client.impl.ehcache.EhcacheClientConfigParser;
@@ -42,17 +40,16 @@ import com.dianping.squirrel.common.exception.StoreInitializeException;
  */
 public class StoreClientConfigHelper {
 	private static transient Logger logger = LoggerFactory.getLogger(StoreClientConfigHelper.class);
-	private static Map<Class, StoreClientConfigParser> parserMap = new ConcurrentHashMap<Class, StoreClientConfigParser>();
+	private static Map<Class<?>, StoreClientConfigParser> parserMap = new ConcurrentHashMap<Class<?>, StoreClientConfigParser>();
 
 	static {
 		register(MemcachedStoreClientImpl.class, new MemcachedClientConfigParser());
 		register(EhcacheStoreClientImpl.class, new EhcacheClientConfigParser());
 		register(DCacheStoreClientImpl.class, new DCacheClientConfigParser());
 		register(RedisStoreClientImpl.class, new RedisClientConfigParser());
-		register(DangaStoreClientImpl.class, new DangaClientConfigParser());
 	}
 
-	public static void register(Class clientClazz, StoreClientConfigParser parser) {
+	public static void register(Class<?> clientClazz, StoreClientConfigParser parser) {
 		parserMap.put(clientClazz, parser);
 	}
 
@@ -62,7 +59,7 @@ public class StoreClientConfigHelper {
 	 */
 	public static StoreClientConfig parse(CacheConfigurationDTO detail) throws StoreInitializeException {
 		try {
-			Class clientClazz = Class.forName(detail.getClientClazz());
+			Class<?> clientClazz = Class.forName(detail.getClientClazz());
 			StoreClientConfig config = parserMap.get(clientClazz).parse(detail);
 			config.init();
 			return config;

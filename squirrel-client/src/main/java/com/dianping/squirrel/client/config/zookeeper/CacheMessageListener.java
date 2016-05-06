@@ -193,7 +193,8 @@ public class CacheMessageListener implements CuratorListener {
         return ce;
     }
 
-    public boolean dispatchCacheEvent(CacheEvent ce) {
+    @SuppressWarnings("unchecked")
+	public boolean dispatchCacheEvent(CacheEvent ce) {
         switch (ce.getType()) {
         case VersionChange:
             CacheKeyTypeVersionUpdateDTO versionChange = (CacheKeyTypeVersionUpdateDTO) ce.getContent();

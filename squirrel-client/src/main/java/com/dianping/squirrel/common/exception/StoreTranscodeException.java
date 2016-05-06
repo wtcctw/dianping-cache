@@ -3,7 +3,12 @@ package com.dianping.squirrel.common.exception;
 
 public class StoreTranscodeException extends StoreException {
 
-    public StoreTranscodeException(Throwable e) {
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -1845828517989292628L;
+
+	public StoreTranscodeException(Throwable e) {
         super(e);
     }
 

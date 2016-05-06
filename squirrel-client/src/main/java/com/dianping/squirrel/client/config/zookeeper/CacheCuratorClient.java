@@ -104,7 +104,6 @@ public class CacheCuratorClient {
 	
 	public CacheConfigurationDTO getServiceConfig(String service) throws Exception {
 		if (PathUtils.isZookeeperEnabled() && isZookeeperConnected()) {
-
 			String path;
 			String content = null;
 			String swimlane = Environment.getSwimlane();
