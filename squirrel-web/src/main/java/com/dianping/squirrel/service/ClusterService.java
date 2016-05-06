@@ -1,4 +1,7 @@
-package com.dianping.cache.service;
+package com.dianping.squirrel.service;
+
+import com.dianping.squirrel.cluster.DataNode;
+import com.dianping.squirrel.cluster.redis.Info;
 
 /**
  * hui.wang@dianping.com
@@ -11,4 +14,5 @@ public interface ClusterService {
 //    boolean clusterNodeRemoveSlave(ClusterNode master, ClusterNode slave);
 //    ClusterConfig clusterConfig(String clusterName);
 //    void freeClusterNode(ClusterNode clusterNode);
+    Info getDataNodeInfo(DataNode dataNode);
 }
