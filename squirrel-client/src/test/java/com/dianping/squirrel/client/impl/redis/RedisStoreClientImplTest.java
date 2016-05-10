@@ -1,21 +1,17 @@
 package com.dianping.squirrel.client.impl.redis;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import com.dianping.squirrel.client.StoreClientFactory;
+import com.dianping.squirrel.client.StoreKey;
+import com.dianping.squirrel.client.impl.Bean;
+import com.dianping.squirrel.client.impl.User;
+import org.junit.Test;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.junit.Test;
-
-import com.dianping.squirrel.client.StoreClientFactory;
-import com.dianping.squirrel.client.StoreKey;
-import com.dianping.squirrel.client.impl.Bean;
-import com.dianping.squirrel.client.impl.User;
+import static org.junit.Assert.*;
 
 @SuppressWarnings({"rawtypes","deprecation"})
 public class RedisStoreClientImplTest {
@@ -459,7 +455,7 @@ public class RedisStoreClientImplTest {
         StoreKey key = new StoreKey(CATEGORY, "raw");
         client.delete(key);
 
-        client.setRaw(key,"abc^&*(sdfasfw3");
+        client.setRaw(key,"abc^&*(sdfasfw3",0);
         assertEquals("abc^&*(sdfasfw3",client.getRaw(key));
 
         client.append(key,"def");

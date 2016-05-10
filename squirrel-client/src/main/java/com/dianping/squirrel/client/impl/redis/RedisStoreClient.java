@@ -110,6 +110,17 @@ public interface RedisStoreClient
 	Boolean set(StoreKey key, Object value, int expire) throws StoreException;
 
 	/**
+	 * 设置 Key 对应的值为 Value(当且仅当key不存在),并设置过期时间expire(默认不需要这个,category自带过期时间)
+	 * @param key
+	 * @param value
+	 * @param expire
+	 * @return 如果成功，返回 true<br>
+	 *         如果失败，返回 false
+	 */
+	@Deprecated
+	Boolean add(StoreKey key, Object value, int expire) throws StoreException;
+
+	/**
 	 * 设置 Key 对应的值为 Value，此value不会进行序列化,以原始的方式存入redis
 	 * @param key
 	 * @param value
