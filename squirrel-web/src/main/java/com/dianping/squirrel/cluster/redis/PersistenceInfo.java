@@ -37,7 +37,15 @@ public class PersistenceInfo extends AbstractInfo {
     }
 
     public PersistenceInfo(Map<String,String> infoMap) {
+        super(infoMap);
+    }
 
+    public PersistenceInfo(String info) {
+        super(info);
+    }
+
+    @Override
+    public void init() {
         loading = NumberUtils.toInt(infoMap.get("loading"),0);
         rdb_changes_since_last_save = NumberUtils.toLong(infoMap.get("rdb_changes_since_last_save"),0);
         rdb_bgsave_in_progress = NumberUtils.toInt(infoMap.get("rdb_bgsave_in_progress"),0);
@@ -60,7 +68,6 @@ public class PersistenceInfo extends AbstractInfo {
         aof_pending_bio_fsync = NumberUtils.toInt(infoMap.get("aof_pending_bio_fsync"),0);
         aof_delayed_fsync = NumberUtils.toInt(infoMap.get("aof_delayed_fsync"),0);
     }
-
 
     public int getLoading() {
         return loading;

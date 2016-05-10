@@ -21,7 +21,16 @@ public class MemoryInfo extends AbstractInfo {
         this.infoSegmentName = "memory";
     }
 
+    public MemoryInfo(String info) {
+        super(info);
+    }
+
     public MemoryInfo(Map<String,String> infoMap) {
+        super(infoMap);
+    }
+
+    @Override
+    public void init() {
         used_memory = Long.parseLong(infoMap.get("used_memory"));
         used_memory_human = infoMap.get("used_memory_human");
         used_memory_rss = Long.parseLong(infoMap.get("used_memory_rss"));

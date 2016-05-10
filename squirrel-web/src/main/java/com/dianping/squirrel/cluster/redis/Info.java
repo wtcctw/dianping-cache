@@ -1,10 +1,10 @@
 package com.dianping.squirrel.cluster.redis;
 
+import com.dianping.squirrel.cluster.RedisUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import redis.clients.jedis.Jedis;
 
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -26,14 +26,7 @@ public class Info {
 
     public Info(String info) {
         try {
-            Map<String, String> data = new HashMap<String, String>();
-            String[] infoArray = info.split("\r\n");
-            for (String infoPair : infoArray) {
-                infoPair.trim();
-                String[] each = infoPair.split(":");
-                if (each.length > 1)
-                    data.put(each[0], each[1]);
-            }
+            Map<String,String> data = RedisUtil.parseStringToMap(info);
             cpuInfo = new CPUInfo(data);
             clientsInfo = new ClientsInfo(data);
             keyspaceInfo = new KeyspaceInfo(data);

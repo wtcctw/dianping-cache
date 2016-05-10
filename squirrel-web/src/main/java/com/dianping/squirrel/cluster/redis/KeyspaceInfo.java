@@ -18,7 +18,18 @@ public class KeyspaceInfo extends AbstractInfo {
         this.infoSegmentName = "keyspace";
     }
 
+    public KeyspaceInfo(String info) {
+        super(info);
+        this.infoSegmentName = "keyspace";
+    }
+
     public KeyspaceInfo(Map<String,String> infoMap) {
+       super(infoMap);
+        this.infoSegmentName = "keyspace";
+    }
+
+    @Override
+    public void init() {
         String db0 = infoMap.get("db0");
         if(db0 == null){
             return;

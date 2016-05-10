@@ -545,6 +545,20 @@ public class RedisUtil {
         }
     }
 
+
+    public static Map<String,String> parseStringToMap(String info){
+        Map<String, String> data = new HashMap<String, String>();
+        String[] infoArray = info.split("\r\n");
+        for (String infoPair : infoArray) {
+            infoPair.trim();
+            String[] each = infoPair.split(":");
+            if (each.length > 1)
+                data.put(each[0], each[1]);
+        }
+        return data;
+    }
+
+
     public static ClusterNodeInformation getNodeSlotsInfo(final HostAndPort nodeInfo) {
         checkNotNull(nodeInfo, "nodeInfo is null.");
 

@@ -27,6 +27,15 @@ public class ReplicationInfo extends AbstractInfo{
     private long repl_backlog_histlen;
 
     public ReplicationInfo(Map<String,String> infoMap){
+        super(infoMap);
+    }
+
+    public ReplicationInfo(String info) {
+        super(info);
+    }
+
+    @Override
+    public void init() {
         role = infoMap.get("role");
         repl_backlog_active = Integer.parseInt(infoMap.get("repl_backlog_active"));
         repl_backlog_size = Long.parseLong(infoMap.get("repl_backlog_size"));
@@ -64,9 +73,8 @@ public class ReplicationInfo extends AbstractInfo{
             master_host = infoMap.get("master_host");
             master_port = Integer.parseInt(infoMap.get("master_port"));
         }
-
-
     }
+
     public String getRole() {
         return role;
     }

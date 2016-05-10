@@ -11,22 +11,31 @@ import java.util.Map;
  */
 public class ClientsInfo extends AbstractInfo {
 
-    public ClientsInfo() {
-        this.infoSegmentName = "clients";
-    }
-
-    public ClientsInfo(Map<String,String> infoMap){
-        this.blocked_clients = NumberUtils.toInt(infoMap.get("blocked_clients"),0);
-        this.client_biggest_input_buf = NumberUtils.toInt(infoMap.get("client_biggest_input_buf"),0);
-        this.client_longest_output_list = NumberUtils.toInt(infoMap.get("client_longest_output_list"),0);
-        this.connected_clients = NumberUtils.toInt(infoMap.get("connected_clients"),0);
-    }
-
     private int connected_clients;
     private int client_longest_output_list;
     private int client_biggest_input_buf;
     private int blocked_clients;
     private List<Client> clientList;
+
+    public ClientsInfo() {
+        this.infoSegmentName = "clients";
+    }
+
+    public ClientsInfo(String info){
+        super(info);
+    }
+
+    public ClientsInfo(Map<String,String> infoMap){
+        super(infoMap);
+    }
+
+    @Override
+    public void init() {
+        this.blocked_clients = NumberUtils.toInt(infoMap.get("blocked_clients"),0);
+        this.client_biggest_input_buf = NumberUtils.toInt(infoMap.get("client_biggest_input_buf"),0);
+        this.client_longest_output_list = NumberUtils.toInt(infoMap.get("client_longest_output_list"),0);
+        this.connected_clients = NumberUtils.toInt(infoMap.get("connected_clients"),0);
+    }
 
     public int getConnected_clients() {
         return connected_clients;

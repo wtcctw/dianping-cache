@@ -18,7 +18,16 @@ public class CPUInfo extends AbstractInfo {
         this.infoSegmentName = "cpu";
     }
 
+    public CPUInfo(String info){
+        super(info);
+    }
+
     public CPUInfo(Map<String,String> infoMap){
+        super(infoMap);
+    }
+
+    @Override
+    public void init() {
         this.used_cpu_sys = NumberUtils.toDouble(infoMap.get("used_cpu_sys"),0.0);
         this.used_cpu_user = NumberUtils.toDouble(infoMap.get("used_cpu_user"),0.0);
         this.used_cpu_sys_children = NumberUtils.toDouble(infoMap.get("used_cpu_sys_children"),0.0);

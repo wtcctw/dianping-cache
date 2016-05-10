@@ -28,6 +28,15 @@ public class StatsInfo extends AbstractInfo {
     private int migrate_cached_sockets;
 
     public StatsInfo(Map<String,String> infoMap){
+       super(infoMap);
+    }
+
+    public StatsInfo(String info) {
+        super(info);
+    }
+
+    @Override
+    public void init() {
         total_connections_received = Long.parseLong(infoMap.get("total_connections_received"));
         total_commands_processed = Long.parseLong(infoMap.get("total_commands_processed"));
         instantaneous_ops_per_sec = Long.parseLong(infoMap.get("instantaneous_ops_per_sec"));
