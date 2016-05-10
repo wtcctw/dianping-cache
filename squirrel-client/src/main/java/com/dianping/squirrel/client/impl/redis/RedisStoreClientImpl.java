@@ -248,6 +248,23 @@ public class RedisStoreClientImpl extends AbstractStoreClient implements RedisSt
     }
 
     @Override
+    public Boolean set(StoreKey key, Object value, int expire){
+        checkNotNull(key, "store key is null");
+        checkNotNull(value, "value is null");
+        final StoreCategoryConfig categoryConfig = configManager.findCacheKeyType(key.getCategory());
+        checkNotNull(categoryConfig, "%s's category config is null", key.getCategory());
+        final String finalKey = categoryConfig.getKey(key.getParams());
+        String result;
+        String str = transcoder.encode(value);
+        if (expire > 0) {
+            result = clientManager.getClient().setex(finalKey,expire,str);
+        } else {
+            result = clientManager.getClient().set(finalKey, str);
+        }
+        return OK.equals(result);
+    }
+
+    @Override
     protected Boolean doSet(StoreCategoryConfig categoryConfig, String finalKey, Object value) {
         String result = null;
         String str = transcoder.encode(value);

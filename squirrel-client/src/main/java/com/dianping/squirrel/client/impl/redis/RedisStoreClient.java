@@ -1,5 +1,6 @@
 package com.dianping.squirrel.client.impl.redis;
 
+import com.dianping.squirrel.common.exception.StoreException;
 import redis.clients.jedis.JedisCluster;
 
 import com.dianping.squirrel.client.StoreClient;
@@ -95,7 +96,19 @@ public interface RedisStoreClient
 	 */
 	Long bitCount(StoreKey key);
 
-	
+	/**
+	 * 设置 Key 对应的值为 Value，并设置过期时间expire(默认不需要这个,category自带过期时间), 如果 Key 不存在则添加，如果 Key 已经存在则覆盖
+	 * @param key
+	 * @param value
+	 * @param expire
+     * @return 如果成功，返回 true<br>
+	 *         如果失败，返回 false
+	 *  @throws StoreException 异常都是 StoreException 的子类且是 RuntimeException，可以根据需要捕获相应异常。
+	 *         如：如果需要捕获超时异常，可以捕获 StoreTimeoutException
+     */
+	@Deprecated
+	Boolean set(StoreKey key, Object value, int expire) throws StoreException;
+
 	Boolean setRaw(StoreKey key, Object value);
 
 	<T> T getRaw(StoreKey key);
