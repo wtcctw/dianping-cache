@@ -242,7 +242,7 @@ public class RedisUtil {
             if (idx == -1) {
                 slotList.add(Integer.parseInt(segment));
             } else if (segment.startsWith("[")) { //TODO 正在传输
-                slot.setMigating(true);
+                slot.setMigrating(true);
             } else {
                 int end = Integer.parseInt(segment.substring(idx + 1).trim());
                 int start = Integer.parseInt(segment.substring(0, idx).trim());
