@@ -109,7 +109,14 @@ public interface RedisStoreClient
 	@Deprecated
 	Boolean set(StoreKey key, Object value, int expire) throws StoreException;
 
-	Boolean setRaw(StoreKey key, Object value);
+	/**
+	 * 设置 Key 对应的值为 Value，此value不会进行序列化,以原始的方式存入redis
+	 * @param key
+	 * @param value
+	 * @param expire
+     * @return
+     */
+	Boolean setRaw(StoreKey key, Object value, int expire);
 
 	<T> T getRaw(StoreKey key);
 

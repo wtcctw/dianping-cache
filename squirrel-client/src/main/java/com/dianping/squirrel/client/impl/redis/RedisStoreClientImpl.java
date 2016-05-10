@@ -1779,14 +1779,14 @@ public class RedisStoreClientImpl extends AbstractStoreClient implements RedisSt
 
     // new commands
     @Override
-    public Boolean setRaw(StoreKey key, Object value) {
+    public Boolean setRaw(StoreKey key, Object value ,int expire) {
         checkNotNull(key, "store key is null");
         final StoreCategoryConfig categoryConfig = configManager.findCacheKeyType(key.getCategory());
         checkNotNull(categoryConfig, "%s's category config is null", key.getCategory());
         final String finalKey = categoryConfig.getKey(key.getParams());
         String result;
-        if (categoryConfig.getDurationSeconds() > 0)
-            result = clientManager.getClient().setex(finalKey, categoryConfig.getDurationSeconds(), value.toString());
+        if (expire > 0)
+            result = clientManager.getClient().setex(finalKey, expire, value.toString());
         else
             result = clientManager.getClient().set(finalKey, value.toString());
         return OK.equals(result);
