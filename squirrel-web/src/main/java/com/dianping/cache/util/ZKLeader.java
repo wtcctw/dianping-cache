@@ -46,11 +46,15 @@ public class ZKLeader {
         boolean isleader;
         try {
             isleader = leaderLatch.hasLeadership();
+            leaderLatch.getState().ordinal();
         } catch (Throwable e) {
             logger.error("get leader failed,",e);
             isleader = false;
         }
         return isleader;
     }
+
+
+
 
 }

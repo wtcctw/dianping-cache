@@ -134,9 +134,7 @@ public class RedisUtil {
             }
 
         }
-
         create(clusterNodes);
-        logger.info("create cluster success. ");
         return null;
     }
 
@@ -307,7 +305,7 @@ public class RedisUtil {
 
     public static void create(final Map<HostAndPort,ArrayList<HostAndPort>> clusterNodes) {
         checkArgument(clusterNodes != null && clusterNodes.size() > 0, "invalid clusterNodes.");
-
+        logger.info("Try to create cluster . nodes : " + clusterNodes);
         HostAndPort firstNode = null;
         for (Map.Entry<HostAndPort, ArrayList<HostAndPort>> pair: clusterNodes.entrySet()) {
             HostAndPort masterNodeInfo = pair.getKey();
@@ -345,6 +343,8 @@ public class RedisUtil {
         allocateSlotsToNodes(slots, Lists.newArrayList(clusterNodes.keySet()));
 
         waitForClusterReady(clusterNodes.keySet());
+
+        logger.info("create cluster success. ");
     }
 
 
@@ -498,6 +498,7 @@ public class RedisUtil {
 
 
     public static void allocateSlotsToNodes(final List<Integer> slots, final List<HostAndPort> masterNodes) {
+        logger.info("Try to allocateSlots To MasterNodes. : " + masterNodes);
         int numOfMaster = masterNodes.size();
         int slotsPerNode = slots.size() / numOfMaster;
         int lastSlot = 0;
@@ -516,6 +517,8 @@ public class RedisUtil {
             node.clusterAddSlots(slotArray);
             node.close();
         }
+        logger.info("allocateSlots successed.");
+
     }
 
 
@@ -582,50 +585,5 @@ public class RedisUtil {
                 return -1;
             }
         }
-    }
-
-
-    public static void main(String[] args) {
-        RawDataNode rawDataNode1 = new RawDataNode("10.32.170.233",6379,"1");
-        RawDataNode rawDataNode2 = new RawDataNode("10.32.146.76",6379,"1");
-        RawDataNode rawDataNode3 = new RawDataNode("10.32.120.188",6379,"2");
-        RawDataNode rawDataNode4 = new RawDataNode("10.32.170.232",6379,"2");
-        RawDataNode rawDataNode5 = new RawDataNode("10.32.174.248",6379,"3");
-        RawDataNode rawDataNode6 = new RawDataNode("10.32.171.226",6379,"3");
-        RawDataNode rawDataNode7 = new RawDataNode("10.32.170.231",6379,"4");
-        RawDataNode rawDataNode8 = new RawDataNode("10.32.146.75",6379,"4");
-        RawDataNode rawDataNode9 = new RawDataNode("10.32.120.165",6379,"4");
-        RawDataNode rawDataNode10 = new RawDataNode("10.32.170.230",6379,"4");
-        RawDataNode rawDataNode11 = new RawDataNode("10.32.174.247",6379,"5");
-        RawDataNode rawDataNode12 = new RawDataNode("10.32.171.225",6379,"5");
-        RawDataNode rawDataNode13 = new RawDataNode("10.32.170.229",6379,"5");
-        RawDataNode rawDataNode14 = new RawDataNode("10.32.146.74",6379,"5");
-        RawDataNode rawDataNode15 = new RawDataNode("10.32.120.164",6379,"6");
-        RawDataNode rawDataNode16 = new RawDataNode("10.32.170.228",6379,"7");
-        RawDataNode rawDataNode17 = new RawDataNode("10.32.174.246",6379,"7");
-        RawDataNode rawDataNode18 = new RawDataNode("10.32.171.224",6379,"8");
-
-        List<RawDataNode> rawDataNodes = new ArrayList<RawDataNode>();
-        rawDataNodes.add(rawDataNode1 );
-        rawDataNodes.add(rawDataNode2 );
-        rawDataNodes.add(rawDataNode3 );
-        rawDataNodes.add(rawDataNode4 );
-        rawDataNodes.add(rawDataNode5 );
-        rawDataNodes.add(rawDataNode6 );
-        rawDataNodes.add(rawDataNode7 );
-        rawDataNodes.add(rawDataNode8 );
-        rawDataNodes.add(rawDataNode9 );
-        rawDataNodes.add(rawDataNode10 );
-        rawDataNodes.add(rawDataNode11 );
-        rawDataNodes.add(rawDataNode12 );
-        rawDataNodes.add(rawDataNode13 );
-        rawDataNodes.add(rawDataNode14 );
-        rawDataNodes.add(rawDataNode15 );
-        rawDataNodes.add(rawDataNode16 );
-        rawDataNodes.add(rawDataNode17 );
-        rawDataNodes.add(rawDataNode18 );
-
-        createCluster(rawDataNodes,6,2);
-
     }
 }

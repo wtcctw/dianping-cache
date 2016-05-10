@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.dianping.squirrel.dao.HulkClusterConfigDao">
+
+    <resultMap id="ConfigResult" type="HulkClusterConfig">
+        <result column="id" property="id"/>
+        <result column="clusterName" property="clusterName"/>
+        <result column="appKey" property="appKey"/>
+        <result column="authToken" property="authToken"/>
+        <result column="memoryQuota" property="memoryQuota"/>
+        <result column="createTime" property="createTime"/>
+        <result column="updateTime" property="updateTime"/>
+    </resultMap>
+
+    <insert id="insert" parameterType="HulkClusterConfig">
+        INSERT INTO hulk_cluster_config(clusterName,appKey,authToken,memoryQuota,createTime, updateTime)
+        VALUES(#{clusterName}, #{appKey},#{authToken},#{memoryQuota},#{createTime},#{updateTime})
+    </insert>
+
+    <update id="update" parameterType="HulkClusterConfig">
+        UPDATE hulk_cluster_config
+        SET appKey=#{appKey},authToken=#{authToken},memoryQuota=#{memoryQuota},updateTime=#{updateTime}
+        WHERE clusterName=#{clusterName}
+    </update>
+
+    <delete id="delete" parameterType="HulkClusterConfig">
+        DELETE FROM hulk_cluster_config
+        WHERE clusterName=#{clusterName}
+    </delete>
+
+    <select id="find" resultMap="ConfigResult" parameterType="String">
+        SELECT id,clusterName,appKey,authToken,memoryQuota,createTime, updateTime
+        FROM hulk_cluster_config
+        WHERE clusterName = #{clusterName}
+    </select>
+
+    <select id="findAll" resultMap="ConfigResult">
+        SELECT id,clusterName,appKey,authToken,memoryQuota,createTime, updateTime
+        FROM hulk_cluster_config
+        ORDER BY id ASC
+    </select>
+
+</mapper>

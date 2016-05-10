@@ -2,6 +2,10 @@ package com.dianping.squirrel.service;
 
 import com.dianping.squirrel.cluster.DataNode;
 import com.dianping.squirrel.cluster.redis.Info;
+import com.dianping.squirrel.entity.HulkClusterConfig;
+import com.dianping.squirrel.vo.ScaleParams;
+
+import java.util.List;
 
 /**
  * hui.wang@dianping.com
@@ -15,4 +19,7 @@ public interface ClusterService {
 //    ClusterConfig clusterConfig(String clusterName);
 //    void freeClusterNode(ClusterNode clusterNode);
     Info getDataNodeInfo(DataNode dataNode);
+    HulkClusterConfig getHulkClusterConfig(String clusterName);
+    List<HulkClusterConfig> getAllHulkClusterConfig();
+    int createCluter(ScaleParams scaleParams);
 }
