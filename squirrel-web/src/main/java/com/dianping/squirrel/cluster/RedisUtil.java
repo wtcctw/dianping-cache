@@ -40,16 +40,16 @@ public class RedisUtil {
     public static final String COLON_SEPARATOR = ":";
 
 
-    public static Cluster createCluster(List<RawDataNode> rawDataNodes,int masterCount, int slaveCount){
+    public static boolean createClusterInOneZone(List<RawDataNode> rawDataNodes,int masterCount, int slaveCount){
         if(rawDataNodes == null || rawDataNodes.size() != (slaveCount + 1) * masterCount){
             logger.error("create cluster failed, wrong number of redis nodes .",rawDataNodes);
-            return null;
+            return false;
         }
 
         for(RawDataNode rawDataNode : rawDataNodes){
             if(!isRedisAvailable(rawDataNode.getIp(),rawDataNode.getPort(),10000)){
                 logger.error("create cluster failed, timeout for waiting redis node available",rawDataNode);
-                return null;
+                return false;
             }
         }
 
@@ -75,7 +75,7 @@ public class RedisUtil {
 
         if(sorted.size() < clusterNodeCount){
             logger.error("create cluster failed, multi master will meeting in on host!");
-            return null;
+            return false;
         }
 
         int index = 0;
@@ -135,7 +135,7 @@ public class RedisUtil {
 
         }
         create(clusterNodes);
-        return null;
+        return true;
     }
 
 

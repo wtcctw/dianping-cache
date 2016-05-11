@@ -21,5 +21,5 @@ public interface ClusterService {
     Info getDataNodeInfo(DataNode dataNode);
     HulkClusterConfig getHulkClusterConfig(String clusterName);
     List<HulkClusterConfig> getAllHulkClusterConfig();
-    int createCluter(ScaleParams scaleParams);
+    void createCluter(ScaleParams scaleParams);
 }

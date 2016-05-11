@@ -1,14 +1,16 @@
 package com.dianping.squirrel.vo.hulk;
 
+import com.dianping.squirrel.vo.Instance;
+
 /**
  * hui.wang@dianping.com
  * Created by hui.wang on 16/5/10.
  */
-public class HulkInstance {
+public class HulkInstance implements Instance{
     private String name;
     private String ip;
-    private String host;
     private String hostIp;
+    private String host;
     private String router;
 
     public String getName() {

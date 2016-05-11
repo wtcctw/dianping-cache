@@ -19,6 +19,11 @@ public class RawDataNode implements Comparator<RawDataNode>{
         this.hostIp = hostIp;
     }
 
+    public RawDataNode(String ip, String hostIp){
+        this(ip,6379,hostIp);
+    }
+
+
     public String getIp() {
         return ip;
     }

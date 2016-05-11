@@ -13,8 +13,6 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.URLConnection;
-import java.util.List;
 import java.util.Map;
 
 public class RequestUtil {
@@ -50,17 +48,22 @@ public class RequestUtil {
      * @return URL 所代表远程资源的响应结果
      */
     public static String sendGet(String url, String param) {
+        return sendGet(url,param,null).getContent();
+    }
+
+    public static HTTPResponse sendGet(String url, String param, Map<String,String> properties) {
         String result = "";
         BufferedReader in = null;
+        HTTPResponse response = new HTTPResponse();
         try {
-        	String urlNameString = url;
-        	
-        	if(param != null)
-        		urlNameString = urlNameString + "?" + param;
-        		
+            String urlNameString = url;
+
+            if(param != null)
+                urlNameString = urlNameString + "?" + param;
+
             URL realUrl = new URL(urlNameString);
             // 打开和URL之间的连接
-            URLConnection connection = realUrl.openConnection();
+            HttpURLConnection connection = (HttpURLConnection)realUrl.openConnection();
             // 设置通用的请求属性
             connection.setConnectTimeout(1000);
             connection.setReadTimeout(5000);
@@ -68,21 +71,30 @@ public class RequestUtil {
             connection.setRequestProperty("connection", "Keep-Alive");
             connection.setRequestProperty("user-agent",
                     "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1;SV1)");
+            if(properties != null){
+                for(Map.Entry<String,String> entry : properties.entrySet()){
+                    connection.setRequestProperty(entry.getKey(),entry.getValue());
+                }
+            }
             // 建立实际的连接
             connection.connect();
-            // 获取所有响应头字段
-            Map<String, List<String>> map = connection.getHeaderFields();
-           
-            // 定义 BufferedReader输入流来读取URL的响应
-            in = new BufferedReader(new InputStreamReader(
-                    connection.getInputStream()));
+            int responseCode = connection.getResponseCode();
+            response.setCode(responseCode);
+            if(responseCode != 200){
+                in = new BufferedReader(
+                        new InputStreamReader(connection.getErrorStream()));
+
+            } else {
+                in = new BufferedReader(
+                        new InputStreamReader(connection.getInputStream()));
+            }
             String line;
             while ((line = in.readLine()) != null) {
                 result += line;
             }
+            response.setContent(result);
         } catch (Exception e) {
-            System.out.println("发送GET请求出现异常！" + e);
-            e.printStackTrace();
+            logger.error("sent get method error.",e);
         }
         // 使用finally块来关闭输入流
         finally {
@@ -94,7 +106,7 @@ public class RequestUtil {
                 e2.printStackTrace();
             }
         }
-        return result;
+        return response;
     }
 
     /**
@@ -107,12 +119,13 @@ public class RequestUtil {
      * @return 所代表远程资源的响应结果
      */
     public static String sendPost(String url, String param) {
-        return sendPost(url,param,null);
+        return sendPost(url,param,null).getContent();
     }
 
-    public static String sendPost(String url, String param, Map<String,String> properties) {
+    public static HTTPResponse sendPost(String url, String param, Map<String,String> properties) {
         PrintWriter out = null;
         BufferedReader in = null;
+        HTTPResponse response = new HTTPResponse();
         String result = "";
         try {
             URL realUrl = new URL(url);
@@ -136,16 +149,21 @@ public class RequestUtil {
             out.print(param);
             out.flush();
 
-            int response = conn.getResponseCode();
-            if(response != 200){
-                throw new Exception("err response :" + response);
+            int responseCode = conn.getResponseCode();
+            response.setCode(responseCode);
+            if(responseCode != 200){
+                in = new BufferedReader(
+                        new InputStreamReader(conn.getErrorStream()));
+
+            } else {
+                in = new BufferedReader(
+                        new InputStreamReader(conn.getInputStream()));
             }
-            in = new BufferedReader(
-                    new InputStreamReader(conn.getInputStream()));
             String line;
             while ((line = in.readLine()) != null) {
                 result += line;
             }
+            response.setContent(result);
         } catch (Exception e) {
             logger.error("send post error" , e);
         }
@@ -162,6 +180,39 @@ public class RequestUtil {
                 ex.printStackTrace();
             }
         }
-        return result;
+        return response;
     }
+
+    public static class HTTPResponse {
+        private int code;
+        private String content;
+
+        public int getCode() {
+            return code;
+        }
+
+        public void setCode(int code) {
+            this.code = code;
+        }
+
+        public String getContent() {
+            return content;
+        }
+
+        public void setContent(String content) {
+            this.content = content;
+        }
+
+        @Override
+        public String toString() {
+            return "HTTPResponse{" +
+                    "code=" + code +
+                    ", content='" + content + '\'' +
+                    '}';
+        }
+    }
+
+
+
+
 }

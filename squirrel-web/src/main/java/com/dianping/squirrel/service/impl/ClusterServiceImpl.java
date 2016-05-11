@@ -1,13 +1,11 @@
 package com.dianping.squirrel.service.impl;
 
 import com.dianping.cache.dao.OperationLogDao;
-import com.dianping.cache.entity.OperationLog;
-import com.dianping.cache.util.RequestUtil;
 import com.dianping.squirrel.cluster.DataNode;
 import com.dianping.squirrel.cluster.redis.Info;
 import com.dianping.squirrel.dao.HulkClusterConfigDao;
 import com.dianping.squirrel.entity.HulkClusterConfig;
-import com.dianping.squirrel.service.CloudApiService;
+import com.dianping.squirrel.service.HulkApiService;
 import com.dianping.squirrel.service.ClusterService;
 import com.dianping.squirrel.vo.ScaleParams;
 import org.slf4j.Logger;
@@ -16,7 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import redis.clients.jedis.Jedis;
 
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -32,7 +29,7 @@ public class ClusterServiceImpl implements ClusterService {
     private HulkClusterConfigDao hulkClusterConfigDao;
 
     @Autowired
-    private CloudApiService cloudApiService;
+    private HulkApiService cloudApiService;
 
     @Autowired
     private OperationLogDao operationLogDao;
@@ -43,15 +40,19 @@ public class ClusterServiceImpl implements ClusterService {
     }
 
     @Override
-    public int createCluter(ScaleParams scaleParams) {
-        int rescode = cloudApiService.scaleOut(scaleParams);
-        OperationLog operationLog = new OperationLog();
-        operationLog.setContent("create cluster. " + scaleParams);
-        operationLog.setOperateTime(new Date());
-        operationLog.setOperator(RequestUtil.getUsername());
-        operationLogDao.create(operationLog);
+    public void createCluter(ScaleParams scaleParams) {
+        //check cluster is exist?
 
-        return rescode;
+        // if master slave in one zone
+            // get master slave number,zone -> scale;
+            // int rescode = cloudApiService.scaleOut(scaleParams);
+            // Result = cloudApiService.scaleOut(scaleParams,rescode);
+            // createInOneZone(Result)
+        // else
+            // get master number , zone  ->   scale;
+            // get slave number , zone -> scale;
+            // create()
+
     }
 
     @Override
