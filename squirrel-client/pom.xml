@@ -1,21 +1,26 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-	<modelVersion>4.0.0</modelVersion>
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
 
-	<parent>
-		<groupId>com.dianping.squirrel</groupId>
-		<artifactId>squirrel-parent</artifactId>
-		<version>2.0.0-SNAPSHOT</version>
-	</parent>
+    <parent>
+        <groupId>com.dianping.squirrel</groupId>
+        <artifactId>squirrel-parent</artifactId>
+        <version>2.0.0-SNAPSHOT</version>
+    </parent>
 
-	<groupId>com.dianping.squirrel</groupId>
-	<artifactId>squirrel-client</artifactId>
-	<packaging>jar</packaging>
-	<version>2.0.0-SNAPSHOT</version>
+    <groupId>com.dianping.squirrel</groupId>
+    <artifactId>squirrel-client</artifactId>
+    <packaging>jar</packaging>
+    <version>2.0.0-SNAPSHOT</version>
 
-	<name>squirrel-client</name>
-	
-	<dependencies>
+    <name>squirrel-client</name>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.dianping.dpsf</groupId>
+            <artifactId>dpsf-net</artifactId>
+            <scope>provided</scope>
+        </dependency>
         <dependency>
             <groupId>org.mortbay.jetty</groupId>
             <artifactId>servlet-api</artifactId>
@@ -23,11 +28,15 @@
         </dependency>
         <dependency>
             <groupId>com.dianping.cat</groupId>
-            <artifactId>cat-client</artifactId>
+            <artifactId>cat-core</artifactId>
         </dependency>
         <dependency>
             <groupId>com.dianping.lion</groupId>
             <artifactId>lion-client</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.dianping</groupId>
+            <artifactId>avatar-tracker</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
@@ -115,8 +124,8 @@
             <artifactId>slf4j-api</artifactId>
         </dependency>
     </dependencies>
-	
-	<build>
+
+    <build>
         <resources>
             <resource>
                 <directory>src/main/java</directory>
@@ -133,5 +142,5 @@
             </resource>
         </resources>
     </build>
-    
+
 </project>
