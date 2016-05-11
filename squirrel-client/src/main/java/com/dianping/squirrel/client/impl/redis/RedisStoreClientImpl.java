@@ -94,7 +94,8 @@ public class RedisStoreClientImpl extends AbstractStoreClient implements RedisSt
         AuthManager.getInstance().authorize(client, resource);
     }
     
-    protected <T> T executeWithMonitor(Command command, StoreCategoryConfig categoryConfig, String finalKey, String action) {
+    @SuppressWarnings("unchecked")
+	protected <T> T executeWithMonitor(Command command, StoreCategoryConfig categoryConfig, String finalKey, String action) {
         String storeType = categoryConfig.getCacheType();
         String category = categoryConfig.getCategory();
         
@@ -109,8 +110,7 @@ public class RedisStoreClientImpl extends AbstractStoreClient implements RedisSt
         int second = (int) (begin / 1000000000 % 60) + 1;
         try {
             Cat.getProducer().logEvent("Squirrel." + storeType + ".qps", "S"+second);
-            Object result = command.execute();
-            return (T) result;
+            return (T) command.execute();
         } catch (JedisConnectionException e) {
             StoreException se = logConnError(category, e);
             if (t != null) {
@@ -191,7 +191,8 @@ public class RedisStoreClientImpl extends AbstractStoreClient implements RedisSt
         return se;
     }
     
-    protected <T> T executeWithMonitor(Command command, StoreCategoryConfig categoryConfig, List<String> keys, String action) {
+    @SuppressWarnings("unchecked")
+	protected <T> T executeWithMonitor(Command command, StoreCategoryConfig categoryConfig, List<String> keys, String action) {
         String storeType = categoryConfig.getCacheType();
         String category = categoryConfig.getCategory();
 
@@ -206,8 +207,7 @@ public class RedisStoreClientImpl extends AbstractStoreClient implements RedisSt
         int second = (int) (begin / 1000000000 % 60) + 1;
         try {
             Cat.getProducer().logEvent("Squirrel." + storeType + ".qps", "S" + second);
-            Object result = command.execute();
-            return (T) result;
+            return (T) command.execute();
         } catch (JedisConnectionException e) {
             StoreException se = logConnError(category, e);
             if (t != null) {
@@ -1792,7 +1792,8 @@ public class RedisStoreClientImpl extends AbstractStoreClient implements RedisSt
         return OK.equals(result);
     }
 
-    @Override
+	@Override
+	@SuppressWarnings("unchecked")
     public <T> T getRaw(StoreKey key) {
         checkNotNull(key, "store key is null");
         final StoreCategoryConfig categoryConfig = configManager.findCacheKeyType(key.getCategory());
