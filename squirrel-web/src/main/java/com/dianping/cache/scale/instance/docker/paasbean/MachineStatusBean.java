@@ -9,7 +9,7 @@ public class MachineStatusBean {
 	private int version;
 
 	private int cpu;
-	
+
 	private List<Integer> coresFree = new ArrayList<Integer>();
 
 	private String ip;
@@ -33,9 +33,9 @@ public class MachineStatusBean {
 	private long keyId;
 
 	private long memoryFree;
-	
+
 	private String zone;
-	
+
 	private long diskFree;
 
 	private int instanceNum;

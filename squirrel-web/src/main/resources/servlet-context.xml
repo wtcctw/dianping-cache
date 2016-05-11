@@ -14,7 +14,6 @@
 
 	<mvc:interceptors>
 		<mvc:interceptor>
-			<mvc:mapping path="/"/>
 			<mvc:mapping path="/cache/*"/>
 			<mvc:mapping path="/cache/config/edit"/>
 			<mvc:mapping path="/cache/config/new"/>
@@ -34,6 +33,10 @@
 			<mvc:mapping path="/event"/>
 			<mvc:mapping path="/task"/>
 
+			<!--  refactor  -->
+			<mvc:mapping path="/"/>
+			<mvc:mapping path="/consumer/*"/>
+			<mvc:mapping path="/log/*"/>
 
 			<bean class="com.dianping.squirrel.view.ModelAndViewInterceptor">
 			</bean>
@@ -54,10 +57,6 @@
 		<property name="suffix" value=".htm" />
 		<property name="mappings">
 			<map>
-				<entry key="cache/*" value="layout/layoutcache.htm" />
-				<entry key="monitor/*" value="layout/layoutcache.htm" />
-				<entry key="alarm/*" value="layout/layoutcache.htm" />
-				<entry key="cluster/*" value="layout/layoutcache.htm" />
 				<entry key="*" value="layout/layoutcache.htm" />
 			</map>
 		</property>

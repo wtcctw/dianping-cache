@@ -90,7 +90,7 @@ public class RedisController extends AbstractSidebarController{
 		return new ModelAndView("monitor/redisserverinfo",createViewMap());
 	}
 
-	
+
 	@RequestMapping(value = "/redis")
 	public ModelAndView redis(){
 		subside = "redis";
